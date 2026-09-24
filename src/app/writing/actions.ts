@@ -244,23 +244,6 @@ export async function evaluateWritingAction(
         },
       });
 
-      for (const item of observed) {
-        await tx.writingTarget.upsert({
-          where: {
-            writingSessionId_lexemeId: {
-              writingSessionId: session.id,
-              lexemeId: item.id,
-            },
-          },
-          create: {
-            writingSessionId: session.id,
-            lexemeId: item.id,
-            position: session.targets.length + lexicalContext.indexOf(item),
-          },
-          update: {},
-        });
-      }
-
       for (const item of lexicalContext) {
         const usage = usageById.get(item.id);
         if (!usage?.used) continue;

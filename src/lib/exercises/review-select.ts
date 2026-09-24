@@ -12,19 +12,34 @@ const reviewFormats: ExerciseType[] = [
   "PARAPHRASE",
 ];
 
+const productionFormats: ExerciseType[] = [
+  "COLLOCATION",
+  "CASE_PREPOSITION",
+  "FREE_SENTENCE",
+  "PARAPHRASE",
+];
+
 export function selectReviewExerciseType(
   snapshot: LearnerSnapshot,
   recentTypes: ExerciseType[],
 ) {
   const preferred = selectExerciseType(snapshot);
+  const recentlyUsed = recentTypes.slice(0, 2);
+
+  if (
+    snapshot.recognition >= 0.75 &&
+    snapshot.meaningRecall >= 0.75
+  ) {
+    const hard = productionFormats.find((type) => !recentlyUsed.includes(type));
+    if (hard) return hard;
+  }
+
   if (!recentTypes.includes(preferred)) return preferred;
 
-  const suitable = reviewFormats.filter((type) => !recentTypes.slice(0, 2).includes(type));
+  const suitable = reviewFormats.filter((type) => !recentlyUsed.includes(type));
 
   if (snapshot.production < 0.5) {
-    return suitable.find((type) =>
-      ["FREE_SENTENCE", "PARAPHRASE", "COLLOCATION", "CASE_PREPOSITION"].includes(type),
-    ) ?? preferred;
+    return suitable.find((type) => productionFormats.includes(type)) ?? preferred;
   }
 
   return suitable[0] ?? preferred;

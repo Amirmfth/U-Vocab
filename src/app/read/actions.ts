@@ -142,6 +142,7 @@ export async function createReadingDocument(
             readingDocumentId: created.id,
             lexemeId: lexeme.id,
             surfaceText: unit.surfaceText,
+            surfaceForms: unit.surfaceForms,
             occurrences: unit.occurrences,
             position: position++,
           },

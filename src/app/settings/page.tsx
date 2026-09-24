@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/current-user";
-import { updateTranslationPreference } from "./actions";
+import { SettingsForm } from "./SettingsForm";
 
 export const dynamic = "force-dynamic";
 
@@ -7,28 +7,17 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
 
   return (
-    <main>
-      <div className="hero">
-        <p className="muted">PREFERENCES</p>
-        <h1 style={{ fontSize: "3rem" }}>Settings</h1>
-        <p className="muted">
-          Choose which translations U-Vocab reveals during learning.
+    <main className="page">
+      <section className="page-header compact">
+        <p className="eyebrow">PREFERENCES</p>
+        <h1>Settings</h1>
+        <p className="page-description">
+          Choose which translation language U-Vocab reveals throughout
+          learning, review, and practice.
         </p>
-      </div>
+      </section>
 
-      <form action={updateTranslationPreference} className="card" style={{ maxWidth: 620 }}>
-        <label htmlFor="translation">Translation language</label>
-        <select
-          id="translation"
-          name="translation"
-          defaultValue={user.preferredTranslation}
-        >
-          <option value="ENGLISH">English</option>
-          <option value="PERSIAN">Persian</option>
-          <option value="BOTH">English + Persian</option>
-        </select>
-        <button className="button" type="submit">Save preference</button>
-      </form>
+      <SettingsForm preference={user.preferredTranslation} />
     </main>
   );
 }

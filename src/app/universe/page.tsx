@@ -1,16 +1,17 @@
+import { connection } from "next/server";
 import { Network } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getUniverseBranch } from "@/lib/universe";
 import { UniverseGraph } from "./UniverseGraph";
 
-export const dynamic = "force-dynamic";
 
 export default async function UniversePage({
   searchParams,
 }: {
   searchParams: Promise<{ root?: string }>;
 }) {
+  await connection();
   const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
 
   const requested = params.root

@@ -184,24 +184,16 @@ export async function completeConversationAction(
         },
       });
 
-      for (const target of session.targets) {
-        await tx.encounter.upsert({
-          where: {
-            userId_lexemeId_source_sourceRef: {
-              userId: user.id,
-              lexemeId: target.lexemeId,
-              source: session.kind === "MISSION" ? "mission" : "conversation",
-              sourceRef: session.id,
-            },
-          },
-          create: {
+      if (session.targets.length) {
+        await tx.encounter.createMany({
+          data: session.targets.map((target) => ({
             userId: user.id,
             lexemeId: target.lexemeId,
             source: session.kind === "MISSION" ? "mission" : "conversation",
             sourceRef: session.id,
             context: session.scenario,
-          },
-          update: {},
+          })),
+          skipDuplicates: true,
         });
       }
     });

@@ -3,6 +3,7 @@ import { TriangleAlert } from "lucide-react";
 import { db } from "@/lib/db";
 import { formatCompactNumber, formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/lib/current-user";
+import { localDateKey } from "@/lib/progress";
 import {
   groupUsageBy,
   summarizeUsage,
@@ -30,12 +31,6 @@ function periodStart(days: number | null) {
   return value;
 }
 
-function startOfToday() {
-  const value = new Date();
-  value.setHours(0, 0, 0, 0);
-  return value;
-}
-
 function money(value: number | null) {
   if (value === null) return "Unknown";
   if (value === 0) return "$0.00";
@@ -55,6 +50,15 @@ function percent(value: number) {
 
 function decimal(value: { toString(): string } | null | undefined) {
   return value == null ? null : Number(value.toString());
+}
+
+function aggregateCost(input: {
+  _sum: { totalCost: { toString(): string } | null };
+  _count: { _all: number; totalCost: number };
+}) {
+  if (input._count._all === 0) return 0;
+  if (input._count.totalCost === 0) return null;
+  return decimal(input._sum.totalCost);
 }
 
 function toAnalyticsEvent(event: {
@@ -98,7 +102,9 @@ export default async function UsagePage({
   const selectedStart = periodStart(PERIOD_DAYS[period]);
   const sevenDaysAgo = periodStart(7)!;
   const thirtyDaysAgo = periodStart(30)!;
-  const today = startOfToday();
+  const now = new Date();
+  const todayKey = localDateKey(now, user.timezone);
+  const recentForToday = new Date(now.getTime() - 36 * 60 * 60 * 1000);
 
   const where = {
     userId: user.id,
@@ -122,21 +128,24 @@ export default async function UsagePage({
     filteredRows,
     recent,
   ] = await Promise.all([
-    db.aiUsageEvent.aggregate({
-      where: { userId: user.id, createdAt: { gte: today } },
-      _sum: { totalCost: true },
+    db.aiUsageEvent.findMany({
+      where: { userId: user.id, createdAt: { gte: recentForToday } },
+      select: { totalCost: true, createdAt: true },
     }),
     db.aiUsageEvent.aggregate({
       where: { userId: user.id, createdAt: { gte: sevenDaysAgo } },
       _sum: { totalCost: true },
+      _count: { _all: true, totalCost: true },
     }),
     db.aiUsageEvent.aggregate({
       where: { userId: user.id, createdAt: { gte: thirtyDaysAgo } },
       _sum: { totalCost: true },
+      _count: { _all: true, totalCost: true },
     }),
     db.aiUsageEvent.aggregate({
       where: { userId: user.id },
       _sum: { totalCost: true },
+      _count: { _all: true, totalCost: true },
     }),
     db.aiUsageEvent.aggregate({
       where: { userId: user.id },
@@ -207,6 +216,19 @@ export default async function UsagePage({
     }),
   ]);
 
+  const todayRows = todayCost.filter(
+    (event) => localDateKey(event.createdAt, user.timezone) === todayKey,
+  );
+  const todayPriced = todayRows
+    .map((event) => decimal(event.totalCost))
+    .filter((value): value is number => value !== null);
+  const todayValue =
+    todayRows.length === 0
+      ? 0
+      : todayPriced.length
+        ? todayPriced.reduce((sum, value) => sum + value, 0)
+        : null;
+
   const analyticsRows = filteredRows.map(toAnalyticsEvent);
   const selectedSummary = summarizeUsage(analyticsRows);
   const byOperation = groupUsageBy(analyticsRows, "operation");
@@ -237,10 +259,10 @@ export default async function UsagePage({
 
       <section className="usage-cost-grid" aria-label="AI cost summary">
         {[
-          ["Today", decimal(todayCost._sum.totalCost)],
-          ["7 days", decimal(sevenDayCost._sum.totalCost)],
-          ["30 days", decimal(thirtyDayCost._sum.totalCost)],
-          ["All time", decimal(allTimeCost._sum.totalCost)],
+          ["Today", todayValue],
+          ["7 days", aggregateCost(sevenDayCost)],
+          ["30 days", aggregateCost(thirtyDayCost)],
+          ["All time", aggregateCost(allTimeCost)],
         ].map(([label, value]) => (
           <article className="panel usage-cost-card" key={String(label)}>
             <span>{label}</span>

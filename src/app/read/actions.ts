@@ -150,7 +150,13 @@ export async function createReadingDocument(
       }
 
       return created;
-    });
+    }, {
+      // Reading analysis can contain up to 120 lexical units with dependent writes.
+      // Keep the document import atomic without Prisma closing its default 5-second transaction.
+      maxWait: 10_000,
+      timeout: 60_000,
+    },
+    );
 
     revalidatePath("/read");
 

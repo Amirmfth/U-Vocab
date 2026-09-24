@@ -41,6 +41,10 @@ export async function evaluatePractice(
   const prompt = String(formData.get("prompt") ?? "");
   const expected = String(formData.get("expected") ?? "").trim();
   const requiresAI = String(formData.get("requiresAI")) === "true";
+  const startedAt = Number(formData.get("startedAt"));
+  const durationMs = Number.isFinite(startedAt) && startedAt > 0
+    ? Math.max(0, Math.min(Date.now() - startedAt, 30 * 60 * 1000))
+    : null;
 
   if (!userVocabularyId || !answer || !exerciseType || !prompt) {
     return { status: "error", feedback: "The exercise submission is incomplete." };
@@ -122,6 +126,7 @@ export async function evaluatePractice(
       correct: evaluation.correct,
       score: evaluation.score,
       feedback: evaluation.feedback,
+      durationMs,
     },
   });
 

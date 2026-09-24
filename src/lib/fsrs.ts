@@ -37,6 +37,11 @@ function jsonCard(card: Card): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(card)) as Prisma.InputJsonValue;
 }
 
+export function currentRetrievability(savedCard: unknown, now = new Date()) {
+  const card = hydrateCard(savedCard, now);
+  return scheduler.get_retrievability(card, now, false);
+}
+
 export function scheduleReview(
   savedCard: unknown,
   grade: ReviewGrade,

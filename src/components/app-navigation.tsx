@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3, BookOpen, BookOpenText, Brain, FileUp, Home, Layers3, Plus, ScanText,
-  Settings, Sparkles, TriangleAlert, type LucideIcon,
+  Settings, Sparkles, TrendingUp, TriangleAlert, type LucideIcon,
 } from "lucide-react";
 
 const primary = [
@@ -20,6 +20,7 @@ const explore = [
   { href: "/import", label: "Import", icon: FileUp },
 ];
 const more = [
+  { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/mistakes", label: "Mistakes", icon: TriangleAlert },
   { href: "/usage", label: "Usage", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },

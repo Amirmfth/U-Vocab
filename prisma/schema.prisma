@@ -82,6 +82,7 @@ model User {
   email                String              @unique
   preferredTranslation TranslationLanguage @default(ENGLISH)
   targetLevel          String              @default("B2")
+  timezone             String              @default("UTC")
   vocabulary           UserVocabulary[]
   attempts             Attempt[]
   mistakes             Mistake[]
@@ -178,6 +179,7 @@ model UserVocabulary {
   stability       Float?
   retrievability  Float?
   nextReviewAt    DateTime?
+  masteredAt      DateTime?
   fsrsCard        Json?
   addedAt         DateTime        @default(now())
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -213,6 +215,7 @@ model Attempt {
   correct          Boolean
   score            Float?
   feedback         String?
+  durationMs       Int?
   createdAt        DateTime        @default(now())
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userVocabulary   UserVocabulary? @relation(fields: [userVocabularyId], references: [id], onDelete: SetNull)

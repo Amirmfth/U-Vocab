@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenText, FileUp, Layers3, Plus, ScanText } from "lucide-react";
+import { ArrowRight, BookOpenText, FileUp, Layers3, Plus, ScanText, TrendingUp } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -52,6 +52,9 @@ export default async function Home() {
         </Link>
         <Link href="/import" className="discovery-link">
           <FileUp size={20} /><span>Import</span><ArrowRight size={17} />
+        </Link>
+        <Link href="/progress" className="discovery-link">
+          <TrendingUp size={20} /><span>Progress</span><ArrowRight size={17} />
         </Link>
       </section>
     </main>

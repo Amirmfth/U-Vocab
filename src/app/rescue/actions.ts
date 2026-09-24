@@ -12,18 +12,18 @@ function safeDuration(value: FormDataEntryValue | null) {
   return Math.max(0, Math.min(Date.now() - startedAt, 30 * 60 * 1000));
 }
 
-export async function submitReview(formData: FormData) {
+export async function submitRescueReview(formData: FormData) {
   const id = String(formData.get("userVocabularyId") ?? "");
   const grade = String(formData.get("grade") ?? "") as ReviewGrade;
   const exerciseType = String(
     formData.get("exerciseType") ?? "MEANING_RECALL",
   ) as ExerciseType;
-  const prompt = String(
-    formData.get("prompt") ?? "Recall this lexical unit.",
-  );
+  const prompt = String(formData.get("prompt") ?? "Rescue this lexical unit.");
+  const ids = String(formData.get("ids") ?? "");
+  const step = Math.max(0, Number(formData.get("step") ?? 0));
 
   if (!id || !["AGAIN", "HARD", "GOOD", "EASY"].includes(grade)) {
-    throw new Error("Invalid review submission.");
+    throw new Error("Invalid rescue review.");
   }
 
   const user = await getCurrentUser();
@@ -36,5 +36,5 @@ export async function submitReview(formData: FormData) {
     durationMs: safeDuration(formData.get("startedAt")),
   });
 
-  redirect("/review");
+  redirect("/rescue?ids=" + encodeURIComponent(ids) + "&step=" + (step + 1));
 }

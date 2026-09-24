@@ -1,50 +1,51 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Eye, RotateCcw } from "lucide-react";
+import { Eye } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { ActionButton } from "@/components/action-button";
-import { submitReview } from "./actions";
+import { submitRescueReview } from "./actions";
 
-type Props = {
+export function RescueCard(props: {
   userVocabularyId: string;
+  ids: string;
+  step: number;
   lemma: string;
   article: string | null;
-  patterns: string[];
-  translations: { language: string; text: string }[];
+  translations: Array<{ language: string; text: string }>;
   exercise: ExerciseDefinition;
-};
-
-export function ReviewCard(props: Props) {
+  riskPercent: number;
+  reasons: string[];
+}) {
   const [revealed, setRevealed] = useState(false);
   const startedAt = useRef(Date.now());
 
   return (
-    <section className="panel learning-card">
+    <section className="panel learning-card rescue-card">
       <div className="learning-card-head">
-        <span className="badge">{props.exercise.type.replaceAll("_", " ")}</span>
-        <span className="muted">{props.lemma}</span>
+        <span className="exercise-type">
+          {props.exercise.type.replaceAll("_", " ").toLowerCase()}
+        </span>
+        <span className="rescue-risk">{props.riskPercent}% risk score</span>
       </div>
 
-      <h2 className="learning-prompt">{props.exercise.prompt}</h2>
+      <h1 className="learning-prompt">{props.exercise.prompt}</h1>
+
+      <div className="rescue-reasons">
+        {props.reasons.map((reason) => (
+          <span key={reason}>{reason}</span>
+        ))}
+      </div>
 
       {!revealed ? (
-        <>
-          {props.exercise.hint && (
-            <details>
-              <summary>Show hint</summary>
-              <p className="muted">{props.exercise.hint}</p>
-            </details>
-          )}
-          <button
-            className="button button-primary"
-            type="button"
-            onClick={() => setRevealed(true)}
-          >
-            <Eye size={18} />
-            Reveal answer
-          </button>
-        </>
+        <button
+          className="button button-primary"
+          type="button"
+          onClick={() => setRevealed(true)}
+        >
+          <Eye size={18} />
+          Reveal
+        </button>
       ) : (
         <>
           <div className="answer-panel">
@@ -52,43 +53,37 @@ export function ReviewCard(props: Props) {
               <p><b>Expected:</b> {props.exercise.expected}</p>
             ) : null}
             <p className="word">
-              {props.article ? props.article + " " : ""}{props.lemma}
+              {props.article ? props.article + " " : ""}
+              {props.lemma}
             </p>
             {props.translations.map((translation) => (
               <p
-                key={translation.language + ":" + translation.text}
+                key={translation.language + translation.text}
                 className={translation.language === "fa" ? "rtl" : undefined}
               >
                 {translation.text}
               </p>
             ))}
-            {props.patterns.map((pattern) => (
-              <p key={pattern}><b>{pattern}</b></p>
-            ))}
-          </div>
-
-          <div className="learning-card-head">
-            <p className="muted">How difficult was this retrieval?</p>
-            <button
-              className="text-button"
-              type="button"
-              onClick={() => setRevealed(false)}
-            >
-              <RotateCcw size={15} />
-              Hide
-            </button>
           </div>
 
           <div className="grade-grid">
             {(["AGAIN", "HARD", "GOOD", "EASY"] as const).map((grade) => (
-              <form action={submitReview} key={grade}>
+              <form action={submitRescueReview} key={grade}>
                 <input type="hidden" name="userVocabularyId" value={props.userVocabularyId} />
                 <input type="hidden" name="grade" value={grade} />
                 <input type="hidden" name="exerciseType" value={props.exercise.type} />
                 <input type="hidden" name="prompt" value={props.exercise.prompt} />
+                <input type="hidden" name="ids" value={props.ids} />
+                <input type="hidden" name="step" value={props.step} />
                 <input type="hidden" name="startedAt" value={startedAt.current} />
                 <ActionButton
-                  variant={grade === "AGAIN" ? "danger" : grade === "EASY" ? "success" : "secondary"}
+                  variant={
+                    grade === "AGAIN"
+                      ? "danger"
+                      : grade === "EASY"
+                        ? "success"
+                        : "secondary"
+                  }
                   pendingLabel="Saving…"
                 >
                   {grade.charAt(0) + grade.slice(1).toLowerCase()}

@@ -1,0 +1,7 @@
+ALTER TABLE "User" ADD COLUMN "timezone" TEXT NOT NULL DEFAULT 'UTC';
+ALTER TABLE "Attempt" ADD COLUMN "durationMs" INTEGER;
+ALTER TABLE "UserVocabulary" ADD COLUMN "masteredAt" TIMESTAMP(3);
+
+UPDATE "UserVocabulary"
+SET "masteredAt" = CURRENT_TIMESTAMP
+WHERE "state" = 'MASTERED';

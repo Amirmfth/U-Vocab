@@ -78,8 +78,20 @@ export function WritingStartForm({
           options={[
             { value: "120", label: "~120 words" },
             { value: "180", label: "~180 words" },
-            { value: "250", label: "~250 words" },
+            { value: "CUSTOM", label: "Custom length" },
           ]}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="writing-custom-words">Custom word target</label>
+        <input
+          id="writing-custom-words"
+          name="customWords"
+          type="number"
+          min="60"
+          max="500"
+          defaultValue="150"
         />
       </div>
 

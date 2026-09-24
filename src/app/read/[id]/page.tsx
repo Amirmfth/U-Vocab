@@ -52,6 +52,7 @@ export default async function ReadingDocumentPage({
       id: item.id,
       lexemeId: item.lexemeId,
       surfaceText: item.surfaceText,
+      surfaceForms: item.surfaceForms as string[],
       lemma: item.lexeme.lemma,
       article: item.lexeme.article,
       partOfSpeech: item.lexeme.partOfSpeech,

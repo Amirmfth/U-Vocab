@@ -1,7 +1,10 @@
 import { db } from "@/lib/db";
 import { evaluateConversationTurn } from "@/lib/ai/conversation-turn-evaluator";
 import { recordMistakesBatch, type MistakeInput } from "@/lib/mistakes-batch";
-import { updateVocabularyMasteryBatch } from "@/lib/vocabulary-batch";
+import {
+  updateConversationTargetsBatch,
+  updateVocabularyMasteryBatch,
+} from "@/lib/vocabulary-batch";
 
 export async function processConversationTurn(input: {
   userId: string;
@@ -114,21 +117,14 @@ export async function processConversationTurn(input: {
 
   if (used.length) {
     await db.$transaction(async (tx) => {
-      if (used.length) {
-        await Promise.all(
-          used.map((usage) => {
-            const target = targetByLexeme.get(usage.lexemeId)!;
-            return tx.conversationTarget.update({
-              where: { id: target.id },
-              data: {
-                uses: { increment: 1 },
-                successfulUses: usage.correct ? { increment: 1 } : undefined,
-                lastUsedAt: now,
-              },
-            });
-          }),
-        );
-      }
+      await updateConversationTargetsBatch(
+        tx,
+        used.map((usage) => ({
+          id: targetByLexeme.get(usage.lexemeId)!.id,
+          successful: usage.correct,
+          lastUsedAt: now,
+        })),
+      );
 
       if (attempts.length) {
         await tx.attempt.createMany({ data: attempts });

@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { createHash } from "node:crypto";
 import { db } from "@/lib/db";
 import { promptVersionFor } from "./prompt-versions";
@@ -52,13 +53,13 @@ export async function putGenerationCache(input: {
       promptVersion,
       schemaVersion: input.schemaVersion,
       sourceHash,
-      payload: input.payload,
+      payload: input.payload as Prisma.InputJsonValue,
     },
     update: {
       promptVersion,
       schemaVersion: input.schemaVersion,
       sourceHash,
-      payload: input.payload,
+      payload: input.payload as Prisma.InputJsonValue,
       updatedAt: new Date(),
     },
   });

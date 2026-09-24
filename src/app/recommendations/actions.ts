@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { prepareRecommendationEmbeddings } from "@/lib/recommendations";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type RecommendationActionState = {
   status: "idle" | "success" | "error";
@@ -51,6 +52,11 @@ export async function addRecommendation(
       }),
     ]);
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "recommendations"],
+      [lexemeId],
+    );
     revalidatePath("/recommendations");
     revalidatePath("/vocabulary");
 
@@ -88,6 +94,7 @@ export async function dismissRecommendation(
       },
     });
 
+    revalidateUserDomains(user.id, ["recommendations"]);
     revalidatePath("/recommendations");
     return { status: "success", message: "Dismissed." };
   } catch (error) {
@@ -104,6 +111,7 @@ export async function refreshSemanticRecommendations(
   try {
     const user = await getCurrentUser();
     const count = await prepareRecommendationEmbeddings(user.id);
+    revalidateUserDomains(user.id, ["recommendations"]);
     revalidatePath("/recommendations");
 
     return {

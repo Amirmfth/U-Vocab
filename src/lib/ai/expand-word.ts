@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -34,16 +35,18 @@ export async function generateWordExpansion(input: {
   patterns: string[];
   level: string;
 }) {
-  const perf = startOperation("ai.word_expansion", { model: AI_MODEL });
+  const route = aiRoute("word_expansion");
+  const perf = startOperation("ai.word_expansion", { model: route.model });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "word_expansion",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, patternCount: input.patterns.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",

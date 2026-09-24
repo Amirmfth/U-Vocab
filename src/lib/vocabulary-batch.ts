@@ -9,7 +9,7 @@ export type VocabularyMasteryUpdate = {
 };
 
 export async function updateVocabularyMasteryBatch(
-  db: PrismaClient,
+  db: Pick<PrismaClient, "$executeRaw">,
   updates: VocabularyMasteryUpdate[],
 ) {
   if (!updates.length) return 0;

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ArrowRight, Plus, Sparkles } from "lucide-react";
+import { StatCard } from "@/components/stat-card";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -8,7 +10,7 @@ export default async function Home() {
   const user = await getCurrentUser();
   const now = new Date();
 
-  const [total, due, weakProduction, mistakes] = await Promise.all([
+  const [total, due, weakProduction, mistakes, usage] = await Promise.all([
     db.userVocabulary.count({ where: { userId: user.id } }),
     db.userVocabulary.count({
       where: {
@@ -20,29 +22,56 @@ export default async function Home() {
       where: { userId: user.id, production: { lt: 0.4 } },
     }),
     db.mistake.count({ where: { userId: user.id, resolvedAt: null } }),
+    db.aIUsageEvent.aggregate({
+      where: { userId: user.id },
+      _sum: { totalTokens: true },
+    }),
   ]);
 
   return (
-    <main>
+    <main className="page">
       <section className="hero">
-        <p className="muted">PERSONAL GERMAN VOCABULARY</p>
-        <h1>Learn words as a connected language system.</h1>
-        <p className="muted">
-          Your vocabulary database now drives review scheduling, active production,
-          and recurring mistake tracking.
+        <p className="eyebrow">TODAY · GERMAN VOCABULARY</p>
+        <h1>Build vocabulary you can actually use.</h1>
+        <p className="hero-copy">
+          Review what is due, practice weak production, and grow your lexical
+          system with AI-assisted context instead of isolated flashcards.
         </p>
-        <div className="toolbar">
-          <Link className="button" href="/review">Review {due} due</Link>
-          <Link className="button secondary" href="/practice">Practice production</Link>
-          <Link href="/vocabulary/new">Add a lexical unit →</Link>
+
+        <div className="hero-actions">
+          <Link className="button button-primary" href="/review">
+            Review {due} due
+            <ArrowRight size={18} />
+          </Link>
+          <Link className="button button-secondary" href="/practice">
+            <Sparkles size={18} />
+            Adaptive practice
+          </Link>
+          <Link className="button button-secondary" href="/vocabulary/new">
+            <Plus size={18} />
+            Add word
+          </Link>
         </div>
       </section>
 
-      <section className="grid">
-        <div className="card"><b>{total}</b><p className="muted">Lexical units</p></div>
-        <div className="card"><b>{due}</b><p className="muted">Due for FSRS review</p></div>
-        <div className="card"><b>{weakProduction}</b><p className="muted">Need production practice</p></div>
-        <div className="card"><b>{mistakes}</b><p className="muted">Open mistake patterns</p></div>
+      <section className="stats-grid">
+        <StatCard label="Lexical units" value={total} detail="Personal vocabulary" />
+        <StatCard label="Due now" value={due} detail="FSRS review queue" />
+        <StatCard label="Weak production" value={weakProduction} detail="Need active recall" />
+        <StatCard label="Open mistakes" value={mistakes} detail="Targeted weaknesses" />
+      </section>
+
+      <section className="panel dashboard-callout">
+        <div>
+          <p className="eyebrow">OPENAI USAGE</p>
+          <h2>{(usage._sum.totalTokens ?? 0).toLocaleString()} tokens tracked</h2>
+          <p className="muted">
+            Every implemented AI request now records token metadata in Neon.
+          </p>
+        </div>
+        <Link href="/usage" className="text-link">
+          View usage <ArrowRight size={16} />
+        </Link>
       </section>
     </main>
   );

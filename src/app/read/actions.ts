@@ -50,7 +50,6 @@ export async function createReadingDocument(
           db.userVocabulary.findMany({
             where: { userId: user.id },
             select: { lexeme: { select: { normalized: true } } },
-            take: 2000,
           }),
         );
         const knownLemmas = new Set(

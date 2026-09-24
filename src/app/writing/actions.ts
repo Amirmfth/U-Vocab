@@ -5,7 +5,8 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateWritingTask } from "@/lib/ai/writing-task";
 import { evaluateWriting } from "@/lib/ai/writing-evaluator";
-import { recordMistakes } from "@/lib/mistakes";
+import { recordMistakesBatch } from "@/lib/mistakes-batch";
+import { updateVocabularyMasteryBatch } from "@/lib/vocabulary-batch";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 
@@ -276,6 +277,72 @@ export async function evaluateWritingAction(
             .map((item) => [item.lexemeId, item]),
         );
 
+        const usedLexemeIds = lexicalContext
+          .filter((item) => usageById.get(item.id)?.used)
+          .map((item) => item.id);
+
+        const vocabularyRows = usedLexemeIds.length
+          ? await perf.span("dbRead", () =>
+              db.userVocabulary.findMany({
+                where: {
+                  userId: user.id,
+                  lexemeId: { in: usedLexemeIds },
+                },
+                select: {
+                  id: true,
+                  lexemeId: true,
+                  production: true,
+                  contextualUsage: true,
+                },
+              }),
+            )
+          : [];
+
+        const vocabularyByLexeme = new Map(
+          vocabularyRows.map((item) => [item.lexemeId, item]),
+        );
+
+        const attempts = [];
+        const masteryUpdates = [];
+
+        for (const item of lexicalContext) {
+          const usage = usageById.get(item.id);
+          if (!usage?.used) continue;
+
+          const userVocabulary = vocabularyByLexeme.get(item.id);
+          attempts.push({
+            userId: user.id,
+            userVocabularyId: userVocabulary?.id ?? null,
+            exerciseType: "FREE_SENTENCE" as const,
+            prompt: "Use vocabulary naturally in a German writing task.",
+            answer: draft,
+            expected: item.lemma,
+            correct: usage.correct,
+            score: usage.naturalness,
+            feedback: usage.note,
+          });
+
+          if (userVocabulary) {
+            masteryUpdates.push({
+              id: userVocabulary.id,
+              production: Math.max(
+                0,
+                Math.min(
+                  1,
+                  userVocabulary.production + (usage.correct ? 0.08 : -0.02),
+                ),
+              ),
+              contextualUsage: Math.max(
+                0,
+                Math.min(
+                  1,
+                  userVocabulary.contextualUsage + (usage.correct ? 0.08 : -0.015),
+                ),
+              ),
+            });
+          }
+        }
+
         await perf.span("dbWrite", () =>
           db.$transaction(async (tx) => {
             await tx.writingSession.update({
@@ -289,87 +356,36 @@ export async function evaluateWritingAction(
               },
             });
 
-            for (const item of lexicalContext) {
-              const usage = usageById.get(item.id);
-              if (!usage?.used) continue;
-
-              const userVocabulary = await tx.userVocabulary.findUnique({
-                where: {
-                  userId_lexemeId: {
-                    userId: user.id,
-                    lexemeId: item.id,
-                  },
-                },
-              });
-
-              await tx.attempt.create({
-                data: {
-                  userId: user.id,
-                  userVocabularyId: userVocabulary?.id ?? null,
-                  exerciseType: "FREE_SENTENCE",
-                  prompt: "Use vocabulary naturally in a German writing task.",
-                  answer: draft,
-                  expected: item.lemma,
-                  correct: usage.correct,
-                  score: usage.naturalness,
-                  feedback: usage.note,
-                },
-              });
-
-              if (userVocabulary) {
-                await tx.userVocabulary.update({
-                  where: { id: userVocabulary.id },
-                  data: {
-                    production: Math.max(
-                      0,
-                      Math.min(
-                        1,
-                        userVocabulary.production +
-                          (usage.correct ? 0.08 : -0.02),
-                      ),
-                    ),
-                    contextualUsage: Math.max(
-                      0,
-                      Math.min(
-                        1,
-                        userVocabulary.contextualUsage +
-                          (usage.correct ? 0.08 : -0.015),
-                      ),
-                    ),
-                  },
-                });
-              }
+            if (attempts.length) {
+              await tx.attempt.createMany({ data: attempts });
             }
+
+            await updateVocabularyMasteryBatch(tx, masteryUpdates);
           }),
         );
 
-        const mistakesByLexeme = new Map<
-          string,
-          typeof evaluation.lexicalMistakes
-        >();
-        for (const mistake of evaluation.lexicalMistakes) {
-          if (!mistake.lexemeId || !validIds.has(mistake.lexemeId)) continue;
-          mistakesByLexeme.set(mistake.lexemeId, [
-            ...(mistakesByLexeme.get(mistake.lexemeId) ?? []),
-            mistake,
-          ]);
-        }
+        const batchedMistakes = evaluation.lexicalMistakes
+          .filter(
+            (mistake) =>
+              Boolean(mistake.lexemeId) &&
+              validIds.has(mistake.lexemeId as string),
+          )
+          .map((mistake) => ({
+            lexemeId: mistake.lexemeId as string,
+            type: mistake.type,
+            expected: mistake.expected,
+            actual: mistake.actual,
+            explanation: mistake.explanation,
+          }));
 
-        await perf.span("dbWrite", async () => {
-          for (const [lexemeId, mistakes] of mistakesByLexeme) {
-            await recordMistakes(db, {
+        if (batchedMistakes.length) {
+          await perf.span("dbWrite", () =>
+            recordMistakesBatch(db, {
               userId: user.id,
-              lexemeId,
-              embed: false,
-              mistakes: mistakes.map((mistake) => ({
-                type: mistake.type,
-                expected: mistake.expected,
-                actual: mistake.actual,
-                explanation: mistake.explanation,
-              })),
-            });
-          }
-        });
+              mistakes: batchedMistakes,
+            }),
+          );
+        }
 
         await perf.span("revalidation", async () => {
           revalidateUserDomains(

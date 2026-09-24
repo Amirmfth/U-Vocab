@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 const lexicalMistakeSchema = z.object({
   type: z.enum([
@@ -83,8 +84,9 @@ export async function evaluateWriting(input: {
     patterns: string[];
   }>;
 }) {
+  const perf = startOperation("ai.writing_evaluation", { model: AI_MODEL, draftChars: input.draft.length, targetCount: input.targets.length, level: input.level });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -97,7 +99,7 @@ export async function evaluateWriting(input: {
       text: {
         format: zodTextFormat(writingEvaluationSchema, "writing_evaluation"),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       throw new Error("OpenAI did not return a valid writing evaluation.");
@@ -112,8 +114,15 @@ export async function evaluateWriting(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     await recordAIUsage({
       userId: input.userId,
       operation: "writing_evaluation",

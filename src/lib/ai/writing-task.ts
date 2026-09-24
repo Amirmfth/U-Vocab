@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const writingTaskSchema = z.object({
   title: z.string(),
@@ -18,8 +19,9 @@ export async function generateWritingTask(input: {
   targetWords: number;
   targets: Array<{ lemma: string; patterns: string[] }>;
 }) {
+  const perf = startOperation("ai.writing_task", { model: AI_MODEL, mode: input.mode, level: input.level, targetCount: input.targets.length });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -30,7 +32,7 @@ export async function generateWritingTask(input: {
         { role: "user", content: JSON.stringify(input) },
       ],
       text: { format: zodTextFormat(writingTaskSchema, "writing_task") },
-    });
+    }));
 
     if (!response.output_parsed) {
       throw new Error("OpenAI did not return a valid writing task.");
@@ -45,8 +47,15 @@ export async function generateWritingTask(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     await recordAIUsage({
       userId: input.userId,
       operation: "writing_task",

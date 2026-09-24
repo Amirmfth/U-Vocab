@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const readingAnalysisSchema = z.object({
   title: z.string().nullable(),
@@ -35,8 +36,9 @@ export async function analyzeReadingText(input: {
   text: string;
   targetLevel: string;
 }) {
+  const perf = startOperation("ai.reading_analysis", { model: AI_MODEL, inputChars: input.text.length, targetLevel: input.targetLevel });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -55,7 +57,7 @@ export async function analyzeReadingText(input: {
       text: {
         format: zodTextFormat(readingAnalysisSchema, "reading_analysis"),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -79,8 +81,15 @@ export async function analyzeReadingText(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid reading analysis.")) {
       await recordAIUsage({
         userId: input.userId,

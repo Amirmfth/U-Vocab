@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const storySchema = z.object({
   title: z.string(),
@@ -25,8 +26,9 @@ export async function generateStory(input: {
   topic?: string | null;
   targets: Array<{ lemma: string; pattern?: string | null }>;
 }) {
+  const perf = startOperation("ai.story_generation", { model: AI_MODEL });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -40,7 +42,7 @@ export async function generateStory(input: {
         },
       ],
       text: { format: zodTextFormat(storySchema, "vocabulary_story") },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -64,8 +66,15 @@ export async function generateStory(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid story.")) {
       await recordAIUsage({
         userId: input.userId,

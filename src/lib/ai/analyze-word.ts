@@ -2,10 +2,12 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { lexicalAnalysisSchema } from "./schemas";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export async function analyzeGermanLexeme(input: string, userId: string) {
+  const perf = startOperation("ai.lexical_analysis", { model: AI_MODEL, inputChars: input.length });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -16,7 +18,7 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
         { role: "user", content: input },
       ],
       text: { format: zodTextFormat(lexicalAnalysisSchema, "lexical_analysis") },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -40,8 +42,15 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid lexical analysis.")) {
       await recordAIUsage({
         userId,

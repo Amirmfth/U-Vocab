@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 const comparisonBaseSchema = z.object({
   germanDistinction: z.string(),
@@ -84,8 +85,9 @@ export async function generateWordComparison(input: {
     examples: string[];
   };
 }) {
+  const perf = startOperation("ai.word_comparison", { model: AI_MODEL });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -98,7 +100,7 @@ export async function generateWordComparison(input: {
       text: {
         format: zodTextFormat(comparisonBaseSchema, "german_word_comparison"),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -122,8 +124,15 @@ export async function generateWordComparison(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (
       !(
         error instanceof Error &&

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const conversationSetupSchema = z.object({
   title: z.string(),
@@ -25,8 +26,9 @@ export async function generateConversationSetup(input: {
     patterns: string[];
   }>;
 }) {
+  const perf = startOperation("ai.conversation_setup", { model: AI_MODEL });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -42,7 +44,7 @@ export async function generateConversationSetup(input: {
       text: {
         format: zodTextFormat(conversationSetupSchema, "conversation_setup"),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -70,8 +72,15 @@ export async function generateConversationSetup(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (
       !(
         error instanceof Error &&

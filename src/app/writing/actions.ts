@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { generateWritingTask } from "@/lib/ai/writing-task";
 import { evaluateWriting } from "@/lib/ai/writing-evaluator";
 import { recordMistakes } from "@/lib/mistakes";
+import { instrumentOperation } from "@/lib/performance";
 
 export type WritingActionState = {
   status: "idle" | "success" | "error";
@@ -64,10 +65,12 @@ export async function createWritingSessionAction(
   _previous: WritingActionState,
   formData: FormData,
 ): Promise<WritingActionState> {
-  const mode = String(formData.get("mode") ?? "GUIDED") === "OPEN" ? "OPEN" : "GUIDED";
+  const mode =
+    String(formData.get("mode") ?? "GUIDED") === "OPEN" ? "OPEN" : "GUIDED";
   const level = String(formData.get("level") ?? "B2");
   const taskType = String(formData.get("taskType") ?? "essay");
-  const topic = String(formData.get("topic") ?? "").trim() || "Alltag und Gesellschaft";
+  const topic =
+    String(formData.get("topic") ?? "").trim() || "Alltag und Gesellschaft";
   const targetWordsRaw = String(formData.get("targetWords") ?? "120");
   const requestedWords =
     targetWordsRaw === "CUSTOM"
@@ -78,76 +81,93 @@ export async function createWritingSessionAction(
     Math.min(500, Number.isFinite(requestedWords) ? requestedWords : 120),
   );
   const rawCollection = String(formData.get("collectionId") ?? "").trim();
-  const collectionId = rawCollection && rawCollection !== "NONE" ? rawCollection : null;
+  const collectionId =
+    rawCollection && rawCollection !== "NONE" ? rawCollection : null;
 
-  try {
-    const user = await getCurrentUser();
-    const targets =
-      mode === "GUIDED"
-        ? await selectGuidedTargets({
+  return instrumentOperation(
+    "writing.create",
+    { mode, level, taskType, targetWords, hasCollection: Boolean(collectionId) },
+    async (perf) => {
+      try {
+        const user = await perf.span("auth", () => getCurrentUser());
+        const targets =
+          mode === "GUIDED"
+            ? await perf.span("dbRead", () =>
+                selectGuidedTargets({
+                  userId: user.id,
+                  collectionId,
+                  limit: 6,
+                }),
+              )
+            : [];
+
+        if (mode === "GUIDED" && targets.length < 2) {
+          return {
+            status: "error",
+            message: "Add more vocabulary before using Guided vocabulary mode.",
+          };
+        }
+
+        const generated = await perf.span("ai", () =>
+          generateWritingTask({
             userId: user.id,
-            collectionId,
-            limit: 6,
-          })
-        : [];
+            mode,
+            level,
+            taskType,
+            topic,
+            targetWords,
+            targets: targets.map((target) => ({
+              lemma: target.lemma,
+              patterns: target.patterns,
+            })),
+          }),
+        );
 
-    if (mode === "GUIDED" && targets.length < 2) {
-      return {
-        status: "error",
-        message: "Add more vocabulary before using Guided vocabulary mode.",
-      };
-    }
+        const task = [
+          generated.title,
+          generated.task,
+          "",
+          "Checklist:",
+          ...generated.checklist.map((item) => "- " + item),
+        ].join("\n");
 
-    const generated = await generateWritingTask({
-      userId: user.id,
-      mode,
-      level,
-      taskType,
-      topic,
-      targetWords,
-      targets: targets.map((target) => ({
-        lemma: target.lemma,
-        patterns: target.patterns,
-      })),
-    });
+        const session = await perf.span("dbWrite", () =>
+          db.writingSession.create({
+            data: {
+              userId: user.id,
+              mode,
+              level,
+              taskType,
+              topic,
+              targetWords,
+              task,
+              targets: {
+                create: targets.map((target, position) => ({
+                  lexemeId: target.id,
+                  position,
+                })),
+              },
+            },
+          }),
+        );
 
-    const task = [
-      generated.title,
-      generated.task,
-      "",
-      "Checklist:",
-      ...generated.checklist.map((item) => "- " + item),
-    ].join("\n");
-
-    const session = await db.writingSession.create({
-      data: {
-        userId: user.id,
-        mode,
-        level,
-        taskType,
-        topic,
-        targetWords,
-        task,
-        targets: {
-          create: targets.map((target, position) => ({
-            lexemeId: target.id,
-            position,
-          })),
-        },
-      },
-    });
-
-    return {
-      status: "success",
-      message: "Writing task ready.",
-      sessionId: session.id,
-    };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not create writing task.",
-    };
-  }
+        return {
+          status: "success",
+          message: "Writing task ready.",
+          sessionId: session.id,
+        };
+      } catch (error) {
+        perf.fail(error);
+        return {
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not create writing task.",
+        };
+      }
+    },
+  );
 }
 
 async function detectKnownLexemes(userId: string, draft: string) {
@@ -179,148 +199,197 @@ export async function evaluateWritingAction(
   const sessionId = String(formData.get("sessionId") ?? "");
   const draft = String(formData.get("draft") ?? "").trim();
 
-  if (draft.length < 40) {
-    return { status: "error", message: "Write a little more before evaluation." };
-  }
+  return instrumentOperation(
+    "writing.evaluate",
+    {
+      draftChars: draft.length,
+      draftWords: countWords(draft),
+      hasSessionId: Boolean(sessionId),
+    },
+    async (perf) => {
+      if (draft.length < 40) {
+        return {
+          status: "error",
+          message: "Write a little more before evaluation.",
+        };
+      }
 
-  try {
-    const user = await getCurrentUser();
-    const session = await db.writingSession.findFirst({
-      where: { id: sessionId, userId: user.id },
-      include: {
-        targets: {
-          include: { lexeme: { include: { patterns: true } } },
-          orderBy: { position: "asc" },
-        },
-      },
-    });
-    if (!session) return { status: "error", message: "Writing session not found." };
+      try {
+        const user = await perf.span("auth", () => getCurrentUser());
+        const session = await perf.span("dbRead", () =>
+          db.writingSession.findFirst({
+            where: { id: sessionId, userId: user.id },
+            include: {
+              targets: {
+                include: { lexeme: { include: { patterns: true } } },
+                orderBy: { position: "asc" },
+              },
+            },
+          }),
+        );
+        if (!session) {
+          return { status: "error", message: "Writing session not found." };
+        }
 
-    const observed = await detectKnownLexemes(user.id, draft);
-    const lexical = new Map(
-      session.targets.map((target) => [
-        target.lexemeId,
-        {
-          id: target.lexemeId,
-          lemma: target.lexeme.lemma,
-          patterns: target.lexeme.patterns.map((pattern) => pattern.pattern),
-        },
-      ]),
-    );
-    for (const item of observed) lexical.set(item.id, item);
-    const lexicalContext = Array.from(lexical.values()).slice(0, 35);
-
-    const evaluation = await evaluateWriting({
-      userId: user.id,
-      level: session.level,
-      mode: session.mode,
-      taskType: session.taskType,
-      task: session.task,
-      targetWords: session.targetWords,
-      draft,
-      targets: lexicalContext.map((item) => ({
-        lexemeId: item.id,
-        lemma: item.lemma,
-        patterns: item.patterns,
-      })),
-    });
-
-    const validIds = new Set(lexicalContext.map((item) => item.id));
-    const usageById = new Map(
-      evaluation.targetUsage
-        .filter((item) => validIds.has(item.lexemeId))
-        .map((item) => [item.lexemeId, item]),
-    );
-
-    await db.$transaction(async (tx) => {
-      await tx.writingSession.update({
-        where: { id: session.id },
-        data: {
-          status: "EVALUATED",
-          draft,
-          wordCount: countWords(draft),
-          evaluation,
-          evaluatedAt: new Date(),
-        },
-      });
-
-      for (const item of lexicalContext) {
-        const usage = usageById.get(item.id);
-        if (!usage?.used) continue;
-
-        const userVocabulary = await tx.userVocabulary.findUnique({
-          where: { userId_lexemeId: { userId: user.id, lexemeId: item.id } },
-        });
-
-        await tx.attempt.create({
-          data: {
-            userId: user.id,
-            userVocabularyId: userVocabulary?.id ?? null,
-            exerciseType: "FREE_SENTENCE",
-            prompt: "Use vocabulary naturally in a German writing task.",
-            answer: draft,
-            expected: item.lemma,
-            correct: usage.correct,
-            score: usage.naturalness,
-            feedback: usage.note,
-          },
-        });
-
-        if (userVocabulary) {
-          await tx.userVocabulary.update({
-            where: { id: userVocabulary.id },
-            data: {
-              production: Math.max(
-                0,
-                Math.min(1, userVocabulary.production + (usage.correct ? 0.08 : -0.02)),
-              ),
-              contextualUsage: Math.max(
-                0,
-                Math.min(1, userVocabulary.contextualUsage + (usage.correct ? 0.08 : -0.015)),
+        const observed = await perf.span("dbRead", () =>
+          detectKnownLexemes(user.id, draft),
+        );
+        const lexical = new Map(
+          session.targets.map((target) => [
+            target.lexemeId,
+            {
+              id: target.lexemeId,
+              lemma: target.lexeme.lemma,
+              patterns: target.lexeme.patterns.map(
+                (pattern) => pattern.pattern,
               ),
             },
-          });
+          ]),
+        );
+        for (const item of observed) lexical.set(item.id, item);
+        const lexicalContext = Array.from(lexical.values()).slice(0, 35);
+
+        const evaluation = await perf.span("ai", () =>
+          evaluateWriting({
+            userId: user.id,
+            level: session.level,
+            mode: session.mode,
+            taskType: session.taskType,
+            task: session.task,
+            targetWords: session.targetWords,
+            draft,
+            targets: lexicalContext.map((item) => ({
+              lexemeId: item.id,
+              lemma: item.lemma,
+              patterns: item.patterns,
+            })),
+          }),
+        );
+
+        const validIds = new Set(lexicalContext.map((item) => item.id));
+        const usageById = new Map(
+          evaluation.targetUsage
+            .filter((item) => validIds.has(item.lexemeId))
+            .map((item) => [item.lexemeId, item]),
+        );
+
+        await perf.span("dbWrite", () =>
+          db.$transaction(async (tx) => {
+            await tx.writingSession.update({
+              where: { id: session.id },
+              data: {
+                status: "EVALUATED",
+                draft,
+                wordCount: countWords(draft),
+                evaluation,
+                evaluatedAt: new Date(),
+              },
+            });
+
+            for (const item of lexicalContext) {
+              const usage = usageById.get(item.id);
+              if (!usage?.used) continue;
+
+              const userVocabulary = await tx.userVocabulary.findUnique({
+                where: {
+                  userId_lexemeId: {
+                    userId: user.id,
+                    lexemeId: item.id,
+                  },
+                },
+              });
+
+              await tx.attempt.create({
+                data: {
+                  userId: user.id,
+                  userVocabularyId: userVocabulary?.id ?? null,
+                  exerciseType: "FREE_SENTENCE",
+                  prompt: "Use vocabulary naturally in a German writing task.",
+                  answer: draft,
+                  expected: item.lemma,
+                  correct: usage.correct,
+                  score: usage.naturalness,
+                  feedback: usage.note,
+                },
+              });
+
+              if (userVocabulary) {
+                await tx.userVocabulary.update({
+                  where: { id: userVocabulary.id },
+                  data: {
+                    production: Math.max(
+                      0,
+                      Math.min(
+                        1,
+                        userVocabulary.production +
+                          (usage.correct ? 0.08 : -0.02),
+                      ),
+                    ),
+                    contextualUsage: Math.max(
+                      0,
+                      Math.min(
+                        1,
+                        userVocabulary.contextualUsage +
+                          (usage.correct ? 0.08 : -0.015),
+                      ),
+                    ),
+                  },
+                });
+              }
+            }
+          }),
+        );
+
+        const mistakesByLexeme = new Map<
+          string,
+          typeof evaluation.lexicalMistakes
+        >();
+        for (const mistake of evaluation.lexicalMistakes) {
+          if (!mistake.lexemeId || !validIds.has(mistake.lexemeId)) continue;
+          mistakesByLexeme.set(mistake.lexemeId, [
+            ...(mistakesByLexeme.get(mistake.lexemeId) ?? []),
+            mistake,
+          ]);
         }
+
+        await perf.span("dbWrite", async () => {
+          for (const [lexemeId, mistakes] of mistakesByLexeme) {
+            await recordMistakes(db, {
+              userId: user.id,
+              lexemeId,
+              embed: false,
+              mistakes: mistakes.map((mistake) => ({
+                type: mistake.type,
+                expected: mistake.expected,
+                actual: mistake.actual,
+                explanation: mistake.explanation,
+              })),
+            });
+          }
+        });
+
+        await perf.span("revalidation", async () => {
+          revalidatePath("/writing/" + session.id);
+          revalidatePath("/writing");
+        });
+
+        return {
+          status: "success",
+          message: "Writing evaluated.",
+          sessionId: session.id,
+        };
+      } catch (error) {
+        perf.fail(error);
+        return {
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not evaluate writing.",
+        };
       }
-    });
-
-    const mistakesByLexeme = new Map<string, typeof evaluation.lexicalMistakes>();
-    for (const mistake of evaluation.lexicalMistakes) {
-      if (!mistake.lexemeId || !validIds.has(mistake.lexemeId)) continue;
-      mistakesByLexeme.set(mistake.lexemeId, [
-        ...(mistakesByLexeme.get(mistake.lexemeId) ?? []),
-        mistake,
-      ]);
-    }
-
-    for (const [lexemeId, mistakes] of mistakesByLexeme) {
-      await recordMistakes(db, {
-        userId: user.id,
-        lexemeId,
-        embed: false,
-        mistakes: mistakes.map((mistake) => ({
-          type: mistake.type,
-          expected: mistake.expected,
-          actual: mistake.actual,
-          explanation: mistake.explanation,
-        })),
-      });
-    }
-
-    revalidatePath("/writing/" + session.id);
-    revalidatePath("/writing");
-
-    return {
-      status: "success",
-      message: "Writing evaluated.",
-      sessionId: session.id,
-    };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not evaluate writing.",
-    };
-  }
+    },
+  );
 }
 
 export async function createRewriteAction(
@@ -329,42 +398,65 @@ export async function createRewriteAction(
 ): Promise<WritingActionState> {
   const sessionId = String(formData.get("sessionId") ?? "");
 
-  try {
-    const user = await getCurrentUser();
-    const source = await db.writingSession.findFirst({
-      where: { id: sessionId, userId: user.id, status: "EVALUATED" },
-      include: { targets: { orderBy: { position: "asc" } } },
-    });
-    if (!source) return { status: "error", message: "Evaluated writing not found." };
+  return instrumentOperation(
+    "writing.rewrite",
+    { hasSessionId: Boolean(sessionId) },
+    async (perf) => {
+      try {
+        const user = await perf.span("auth", () => getCurrentUser());
+        const source = await perf.span("dbRead", () =>
+          db.writingSession.findFirst({
+            where: {
+              id: sessionId,
+              userId: user.id,
+              status: "EVALUATED",
+            },
+            include: { targets: { orderBy: { position: "asc" } } },
+          }),
+        );
+        if (!source) {
+          return {
+            status: "error",
+            message: "Evaluated writing not found.",
+          };
+        }
 
-    const rewrite = await db.writingSession.create({
-      data: {
-        userId: user.id,
-        parentId: source.id,
-        mode: source.mode,
-        level: source.level,
-        taskType: source.taskType,
-        topic: source.topic,
-        targetWords: source.targetWords,
-        task: source.task,
-        targets: {
-          create: source.targets.map((target) => ({
-            lexemeId: target.lexemeId,
-            position: target.position,
-          })),
-        },
-      },
-    });
+        const rewrite = await perf.span("dbWrite", () =>
+          db.writingSession.create({
+            data: {
+              userId: user.id,
+              parentId: source.id,
+              mode: source.mode,
+              level: source.level,
+              taskType: source.taskType,
+              topic: source.topic,
+              targetWords: source.targetWords,
+              task: source.task,
+              targets: {
+                create: source.targets.map((target) => ({
+                  lexemeId: target.lexemeId,
+                  position: target.position,
+                })),
+              },
+            },
+          }),
+        );
 
-    return {
-      status: "success",
-      message: "Rewrite ready.",
-      sessionId: rewrite.id,
-    };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not create rewrite.",
-    };
-  }
+        return {
+          status: "success",
+          message: "Rewrite ready.",
+          sessionId: rewrite.id,
+        };
+      } catch (error) {
+        perf.fail(error);
+        return {
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not create rewrite.",
+        };
+      }
+    },
+  );
 }

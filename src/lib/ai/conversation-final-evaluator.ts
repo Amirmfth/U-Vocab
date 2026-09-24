@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const conversationFinalEvaluationSchema = z.object({
   taskSuccess: z.boolean(),
@@ -42,8 +43,9 @@ export async function evaluateConversationSession(input: {
   }>;
   messages: Array<{ role: "user" | "assistant"; content: string }>;
 }) {
+  const perf = startOperation("ai.conversation_final_evaluation", { model: AI_MODEL, messageCount: input.messages.length, targetCount: input.targets.length, level: input.level });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -59,7 +61,7 @@ export async function evaluateConversationSession(input: {
           "conversation_final_evaluation",
         ),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -83,8 +85,15 @@ export async function evaluateConversationSession(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (
       !(
         error instanceof Error &&

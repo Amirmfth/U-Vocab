@@ -9,6 +9,7 @@ type ReadingLexeme = {
   id: string;
   lexemeId: string;
   surfaceText: string;
+  surfaceForms: string[];
   lemma: string;
   article: string | null;
   partOfSpeech: string;
@@ -47,10 +48,17 @@ export function ReadingViewer({
   const selected = items.find((item) => item.id === selectedId) ?? items[0];
 
   const rendered = useMemo(() => {
+    const pairs = items.flatMap((item) =>
+      Array.from(new Set([item.surfaceText, ...item.surfaceForms]))
+        .filter(Boolean)
+        .map((surface) => [
+          surface.toLocaleLowerCase("de-DE"),
+          item,
+        ] as const),
+    );
+
     const bySurface = new Map(
-      [...items]
-        .sort((a, b) => b.surfaceText.length - a.surfaceText.length)
-        .map((item) => [item.surfaceText.toLocaleLowerCase("de-DE"), item]),
+      pairs.sort((a, b) => b[0].length - a[0].length),
     );
 
     if (!bySurface.size) return [content];

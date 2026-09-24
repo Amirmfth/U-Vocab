@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const expansionSchema = z.object({
   suggestions: z.array(
@@ -33,8 +34,9 @@ export async function generateWordExpansion(input: {
   patterns: string[];
   level: string;
 }) {
+  const perf = startOperation("ai.word_expansion", { model: AI_MODEL });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -45,7 +47,7 @@ export async function generateWordExpansion(input: {
         { role: "user", content: JSON.stringify(input) },
       ],
       text: { format: zodTextFormat(expansionSchema, "word_expansion") },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -69,8 +71,15 @@ export async function generateWordExpansion(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid word expansion.")) {
       await recordAIUsage({
         userId: input.userId,

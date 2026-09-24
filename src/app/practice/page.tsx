@@ -6,11 +6,18 @@ import { PracticeForm } from "./PracticeForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function PracticePage() {
-  const user = await getCurrentUser();
+export default async function PracticePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lexeme?: string }>;
+}) {
+  const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
 
   const item = await db.userVocabulary.findFirst({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      ...(params.lexeme ? { lexemeId: params.lexeme } : {}),
+    },
     include: {
       lexeme: {
         include: {
@@ -20,12 +27,14 @@ export default async function PracticePage() {
         },
       },
     },
-    orderBy: [
-      { production: "asc" },
-      { contextualUsage: "asc" },
-      { meaningRecall: "asc" },
-      { addedAt: "asc" },
-    ],
+    orderBy: params.lexeme
+      ? undefined
+      : [
+          { production: "asc" },
+          { contextualUsage: "asc" },
+          { meaningRecall: "asc" },
+          { addedAt: "asc" },
+        ],
   });
 
   if (!item) {
@@ -35,7 +44,11 @@ export default async function PracticePage() {
           <p className="muted">PRACTICE</p>
           <h1 style={{ fontSize: "3rem" }}>Active recall</h1>
         </div>
-        <p className="muted">Add vocabulary before starting practice.</p>
+        <p className="muted">
+          {params.lexeme
+            ? "That lexical unit is not in your personal vocabulary."
+            : "Add vocabulary before starting practice."}
+        </p>
       </main>
     );
   }
@@ -67,10 +80,12 @@ export default async function PracticePage() {
   return (
     <main>
       <div className="hero">
-        <p className="muted">ADAPTIVE ACTIVE RECALL</p>
+        <p className="muted">
+          {mistakes.length ? "TARGETED WEAKNESS PRACTICE" : "ADAPTIVE ACTIVE RECALL"}
+        </p>
         <h1 style={{ fontSize: "3rem" }}>Practice what is weakest.</h1>
         <p className="muted">
-          Exercise type: {exercise.type.replaceAll("_", " ").toLowerCase()}
+          {item.lexeme.lemma} · {exercise.type.replaceAll("_", " ").toLowerCase()}
         </p>
       </div>
 

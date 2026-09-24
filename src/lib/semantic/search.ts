@@ -44,21 +44,12 @@ export async function findSimilarLexemes(input: {
   });
   const byId = new Map(lexemes.map((lexeme) => [lexeme.id, lexeme]));
 
-  return rows
-    .map((row) => {
-      const lexeme = byId.get(row.id);
-      return lexeme
-        ? { lexeme, similarity: Number(row.similarity) }
-        : null;
-    })
-    .filter(
-      (
-        value,
-      ): value is {
-        lexeme: NonNullable<typeof value>["lexeme"];
-        similarity: number;
-      } => Boolean(value),
-    );
+  return rows.flatMap((row) => {
+    const lexeme = byId.get(row.id);
+    return lexeme
+      ? [{ lexeme, similarity: Number(row.similarity) }]
+      : [];
+  });
 }
 
 export async function semanticLexemeSearch(input: {

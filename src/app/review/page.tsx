@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { db } from "@/lib/db";
@@ -15,36 +16,25 @@ export default async function ReviewPage() {
       OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: new Date() } }],
     },
     include: {
-      lexeme: {
-        include: { translations: true, patterns: true, examples: true },
-      },
-      attempts: {
-        orderBy: { createdAt: "desc" },
-        take: 3,
-        select: { exerciseType: true },
-      },
+      lexeme: { include: { translations: true, patterns: true, examples: true } },
+      attempts: { orderBy: { createdAt: "desc" }, take: 3, select: { exerciseType: true } },
     },
     orderBy: [{ nextReviewAt: "asc" }, { addedAt: "asc" }],
   });
 
   if (!item) {
     return (
-      <main className="page">
-        <section className="page-header compact">
-          <p className="eyebrow">REVIEW</p>
-          <h1 style={{ fontSize: "3rem" }}>You are caught up.</h1>
-          <p className="page-description">FSRS will surface vocabulary here when it becomes due.</p>
+      <main className="page focus-page">
+        <section className="empty-state compact-empty">
+          <strong>All caught up</strong>
+          <Link href="/practice" className="button button-secondary">Practice anyway</Link>
         </section>
       </main>
     );
   }
 
   const mistakes = await db.mistake.findMany({
-    where: {
-      userId: user.id,
-      lexemeId: item.lexemeId,
-      resolvedAt: null,
-    },
+    where: { userId: user.id, lexemeId: item.lexemeId, resolvedAt: null },
     select: { type: true },
   });
 
@@ -59,22 +49,13 @@ export default async function ReviewPage() {
     item.attempts.map((attempt) => attempt.exerciseType),
   );
 
-  const exercise = buildExercise(
-    exerciseType,
-    item.lexeme,
-    user.preferredTranslation,
-  );
-
+  const exercise = buildExercise(exerciseType, item.lexeme, user.preferredTranslation);
   const translations = item.lexeme.translations.filter((translation) =>
-    isTranslationVisible(user.preferredTranslation, translation.language),
-  );
+    isTranslationVisible(user.preferredTranslation, translation.language));
 
   return (
-    <main className="page">
-      <section className="page-header compact">
-        <p className="eyebrow">DUE NOW · CONTEXTUAL SRS</p>
-        <h1 style={{ fontSize: "3rem" }}>Review</h1>
-      </section>
+    <main className="page focus-page">
+      <div className="focus-meta"><span>Review</span><span>{item.lexeme.lemma}</span></div>
       <ReviewCard
         userVocabularyId={item.id}
         lemma={item.lexeme.lemma}

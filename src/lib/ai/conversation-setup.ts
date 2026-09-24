@@ -47,7 +47,7 @@ export async function generateConversationSetup(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: {

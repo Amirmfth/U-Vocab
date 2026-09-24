@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { evaluateConversationTurn } from "@/lib/ai/conversation-turn-evaluator";
-import { recordMistakesBatch } from "@/lib/mistakes-batch";
+import { recordMistakesBatch, type MistakeInput } from "@/lib/mistakes-batch";
 import { updateVocabularyMasteryBatch } from "@/lib/vocabulary-batch";
 
 export async function processConversationTurn(input: {
@@ -62,27 +62,15 @@ export async function processConversationTurn(input: {
     vocabularyRows.map((item) => [item.lexemeId, item]),
   );
 
-  const targetUpdates = [];
   const attempts = [];
   const masteryUpdates = [];
-  const mistakes = [];
+  const mistakes: MistakeInput[] = [];
   const now = new Date();
 
   for (const usage of used) {
     const target = targetByLexeme.get(usage.lexemeId);
     if (!target) continue;
     const userVocabulary = vocabularyByLexeme.get(usage.lexemeId);
-
-    targetUpdates.push(
-      db.conversationTarget.update({
-        where: { id: target.id },
-        data: {
-          uses: { increment: 1 },
-          successfulUses: usage.correct ? { increment: 1 } : undefined,
-          lastUsedAt: now,
-        },
-      }),
-    );
 
     attempts.push({
       userId: input.userId,
@@ -126,7 +114,7 @@ export async function processConversationTurn(input: {
 
   if (used.length) {
     await db.$transaction(async (tx) => {
-      if (targetUpdates.length) {
+      if (used.length) {
         await Promise.all(
           used.map((usage) => {
             const target = targetByLexeme.get(usage.lexemeId)!;

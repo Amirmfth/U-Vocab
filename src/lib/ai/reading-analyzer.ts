@@ -9,6 +9,7 @@ export const readingAnalysisSchema = z.object({
   lexicalUnits: z.array(
     z.object({
       surfaceText: z.string(),
+      surfaceForms: z.array(z.string()).min(1).max(12),
       lemma: z.string(),
       partOfSpeech: z.enum([
         "NOUN","VERB","ADJECTIVE","ADVERB","PRONOUN","PREPOSITION",
@@ -41,7 +42,7 @@ export async function analyzeReadingText(input: {
         {
           role: "system",
           content:
-            "Analyze German reading text into useful lexical units for a vocabulary learner. Prefer multi-word phrases, verb-preposition patterns, collocations, separable/reflexive constructions, and meaningful lemmas over naive token-by-token extraction. Keep surfaceText exactly as it appears in the submitted text whenever possible. Provide concise English and Persian meanings plus one useful grammatical pattern when relevant. Deduplicate lexical units and report occurrence counts.",
+            "Analyze German reading text into useful lexical units for a vocabulary learner. Prefer multi-word phrases, verb-preposition patterns, collocations, separable/reflexive constructions, and meaningful lemmas over naive token-by-token extraction. Keep surfaceText exactly as a representative form from the submitted text and return every distinct observed inflected/conjugated spelling in surfaceForms. Provide concise English and Persian meanings plus one useful grammatical pattern when relevant. Deduplicate lexical units and report occurrence counts.",
         },
         {
           role: "user",

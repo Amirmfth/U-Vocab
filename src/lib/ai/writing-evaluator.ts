@@ -103,7 +103,7 @@ export async function evaluateWriting(input: {
           content:
             "Evaluate this German writing practice. Scores are internal learning signals only, never official CEFR certification. Assess task completion, organization/coherence, grammar, vocabulary range, lexical accuracy/naturalness, repetition, collocations, and supplied target vocabulary. Only create lexicalMistakes for vocabulary-related errors. targetUsage must use only supplied lexeme IDs. Give concise corrections and a polished improved version that preserves the learner's intended content.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: {
         format: zodTextFormat(writingEvaluationSchema, "writing_evaluation"),

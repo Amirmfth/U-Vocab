@@ -8,7 +8,30 @@ function nowMs() {
   return typeof performance !== "undefined" ? performance.now() : Date.now();
 }
 
+function errorStatus(error: unknown) {
+  if (!error || typeof error !== "object") return null;
+  const value = "status" in error ? error.status : null;
+  return typeof value === "number" ? value : null;
+}
+
+function errorRequestId(error: unknown) {
+  if (!error || typeof error !== "object") return null;
+  for (const key of ["request_id", "requestId", "_request_id"] as const) {
+    if (key in error) {
+      const value = error[key];
+      if (typeof value === "string") return value;
+    }
+  }
+  return null;
+}
+
 function errorCategory(error: unknown) {
+  const status = errorStatus(error);
+  if (status === 401 || status === 403) return "auth";
+  if (status === 408) return "timeout";
+  if (status === 429) return "rate_limit";
+  if (status !== null && status >= 500) return "provider_error";
+
   if (!(error instanceof Error)) return "unknown";
   const name = error.name.toLowerCase();
   const message = error.message.toLowerCase();
@@ -47,7 +70,7 @@ export function createAIUsageRecorder(input: {
       provider: input.provider ?? AI_PROVIDER,
       status: args.status,
       usage: args.usage,
-      requestId: args.requestId,
+      requestId: args.requestId ?? errorRequestId(args.error),
       errorMessage:
         args.error instanceof Error
           ? args.error.message

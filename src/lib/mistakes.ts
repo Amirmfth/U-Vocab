@@ -6,6 +6,7 @@ export async function recordMistakes(
   input: {
     userId: string;
     lexemeId: string;
+    embed?: boolean;
     mistakes: Array<{
       type: MistakeType;
       expected: string | null;
@@ -54,11 +55,13 @@ export async function recordMistakes(
     }
   }
 
-  for (const mistakeId of touchedIds) {
-    try {
-      await ensureMistakeEmbedding(mistakeId, input.userId, true);
-    } catch (error) {
-      console.error("Failed to embed mistake", error);
+  if (input.embed !== false) {
+    for (const mistakeId of touchedIds) {
+      try {
+        await ensureMistakeEmbedding(mistakeId, input.userId, true);
+      } catch (error) {
+        console.error("Failed to embed mistake", error);
+      }
     }
   }
 }

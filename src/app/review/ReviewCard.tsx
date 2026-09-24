@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, RotateCcw } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
+import { ActionButton } from "@/components/action-button";
 import { submitReview } from "./actions";
 
 type Props = {
@@ -17,9 +19,13 @@ export function ReviewCard(props: Props) {
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <section className="card" style={{ maxWidth: 720 }}>
-      <p className="muted">{props.exercise.type.replaceAll("_", " ")}</p>
-      <h2 style={{ fontSize: "2rem" }}>{props.exercise.prompt}</h2>
+    <section className="panel learning-card">
+      <div className="learning-card-head">
+        <span className="badge">{props.exercise.type.replaceAll("_", " ")}</span>
+        <span className="muted">{props.lemma}</span>
+      </div>
+
+      <h2 className="learning-prompt">{props.exercise.prompt}</h2>
 
       {!revealed ? (
         <>
@@ -29,18 +35,23 @@ export function ReviewCard(props: Props) {
               <p className="muted">{props.exercise.hint}</p>
             </details>
           )}
-          <button className="button" type="button" onClick={() => setRevealed(true)}>
-            Reveal answer and self-grade
+          <button
+            className="button button-primary"
+            type="button"
+            onClick={() => setRevealed(true)}
+          >
+            <Eye size={18} />
+            Reveal answer
           </button>
         </>
       ) : (
         <>
-          <div className="answerPanel">
-            {props.exercise.expected && (
+          <div className="answer-panel">
+            {props.exercise.expected ? (
               <p><b>Expected:</b> {props.exercise.expected}</p>
-            )}
-            <p>
-              <b>{props.article ? props.article + " " : ""}{props.lemma}</b>
+            ) : null}
+            <p className="word">
+              {props.article ? props.article + " " : ""}{props.lemma}
             </p>
             {props.translations.map((translation) => (
               <p
@@ -50,18 +61,36 @@ export function ReviewCard(props: Props) {
                 {translation.text}
               </p>
             ))}
-            {props.patterns.map((pattern) => <p key={pattern}><b>{pattern}</b></p>)}
+            {props.patterns.map((pattern) => (
+              <p key={pattern}><b>{pattern}</b></p>
+            ))}
           </div>
 
-          <p className="muted">How difficult was this retrieval?</p>
-          <div className="toolbar">
+          <div className="learning-card-head">
+            <p className="muted">How difficult was this retrieval?</p>
+            <button
+              className="text-button"
+              type="button"
+              onClick={() => setRevealed(false)}
+            >
+              <RotateCcw size={15} />
+              Hide
+            </button>
+          </div>
+
+          <div className="grade-grid">
             {(["AGAIN", "HARD", "GOOD", "EASY"] as const).map((grade) => (
               <form action={submitReview} key={grade}>
                 <input type="hidden" name="userVocabularyId" value={props.userVocabularyId} />
                 <input type="hidden" name="grade" value={grade} />
                 <input type="hidden" name="exerciseType" value={props.exercise.type} />
                 <input type="hidden" name="prompt" value={props.exercise.prompt} />
-                <button className="button secondary" type="submit">{grade}</button>
+                <ActionButton
+                  variant={grade === "AGAIN" ? "danger" : grade === "EASY" ? "success" : "secondary"}
+                  pendingLabel="Saving…"
+                >
+                  {grade.charAt(0) + grade.slice(1).toLowerCase()}
+                </ActionButton>
               </form>
             ))}
           </div>

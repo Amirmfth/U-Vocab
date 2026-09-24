@@ -1,5 +1,5 @@
 import { AI_MODEL, getOpenAI } from "@/lib/ai/client";
-import { recordAIUsage } from "@/lib/ai/usage";
+import { createAIUsageRecorder } from "@/lib/ai/usage-recorder";
 import {
   AI_RESPONSE_COMPLETED_EVENT,
   AI_TEXT_DELTA_EVENT,
@@ -97,6 +97,17 @@ export async function POST(
     messageChars: message.length,
     contextMessages: context.messages.length,
   });
+  const tutorUsage = createAIUsageRecorder({
+    userId: user.id,
+    operation: "conversation_tutor",
+    model: AI_MODEL,
+    metadata: {
+      messageChars: message.length,
+      contextMessages: context.messages.length,
+      targetCount: context.targets.length,
+    },
+  });
+  const providerStartedAt = Date.now();
 
   const stream = await tutorPerf
     .span("providerStart", () =>
@@ -114,14 +125,7 @@ export async function POST(
     )
     .catch(async (error) => {
       tutorPerf.fail(error);
-      await recordAIUsage({
-        userId: user.id,
-        operation: "conversation_tutor",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage:
-          error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await tutorUsage.failure(error);
       return null;
     });
 
@@ -146,6 +150,7 @@ export async function POST(
   const bodyStream = new ReadableStream<Uint8Array>({
     async start(controller) {
       let output = "";
+      let timeToFirstTokenMs: number | null = null;
       let completedResponse:
         | {
             id?: string;
@@ -161,6 +166,9 @@ export async function POST(
         await tutorPerf.span("stream", async () => {
           for await (const event of stream) {
             if (event.type === AI_TEXT_DELTA_EVENT) {
+              if (timeToFirstTokenMs === null) {
+                timeToFirstTokenMs = Math.max(0, Date.now() - providerStartedAt);
+              }
               output += event.delta;
               controller.enqueue(encoder.encode(event.delta));
             }
@@ -184,13 +192,10 @@ export async function POST(
           );
         }
 
-        await recordAIUsage({
-          userId: user.id,
-          operation: "conversation_tutor",
-          model: AI_MODEL,
-          status: "SUCCESS",
+        await tutorUsage.streamingSuccess({
           usage: completedResponse?.usage,
           requestId: completedResponse?.id ?? null,
+          timeToFirstTokenMs,
         });
 
         await perf.span("dbWrite", () =>
@@ -216,14 +221,7 @@ export async function POST(
       } catch (error) {
         tutorPerf.fail(error);
         perf.fail(error);
-        await recordAIUsage({
-          userId: user.id,
-          operation: "conversation_tutor",
-          model: AI_MODEL,
-          status: "ERROR",
-          errorMessage:
-            error instanceof Error ? error.message : "Unknown streaming error",
-        });
+        await tutorUsage.failure(error, completedResponse);
         await db.conversationSession.updateMany({
           where: { id, userId: user.id },
           data: { turnInFlight: false },

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Clock3, Flame, Play } from "lucide-react";
+import { ActionButton } from "@/components/action-button";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { createFocusSession } from "./actions";
@@ -57,9 +58,10 @@ export default async function FocusPage() {
             <strong>Daily challenge</strong>
             <span>Compact mixed practice · about 12 min</span>
           </div>
-          <button type="submit" className="icon-button" aria-label="Start daily challenge">
-            <Play size={18} />
-          </button>
+          <ActionButton variant="secondary" pendingLabel="Starting…">
+            <Play size={17} />
+            Start
+          </ActionButton>
         </form>
 
         {[15, 30, 45, 60].map((minutes) => (
@@ -71,9 +73,10 @@ export default async function FocusPage() {
               <strong>{minutes} minutes</strong>
               <span>Adaptive learning block</span>
             </div>
-            <button type="submit" className="icon-button" aria-label={"Start " + minutes + " minute focus"}>
-              <Play size={18} />
-            </button>
+            <ActionButton variant="secondary" pendingLabel="Starting…">
+              <Play size={17} />
+              Start
+            </ActionButton>
           </form>
         ))}
       </section>

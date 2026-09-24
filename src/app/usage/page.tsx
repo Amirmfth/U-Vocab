@@ -31,7 +31,18 @@ export default async function UsagePage() {
       _sum: { totalTokens: true }, _count: { _all: true },
       orderBy: { _sum: { totalTokens: "desc" } },
     }),
-    db.aiUsageEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 12 }),
+    db.aiUsageEvent.findMany({
+      where: { userId: user.id },
+      select: {
+        id: true,
+        operation: true,
+        createdAt: true,
+        totalTokens: true,
+        status: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+    }),
   ]);
 
   return (

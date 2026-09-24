@@ -105,3 +105,21 @@ export function startOperation(
     },
   };
 }
+
+export type OperationTimer = ReturnType<typeof startOperation>;
+
+export async function instrumentOperation<T>(
+  operation: string,
+  metadata: PerformanceMetadata,
+  work: (timer: OperationTimer) => Promise<T>,
+): Promise<T> {
+  const timer = startOperation(operation, metadata);
+  try {
+    const result = await work(timer);
+    timer.success();
+    return result;
+  } catch (error) {
+    timer.fail(error);
+    throw error;
+  }
+}

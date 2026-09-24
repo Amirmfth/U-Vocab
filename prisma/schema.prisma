@@ -142,6 +142,7 @@ model Example {
   english       String?
   persian       String?
   level         String?
+  register      String?
   generatedByAi Boolean @default(false)
   lexeme        Lexeme  @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
 }

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
+import { recordAIUsage } from "./usage";
 
 export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
@@ -32,6 +33,7 @@ export const productionEvaluationSchema = z.object({
 export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
 
 export async function evaluateVocabularyProduction(input: {
+  userId: string;
   exerciseType: string;
   exercisePrompt: string;
   expected?: string;
@@ -41,30 +43,61 @@ export async function evaluateVocabularyProduction(input: {
   examples: string[];
   answer: string;
 }) {
-  const response = await getOpenAI().responses.parse({
-    model: AI_MODEL,
-    input: [
-      {
-        role: "system",
-        content:
-          "You are U-Vocab's German vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, article, case, preposition, reflexive structure, collocation, word choice, word form, spelling, and naturalness. Accept valid alternatives. Give concise actionable feedback. If the answer is wrong or incomplete, provide a short retryPrompt that asks the learner to try again without simply giving away the full answer.",
+  try {
+    const response = await getOpenAI().responses.parse({
+      model: AI_MODEL,
+      input: [
+        {
+          role: "system",
+          content:
+            "You are U-Vocab's German vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, article, case, preposition, reflexive structure, collocation, word choice, word form, spelling, and naturalness. Accept valid alternatives. Give concise actionable feedback. If the answer is wrong or incomplete, provide a short retryPrompt that asks the learner to try again without simply giving away the full answer.",
+        },
+        {
+          role: "user",
+          content: JSON.stringify(input),
+        },
+      ],
+      text: {
+        format: zodTextFormat(
+          productionEvaluationSchema,
+          "production_evaluation",
+        ),
       },
-      {
-        role: "user",
-        content: JSON.stringify(input),
-      },
-    ],
-    text: {
-      format: zodTextFormat(
-        productionEvaluationSchema,
-        "production_evaluation",
-      ),
-    },
-  });
+    });
 
-  if (!response.output_parsed) {
-    throw new Error("OpenAI did not return a valid production evaluation.");
+    if (!response.output_parsed) {
+      await recordAIUsage({
+        userId: input.userId,
+        operation: "answer_evaluation",
+        model: AI_MODEL,
+        status: "ERROR",
+        usage: response.usage,
+        requestId: response.id,
+        errorMessage: "OpenAI returned no parsed production evaluation.",
+      });
+      throw new Error("OpenAI did not return a valid production evaluation.");
+    }
+
+    await recordAIUsage({
+      userId: input.userId,
+      operation: "answer_evaluation",
+      model: AI_MODEL,
+      status: "SUCCESS",
+      usage: response.usage,
+      requestId: response.id,
+    });
+
+    return response.output_parsed;
+  } catch (error) {
+    if (!(error instanceof Error && error.message === "OpenAI did not return a valid production evaluation.")) {
+      await recordAIUsage({
+        userId: input.userId,
+        operation: "answer_evaluation",
+        model: AI_MODEL,
+        status: "ERROR",
+        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
+      });
+    }
+    throw error;
   }
-
-  return response.output_parsed;
 }

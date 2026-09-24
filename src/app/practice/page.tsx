@@ -39,12 +39,12 @@ export default async function PracticePage({
 
   if (!item) {
     return (
-      <main>
-        <div className="hero">
-          <p className="muted">PRACTICE</p>
+      <main className="page">
+        <section className="page-header compact">
+          <p className="eyebrow">PRACTICE</p>
           <h1 style={{ fontSize: "3rem" }}>Active recall</h1>
-        </div>
-        <p className="muted">
+        </section>
+        <p className="eyebrow">
           {params.lexeme
             ? "That lexical unit is not in your personal vocabulary."
             : "Add vocabulary before starting practice."}
@@ -78,16 +78,16 @@ export default async function PracticePage({
   );
 
   return (
-    <main>
-      <div className="hero">
-        <p className="muted">
+    <main className="page">
+      <section className="page-header compact">
+        <p className="eyebrow">
           {mistakes.length ? "TARGETED WEAKNESS PRACTICE" : "ADAPTIVE ACTIVE RECALL"}
         </p>
         <h1 style={{ fontSize: "3rem" }}>Practice what is weakest.</h1>
-        <p className="muted">
+        <p className="eyebrow">
           {item.lexeme.lemma} · {exercise.type.replaceAll("_", " ").toLowerCase()}
         </p>
-      </div>
+      </section>
 
       <PracticeForm
         userVocabularyId={item.id}

@@ -1,2 +1,18 @@
-import { createLexeme } from "./actions";
-export default function NewWord(){return <main><div className="hero"><p className="muted">AI-ASSISTED ENTRY</p><h1 style={{fontSize:"3rem"}}>Add a lexical unit</h1><p className="muted">Enter a German word, phrase, or grammatical pattern. OpenAI will create a structured draft with English and Persian meanings.</p></div><form action={createLexeme} className="card" style={{maxWidth:620}}><label htmlFor="word">German word or phrase</label><input id="word" name="word" placeholder="z. B. sich interessieren für" required/><button className="button" type="submit">Analyze and add</button></form></main>}
+import { AddLexemeForm } from "./AddLexemeForm";
+
+export default function NewWord() {
+  return (
+    <main className="page">
+      <section className="page-header compact">
+        <p className="eyebrow">AI-ASSISTED ENTRY</p>
+        <h1>Add vocabulary</h1>
+        <p className="page-description">
+          Add a German word, phrase, or grammatical pattern. OpenAI creates a
+          structured lexical entry; Neon remains the source of truth.
+        </p>
+      </section>
+
+      <AddLexemeForm />
+    </main>
+  );
+}

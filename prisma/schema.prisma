@@ -85,6 +85,7 @@ model User {
   attempts             Attempt[]
   mistakes             Mistake[]
   encounters           Encounter[]
+  aiUsage              AiUsageEvent[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -240,4 +241,30 @@ model Encounter {
   lexeme    Lexeme   @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
 
   @@index([userId, lexemeId, createdAt])
+}
+
+
+enum AIUsageStatus {
+  SUCCESS
+  ERROR
+}
+
+model AiUsageEvent {
+  id           String        @id @default(cuid())
+  userId       String
+  operation    String
+  model        String
+  status       AIUsageStatus
+  inputTokens  Int           @default(0)
+  outputTokens Int           @default(0)
+  totalTokens  Int           @default(0)
+  requestId    String?
+  errorMessage String?
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, operation, createdAt])
+  @@index([userId, model, createdAt])
+  @@map("AIUsageEvent")
 }

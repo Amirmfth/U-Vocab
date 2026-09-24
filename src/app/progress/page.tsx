@@ -104,7 +104,7 @@ export default async function ProgressPage({
     }),
     db.encounter.findMany({
       where: metricEncounterWhere,
-      select: { createdAt: true },
+      select: { createdAt: true, source: true },
     }),
     db.attempt.findMany({
       where: { userId: user.id, createdAt: { gte: activityCutoff } },
@@ -119,7 +119,7 @@ export default async function ProgressPage({
     }),
     db.encounter.findMany({
       where: { userId: user.id, createdAt: { gte: activityCutoff } },
-      select: { createdAt: true },
+      select: { createdAt: true, source: true },
     }),
     db.mistake.findMany({
       where: {
@@ -456,7 +456,7 @@ export default async function ProgressPage({
             <span>{selectedActivity?.reviewed ?? 0} reviewed</span>
             <span>{selectedActivity?.learned ?? 0} learned</span>
             <span>{selectedActivity?.produced ?? 0} produced</span>
-            <span>{selectedActivity?.encounters ?? 0} encounters</span>
+            <span>{selectedActivity?.readingEncounters ?? 0} reading encounters</span>
             <span>{selectedActivity?.mistakesCorrected ?? 0} mistakes corrected</span>
             <span>{minutes(selectedActivity?.durationMs ?? 0)} min</span>
           </div>

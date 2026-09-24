@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, GitCompareArrows } from "lucide-react";
 import { db } from "@/lib/db";
@@ -5,13 +6,13 @@ import { getCurrentUser } from "@/lib/current-user";
 import { CompareForm } from "./CompareForm";
 import { QuickCompareSuggestion } from "./QuickCompareSuggestion";
 
-export const dynamic = "force-dynamic";
 
 function normalized(value: string | null) {
   return value?.toLocaleLowerCase("de-DE").trim() ?? "";
 }
 
 export default async function ComparePage() {
+  await connection();
   const user = await getCurrentUser();
 
   const [vocabulary, pairs, wordChoiceMistakes] = await Promise.all([

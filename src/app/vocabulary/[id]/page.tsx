@@ -229,6 +229,7 @@ export default async function Word({
             <article className="card example-card" key={example.id}>
               <div className="word-meta">
                 {example.level ? <span className="badge">{example.level}</span> : null}
+                {example.register ? <span className="badge">{example.register}</span> : null}
                 {example.generatedByAi ? (
                   <span className="badge">AI generated</span>
                 ) : (

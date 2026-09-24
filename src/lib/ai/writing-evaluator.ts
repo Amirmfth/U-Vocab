@@ -89,7 +89,7 @@ export async function evaluateWriting(input: {
     userId: input.userId,
     operation: "writing_evaluation",
     model: AI_MODEL,
-    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\\s+\/u).length : 0, targetCount: input.targets.length },
+    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.targets.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({

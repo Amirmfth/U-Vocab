@@ -157,6 +157,7 @@ export async function createWritingSessionAction(
           sessionId: session.id,
         };
       } catch (error) {
+        perf.fail(error);
         return {
           status: "error",
           message:
@@ -378,6 +379,7 @@ export async function evaluateWritingAction(
           sessionId: session.id,
         };
       } catch (error) {
+        perf.fail(error);
         return {
           status: "error",
           message:
@@ -446,6 +448,7 @@ export async function createRewriteAction(
           sessionId: rewrite.id,
         };
       } catch (error) {
+        perf.fail(error);
         return {
           status: "error",
           message:

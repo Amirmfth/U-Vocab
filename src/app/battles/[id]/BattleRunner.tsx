@@ -19,20 +19,19 @@ export function BattleRunner({
   sessionId,
   mode,
   durationSec,
+  startedAt,
   initialScore,
   questions,
 }: {
   sessionId: string;
   mode: "TIMED" | "UNTIMED";
   durationSec: number | null;
+  startedAt: string;
   initialScore: number;
   questions: Question[];
 }) {
   const router = useRouter();
-  const firstUnanswered = Math.max(
-    0,
-    questions.findIndex((question) => !question.answer),
-  );
+  const firstUnanswered = questions.findIndex((question) => !question.answer);
   const [index, setIndex] = useState(
     firstUnanswered === -1 ? questions.length : firstUnanswered,
   );
@@ -43,7 +42,13 @@ export function BattleRunner({
     explanation: string | null;
     points: number;
   } | null>(null);
-  const [remaining, setRemaining] = useState(durationSec ?? 0);
+  const [remaining, setRemaining] = useState(() => {
+    if (!durationSec) return 0;
+    const elapsed = Math.floor(
+      (Date.now() - new Date(startedAt).getTime()) / 1000,
+    );
+    return Math.max(0, durationSec - elapsed);
+  });
   const [pending, startTransition] = useTransition();
   const questionStartedAt = useRef(Date.now());
   const current = questions[index];

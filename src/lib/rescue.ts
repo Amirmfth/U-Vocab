@@ -47,15 +47,20 @@ export async function getRescueWords(userId: string, limit = 10) {
 
   return items
     .map((item) => {
+      const recentFailures = failureCounts.get(item.id) ?? 0;
       const risk = rescueRisk({
         fsrsCard: item.fsrsCard,
         nextReviewAt: item.nextReviewAt,
         stability: item.stability,
-        recentFailures: failureCounts.get(item.id) ?? 0,
+        recentFailures,
       });
-      return { ...item, risk };
+      return { ...item, risk, recentFailures };
     })
-    .filter((item) => item.risk.score >= 0.16 || item.risk.reasons.length > 0)
+    .filter(
+      (item) =>
+        (item.fsrsCard || item.recentFailures > 0) &&
+        (item.risk.score >= 0.16 || item.risk.reasons.length > 0),
+    )
     .sort((a, b) => b.risk.score - a.risk.score)
     .slice(0, limit);
 }

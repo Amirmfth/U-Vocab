@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -18,8 +19,8 @@ export default async function MistakesPage() {
         <p className="muted">MISTAKE MEMORY</p>
         <h1 style={{ fontSize: "3rem" }}>Recurring weaknesses</h1>
         <p className="muted">
-          U-Vocab stores lexical mistakes so future practice can target patterns,
-          not just individual failed answers.
+          U-Vocab stores recurring lexical patterns and feeds them back into
+          adaptive practice until a targeted attempt resolves them.
         </p>
       </div>
 
@@ -34,6 +35,14 @@ export default async function MistakesPage() {
             <p className="muted">
               Seen {mistake.occurrences} {mistake.occurrences === 1 ? "time" : "times"}
             </p>
+            {mistake.lexemeId && (
+              <Link
+                className="button secondary"
+                href={"/practice?lexeme=" + mistake.lexemeId}
+              >
+                Practice this weakness
+              </Link>
+            )}
           </article>
         ))}
       </div>

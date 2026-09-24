@@ -2726,3 +2726,152 @@ summary {
   width: auto;
   min-width: 86px;
 }
+
+
+.recommendation-refresh {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: fit-content;
+}
+
+.recommendation-list,
+.mistake-cluster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recommendation-row {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.recommendation-row:first-child {
+  padding-top: 0;
+}
+
+.recommendation-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recommendation-copy h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: -0.03em;
+}
+
+.recommendation-copy p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.recommendation-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recommendation-reasons span {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  font-size: 0.67rem;
+  line-height: 1.3;
+}
+
+.recommendation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recommendation-actions form {
+  width: 100%;
+}
+
+.mistake-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mistake-cluster-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.mistake-cluster-head h2 {
+  margin: 8px 0 0;
+  font-size: 1.08rem;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+}
+
+.mistake-cluster-head > svg {
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+
+.mistake-pattern-items {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.mistake-pattern-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.mistake-copy {
+  min-width: 0;
+}
+
+.mistake-copy > strong {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.mistake-copy p {
+  margin: 5px 0;
+  line-height: 1.45;
+}
+
+.mistake-resolve {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+@media (min-width: 620px) {
+  .recommendation-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .recommendation-actions {
+    min-width: 150px;
+  }
+
+  .mistake-pattern-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}

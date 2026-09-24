@@ -17,6 +17,7 @@ type ReadingLexeme = {
   translations: Array<{ language: string; text: string }>;
   patterns: Array<{ pattern: string; explanation: string | null }>;
   examples: Array<{ german: string; english: string | null; persian: string | null }>;
+  collocations: string[];
 };
 
 function escapeRegex(value: string) {
@@ -140,6 +141,19 @@ export function ReadingViewer({
                   {pattern.explanation ? <p className="muted">{pattern.explanation}</p> : null}
                 </div>
               ))}
+            </div>
+          ) : null}
+
+          {selected.collocations.length ? (
+            <div className="reading-detail-section">
+              <span className="eyebrow">COLLOCATIONS</span>
+              <div className="relation-list">
+                {selected.collocations.map((collocation) => (
+                  <span className="relation-chip" key={collocation}>
+                    <span>{collocation}</span>
+                  </span>
+                ))}
+              </div>
             </div>
           ) : null}
 

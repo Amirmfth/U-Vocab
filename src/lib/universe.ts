@@ -6,6 +6,7 @@ export type UniverseNode = {
   kind: "LEXEME" | "TOPIC";
   label: string;
   sublabel: string | null;
+  meaning: string | null;
   state: "unknown" | "learning" | "known" | "mastered" | "weak" | "topic";
   lexemeId: string | null;
 };
@@ -44,6 +45,8 @@ export async function getUniverseBranch(input: {
         include: {
           target: {
             include: {
+              translations: true,
+              translations: true,
               userStates: { where: { userId: input.userId }, take: 1 },
             },
           },
@@ -77,6 +80,7 @@ export async function getUniverseBranch(input: {
     kind: "LEXEME",
     label: (root.article ? root.article + " " : "") + root.lemma,
     sublabel: root.partOfSpeech,
+    meaning: root.translations.find((translation) => translation.language === "en")?.text ?? root.translations[0]?.text ?? null,
     state: learnerState(
       rootState?.state,
       rootState?.production,
@@ -94,6 +98,7 @@ export async function getUniverseBranch(input: {
         (relation.target.article ? relation.target.article + " " : "") +
         relation.target.lemma,
       sublabel: relation.target.partOfSpeech,
+      meaning: relation.target.translations.find((translation) => translation.language === "en")?.text ?? relation.target.translations[0]?.text ?? null,
       state: learnerState(
         targetState?.state,
         targetState?.production,
@@ -118,6 +123,7 @@ export async function getUniverseBranch(input: {
         (relation.source.article ? relation.source.article + " " : "") +
         relation.source.lemma,
       sublabel: relation.source.partOfSpeech,
+      meaning: relation.source.translations.find((translation) => translation.language === "en")?.text ?? relation.source.translations[0]?.text ?? null,
       state: learnerState(
         sourceState?.state,
         sourceState?.production,
@@ -140,6 +146,7 @@ export async function getUniverseBranch(input: {
       kind: "TOPIC",
       label: membership.topicPack.topic,
       sublabel: membership.topicPack.title,
+      meaning: membership.topicPack.description,
       state: "topic",
       lexemeId: null,
     });
@@ -175,6 +182,7 @@ export async function getUniverseBranch(input: {
             (item.lexeme.article ? item.lexeme.article + " " : "") +
             item.lexeme.lemma,
           sublabel: "semantic " + Math.round(item.similarity * 100) + "%",
+          meaning: item.lexeme.translations.find((translation) => translation.language === "en")?.text ?? item.lexeme.translations[0]?.text ?? null,
           state: learnerState(
             state?.state,
             state?.production,

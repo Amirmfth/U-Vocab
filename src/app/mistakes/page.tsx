@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { Brain, Layers3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -5,7 +6,6 @@ import { clusterOpenMistakes } from "@/lib/semantic/clusters";
 import { MistakeResolveButton } from "./MistakeResolveButton";
 import { MistakeRefreshButton } from "./MistakeRefreshButton";
 
-export const dynamic = "force-dynamic";
 
 function clusterTitle(types: string[], count: number) {
   const normalized = types
@@ -16,6 +16,7 @@ function clusterTitle(types: string[], count: number) {
 }
 
 export default async function MistakesPage() {
+  await connection();
   const user = await getCurrentUser();
   const clusters = await clusterOpenMistakes(user.id);
   const total = clusters.reduce((sum, cluster) => sum + cluster.items.length, 0);

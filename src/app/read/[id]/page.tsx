@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -6,13 +7,13 @@ import { getCurrentUser } from "@/lib/current-user";
 import { ReadingViewer } from "./ReadingViewer";
 import { RecordEncountersForm } from "./RecordEncountersForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function ReadingDocumentPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
 
   const document = await db.readingDocument.findFirst({

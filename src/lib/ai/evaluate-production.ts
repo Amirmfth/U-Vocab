@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
@@ -43,8 +44,9 @@ export async function evaluateVocabularyProduction(input: {
   examples: string[];
   answer: string;
 }) {
+  const perf = startOperation("ai.answer_evaluation", { model: AI_MODEL, answerChars: input.answer.length, exerciseType: input.exerciseType });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -63,7 +65,7 @@ export async function evaluateVocabularyProduction(input: {
           "production_evaluation",
         ),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -87,8 +89,15 @@ export async function evaluateVocabularyProduction(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid production evaluation.")) {
       await recordAIUsage({
         userId: input.userId,

@@ -116,6 +116,7 @@ export async function generateInsightAction(
             english: example.english,
             persian: example.persian,
             level: user.targetLevel,
+            register: example.register,
             generatedByAi: true,
           })),
         });

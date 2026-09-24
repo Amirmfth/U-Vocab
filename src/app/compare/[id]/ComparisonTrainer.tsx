@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, Send, XCircle } from "lucide-react";
 import { StatusNotice } from "@/components/status-notice";
 import type { ComparisonContent } from "@/lib/ai/compare-words";
@@ -20,6 +21,8 @@ export function ComparisonTrainer({
   rightLabel: string;
   content: ComparisonContent;
 }) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [answers, setAnswers] = useState<
     Record<number, { correct: boolean; explanation: string; expected: string }>
   >({});
@@ -32,6 +35,7 @@ export function ComparisonTrainer({
 
   return (
     <div className="compare-trainer">
+      {error ? <StatusNotice tone="error">{error}</StatusNotice> : null}
       <section className="panel compare-questions">
         <div className="section-heading">
           <div>
@@ -55,6 +59,8 @@ export function ComparisonTrainer({
                     key={choice}
                     onClick={() =>
                       startChoice(async () => {
+                        setError(null);
+                        try {
                         const response = await recordComparisonChoice({
                           pairId,
                           questionIndex: index,
@@ -64,6 +70,10 @@ export function ComparisonTrainer({
                           ...current,
                           [index]: response,
                         }));
+                        router.refresh();
+                        } catch (actionError) {
+                          setError(actionError instanceof Error ? actionError.message : "Could not save this answer.");
+                        }
                       })
                     }
                   >
@@ -122,6 +132,8 @@ export function ComparisonTrainer({
                 disabled={pendingProduction || !(productionAnswers[key] ?? "").trim()}
                 onClick={() =>
                   startProduction(async () => {
+                    setError(null);
+                    try {
                     const response = await evaluateComparisonProduction({
                       pairId,
                       target: key,
@@ -131,6 +143,10 @@ export function ComparisonTrainer({
                       ...current,
                       [key]: response,
                     }));
+                    router.refresh();
+                    } catch (actionError) {
+                      setError(actionError instanceof Error ? actionError.message : "Could not evaluate this sentence.");
+                    }
                   })
                 }
               >

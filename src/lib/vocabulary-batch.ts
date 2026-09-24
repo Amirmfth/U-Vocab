@@ -45,3 +45,38 @@ export async function updateVocabularyMasteryBatch(
     `,
   );
 }
+
+export async function updateConversationTargetsBatch(
+  db: Pick<PrismaClient, "$executeRaw">,
+  updates: Array<{
+    id: string;
+    successful: boolean;
+    lastUsedAt: Date;
+  }>,
+) {
+  if (!updates.length) return 0;
+
+  const values = Prisma.join(
+    updates.map((update) =>
+      Prisma.sql`(
+        ${update.id}::text,
+        ${update.successful ? 1 : 0}::integer,
+        ${update.lastUsedAt}::timestamptz
+      )`,
+    ),
+  );
+
+  return db.$executeRaw(
+    Prisma.sql`
+      UPDATE "ConversationTarget" AS target
+      SET
+        "uses" = target."uses" + 1,
+        "successfulUses" = target."successfulUses" + v.successful,
+        "lastUsedAt" = v.last_used_at
+      FROM (
+        VALUES ${values}
+      ) AS v(id, successful, last_used_at)
+      WHERE target.id = v.id
+    `,
+  );
+}

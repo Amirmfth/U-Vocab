@@ -40,14 +40,16 @@ const ROUTE_OWNERS: RouteOwner[] = [
 ];
 
 export function routeOwner(pathname: string) {
-  if (pathname === "/") {
+  const path = pathname.split(/[?#]/u)[0] || "/";
+
+  if (path === "/") {
     return { section: "home" as const, label: "Home", group: undefined };
   }
 
   const match = ROUTE_OWNERS
     .filter(
       (route) =>
-        pathname === route.prefix || pathname.startsWith(route.prefix + "/"),
+        path === route.prefix || path.startsWith(route.prefix + "/"),
     )
     .sort((a, b) => b.prefix.length - a.prefix.length)[0];
 

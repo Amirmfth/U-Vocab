@@ -17,6 +17,10 @@ export async function getRescueWords(userId: string, limit = 10) {
             translations: true,
             patterns: true,
             examples: { take: 3 },
+            mistakes: {
+              where: { userId, resolvedAt: null },
+              select: { type: true },
+            },
           },
         },
       },

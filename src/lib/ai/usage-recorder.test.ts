@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { recordAIUsage } from "./usage";
+import type { AIUsageRecordInput } from "./usage";
 import { createAIUsageRecorder } from "./usage-recorder";
 
 function persistenceSpy() {
-  const calls: Array<Parameters<typeof recordAIUsage>[0]> = [];
-  const persist: typeof recordAIUsage = async (input) => {
+  const calls: AIUsageRecordInput[] = [];
+  const persist = async (input: AIUsageRecordInput) => {
     calls.push(input);
   };
   return { calls, persist };

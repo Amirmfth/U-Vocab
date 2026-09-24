@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { AI_PROVIDER } from "./client";
+import { promptVersionFor } from "./prompt-versions";
 
 type UsageLike = {
   input_tokens?: number | null;
@@ -10,6 +12,8 @@ export async function recordAIUsage(input: {
   userId: string;
   operation: string;
   model: string;
+  provider?: string;
+  promptVersion?: string;
   status: "SUCCESS" | "ERROR";
   usage?: UsageLike | null;
   requestId?: string | null;
@@ -20,7 +24,10 @@ export async function recordAIUsage(input: {
       data: {
         userId: input.userId,
         operation: input.operation,
+        provider: input.provider ?? AI_PROVIDER,
         model: input.model,
+        promptVersion:
+          input.promptVersion ?? promptVersionFor(input.operation),
         status: input.status,
         inputTokens: input.usage?.input_tokens ?? 0,
         outputTokens: input.usage?.output_tokens ?? 0,

@@ -4081,3 +4081,261 @@ summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* AI usage operations dashboard */
+.usage-dashboard {
+  --usage-gap: 12px;
+}
+
+.usage-cost-grid,
+.usage-summary-grid,
+.usage-breakdown-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--usage-gap);
+}
+
+.usage-cost-card,
+.usage-summary-grid > .panel {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.usage-cost-card > span,
+.usage-summary-grid > .panel > span {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.usage-cost-card > strong,
+.usage-summary-grid > .panel > strong {
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 1.55rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.usage-cost-card > small,
+.usage-summary-grid > .panel > small {
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.usage-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.usage-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.usage-filters .button {
+  align-self: end;
+}
+
+.usage-chart-panel {
+  overflow: hidden;
+}
+
+.usage-cost-chart {
+  min-height: 180px;
+  display: flex;
+  align-items: stretch;
+  gap: 5px;
+  overflow-x: auto;
+  padding: 8px 0 0;
+}
+
+.usage-cost-day {
+  min-width: 26px;
+  flex: 1 0 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.usage-cost-bar-track {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.usage-cost-bar {
+  width: min(18px, 72%);
+  min-height: 3px;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--primary);
+}
+
+.usage-cost-day small {
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  writing-mode: vertical-rl;
+}
+
+.usage-analytics-list,
+.usage-request-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.usage-analytics-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.usage-analytics-row:last-child,
+.usage-request-row:last-child {
+  border-bottom: 0;
+}
+
+.usage-analytics-row > div:first-child,
+.usage-analytics-numbers {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.usage-analytics-row span,
+.usage-request-row span {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+.usage-analytics-numbers {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.usage-analytics-numbers strong {
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.usage-request-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.usage-request-main,
+.usage-request-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.usage-request-main > div:first-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.usage-request-main > div:first-child strong,
+.usage-request-main > div:first-child span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-request-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+
+.usage-request-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.usage-request-metrics span {
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-raised);
+}
+
+.usage-request-metrics b {
+  display: block;
+  color: var(--text-soft);
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 0.72rem;
+}
+
+.usage-request-foot {
+  flex-direction: column;
+  gap: 3px;
+}
+
+@media (min-width: 620px) {
+  .usage-cost-grid,
+  .usage-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .usage-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .usage-filters .button {
+    grid-column: 1 / -1;
+  }
+
+  .usage-request-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .usage-request-foot {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 940px) {
+  .usage-cost-grid,
+  .usage-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .usage-breakdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .usage-filters {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: end;
+  }
+
+  .usage-filters .button {
+    grid-column: auto;
+    min-height: 48px;
+  }
+
+  .usage-request-metrics {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}

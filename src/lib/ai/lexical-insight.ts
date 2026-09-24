@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const lexicalInsightSchema = z.object({
@@ -34,6 +34,12 @@ export async function generateLexicalInsight(input: {
   compareWith?: string | null;
 }) {
   const perf = startOperation("ai.lexical_insight", { model: AI_MODEL });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "lexical_insight",
+    model: AI_MODEL,
+    metadata: { level: input.level, patternCount: input.patterns.length, hasComparison: Boolean(input.compareWith) },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -54,26 +60,12 @@ export async function generateLexicalInsight(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "lexical_insight",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed lexical insight.",
-      });
-      throw new Error("OpenAI did not return a valid lexical insight.");
+      const parseError = new Error("OpenAI did not return a valid lexical insight.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "lexical_insight",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -85,13 +77,7 @@ export async function generateLexicalInsight(input: {
   } catch (error) {
     perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid lexical insight.")) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "lexical_insight",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

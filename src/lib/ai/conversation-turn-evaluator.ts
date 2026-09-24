@@ -68,7 +68,7 @@ export async function evaluateConversationTurn(input: {
           content:
             "Evaluate only the learner's use of the supplied German target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, case/preposition, form, spelling, and naturalness. Do not penalize unrelated grammar. relevantCorrection should be a very short conversational correction only when useful; otherwise null.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: {
         format: zodTextFormat(

@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateTopicPack } from "@/lib/ai/topic-pack";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { deduplicateLexicalItems } from "@/lib/lexical-batch";
 
 export type TopicPackState = {
   status: "idle" | "success" | "error";
@@ -39,8 +40,111 @@ export async function createTopicPack(
       size,
     });
 
+    const items = deduplicateLexicalItems(result.items).map(
+      (item, position) => ({
+        ...item,
+        normalized: item.lemma.toLocaleLowerCase("de-DE").trim(),
+        position,
+      }),
+    );
+
+    const lookup = items.map((item) => ({
+      language: "de",
+      normalized: item.normalized,
+      partOfSpeech: item.partOfSpeech as PartOfSpeech,
+    }));
+    const existing = lookup.length
+      ? await db.lexeme.findMany({
+          where: { OR: lookup },
+          select: {
+            id: true,
+            normalized: true,
+            partOfSpeech: true,
+          },
+        })
+      : [];
+    const existingKeys = new Set(
+      existing.map(
+        (lexeme) => lexeme.normalized + ":" + lexeme.partOfSpeech,
+      ),
+    );
+    const missing = items.filter(
+      (item) =>
+        !existingKeys.has(item.normalized + ":" + item.partOfSpeech),
+    );
+
     const pack = await db.$transaction(
       async (tx) => {
+        if (missing.length) {
+          await tx.lexeme.createMany({
+            data: missing.map((item) => ({
+              lemma: item.lemma,
+              normalized: item.normalized,
+              language: "de",
+              partOfSpeech: item.partOfSpeech as PartOfSpeech,
+              article: item.article,
+              plural: item.plural,
+            })),
+            skipDuplicates: true,
+          });
+        }
+
+        const lexemes = lookup.length
+          ? await tx.lexeme.findMany({
+              where: { OR: lookup },
+              select: {
+                id: true,
+                normalized: true,
+                partOfSpeech: true,
+                translations: { select: { language: true } },
+              },
+            })
+          : [];
+        const lexemeByKey = new Map(
+          lexemes.map((lexeme) => [
+            lexeme.normalized + ":" + lexeme.partOfSpeech,
+            lexeme.id,
+          ]),
+        );
+
+        if (missing.length) {
+          const lexemeByFullKey = new Map(
+            lexemes.map((lexeme) => [
+              lexeme.normalized + ":" + lexeme.partOfSpeech,
+              lexeme,
+            ]),
+          );
+          const translations = missing.flatMap((item) => {
+            const lexeme = lexemeByFullKey.get(
+              item.normalized + ":" + item.partOfSpeech,
+            );
+            if (!lexeme) return [];
+
+            const languages = new Set(
+              lexeme.translations.map((translation) => translation.language),
+            );
+            return [
+              ...(!languages.has("en")
+                ? [{
+                    lexemeId: lexeme.id,
+                    language: "en",
+                    text: item.englishMeaning,
+                  }]
+                : []),
+              ...(!languages.has("fa")
+                ? [{
+                    lexemeId: lexeme.id,
+                    language: "fa",
+                    text: item.persianMeaning,
+                  }]
+                : []),
+            ];
+          });
+          if (translations.length) {
+            await tx.translation.createMany({ data: translations });
+          }
+        }
+
         const created = await tx.topicPack.create({
           data: {
             userId: user.id,
@@ -51,55 +155,30 @@ export async function createTopicPack(
           },
         });
 
-        const seen = new Set<string>();
-        let position = 0;
+        const packItems = items.flatMap((item) => {
+          const lexemeId = lexemeByKey.get(
+            item.normalized + ":" + item.partOfSpeech,
+          );
+          return lexemeId
+            ? [{
+                topicPackId: created.id,
+                lexemeId,
+                rationale: item.rationale,
+                usefulness: item.usefulness,
+                position: item.position,
+              }]
+            : [];
+        });
 
-        for (const item of result.items) {
-          const normalized = item.lemma.toLocaleLowerCase("de-DE").trim();
-          const key = normalized + ":" + item.partOfSpeech;
-          if (seen.has(key)) continue;
-          seen.add(key);
-
-          const lexeme = await tx.lexeme.upsert({
-            where: {
-              language_normalized_partOfSpeech: {
-                language: "de",
-                normalized,
-                partOfSpeech: item.partOfSpeech as PartOfSpeech,
-              },
-            },
-            create: {
-              lemma: item.lemma,
-              normalized,
-              partOfSpeech: item.partOfSpeech as PartOfSpeech,
-              article: item.article,
-              plural: item.plural,
-              translations: {
-                create: [
-                  { language: "en", text: item.englishMeaning },
-                  { language: "fa", text: item.persianMeaning },
-                ],
-              },
-            },
-            update: {},
-          });
-
-          await tx.topicPackItem.create({
-            data: {
-              topicPackId: created.id,
-              lexemeId: lexeme.id,
-              rationale: item.rationale,
-              usefulness: item.usefulness,
-              position: position++,
-            },
-          });
+        if (packItems.length) {
+          await tx.topicPackItem.createMany({ data: packItems });
         }
 
         return created;
       },
       {
         maxWait: 10_000,
-        timeout: 20_000,
+        timeout: 10_000,
       },
     );
 
@@ -162,29 +241,19 @@ export async function addPackToVocabulary(
     const user = await getCurrentUser();
     const pack = await db.topicPack.findFirst({
       where: { id: packId, userId: user.id },
-      include: { items: true },
+      select: { id: true, items: { select: { lexemeId: true } } },
     });
 
     if (!pack) return { status: "error", message: "Topic pack not found." };
 
-    await db.$transaction(
-      pack.items.map((item) =>
-        db.userVocabulary.upsert({
-          where: {
-            userId_lexemeId: {
-              userId: user.id,
-              lexemeId: item.lexemeId,
-            },
-          },
-          create: {
-            userId: user.id,
-            lexemeId: item.lexemeId,
-            nextReviewAt: new Date(),
-          },
-          update: {},
-        }),
-      ),
-    );
+    await db.userVocabulary.createMany({
+      data: pack.items.map((item) => ({
+        userId: user.id,
+        lexemeId: item.lexemeId,
+        nextReviewAt: new Date(),
+      })),
+      skipDuplicates: true,
+    });
 
     revalidateUserDomains(
       user.id,
@@ -212,29 +281,19 @@ export async function launchPackSession(formData: FormData) {
 
   const pack = await db.topicPack.findFirst({
     where: { id: packId, userId: user.id },
-    include: { items: true },
+    select: { id: true, items: { select: { lexemeId: true } } },
   });
 
   if (!pack) throw new Error("Topic pack not found.");
 
-  await db.$transaction(
-    pack.items.map((item) =>
-      db.userVocabulary.upsert({
-        where: {
-          userId_lexemeId: {
-            userId: user.id,
-            lexemeId: item.lexemeId,
-          },
-        },
-        create: {
-          userId: user.id,
-          lexemeId: item.lexemeId,
-          nextReviewAt: new Date(),
-        },
-        update: {},
-      }),
-    ),
-  );
+  await db.userVocabulary.createMany({
+    data: pack.items.map((item) => ({
+      userId: user.id,
+      lexemeId: item.lexemeId,
+      nextReviewAt: new Date(),
+    })),
+    skipDuplicates: true,
+  });
 
   revalidateUserDomains(
     user.id,

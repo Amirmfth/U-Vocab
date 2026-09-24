@@ -38,6 +38,7 @@ export function VocabularyFilters({
   const searchParams = useSearchParams();
   const [menu, setMenu] = useState<"types" | FilterKey | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filters: FilterDefinition[] = [
     {
@@ -77,7 +78,10 @@ export function VocabularyFilters({
     }
 
     document.addEventListener("pointerdown", closeMenu);
-    return () => document.removeEventListener("pointerdown", closeMenu);
+    return () => {
+      document.removeEventListener("pointerdown", closeMenu);
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
   }, []);
 
   function setParam(key: FilterKey, value: string) {
@@ -86,6 +90,18 @@ export function VocabularyFilters({
     else params.set(key, value);
     router.push("/vocabulary" + (params.toString() ? "?" + params.toString() : ""));
     setMenu(null);
+  }
+
+  function updateSearch(value: string) {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+    searchTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      const query = value.trim();
+      if (query) params.set("q", query);
+      else params.delete("q");
+      router.replace("/vocabulary" + (params.toString() ? "?" + params.toString() : ""));
+    }, 180);
   }
 
   const activeFilters = filters.flatMap((filter) => {
@@ -105,6 +121,7 @@ export function VocabularyFilters({
         <input
           name="q"
           defaultValue={current.q}
+          onChange={(event) => updateSearch(event.currentTarget.value)}
           placeholder="Search German, English, or Persian…"
           aria-label="Search vocabulary"
         />

@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { deduplicateLexicalItems } from "@/lib/lexical-batch";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -52,9 +53,146 @@ export async function createReadingDocument(
           }),
         );
 
+        const lexicalUnits = deduplicateLexicalItems(
+          analysis.lexicalUnits,
+        ).map((unit, position) => ({
+            ...unit,
+            normalized: unit.lemma.toLocaleLowerCase("de-DE").trim(),
+            position,
+          }));
+
+        const lookup = lexicalUnits.map((unit) => ({
+          language: "de",
+          normalized: unit.normalized,
+          partOfSpeech: unit.partOfSpeech as PartOfSpeech,
+        }));
+
+        const existing = lookup.length
+          ? await perf.span("dbRead", () =>
+              db.lexeme.findMany({
+                where: { OR: lookup },
+                select: {
+                  id: true,
+                  normalized: true,
+                  partOfSpeech: true,
+                },
+              }),
+            )
+          : [];
+
+        const existingKeys = new Set(
+          existing.map(
+            (lexeme) => lexeme.normalized + ":" + lexeme.partOfSpeech,
+          ),
+        );
+        const missingUnits = lexicalUnits.filter(
+          (unit) =>
+            !existingKeys.has(unit.normalized + ":" + unit.partOfSpeech),
+        );
+        const missingKeys = new Set(
+          missingUnits.map(
+            (unit) => unit.normalized + ":" + unit.partOfSpeech,
+          ),
+        );
+
         const document = await perf.span("dbWrite", () =>
           db.$transaction(
             async (tx) => {
+              if (missingUnits.length) {
+                await tx.lexeme.createMany({
+                  data: missingUnits.map((unit) => ({
+                    lemma: unit.lemma,
+                    normalized: unit.normalized,
+                    language: "de",
+                    partOfSpeech: unit.partOfSpeech as PartOfSpeech,
+                    article: unit.article,
+                    plural: unit.plural,
+                  })),
+                  skipDuplicates: true,
+                });
+              }
+
+              const lexemes = lookup.length
+                ? await tx.lexeme.findMany({
+                    where: { OR: lookup },
+                    select: {
+                      id: true,
+                      normalized: true,
+                      partOfSpeech: true,
+                      translations: { select: { language: true } },
+                      patterns: { select: { id: true } },
+                    },
+                  })
+                : [];
+
+              const lexemeByKey = new Map(
+                lexemes.map((lexeme) => [
+                  lexeme.normalized + ":" + lexeme.partOfSpeech,
+                  lexeme,
+                ]),
+              );
+
+              const translations = [];
+              const patterns = [];
+              const examples = [];
+              const readingItems = [];
+
+              for (const unit of lexicalUnits) {
+                const key = unit.normalized + ":" + unit.partOfSpeech;
+                const lexeme = lexemeByKey.get(key);
+                if (!lexeme) continue;
+
+                const languages = new Set(
+                  lexeme.translations.map((translation) => translation.language),
+                );
+                if (!languages.has("en")) {
+                  translations.push({
+                    lexemeId: lexeme.id,
+                    language: "en",
+                    text: unit.englishMeaning,
+                  });
+                }
+                if (!languages.has("fa")) {
+                  translations.push({
+                    lexemeId: lexeme.id,
+                    language: "fa",
+                    text: unit.persianMeaning,
+                  });
+                }
+                if (!lexeme.patterns.length && unit.pattern) {
+                  patterns.push({
+                    lexemeId: lexeme.id,
+                    pattern: unit.pattern,
+                    explanation: unit.patternExplanation,
+                  });
+                }
+                if (missingKeys.has(key) && unit.example) {
+                  examples.push({
+                    lexemeId: lexeme.id,
+                    german: unit.example,
+                    generatedByAi: true,
+                  });
+                }
+
+                readingItems.push({
+                  lexemeId: lexeme.id,
+                  surfaceText: unit.surfaceText,
+                  surfaceForms: unit.surfaceForms,
+                  occurrences: unit.occurrences,
+                  position: unit.position,
+                });
+              }
+
+              if (translations.length) {
+                await tx.translation.createMany({ data: translations });
+              }
+              if (patterns.length) {
+                await tx.lexicalPattern.createMany({ data: patterns });
+              }
+              if (examples.length) {
+                await tx.example.createMany({ data: examples });
+              }
+
               const created = await tx.readingDocument.create({
                 data: {
                   userId: user.id,
@@ -65,129 +203,12 @@ export async function createReadingDocument(
                 },
               });
 
-              const seen = new Set<string>();
-              let position = 0;
-
-              for (const unit of analysis.lexicalUnits) {
-                const normalized = unit.lemma
-                  .toLocaleLowerCase("de-DE")
-                  .trim();
-                const key = normalized + ":" + unit.partOfSpeech;
-                if (seen.has(key)) continue;
-                seen.add(key);
-
-                let lexeme = await tx.lexeme.findUnique({
-                  where: {
-                    language_normalized_partOfSpeech: {
-                      language: "de",
-                      normalized,
-                      partOfSpeech: unit.partOfSpeech as PartOfSpeech,
-                    },
-                  },
-                  include: {
-                    translations: true,
-                    patterns: true,
-                  },
-                });
-
-                if (!lexeme) {
-                  lexeme = await tx.lexeme.create({
-                    data: {
-                      lemma: unit.lemma,
-                      normalized,
-                      partOfSpeech: unit.partOfSpeech as PartOfSpeech,
-                      article: unit.article,
-                      plural: unit.plural,
-                      translations: {
-                        create: [
-                          {
-                            language: "en",
-                            text: unit.englishMeaning,
-                          },
-                          {
-                            language: "fa",
-                            text: unit.persianMeaning,
-                          },
-                        ],
-                      },
-                      patterns: unit.pattern
-                        ? {
-                            create: [{
-                              pattern: unit.pattern,
-                              explanation: unit.patternExplanation,
-                            }],
-                          }
-                        : undefined,
-                      examples: unit.example
-                        ? {
-                            create: [{
-                              german: unit.example,
-                              generatedByAi: true,
-                            }],
-                          }
-                        : undefined,
-                    },
-                    include: {
-                      translations: true,
-                      patterns: true,
-                    },
-                  });
-                } else {
-                  const hasEnglish = lexeme.translations.some(
-                    (item) => item.language === "en",
-                  );
-                  const hasPersian = lexeme.translations.some(
-                    (item) => item.language === "fa",
-                  );
-                  const missingPatterns =
-                    !lexeme.patterns.length && unit.pattern;
-
-                  if (!hasEnglish || !hasPersian || missingPatterns) {
-                    lexeme = await tx.lexeme.update({
-                      where: { id: lexeme.id },
-                      data: {
-                        translations: {
-                          create: [
-                            ...(!hasEnglish
-                              ? [{
-                                  language: "en",
-                                  text: unit.englishMeaning,
-                                }]
-                              : []),
-                            ...(!hasPersian
-                              ? [{
-                                  language: "fa",
-                                  text: unit.persianMeaning,
-                                }]
-                              : []),
-                          ],
-                        },
-                        patterns: missingPatterns
-                          ? {
-                              create: [{
-                                pattern: unit.pattern!,
-                                explanation: unit.patternExplanation,
-                              }],
-                            }
-                          : undefined,
-                      },
-                      include: {
-                        translations: true,
-                        patterns: true,
-                      },
-                    });
-                  }
-                }
-
-                await tx.readingItem.create({
-                  data: {
+              if (readingItems.length) {
+                await tx.readingItem.createMany({
+                  data: readingItems.map((item) => ({
                     readingDocumentId: created.id,
-                    lexemeId: lexeme.id,
-                    surfaceText: unit.surfaceText,
-                    surfaceForms: unit.surfaceForms,
-                    occurrences: unit.occurrences,
-                    position: position++,
-                  },
+                    ...item,
+                  })),
                 });
               }
 
@@ -195,7 +216,7 @@ export async function createReadingDocument(
             },
             {
               maxWait: 10_000,
-              timeout: 60_000,
+              timeout: 20_000,
             },
           ),
         );
@@ -298,7 +319,11 @@ export async function recordReadingEncounters(
     const user = await getCurrentUser();
     const document = await db.readingDocument.findFirst({
       where: { id: documentId, userId: user.id },
-      include: { items: true },
+      select: {
+        id: true,
+        content: true,
+        items: { select: { lexemeId: true } },
+      },
     });
 
     if (!document) {

@@ -114,14 +114,28 @@ export async function completeConversationAction(
         status: "ACTIVE",
         turnInFlight: false,
       },
-      include: {
+      select: {
+        id: true,
+        kind: true,
+        level: true,
+        scenario: true,
+        objective: true,
         targets: {
-          include: {
-            lexeme: { include: { patterns: true } },
+          select: {
+            lexemeId: true,
+            uses: true,
+            successfulUses: true,
+            lexeme: {
+              select: {
+                lemma: true,
+                patterns: { select: { pattern: true } },
+              },
+            },
           },
           orderBy: { position: "asc" },
         },
         messages: {
+          select: { role: true, content: true },
           orderBy: { createdAt: "desc" },
           take: 40,
         },
@@ -184,24 +198,16 @@ export async function completeConversationAction(
         },
       });
 
-      for (const target of session.targets) {
-        await tx.encounter.upsert({
-          where: {
-            userId_lexemeId_source_sourceRef: {
-              userId: user.id,
-              lexemeId: target.lexemeId,
-              source: session.kind === "MISSION" ? "mission" : "conversation",
-              sourceRef: session.id,
-            },
-          },
-          create: {
+      if (session.targets.length) {
+        await tx.encounter.createMany({
+          data: session.targets.map((target) => ({
             userId: user.id,
             lexemeId: target.lexemeId,
             source: session.kind === "MISSION" ? "mission" : "conversation",
             sourceRef: session.id,
             context: session.scenario,
-          },
-          update: {},
+          })),
+          skipDuplicates: true,
         });
       }
     });

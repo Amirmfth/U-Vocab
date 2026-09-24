@@ -227,6 +227,8 @@ model LexicalPattern {
   pattern     String
   explanation String?
   lexeme      Lexeme  @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@index([lexemeId])
 }
 
 model Example {
@@ -239,6 +241,8 @@ model Example {
   register      String?
   generatedByAi Boolean @default(false)
   lexeme        Lexeme  @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@index([lexemeId])
 }
 
 model LexemeRelation {
@@ -250,6 +254,7 @@ model LexemeRelation {
   target   Lexeme       @relation("target", fields: [targetId], references: [id], onDelete: Cascade)
 
   @@unique([sourceId, targetId, type])
+  @@index([targetId, type])
 }
 
 model UserVocabulary {
@@ -277,6 +282,7 @@ model UserVocabulary {
   @@unique([userId, lexemeId])
   @@index([userId, state])
   @@index([userId, nextReviewAt])
+  @@index([userId, addedAt])
 }
 
 model Review {
@@ -330,6 +336,7 @@ model Mistake {
 
   @@index([userId, type, lastOccurredAt])
   @@index([userId, lexemeId, type])
+  @@index([userId, resolvedAt, lastOccurredAt])
 }
 
 model Encounter {
@@ -424,6 +431,7 @@ model TopicPackItem {
 
   @@unique([topicPackId, lexemeId])
   @@index([topicPackId, position])
+  @@index([lexemeId])
 }
 
 model Story {

@@ -59,6 +59,7 @@ export async function commitIngestionCandidates(
   },
 ) {
   const unique = deduplicateCandidates(input.candidates);
+  const timeout = Math.min(120_000, Math.max(20_000, unique.length * 1_500));
 
   return db.$transaction(async (tx) => {
     const ids: string[] = [];
@@ -147,5 +148,11 @@ export async function commitIngestionCandidates(
     }
 
     return ids;
+  }, {
+    // Each candidate creates or links several dependent records. Scale the
+    // transaction window for pasted-text batches instead of using Prisma's
+    // five-second default.
+    maxWait: 10_000,
+    timeout,
   });
 }

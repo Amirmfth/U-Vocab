@@ -45,7 +45,15 @@ export async function createStory(
     const targets = selectedIds.length
       ? await db.userVocabulary.findMany({
           where: { userId: user.id, lexemeId: { in: selectedIds } },
-          include: { lexeme: { include: { patterns: true } } },
+          select: {
+            lexemeId: true,
+            lexeme: {
+              select: {
+                lemma: true,
+                patterns: { select: { pattern: true } },
+              },
+            },
+          },
           take: 10,
         })
       : await db.userVocabulary.findMany({
@@ -53,7 +61,15 @@ export async function createStory(
             userId: user.id,
             state: { in: ["NEW","LEARNING","FAMILIAR","ACTIVE"] },
           },
-          include: { lexeme: { include: { patterns: true } } },
+          select: {
+            lexemeId: true,
+            lexeme: {
+              select: {
+                lemma: true,
+                patterns: { select: { pattern: true } },
+              },
+            },
+          },
           orderBy: [
             { production: "asc" },
             { contextualUsage: "asc" },
@@ -140,7 +156,11 @@ export async function markStoryRead(
     const user = await getCurrentUser();
     const story = await db.story.findFirst({
       where: { id: storyId, userId: user.id },
-      include: { targets: true },
+      select: {
+        id: true,
+        content: true,
+        targets: { select: { lexemeId: true } },
+      },
     });
 
     if (!story) return { status: "error", message: "Story not found." };

@@ -1,5 +1,6 @@
 import type { MistakeType, PrismaClient } from "@prisma/client";
 import { ensureMistakeEmbedding } from "@/lib/semantic/embeddings";
+import { recordMistakesBatch } from "@/lib/mistakes-batch";
 
 export async function recordMistakes(
   db: PrismaClient,
@@ -15,53 +16,39 @@ export async function recordMistakes(
     }>;
   },
 ) {
-  const touchedIds: string[] = [];
+  if (!input.mistakes.length) return;
 
-  for (const mistake of input.mistakes) {
-    const existing = await db.mistake.findFirst({
-      where: {
-        userId: input.userId,
-        lexemeId: input.lexemeId,
-        type: mistake.type,
-        resolvedAt: null,
+  await recordMistakesBatch(db, {
+    userId: input.userId,
+    mistakes: input.mistakes.map((mistake) => ({
+      lexemeId: input.lexemeId,
+      ...mistake,
+    })),
+  });
+
+  if (input.embed === false) return;
+
+  const touched = await db.mistake.findMany({
+    where: {
+      userId: input.userId,
+      lexemeId: input.lexemeId,
+      resolvedAt: null,
+      type: {
+        in: Array.from(new Set(input.mistakes.map((mistake) => mistake.type))),
       },
-    });
+    },
+    select: { id: true },
+  });
 
-    if (existing) {
-      await db.mistake.update({
-        where: { id: existing.id },
-        data: {
-          occurrences: { increment: 1 },
-          expected: mistake.expected,
-          actual: mistake.actual,
-          explanation: mistake.explanation,
-          lastOccurredAt: new Date(),
-          embeddedAt: null,
-        },
-      });
-      touchedIds.push(existing.id);
-    } else {
-      const created = await db.mistake.create({
-        data: {
-          userId: input.userId,
-          lexemeId: input.lexemeId,
-          type: mistake.type,
-          expected: mistake.expected,
-          actual: mistake.actual,
-          explanation: mistake.explanation,
-        },
-      });
-      touchedIds.push(created.id);
-    }
-  }
+  const embeddingResults = await Promise.allSettled(
+    touched.map((mistake) =>
+      ensureMistakeEmbedding(mistake.id, input.userId, true),
+    ),
+  );
 
-  if (input.embed !== false) {
-    for (const mistakeId of touchedIds) {
-      try {
-        await ensureMistakeEmbedding(mistakeId, input.userId, true);
-      } catch (error) {
-        console.error("Failed to embed mistake", error);
-      }
+  for (const result of embeddingResults) {
+    if (result.status === "rejected") {
+      console.error("Failed to embed mistake", result.reason);
     }
   }
 }

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const conversationTurnEvaluationSchema = z.object({
   targetUsage: z.array(
@@ -48,8 +49,9 @@ export async function evaluateConversationTurn(input: {
     patterns: string[];
   }>;
 }) {
+  const perf = startOperation("ai.conversation_turn_evaluation", { model: AI_MODEL, messageChars: input.message.length, targetCount: input.targets.length, level: input.level });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -65,7 +67,7 @@ export async function evaluateConversationTurn(input: {
           "conversation_turn_evaluation",
         ),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -89,8 +91,15 @@ export async function evaluateConversationTurn(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (
       !(
         error instanceof Error &&

@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, BookOpenText, HelpCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { isTranslationVisible } from "@/lib/translations";
 import { ReadStoryButton } from "./ReadStoryButton";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,9 @@ function highlightStory(
   if (!sorted.length) return [content];
 
   const regex = new RegExp(
-    "(" + sorted.map((target) => escapeRegex(target.lexeme.lemma)).join("|") + ")",
+    "(?<![\\p{L}\\p{N}_])(" +
+      sorted.map((target) => escapeRegex(target.lexeme.lemma)).join("|") +
+      ")(?![\\p{L}\\p{N}_])",
     "giu",
   );
   const lookup = new Map(
@@ -105,33 +108,15 @@ export default async function StoryDetailPage({
       </section>
 
       <article className="panel story-reader">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">GERMAN READING</p>
-            <h2>Story</h2>
-          </div>
-          <BookOpenText size={20} />
-        </div>
-
         <div className="story-content">
           {highlightStory(story.content, story.targets)}
         </div>
-
-        <p className="form-help">
-          Highlighted target vocabulary opens its lexical detail page.
-        </p>
 
         <ReadStoryButton storyId={story.id} />
       </article>
 
       <section className="panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">TARGET VOCABULARY</p>
-            <h2>Words in this story</h2>
-          </div>
-          <BookOpenText size={20} />
-        </div>
+        <h2 className="section-title">Target words</h2>
 
         <div className="relation-list">
           {story.targets.map((target) => (
@@ -141,26 +126,25 @@ export default async function StoryDetailPage({
               key={target.id}
             >
               <span>{target.lexeme.lemma}</span>
-              <small>
-                {target.lexeme.translations.find((item) =>
-                  user.preferredTranslation === "PERSIAN"
-                    ? item.language === "fa"
-                    : item.language === "en",
-                )?.text ?? "Open details"}
-              </small>
+              {target.lexeme.translations
+                .filter((item) =>
+                  isTranslationVisible(user.preferredTranslation, item.language),
+                )
+                .map((item) => (
+                  <small
+                    key={item.id}
+                    className={item.language === "fa" ? "rtl" : undefined}
+                  >
+                    {item.text}
+                  </small>
+                ))}
             </Link>
           ))}
         </div>
       </section>
 
       <section className="panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">POST-READING</p>
-            <h2>Check your understanding</h2>
-          </div>
-          <HelpCircle size={20} />
-        </div>
+        <h2 className="section-title">Questions</h2>
 
         <div className="question-list">
           {questions.map((question, index) => (
@@ -176,7 +160,7 @@ export default async function StoryDetailPage({
       </section>
 
       <section className="panel story-summary">
-        <p className="eyebrow">SUMMARY</p>
+        <h2 className="section-title">Summary</h2>
         {user.preferredTranslation !== "PERSIAN" && story.englishSummary ? (
           <p>{story.englishSummary}</p>
         ) : null}

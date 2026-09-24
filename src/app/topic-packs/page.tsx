@@ -17,48 +17,26 @@ export default async function TopicPacksPage() {
 
   return (
     <main className="page">
-      <section className="page-header">
-        <p className="eyebrow">AI TOPIC VOCABULARY</p>
-        <h1>Topic packs</h1>
-        <p className="page-description">
-          Build focused German lexical collections for situations you actually
-          need, with English and Persian meanings and learner-state awareness.
-        </p>
-      </section>
+      <section className="page-header compact"><h1>Topic packs</h1></section>
 
       <TopicPackForm defaultLevel={user.targetLevel} />
 
       <section className="page-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">SAVED PACKS</p>
-            <h2>Your collections</h2>
-          </div>
-          <Layers3 size={20} />
-        </div>
-
+        <h2 className="section-title">Saved</h2>
         {packs.length ? (
-          <div className="grid">
+          <div className="collection-list">
             {packs.map((pack) => (
-              <Link className="card pack-card" href={"/topic-packs/" + pack.id} key={pack.id}>
-                <div className="word-meta">
-                  <span className="badge">{pack.level}</span>
-                  <span className="badge">{pack._count.items} items</span>
+              <Link className="collection-row" href={"/topic-packs/" + pack.id} key={pack.id}>
+                <div>
+                  <strong>{pack.title}</strong>
+                  <span>{pack.level} · {pack._count.items} words</span>
                 </div>
-                <h3>{pack.title}</h3>
-                <p className="muted">{pack.description}</p>
-                <span className="text-link">
-                  Open pack <ArrowRight size={15} />
-                </span>
+                <ArrowRight size={17} />
               </Link>
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <Layers3 size={22} />
-            <strong>No saved topic packs yet.</strong>
-            <span>Generate one above to create your first focused collection.</span>
-          </div>
+          <div className="empty-state compact-empty"><Layers3 size={22} /><strong>No saved packs</strong></div>
         )}
       </section>
     </main>

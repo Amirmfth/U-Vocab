@@ -92,9 +92,7 @@ export default async function RescuePage({
   }
 
   const requestedIds = query.ids.split(",").filter(Boolean);
-  const stableIds = requestedIds.filter((id) =>
-    ranked.some((item) => item.id === id),
-  );
+  const stableIds = requestedIds;
   const step = Math.max(0, Number(query.step ?? 0) || 0);
   const currentId = stableIds[step];
   const current = ranked.find((item) => item.id === currentId);

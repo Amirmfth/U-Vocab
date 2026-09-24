@@ -1,27 +1,15 @@
 import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, PenLine } from "lucide-react";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { WritingStartForm } from "./WritingStartForm";
+import { getCachedWritingIndex } from "@/lib/cached-data";
 
 
 export default async function WritingPage() {
   await connection();
   const user = await getCurrentUser();
-  const [collections, sessions] = await Promise.all([
-    db.topicPack.findMany({
-      where: { userId: user.id },
-      select: { id: true, title: true },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    }),
-    db.writingSession.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 12,
-    }),
-  ]);
+  const [collections, sessions] = await getCachedWritingIndex(user.id);
 
   return (
     <main className="page">
@@ -46,7 +34,7 @@ export default async function WritingPage() {
           <h2 className="section-title">Recent writing</h2>
           <div className="collection-list">
             {sessions.map((session) => (
-              <Link href={"/writing/" + session.id} className="collection-row" key={session.id}>
+              <Link href={"/writing/" + session.id} className="collection-row" key={session.id} prefetch>
                 <div>
                   <strong>{session.topic}</strong>
                   <span>

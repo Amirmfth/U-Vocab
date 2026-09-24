@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { analyzeGermanLexeme } from "@/lib/ai/analyze-word";
 import { getCurrentUser } from "@/lib/current-user";
 import { commitIngestionCandidates } from "@/lib/ingestion/service";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type CreateLexemeState = {
   status: "idle" | "error";
@@ -53,6 +54,11 @@ export async function createLexeme(
     }
 
     lexemeId = ids[0];
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "progress"],
+      [lexemeId],
+    );
   } catch (error) {
     return {
       status: "error",

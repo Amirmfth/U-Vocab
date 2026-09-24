@@ -12,6 +12,7 @@ import {
   commitIngestionCandidates,
   deduplicateCandidates,
 } from "@/lib/ingestion/service";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 import type {
   CandidateWithState,
   IngestionCandidate,
@@ -191,13 +192,18 @@ export async function confirmImport(
     }
 
     const user = await getCurrentUser();
-    await commitIngestionCandidates(db, {
+    const lexemeIds = await commitIngestionCandidates(db, {
       userId: user.id,
       sourceType,
       sourceRef: "import:" + crypto.randomUUID(),
       candidates,
     });
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "progress"],
+      lexemeIds,
+    );
     revalidatePath("/vocabulary");
     revalidatePath("/import");
 

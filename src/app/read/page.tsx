@@ -1,19 +1,15 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, ScanText } from "lucide-react";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { ReadingForm } from "./ReadingForm";
+import { getCachedReadingIndex } from "@/lib/cached-data";
 
-export const dynamic = "force-dynamic";
 
 export default async function ReadPage() {
+  await connection();
   const user = await getCurrentUser();
-  const documents = await db.readingDocument.findMany({
-    where: { userId: user.id },
-    include: { _count: { select: { items: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 30,
-  });
+  const documents = await getCachedReadingIndex(user.id);
 
   return (
     <main className="page">
@@ -33,6 +29,7 @@ export default async function ReadPage() {
                 key={document.id}
                 href={"/read/" + document.id}
                 className="collection-row"
+                prefetch
               >
                 <div>
                   <strong>{document.title ?? "Untitled reading"}</strong>

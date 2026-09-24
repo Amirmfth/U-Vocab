@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, CheckCircle2, LifeBuoy } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -7,13 +8,13 @@ import { selectReviewExerciseType } from "@/lib/exercises/review-select";
 import { isTranslationVisible } from "@/lib/translations";
 import { RescueCard } from "./RescueCard";
 
-export const dynamic = "force-dynamic";
 
 export default async function RescuePage({
   searchParams,
 }: {
   searchParams: Promise<{ ids?: string; step?: string }>;
 }) {
+  await connection();
   const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
   const ranked = await getRescueWords(user.id, 100);
 

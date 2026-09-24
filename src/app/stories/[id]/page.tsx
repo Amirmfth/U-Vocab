@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -7,7 +8,6 @@ import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { ReadStoryButton } from "./ReadStoryButton";
 
-export const dynamic = "force-dynamic";
 
 type StoryQuestion = {
   type: "COMPREHENSION" | "VOCABULARY";
@@ -67,6 +67,7 @@ export default async function StoryDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
 
   const story = await db.story.findFirst({

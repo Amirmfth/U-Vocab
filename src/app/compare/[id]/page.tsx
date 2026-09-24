@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -7,13 +8,13 @@ import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { ComparisonTrainer } from "./ComparisonTrainer";
 
-export const dynamic = "force-dynamic";
 
 export default async function ComparisonPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
   const pair = await db.confusionPair.findFirst({
     where: { id, userId: user.id },

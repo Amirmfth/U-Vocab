@@ -1,15 +1,16 @@
+import { connection } from "next/server";
 import { TriangleAlert } from "lucide-react";
 import { db } from "@/lib/db";
 import { formatCompactNumber, formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/lib/current-user";
 
-export const dynamic = "force-dynamic";
 
 function operationLabel(operation: string) {
   return operation.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 }
 
 export default async function UsagePage() {
+  await connection();
   const user = await getCurrentUser();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);

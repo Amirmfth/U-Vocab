@@ -1,12 +1,13 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { ConversationStartForm } from "./ConversationStartForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function ConversationPage() {
+  await connection();
   const user = await getCurrentUser();
   const [collections, sessions] = await Promise.all([
     db.topicPack.findMany({

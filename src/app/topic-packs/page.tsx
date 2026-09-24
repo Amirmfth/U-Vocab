@@ -1,12 +1,13 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, Layers3 } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { TopicPackForm } from "./TopicPackForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function TopicPacksPage() {
+  await connection();
   const user = await getCurrentUser();
   const packs = await db.topicPack.findMany({
     where: { userId: user.id },

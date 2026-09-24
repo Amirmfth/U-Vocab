@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, BookOpenCheck, Brain, Network } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -8,13 +9,13 @@ import { PracticeForm } from "@/app/practice/PracticeForm";
 import { LexicalInsightPanel } from "../LexicalInsightPanel";
 import { ScheduleReviewForm } from "./ScheduleReviewForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function TeachWordPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
 
   const word = await db.lexeme.findFirst({

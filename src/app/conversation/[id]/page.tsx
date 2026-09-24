@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Target, XCircle } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -10,7 +11,6 @@ import {
   ConversationReplay,
 } from "../ConversationFinish";
 
-export const dynamic = "force-dynamic";
 
 function percent(value: number) {
   return Math.round(value * 100);
@@ -21,6 +21,7 @@ export default async function ConversationSessionPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
   const session = await db.conversationSession.findFirst({
     where: { id, userId: user.id },

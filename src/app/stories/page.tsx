@@ -1,12 +1,13 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, BookOpenText } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { StoryForm } from "./StoryForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function StoriesPage() {
+  await connection();
   const user = await getCurrentUser();
   const [stories, vocabulary] = await Promise.all([
     db.story.findMany({

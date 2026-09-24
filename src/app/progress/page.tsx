@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, Clock3, Flame, ShieldCheck, TrendingUp } from "lucide-react";
 import { db } from "@/lib/db";
@@ -7,7 +8,6 @@ import { currentRetrievability } from "@/lib/fsrs";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { TimezoneSync } from "./TimezoneSync";
 
-export const dynamic = "force-dynamic";
 
 const RANGE_DAYS: Record<string, number | null> = {
   "7": 7,
@@ -48,6 +48,7 @@ export default async function ProgressPage({
 }: {
   searchParams: Promise<{ range?: string; day?: string }>;
 }) {
+  await connection();
   const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
   const range = query.range && query.range in RANGE_DAYS ? query.range : "30";
   const cutoff = rangeCutoff(range);

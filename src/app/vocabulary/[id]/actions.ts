@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateLexicalInsight } from "@/lib/ai/lexical-insight";
 import { generateWordExpansion } from "@/lib/ai/expand-word";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type InsightActionState = {
   status: "idle" | "success" | "error";
@@ -123,6 +124,7 @@ export async function generateInsightAction(
       }
     });
 
+    revalidateUserDomains(user.id, ["vocabulary"], [lexeme.id]);
     revalidatePath(`/vocabulary/${lexeme.id}`);
     revalidatePath(`/vocabulary/${lexeme.id}/teach`);
 
@@ -303,6 +305,11 @@ export async function addExpansionAction(
       }),
     ]);
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "progress"],
+      [source.id, target.id],
+    );
     revalidatePath(`/vocabulary/${source.id}`);
     revalidatePath("/vocabulary");
 
@@ -341,6 +348,11 @@ export async function scheduleTeachReviewAction(
       },
     });
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "progress"],
+      [lexemeId],
+    );
     revalidatePath(`/vocabulary/${lexemeId}/teach`);
     revalidatePath("/review");
 

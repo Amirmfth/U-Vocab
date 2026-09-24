@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -5,13 +6,13 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { BattleRunner } from "./BattleRunner";
 
-export const dynamic = "force-dynamic";
 
 export default async function BattlePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
   const session = await db.battleSession.findFirst({
     where: { id, userId: user.id },

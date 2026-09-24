@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateTopicPack } from "@/lib/ai/topic-pack";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type TopicPackState = {
   status: "idle" | "success" | "error";
@@ -102,6 +103,7 @@ export async function createTopicPack(
       },
     );
 
+    revalidateUserDomains(user.id, ["topicPacks", "vocabulary"]);
     revalidatePath("/topic-packs");
 
     return {
@@ -138,6 +140,7 @@ export async function removePackItem(
     if (!item) return { status: "error", message: "Pack item not found." };
 
     await db.topicPackItem.delete({ where: { id: item.id } });
+    revalidateUserDomains(user.id, ["topicPacks", "vocabulary"]);
     revalidatePath("/topic-packs/" + item.topicPackId);
 
     return { status: "success", message: "Removed from this pack." };
@@ -183,6 +186,11 @@ export async function addPackToVocabulary(
       ),
     );
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "topicPacks"],
+      pack.items.map((item) => item.lexemeId),
+    );
     revalidatePath("/topic-packs/" + pack.id);
     revalidatePath("/vocabulary");
 
@@ -226,6 +234,12 @@ export async function launchPackSession(formData: FormData) {
         update: {},
       }),
     ),
+  );
+
+  revalidateUserDomains(
+    user.id,
+    ["home", "vocabulary", "review", "topicPacks"],
+    pack.items.map((item) => item.lexemeId),
   );
 
   redirect("/topic-packs/" + pack.id + "/learn");

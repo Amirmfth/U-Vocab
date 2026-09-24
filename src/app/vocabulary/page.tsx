@@ -1,14 +1,14 @@
 import Link from "next/link";
 import type { RelationType } from "@prisma/client";
 import { BookOpen, Plus } from "lucide-react";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { currentRetrievability } from "@/lib/fsrs";
 import { TranslationModeControl } from "@/components/translation-mode-control";
 import { VocabularyFilters } from "./VocabularyFilters";
+import { connection } from "next/server";
+import { getCachedVocabularyLibrary } from "@/lib/cached-data";
 
-export const dynamic = "force-dynamic";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -25,6 +25,7 @@ export default async function Vocabulary({
     relation?: string;
   }>;
 }) {
+  await connection();
   const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
   const now = new Date();
   const recentCutoff = new Date(now);
@@ -40,37 +41,7 @@ export default async function Vocabulary({
     relation: query.relation ?? "ALL",
   };
 
-  const [items, packs] = await Promise.all([
-    db.userVocabulary.findMany({
-      where: { userId: user.id },
-      include: {
-        lexeme: {
-          include: {
-            translations: true,
-            patterns: true,
-            insights: { select: { level: true } },
-            outgoing: { select: { type: true, target: { select: { lemma: true } } } },
-            incoming: { select: { type: true, source: { select: { lemma: true } } } },
-            topicPackItems: { select: { topicPackId: true, topicPack: { select: { topic: true } } } },
-            encounters: {
-              where: { userId: user.id },
-              select: { createdAt: true },
-              orderBy: { createdAt: "desc" },
-              take: 1,
-            },
-          },
-        },
-      },
-      orderBy: { addedAt: "desc" },
-      take: 500,
-    }),
-    db.topicPack.findMany({
-      where: { userId: user.id },
-      select: { id: true, title: true, topic: true },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    }),
-  ]);
+  const [items, packs] = await getCachedVocabularyLibrary(user.id);
 
   const normalizedQuery = current.q.toLocaleLowerCase("de-DE");
 
@@ -202,7 +173,7 @@ export default async function Vocabulary({
         </div>
         <div className="library-header-actions">
           <TranslationModeControl value={user.preferredTranslation} />
-          <Link href="/vocabulary/new" className="button button-primary">
+          <Link href="/vocabulary/new" className="button button-primary" prefetch>
             <Plus size={18} />
             Add word
           </Link>
@@ -246,6 +217,7 @@ export default async function Vocabulary({
                 className="vocabulary-row"
                 key={item.id}
                 href={"/vocabulary/" + word.id}
+                prefetch
               >
                 <div className="vocabulary-row-main">
                   <div className="word">

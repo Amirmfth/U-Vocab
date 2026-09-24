@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, BookOpenCheck, Brain } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -5,12 +6,12 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 
-export const dynamic = "force-dynamic";
 
 export default async function TopicPackLearnPage({ params, searchParams }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ step?: string }>;
 }) {
+  await connection();
   const [{ id }, query, user] = await Promise.all([params, searchParams, getCurrentUser()]);
   const pack = await db.topicPack.findFirst({
     where: { id, userId: user.id },

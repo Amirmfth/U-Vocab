@@ -1,12 +1,13 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, Swords } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { BattleStartForm } from "./BattleStartForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function BattlesPage() {
+  await connection();
   const user = await getCurrentUser();
   const sessions = await db.battleSession.findMany({
     where: { userId: user.id },

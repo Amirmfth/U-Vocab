@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -9,9 +10,9 @@ import { launchPackSession } from "../actions";
 import { PackActions } from "./PackActions";
 import { PackItemActions } from "./PackItemActions";
 
-export const dynamic = "force-dynamic";
 
 export default async function TopicPackDetail({ params }: { params: Promise<{ id: string }> }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
   const pack = await db.topicPack.findFirst({
     where: { id, userId: user.id },

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { rebuildMistakeEmbeddings } from "@/lib/semantic/embeddings";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type MistakeActionState = {
   status: "idle" | "success" | "error";
@@ -18,6 +19,14 @@ export async function resolveMistake(
 
   try {
     const user = await getCurrentUser();
+    const mistake = await db.mistake.findFirst({
+      where: { id: mistakeId, userId: user.id, resolvedAt: null },
+      select: { lexemeId: true },
+    });
+    if (!mistake) {
+      return { status: "error", message: "Mistake not found." };
+    }
+
     const updated = await db.mistake.updateMany({
       where: {
         id: mistakeId,
@@ -31,6 +40,11 @@ export async function resolveMistake(
       return { status: "error", message: "Mistake not found." };
     }
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "mistakes", "progress", "review"],
+      [mistake.lexemeId],
+    );
     revalidatePath("/mistakes");
     return { status: "success", message: "Marked resolved." };
   } catch (error) {
@@ -48,6 +62,7 @@ export async function refreshMistakeEmbeddings(
   try {
     const user = await getCurrentUser();
     const result = await rebuildMistakeEmbeddings({ userId: user.id, limit: 30 });
+    revalidateUserDomains(user.id, ["mistakes"]);
     revalidatePath("/mistakes");
     return {
       status: result.failed ? "error" : "success",

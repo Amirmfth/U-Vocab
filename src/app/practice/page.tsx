@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { db } from "@/lib/db";
@@ -6,11 +7,11 @@ import { buildExercise } from "@/lib/exercises/build";
 import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function PracticePage({ searchParams }: {
   searchParams: Promise<{ lexeme?: string }>;
 }) {
+  await connection();
   const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
   const item = await db.userVocabulary.findFirst({
     where: { userId: user.id, ...(params.lexeme ? { lexemeId: params.lexeme } : {}) },

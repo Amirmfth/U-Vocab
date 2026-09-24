@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, Clock3, Flame, Play } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
@@ -5,9 +6,9 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { createFocusSession } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 export default async function FocusPage() {
+  await connection();
   const user = await getCurrentUser();
 
   const [active, recent] = await Promise.all([

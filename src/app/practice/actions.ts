@@ -7,6 +7,7 @@ import { evaluateVocabularyProduction } from "@/lib/ai/evaluate-production";
 import { checkDeterministicAnswer } from "@/lib/exercises/check";
 import { recordMistakes } from "@/lib/mistakes";
 import { instrumentOperation } from "@/lib/performance";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type PracticeState = {
   status: "idle" | "success" | "error";
@@ -210,6 +211,12 @@ export async function evaluatePractice(
           },
         });
       });
+
+      revalidateUserDomains(
+        user.id,
+        ["home", "vocabulary", "progress", "mistakes"],
+        [item.lexemeId],
+      );
 
       return {
         status: "success",

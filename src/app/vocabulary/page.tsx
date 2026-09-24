@@ -173,7 +173,7 @@ export default async function Vocabulary({
         </div>
         <div className="library-header-actions">
           <TranslationModeControl value={user.preferredTranslation} />
-          <Link href="/vocabulary/new" className="button button-primary">
+          <Link href="/vocabulary/new" className="button button-primary" prefetch>
             <Plus size={18} />
             Add word
           </Link>
@@ -217,6 +217,7 @@ export default async function Vocabulary({
                 className="vocabulary-row"
                 key={item.id}
                 href={"/vocabulary/" + word.id}
+                prefetch
               >
                 <div className="vocabulary-row-main">
                   <div className="word">

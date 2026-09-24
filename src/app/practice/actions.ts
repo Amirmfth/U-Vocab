@@ -87,7 +87,17 @@ export async function evaluatePractice(
         }>;
       };
 
-      if (!requiresAI && expected) {
+      const deterministicTypes = new Set<ExerciseType>([
+        "MEANING_RECALL",
+        "REVERSE_RECALL",
+        "ARTICLE",
+        "CLOZE",
+        "CONTEXTUAL_CHOICE",
+      ]);
+      const useDeterministic =
+        Boolean(expected) && deterministicTypes.has(exerciseType);
+
+      if (useDeterministic) {
         const deterministic = checkDeterministicAnswer(answer, expected);
         evaluation = {
           ...deterministic,

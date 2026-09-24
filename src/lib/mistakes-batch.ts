@@ -8,6 +8,8 @@ export type MistakeInput = {
   explanation: string;
 };
 
+type GroupedMistake = MistakeInput & { occurrences: number };
+
 export async function recordMistakesBatch(
   db: PrismaClient,
   input: {
@@ -17,11 +19,16 @@ export async function recordMistakesBatch(
 ) {
   if (!input.mistakes.length) return;
 
-  const latestByKey = new Map<string, MistakeInput>();
+  const grouped = new Map<string, GroupedMistake>();
   for (const mistake of input.mistakes) {
-    latestByKey.set(mistake.lexemeId + ":" + mistake.type, mistake);
+    const key = mistake.lexemeId + ":" + mistake.type;
+    const current = grouped.get(key);
+    grouped.set(key, {
+      ...mistake,
+      occurrences: (current?.occurrences ?? 0) + 1,
+    });
   }
-  const mistakes = Array.from(latestByKey.values());
+  const mistakes = Array.from(grouped.values());
 
   const lexemeIds = Array.from(new Set(mistakes.map((item) => item.lexemeId)));
   const types = Array.from(new Set(mistakes.map((item) => item.type)));
@@ -57,7 +64,7 @@ export async function recordMistakesBatch(
         db.mistake.update({
           where: { id: found.id },
           data: {
-            occurrences: { increment: 1 },
+            occurrences: { increment: mistake.occurrences },
             expected: mistake.expected,
             actual: mistake.actual,
             explanation: mistake.explanation,
@@ -74,6 +81,8 @@ export async function recordMistakesBatch(
         expected: mistake.expected,
         actual: mistake.actual,
         explanation: mistake.explanation,
+        occurrences: mistake.occurrences,
+        lastOccurredAt: now,
       });
     }
   }

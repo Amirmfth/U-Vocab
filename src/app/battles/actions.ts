@@ -90,6 +90,15 @@ export async function answerBattleQuestion(input: {
   });
   if (!question) throw new Error("Question is unavailable or already answered.");
 
+  if (
+    question.session.mode === "TIMED" &&
+    question.session.durationSec &&
+    Date.now() - question.session.startedAt.getTime() >
+      question.session.durationSec * 1000 + 5000
+  ) {
+    throw new Error("Time is up for this battle.");
+  }
+
   const correct =
     question.expected.trim().toLocaleLowerCase("de-DE") ===
     input.answer.trim().toLocaleLowerCase("de-DE");

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -44,16 +45,18 @@ export async function evaluateVocabularyProduction(input: {
   examples: string[];
   answer: string;
 }) {
-  const perf = startOperation("ai.answer_evaluation", { model: AI_MODEL, answerChars: input.answer.length, exerciseType: input.exerciseType });
+  const route = aiRoute("answer_evaluation");
+  const perf = startOperation("ai.answer_evaluation", { model: route.model, answerChars: input.answer.length, exerciseType: input.exerciseType });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "answer_evaluation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { answerChars: input.answer.length, exerciseType: input.exerciseType, patternCount: input.patterns.length, exampleCount: input.examples.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",

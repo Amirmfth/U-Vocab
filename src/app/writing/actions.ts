@@ -7,6 +7,7 @@ import { generateWritingTask } from "@/lib/ai/writing-task";
 import { evaluateWriting } from "@/lib/ai/writing-evaluator";
 import { recordMistakes } from "@/lib/mistakes";
 import { instrumentOperation } from "@/lib/performance";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type WritingActionState = {
   status: "idle" | "success" | "error";
@@ -150,6 +151,8 @@ export async function createWritingSessionAction(
             },
           }),
         );
+
+        revalidateUserDomains(user.id, ["writing"]);
 
         return {
           status: "success",
@@ -369,6 +372,11 @@ export async function evaluateWritingAction(
         });
 
         await perf.span("revalidation", async () => {
+          revalidateUserDomains(
+            user.id,
+            ["home", "vocabulary", "progress", "mistakes", "writing"],
+            lexicalContext.map((item) => item.id),
+          );
           revalidatePath("/writing/" + session.id);
           revalidatePath("/writing");
         });
@@ -441,6 +449,8 @@ export async function createRewriteAction(
             },
           }),
         );
+
+        revalidateUserDomains(user.id, ["writing"]);
 
         return {
           status: "success",

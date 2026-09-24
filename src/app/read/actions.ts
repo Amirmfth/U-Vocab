@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { deduplicateLexicalItems } from "@/lib/lexical-batch";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -52,16 +53,9 @@ export async function createReadingDocument(
           }),
         );
 
-        const seen = new Set<string>();
-        const lexicalUnits = analysis.lexicalUnits
-          .filter((unit) => {
-            const normalized = unit.lemma.toLocaleLowerCase("de-DE").trim();
-            const key = normalized + ":" + unit.partOfSpeech;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-          })
-          .map((unit, position) => ({
+        const lexicalUnits = deduplicateLexicalItems(
+          analysis.lexicalUnits,
+        ).map((unit, position) => ({
             ...unit,
             normalized: unit.lemma.toLocaleLowerCase("de-DE").trim(),
             position,

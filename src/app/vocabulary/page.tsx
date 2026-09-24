@@ -21,6 +21,7 @@ export default async function Vocabulary({
     pos?: string;
     level?: string;
     topic?: string;
+    collection?: string;
     relation?: string;
   }>;
 }) {
@@ -35,6 +36,7 @@ export default async function Vocabulary({
     pos: query.pos ?? "ALL",
     level: query.level ?? "ALL",
     topic: query.topic ?? "ALL",
+    collection: query.collection ?? "ALL",
     relation: query.relation ?? "ALL",
   };
 
@@ -49,7 +51,7 @@ export default async function Vocabulary({
             insights: { select: { level: true } },
             outgoing: { select: { type: true, target: { select: { lemma: true } } } },
             incoming: { select: { type: true, source: { select: { lemma: true } } } },
-            topicPackItems: { select: { topicPackId: true } },
+            topicPackItems: { select: { topicPackId: true, topicPack: { select: { topic: true } } } },
             encounters: {
               where: { userId: user.id },
               select: { createdAt: true },
@@ -64,7 +66,7 @@ export default async function Vocabulary({
     }),
     db.topicPack.findMany({
       where: { userId: user.id },
-      select: { id: true, title: true },
+      select: { id: true, title: true, topic: true },
       orderBy: { createdAt: "desc" },
       take: 50,
     }),
@@ -109,7 +111,14 @@ export default async function Vocabulary({
 
     if (
       current.topic !== "ALL" &&
-      !word.topicPackItems.some((topic) => topic.topicPackId === current.topic)
+      !word.topicPackItems.some((item) => item.topicPack.topic === current.topic)
+    ) {
+      return false;
+    }
+
+    if (
+      current.collection !== "ALL" &&
+      !word.topicPackItems.some((item) => item.topicPackId === current.collection)
     ) {
       return false;
     }
@@ -204,7 +213,10 @@ export default async function Vocabulary({
         current={current}
         partOfSpeechOptions={partOfSpeechOptions}
         levelOptions={LEVELS.map((level) => ({ value: level, label: level }))}
-        topicOptions={packs.map((pack) => ({
+        topicOptions={Array.from(
+          new Map(packs.map((pack) => [pack.topic, { value: pack.topic, label: pack.topic }])).values(),
+        )}
+        collectionOptions={packs.map((pack) => ({
           value: pack.id,
           label: pack.title,
         }))}

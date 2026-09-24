@@ -16,7 +16,7 @@ export default async function Home() {
   await connection();
   const perf = startOperation("page.home");
   const user = await perf.span("auth", () => getCurrentUser());
-  const { total, due, weakProduction, mistakes } = await perf.span(
+  const { total, due, weakProduction, mistakes, recent } = await perf.span(
     "dbRead",
     () => getCachedHomeStats(user.id),
   );
@@ -66,6 +66,19 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      {recent ? (
+        <section className="panel home-continue">
+          <div>
+            <p className="eyebrow">CONTINUE</p>
+            <h2>{recent.label}</h2>
+            <p className="muted">{recent.detail}</p>
+          </div>
+          <Link href={recent.href} className="button button-secondary">
+            Continue <ArrowRight size={17} />
+          </Link>
+        </section>
+      ) : null}
 
       <section className="home-metrics" aria-label="Learning status">
         <Link href="/vocabulary">

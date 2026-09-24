@@ -15,6 +15,7 @@ type ActivitySelectProps = {
   defaultValue: string;
   options: ActivitySelectOption[];
   disabled?: boolean;
+  onValueChange?: (value: string) => void;
 };
 
 export function ActivitySelect({
@@ -23,6 +24,7 @@ export function ActivitySelect({
   defaultValue,
   options,
   disabled = false,
+  onValueChange,
 }: ActivitySelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(defaultValue);
@@ -81,6 +83,7 @@ export function ActivitySelect({
                   key={option.value}
                   onClick={() => {
                     setValue(option.value);
+                    onValueChange?.(option.value);
                     setIsOpen(false);
                   }}
                   role="option"

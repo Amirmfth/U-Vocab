@@ -24,17 +24,17 @@ async function selectGuidedTargets(input: {
   if (input.collectionId) {
     const pack = await db.topicPack.findFirst({
       where: { id: input.collectionId, userId: input.userId },
-      include: {
+      select: {
         items: {
           select: {
-      lexemeId: true,
-      lexeme: {
-        select: {
-          lemma: true,
-          patterns: { select: { pattern: true } },
-        },
-      },
-    },
+            lexemeId: true,
+            lexeme: {
+              select: {
+                lemma: true,
+                patterns: { select: { pattern: true } },
+              },
+            },
+          },
           orderBy: [{ usefulness: "desc" }, { position: "asc" }],
           take: input.limit,
         },

@@ -25,7 +25,7 @@ export default async function TeachWordPage({
     include: {
       translations: true,
       patterns: true,
-      examples: { orderBy: { createdAt: "desc" }, take: 6 },
+      examples: { take: 6 },
       insights: {
         where: { level: user.targetLevel },
         take: 1,

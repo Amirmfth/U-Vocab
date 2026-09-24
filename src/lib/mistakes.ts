@@ -1,4 +1,5 @@
 import type { MistakeType, PrismaClient } from "@prisma/client";
+import { ensureMistakeEmbedding } from "@/lib/semantic/embeddings";
 
 export async function recordMistakes(
   db: PrismaClient,
@@ -13,6 +14,8 @@ export async function recordMistakes(
     }>;
   },
 ) {
+  const touchedIds: string[] = [];
+
   for (const mistake of input.mistakes) {
     const existing = await db.mistake.findFirst({
       where: {
@@ -32,10 +35,12 @@ export async function recordMistakes(
           actual: mistake.actual,
           explanation: mistake.explanation,
           lastOccurredAt: new Date(),
+          embeddedAt: null,
         },
       });
+      touchedIds.push(existing.id);
     } else {
-      await db.mistake.create({
+      const created = await db.mistake.create({
         data: {
           userId: input.userId,
           lexemeId: input.lexemeId,
@@ -45,6 +50,15 @@ export async function recordMistakes(
           explanation: mistake.explanation,
         },
       });
+      touchedIds.push(created.id);
+    }
+  }
+
+  for (const mistakeId of touchedIds) {
+    try {
+      await ensureMistakeEmbedding(mistakeId, input.userId, true);
+    } catch (error) {
+      console.error("Failed to embed mistake", error);
     }
   }
 }

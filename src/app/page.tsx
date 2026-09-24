@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenText, FileUp, Layers3, Plus, ScanText, TimerReset, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpenText, FileUp, Layers3, Plus, ScanText, Star, TimerReset, TrendingUp } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -43,6 +43,9 @@ export default async function Home() {
       <section className="discovery-grid" aria-label="More ways to learn">
         <Link href="/focus" className="discovery-link">
           <TimerReset size={20} /><span>Focus session</span><ArrowRight size={17} />
+        </Link>
+        <Link href="/recommendations" className="discovery-link">
+          <Star size={20} /><span>Recommendations</span><ArrowRight size={17} />
         </Link>
         <Link href="/topic-packs" className="discovery-link">
           <Layers3 size={20} /><span>Topic packs</span><ArrowRight size={17} />

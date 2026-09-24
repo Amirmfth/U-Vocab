@@ -46,9 +46,18 @@ export async function buildSessionPlan(
     }),
     db.userVocabulary.findMany({
       where: { userId: input.userId },
-      include: { lexeme: true },
+      include: {
+        lexeme: {
+          include: {
+            mistakes: {
+              where: { userId: input.userId, resolvedAt: null },
+              select: { occurrences: true },
+            },
+          },
+        },
+      },
       orderBy: [{ production: "asc" }, { contextualUsage: "asc" }],
-      take: 8,
+      take: 24,
     }),
     db.userVocabulary.findMany({
       where: { userId: input.userId, state: { in: ["NEW", "LEARNING"] } },
@@ -71,7 +80,21 @@ export async function buildSessionPlan(
   const minutes = splitMinutes(input.minutes, input.kind);
   const items: PlannedItem[] = [];
 
-  const warmup = weak[0] ?? due[0] ?? fresh[0];
+  const prioritizedWeak = [...weak].sort((a, b) => {
+    const aMistakes = a.lexeme.mistakes.reduce(
+      (sum, mistake) => sum + mistake.occurrences,
+      0,
+    );
+    const bMistakes = b.lexeme.mistakes.reduce(
+      (sum, mistake) => sum + mistake.occurrences,
+      0,
+    );
+    if (aMistakes !== bMistakes) return bMistakes - aMistakes;
+    if (a.production !== b.production) return a.production - b.production;
+    return a.contextualUsage - b.contextualUsage;
+  });
+
+  const warmup = prioritizedWeak[0] ?? due[0] ?? fresh[0];
   if (warmup) {
     items.push({
       activity: "WARMUP",
@@ -135,9 +158,9 @@ export async function buildSessionPlan(
     });
   }
 
-  const production = weak.find(
+  const production = prioritizedWeak.find(
     (item) => item.lexemeId !== warmup?.lexemeId && item.production < 0.65,
-  ) ?? weak[1] ?? weak[0];
+  ) ?? prioritizedWeak[1] ?? prioritizedWeak[0];
   if (production) {
     items.push({
       activity: "PRODUCTION",
@@ -149,7 +172,7 @@ export async function buildSessionPlan(
     });
   }
 
-  const finalWord = weak.find(
+  const finalWord = prioritizedWeak.find(
     (item) =>
       item.lexemeId !== warmup?.lexemeId &&
       item.lexemeId !== production?.lexemeId,

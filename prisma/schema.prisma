@@ -85,6 +85,11 @@ enum SessionActivity {
   FINAL_CHALLENGE
 }
 
+enum RecommendationAction {
+  ADDED
+  DISMISSED
+}
+
 enum MistakeType {
   ARTICLE
   CASE
@@ -112,6 +117,7 @@ model User {
   stories              Story[]
   readingDocuments     ReadingDocument[]
   learningSessions     LearningSession[]
+  recommendationFeedback RecommendationFeedback[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -139,7 +145,12 @@ model Lexeme {
   storyTargets StoryTarget[]
   readingItems ReadingItem[]
   sessionItems LearningSessionItem[]
+  recommendationFeedback RecommendationFeedback[]
   createdAt    DateTime         @default(now())
+  embedding      Unsupported("vector(1536)")?
+  embeddingModel String?
+  embeddingVersion Int?
+  embeddedAt     DateTime?
   updatedAt    DateTime         @updatedAt
 
   @@unique([language, normalized, partOfSpeech])
@@ -256,6 +267,10 @@ model Mistake {
   occurrences    Int         @default(1)
   lastOccurredAt DateTime     @default(now())
   resolvedAt     DateTime?
+  embedding      Unsupported("vector(1536)")?
+  embeddingModel String?
+  embeddingVersion Int?
+  embeddedAt     DateTime?
   user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   lexeme         Lexeme?     @relation(fields: [lexemeId], references: [id], onDelete: SetNull)
 
@@ -451,4 +466,19 @@ model LearningSessionItem {
 
   @@unique([learningSessionId, position])
   @@index([learningSessionId, position])
+}
+
+
+model RecommendationFeedback {
+  id        String               @id @default(cuid())
+  userId    String
+  lexemeId  String
+  action    RecommendationAction
+  rationale String?
+  createdAt DateTime             @default(now())
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lexeme    Lexeme               @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lexemeId])
+  @@index([userId, action, createdAt])
 }

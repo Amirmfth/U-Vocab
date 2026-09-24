@@ -1,87 +1,282 @@
+import Link from "next/link";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  Brain,
+  Network,
+  Sparkles,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible, translationLabel } from "@/lib/translations";
+import { LexicalInsightPanel } from "./LexicalInsightPanel";
+import { ExpansionPanel } from "./ExpansionPanel";
 
 export const dynamic = "force-dynamic";
 
-export default async function Word({ params }: { params: Promise<{ id: string }> }) {
+export default async function Word({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+
   const word = await db.lexeme.findUnique({
     where: { id },
     include: {
       translations: true,
       patterns: true,
       examples: true,
+      insights: {
+        where: { level: user.targetLevel },
+        take: 1,
+      },
+      outgoing: {
+        include: { target: true },
+        take: 10,
+      },
       userStates: { where: { userId: user.id }, take: 1 },
     },
   });
 
   if (!word || word.userStates.length === 0) notFound();
+
   const state = word.userStates[0];
+  const insight = word.insights[0];
   const translations = word.translations.filter((translation) =>
     isTranslationVisible(user.preferredTranslation, translation.language),
   );
 
   return (
-    <main>
-      <div className="hero">
-        <p className="muted">{word.partOfSpeech} · {state.state}</p>
-        <h1 style={{ fontSize: "4rem" }}>
-          {word.article ? `${word.article} ` : ""}{word.lemma}
-        </h1>
-        {word.plural && <p>Plural: {word.plural}</p>}
-      </div>
+    <main className="page">
+      <section className="page-header">
+        <div className="word-meta">
+          <span className="badge">{word.partOfSpeech}</span>
+          <span className="badge">{state.state}</span>
+          <span className="badge">{user.targetLevel} explanations</span>
+        </div>
 
-      <section className="grid">
-        <div className="card">
+        <h1>
+          {word.article ? word.article + " " : ""}
+          {word.lemma}
+        </h1>
+
+        {word.plural ? (
+          <p className="page-description">Plural: {word.plural}</p>
+        ) : null}
+
+        <div className="hero-actions">
+          <Link
+            href={"/vocabulary/" + word.id + "/teach"}
+            className="button button-primary"
+          >
+            <BookOpenCheck size={18} />
+            Teach me this word
+          </Link>
+          <Link
+            href={"/practice?lexeme=" + word.id}
+            className="button button-secondary"
+          >
+            <Brain size={18} />
+            Practice
+          </Link>
+        </div>
+      </section>
+
+      <section className="word-detail-grid">
+        <article className="panel word-detail-card">
+          <p className="eyebrow">CANONICAL MEANING</p>
           <h2>Meaning</h2>
           {translations.map((translation) => (
-            <div key={translation.id}>
-              <small className="muted">{translationLabel(translation.language)}</small>
-              <p className={translation.language === "fa" ? "rtl" : undefined}>
+            <div key={translation.id} className="meaning-block">
+              <small className="muted">
+                {translationLabel(translation.language)}
+              </small>
+              <p
+                className={
+                  translation.language === "fa"
+                    ? "rtl lesson-meaning"
+                    : "lesson-meaning"
+                }
+              >
                 {translation.text}
               </p>
             </div>
           ))}
-        </div>
+        </article>
 
-        <div className="card">
-          <h2>Learning state</h2>
-          <p>Recognition: {Math.round(state.recognition * 100)}%</p>
-          <p>Meaning recall: {Math.round(state.meaningRecall * 100)}%</p>
-          <p>Production: {Math.round(state.production * 100)}%</p>
-          <p>Context: {Math.round(state.contextualUsage * 100)}%</p>
-          {state.nextReviewAt && (
-            <p className="muted">Next review: {state.nextReviewAt.toLocaleString()}</p>
-          )}
-        </div>
+        <article className="panel word-detail-card">
+          <p className="eyebrow">LEARNER MODEL</p>
+          <h2>Mastery</h2>
 
-        <div className="card">
-          <h2>Patterns</h2>
-          {word.patterns.length ? word.patterns.map((pattern) => (
-            <p key={pattern.id}>
-              <b>{pattern.pattern}</b><br />
-              <span className="muted">{pattern.explanation}</span>
+          {[
+            ["Recognition", state.recognition],
+            ["Meaning recall", state.meaningRecall],
+            ["Production", state.production],
+            ["Context", state.contextualUsage],
+          ].map(([label, value]) => {
+            const score = Number(value);
+            return (
+              <div className="mastery-row" key={String(label)}>
+                <div>
+                  <span>{label}</span>
+                  <strong>{Math.round(score * 100)}%</strong>
+                </div>
+                <div className="metric-bar">
+                  <span style={{ width: Math.round(score * 100) + "%" }} />
+                </div>
+              </div>
+            );
+          })}
+
+          {state.nextReviewAt ? (
+            <p className="muted">
+              Next review: {state.nextReviewAt.toLocaleString()}
             </p>
-          )) : <p className="muted">No patterns yet.</p>}
+          ) : null}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">LEXICAL PATTERNS</p>
+          <h2>Grammar & usage</h2>
+          {word.patterns.length ? (
+            word.patterns.map((pattern) => (
+              <div className="pattern-block" key={pattern.id}>
+                <strong>{pattern.pattern}</strong>
+                {pattern.explanation ? (
+                  <p className="muted">{pattern.explanation}</p>
+                ) : null}
+              </div>
+            ))
+          ) : (
+            <p className="muted">No stored patterns yet.</p>
+          )}
+        </article>
+      </section>
+
+      <section className="panel intelligence-panel">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">OPENAI · GENERATED CONTENT</p>
+            <h2>Contextual explanation</h2>
+          </div>
+          <Sparkles size={20} />
+        </div>
+
+        {insight ? (
+          <div className="insight-content">
+            <div>
+              <h3>German definition</h3>
+              <p>{insight.germanDefinition}</p>
+            </div>
+
+            {user.preferredTranslation !== "PERSIAN" ? (
+              <div>
+                <h3>English explanation</h3>
+                <p className="muted">{insight.englishExplanation}</p>
+              </div>
+            ) : null}
+
+            {user.preferredTranslation !== "ENGLISH" ? (
+              <div className="rtl">
+                <h3>توضیح فارسی</h3>
+                <p className="muted">{insight.persianExplanation}</p>
+              </div>
+            ) : null}
+
+            <div>
+              <h3>Grammar notes</h3>
+              <p>{insight.grammarNotes}</p>
+            </div>
+
+            {insight.comparisonTarget && insight.comparisonNotes ? (
+              <div className="comparison-box">
+                <p className="eyebrow">COMPARE</p>
+                <h3>{word.lemma} vs. {insight.comparisonTarget}</h3>
+                <p>{insight.comparisonNotes}</p>
+              </div>
+            ) : null}
+
+            <p className="generated-meta">
+              AI-generated · {insight.level} · version {insight.version}
+            </p>
+          </div>
+        ) : (
+          <div className="empty-state compact-empty">
+            <Sparkles size={22} />
+            <strong>No contextual explanation generated yet.</strong>
+            <span>
+              Generate one at your current {user.targetLevel} target level.
+            </span>
+          </div>
+        )}
+
+        <LexicalInsightPanel lexemeId={word.id} hasInsight={Boolean(insight)} />
+      </section>
+
+      <section className="page-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">CONTEXT</p>
+            <h2>Examples</h2>
+          </div>
+          <BookOpenCheck size={20} />
+        </div>
+
+        <div className="grid">
+          {word.examples.map((example) => (
+            <article className="card example-card" key={example.id}>
+              <div className="word-meta">
+                {example.level ? <span className="badge">{example.level}</span> : null}
+                {example.generatedByAi ? (
+                  <span className="badge">AI generated</span>
+                ) : (
+                  <span className="badge">canonical</span>
+                )}
+              </div>
+              <strong>{example.german}</strong>
+              {user.preferredTranslation !== "PERSIAN" && example.english ? (
+                <p className="muted">{example.english}</p>
+              ) : null}
+              {user.preferredTranslation !== "ENGLISH" && example.persian ? (
+                <p className="rtl muted">{example.persian}</p>
+              ) : null}
+            </article>
+          ))}
         </div>
       </section>
 
-      <h2>Context</h2>
-      <div className="grid">
-        {word.examples.map((example) => (
-          <div className="card" key={example.id}>
-            <p>{example.german}</p>
-            {user.preferredTranslation !== "PERSIAN" && (
-              <p className="muted">{example.english}</p>
-            )}
-            {user.preferredTranslation !== "ENGLISH" && (
-              <p className="rtl muted">{example.persian}</p>
-            )}
+      {word.outgoing.length ? (
+        <section className="panel intelligence-panel">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">LEXICAL GRAPH</p>
+              <h2>Connections</h2>
+            </div>
+            <Network size={20} />
           </div>
-        ))}
-      </div>
+
+          <div className="relation-list">
+            {word.outgoing.map((relation) => (
+              <Link
+                href={"/vocabulary/" + relation.target.id}
+                className="relation-chip"
+                key={relation.id}
+              >
+                <span>{relation.target.lemma}</span>
+                <small>{relation.type.replaceAll("_", " ")}</small>
+              </Link>
+            ))}
+          </div>
+
+          <Link href="/vocabulary" className="text-link">
+            Browse vocabulary <ArrowRight size={16} />
+          </Link>
+        </section>
+      ) : null}
+
+      <ExpansionPanel lexemeId={word.id} />
     </main>
   );
 }

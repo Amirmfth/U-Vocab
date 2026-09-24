@@ -240,8 +240,10 @@ export default async function UsagePage({
   );
   const daily = new Map<string, number>();
   for (const event of chartRows) {
+    const cost = decimal(event.totalCost);
+    if (cost === null) continue;
     const key = event.createdAt.toISOString().slice(0, 10);
-    daily.set(key, (daily.get(key) ?? 0) + (decimal(event.totalCost) ?? 0));
+    daily.set(key, (daily.get(key) ?? 0) + cost);
   }
   const chart = Array.from(daily, ([date, cost]) => ({ date, cost }));
   const chartMax = Math.max(0.000001, ...chart.map((item) => item.cost));

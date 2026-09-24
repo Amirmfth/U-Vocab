@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateTopicPack } from "@/lib/ai/topic-pack";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { deduplicateLexicalItems } from "@/lib/lexical-batch";
 
 export type TopicPackState = {
   status: "idle" | "success" | "error";
@@ -39,20 +40,13 @@ export async function createTopicPack(
       size,
     });
 
-    const seen = new Set<string>();
-    const items = result.items
-      .filter((item) => {
-        const normalized = item.lemma.toLocaleLowerCase("de-DE").trim();
-        const key = normalized + ":" + item.partOfSpeech;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      })
-      .map((item, position) => ({
+    const items = deduplicateLexicalItems(result.items).map(
+      (item, position) => ({
         ...item,
         normalized: item.lemma.toLocaleLowerCase("de-DE").trim(),
         position,
-      }));
+      }),
+    );
 
     const lookup = items.map((item) => ({
       language: "de",

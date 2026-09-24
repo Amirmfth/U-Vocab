@@ -5,6 +5,7 @@ import { Save } from "lucide-react";
 import type { TranslationLanguage } from "@prisma/client";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { ActivitySelect } from "@/components/ui/activity-select";
 import {
   updateTranslationPreference,
   type SettingsState,
@@ -27,28 +28,34 @@ export function SettingsForm({
   return (
     <form action={action} className="panel form-panel">
       <div className="field">
-        <label htmlFor="translation">Translation language</label>
-        <select
+        <label htmlFor="translation-trigger">Translation language</label>
+        <ActivitySelect
+          defaultValue={preference}
           id="translation"
           name="translation"
-          defaultValue={preference}
-        >
-          <option value="ENGLISH">English</option>
-          <option value="PERSIAN">Persian</option>
-          <option value="BOTH">English + Persian</option>
-        </select>
+          options={[
+            { label: "English", value: "ENGLISH" },
+            { label: "Persian", value: "PERSIAN" },
+            { label: "English + Persian", value: "BOTH" },
+          ]}
+        />
       </div>
 
       <div className="field">
-        <label htmlFor="targetLevel">German target level</label>
-        <select id="targetLevel" name="targetLevel" defaultValue={targetLevel}>
-          <option value="A1">A1 · Beginner</option>
-          <option value="A2">A2 · Elementary</option>
-          <option value="B1">B1 · Intermediate</option>
-          <option value="B2">B2 · Upper intermediate</option>
-          <option value="C1">C1 · Advanced</option>
-          <option value="C2">C2 · Proficient</option>
-        </select>
+        <label htmlFor="targetLevel-trigger">German target level</label>
+        <ActivitySelect
+          defaultValue={targetLevel}
+          id="targetLevel"
+          name="targetLevel"
+          options={[
+            { label: "A1 · Beginner", value: "A1" },
+            { label: "A2 · Elementary", value: "A2" },
+            { label: "B1 · Intermediate", value: "B1" },
+            { label: "B2 · Upper intermediate", value: "B2" },
+            { label: "C1 · Advanced", value: "C1" },
+            { label: "C2 · Proficient", value: "C2" },
+          ]}
+        />
         <small className="muted">
           AI explanations and guided lessons adapt to this level.
         </small>

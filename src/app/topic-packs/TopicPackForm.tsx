@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { ActivitySelect } from "@/components/ui/activity-select";
 import { createTopicPack, type TopicPackState } from "./actions";
 
 const initialState: TopicPackState = { status: "idle" };
@@ -26,20 +27,25 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
 
       <div className="form-grid">
         <div className="field">
-          <label htmlFor="level">Level</label>
-          <select id="level" name="level" defaultValue={defaultLevel}>
-            {["A1","A2","B1","B2","C1","C2"].map((level) => (
-              <option value={level} key={level}>{level}</option>
-            ))}
-          </select>
+          <label htmlFor="level-trigger">Level</label>
+          <ActivitySelect
+            defaultValue={defaultLevel}
+            id="level"
+            name="level"
+            options={["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => ({ label: level, value: level }))}
+          />
         </div>
         <div className="field">
-          <label htmlFor="size">Pack size</label>
-          <select id="size" name="size" defaultValue="12">
-            {[8,12,16,20,24].map((size) => (
-              <option value={size} key={size}>{size} lexical units</option>
-            ))}
-          </select>
+          <label htmlFor="size-trigger">Pack size</label>
+          <ActivitySelect
+            defaultValue="12"
+            id="size"
+            name="size"
+            options={[8, 12, 16, 20, 24].map((size) => ({
+              label: `${size} lexical units`,
+              value: String(size),
+            }))}
+          />
         </div>
       </div>
 

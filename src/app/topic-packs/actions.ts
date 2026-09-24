@@ -38,63 +38,69 @@ export async function createTopicPack(
       size,
     });
 
-    const pack = await db.$transaction(async (tx) => {
-      const created = await tx.topicPack.create({
-        data: {
-          userId: user.id,
-          title: result.title,
-          topic,
-          level,
-          description: result.description,
-        },
-      });
+    const pack = await db.$transaction(
+      async (tx) => {
+        const created = await tx.topicPack.create({
+          data: {
+            userId: user.id,
+            title: result.title,
+            topic,
+            level,
+            description: result.description,
+          },
+        });
 
-      const seen = new Set<string>();
-      let position = 0;
+        const seen = new Set<string>();
+        let position = 0;
 
-      for (const item of result.items) {
-        const normalized = item.lemma.toLocaleLowerCase("de-DE").trim();
-        const key = normalized + ":" + item.partOfSpeech;
-        if (seen.has(key)) continue;
-        seen.add(key);
+        for (const item of result.items) {
+          const normalized = item.lemma.toLocaleLowerCase("de-DE").trim();
+          const key = normalized + ":" + item.partOfSpeech;
+          if (seen.has(key)) continue;
+          seen.add(key);
 
-        const lexeme = await tx.lexeme.upsert({
-          where: {
-            language_normalized_partOfSpeech: {
-              language: "de",
+          const lexeme = await tx.lexeme.upsert({
+            where: {
+              language_normalized_partOfSpeech: {
+                language: "de",
+                normalized,
+                partOfSpeech: item.partOfSpeech as PartOfSpeech,
+              },
+            },
+            create: {
+              lemma: item.lemma,
               normalized,
               partOfSpeech: item.partOfSpeech as PartOfSpeech,
+              article: item.article,
+              plural: item.plural,
+              translations: {
+                create: [
+                  { language: "en", text: item.englishMeaning },
+                  { language: "fa", text: item.persianMeaning },
+                ],
+              },
             },
-          },
-          create: {
-            lemma: item.lemma,
-            normalized,
-            partOfSpeech: item.partOfSpeech as PartOfSpeech,
-            article: item.article,
-            plural: item.plural,
-            translations: {
-              create: [
-                { language: "en", text: item.englishMeaning },
-                { language: "fa", text: item.persianMeaning },
-              ],
+            update: {},
+          });
+
+          await tx.topicPackItem.create({
+            data: {
+              topicPackId: created.id,
+              lexemeId: lexeme.id,
+              rationale: item.rationale,
+              usefulness: item.usefulness,
+              position: position++,
             },
-          },
-          update: {},
-        });
+          });
+        }
 
-        await tx.topicPackItem.create({
-          data: {
-            topicPackId: created.id,
-            lexemeId: lexeme.id,
-            rationale: item.rationale,
-            usefulness: item.usefulness,
-            position: position++,
-          },
-        });
-      }
-
-      return created;
-    });
+        return created;
+      },
+      {
+        maxWait: 10_000,
+        timeout: 20_000,
+      },
+    );
 
     revalidatePath("/topic-packs");
 

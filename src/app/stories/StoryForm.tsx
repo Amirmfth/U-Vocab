@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { ArrowRight, BookOpenText, Sparkles } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { ActivitySelect } from "@/components/ui/activity-select";
 import { createStory, type StoryState } from "./actions";
 
 const initialState: StoryState = { status: "idle" };
@@ -28,21 +29,27 @@ export function StoryForm({
     <form action={action} className="panel story-form">
       <div className="form-grid">
         <div className="field">
-          <label htmlFor="level">Level</label>
-          <select id="level" name="level" defaultValue={defaultLevel}>
-            {["A1","A2","B1","B2","C1","C2"].map((level) => (
-              <option value={level} key={level}>{level}</option>
-            ))}
-          </select>
+          <label htmlFor="level-trigger">Level</label>
+          <ActivitySelect
+            defaultValue={defaultLevel}
+            id="level"
+            name="level"
+            options={["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => ({ label: level, value: level }))}
+          />
         </div>
 
         <div className="field">
-          <label htmlFor="length">Length</label>
-          <select id="length" name="length" defaultValue="MEDIUM">
-            <option value="SHORT">Short</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LONG">Long</option>
-          </select>
+          <label htmlFor="length-trigger">Length</label>
+          <ActivitySelect
+            defaultValue="MEDIUM"
+            id="length"
+            name="length"
+            options={[
+              { label: "Short", value: "SHORT" },
+              { label: "Medium", value: "MEDIUM" },
+              { label: "Long", value: "LONG" },
+            ]}
+          />
         </div>
       </div>
 

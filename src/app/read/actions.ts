@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { instrumentOperation } from "@/lib/performance";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -200,6 +201,7 @@ export async function createReadingDocument(
         );
 
         await perf.span("revalidation", async () => {
+          revalidateUserDomains(user.id, ["reading"]);
           revalidatePath("/read");
         });
 
@@ -266,6 +268,11 @@ export async function addReadingLexeme(
       update: {},
     });
 
+    revalidateUserDomains(
+      user.id,
+      ["home", "vocabulary", "review", "reading"],
+      [lexemeId],
+    );
     revalidatePath("/read/" + documentId);
     revalidatePath("/vocabulary");
 
@@ -312,6 +319,11 @@ export async function recordReadingEncounters(
       skipDuplicates: true,
     });
 
+    revalidateUserDomains(
+      user.id,
+      ["vocabulary", "reading"],
+      document.items.map((item) => item.lexemeId),
+    );
     revalidatePath("/read/" + document.id);
 
     return {

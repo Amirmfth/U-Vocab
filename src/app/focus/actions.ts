@@ -20,7 +20,7 @@ export async function createFocusSession(formData: FormData) {
   const user = await getCurrentUser();
 
   const active = await db.learningSession.findFirst({
-    where: { userId: user.id, status: "ACTIVE", kind },
+    where: { userId: user.id, status: "ACTIVE" },
     orderBy: { lastActiveAt: "desc" },
   });
 

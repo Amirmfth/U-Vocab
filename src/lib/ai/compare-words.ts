@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { getGenerationCache, putGenerationCache } from "./generation-cache";
 
 const comparisonBaseSchema = z.object({
   germanDistinction: z.string(),
@@ -88,6 +89,23 @@ export async function generateWordComparison(input: {
 }) {
   const route = aiRoute("word_comparison");
   const perf = startOperation("ai.word_comparison", { model: route.model });
+  const source = { left: input.left, right: input.right };
+  const dimensions = {
+    level: input.level,
+    left: input.left.lemma.toLocaleLowerCase("de-DE"),
+    right: input.right.lemma.toLocaleLowerCase("de-DE"),
+  };
+  const cached = await getGenerationCache<unknown>({
+    operation: "word_comparison",
+    dimensions,
+    source,
+    schemaVersion: "v2",
+  });
+  const parsedCached = comparisonSchema.safeParse(cached);
+  if (parsedCached.success) {
+    perf.success({ cacheHit: true });
+    return parsedCached.data;
+  }
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "word_comparison",
@@ -118,6 +136,13 @@ export async function generateWordComparison(input: {
     }
 
     await usageRecorder.success(response);
+    await putGenerationCache({
+      operation: "word_comparison",
+      dimensions,
+      source,
+      schemaVersion: "v2",
+      payload: response.output_parsed,
+    });
 
     perf.success({
       requestId: response.id,

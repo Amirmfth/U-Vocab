@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import {
   createEmptyCard,
   fsrs,
@@ -32,8 +33,8 @@ function hydrateCard(value: unknown, now: Date): Card {
   };
 }
 
-function jsonCard(card: Card) {
-  return JSON.parse(JSON.stringify(card)) as Record<string, unknown>;
+function jsonCard(card: Card): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(card)) as Prisma.InputJsonValue;
 }
 
 export function scheduleReview(

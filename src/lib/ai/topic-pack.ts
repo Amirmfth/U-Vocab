@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const topicPackSchema = z.object({
   title: z.string(),
@@ -29,8 +30,9 @@ export async function generateTopicPack(input: {
   level: string;
   size: number;
 }) {
+  const perf = startOperation("ai.topic_pack_generation", { model: AI_MODEL });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -44,7 +46,7 @@ export async function generateTopicPack(input: {
         },
       ],
       text: { format: zodTextFormat(topicPackSchema, "topic_pack") },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -68,11 +70,19 @@ export async function generateTopicPack(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+      requestedSize: input.size,
+    });
+
     return {
       ...response.output_parsed,
       items: response.output_parsed.items.slice(0, input.size),
     };
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid topic pack.")) {
       await recordAIUsage({
         userId: input.userId,

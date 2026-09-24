@@ -20,11 +20,11 @@ export function ConversationChat({
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
   const [draft, setDraft] = useState("");
+  const [streaming, setStreaming] = useState(false);
 
   useEffect(() => {
     if (!streaming) setMessages(initialMessages);
   }, [initialMessages, streaming]);
-  const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const temporaryId = useRef(0);
 

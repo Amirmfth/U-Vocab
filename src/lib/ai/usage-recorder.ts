@@ -1,5 +1,9 @@
 import { AI_PROVIDER } from "./client";
-import { recordAIUsage, type AIUsageLike } from "./usage";
+import {
+  recordAIUsage,
+  type AIUsageLike,
+  type AIUsageRecordInput,
+} from "./usage";
 
 type SafeMetadataValue = string | number | boolean | null | undefined;
 export type SafeAIMetadata = Record<string, SafeMetadataValue>;
@@ -48,7 +52,7 @@ export function createAIUsageRecorder(input: {
   model: string;
   provider?: string;
   metadata?: SafeAIMetadata;
-}, persistUsage: typeof recordAIUsage = recordAIUsage) {
+}, persistUsage: (input: AIUsageRecordInput) => Promise<void> = recordAIUsage) {
   const startedAt = nowMs();
   let recorded = false;
 

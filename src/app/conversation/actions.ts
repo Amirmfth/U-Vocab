@@ -112,6 +112,7 @@ export async function completeConversationAction(
         id: sessionId,
         userId: user.id,
         status: "ACTIVE",
+        turnInFlight: false,
       },
       include: {
         targets: {
@@ -120,7 +121,10 @@ export async function completeConversationAction(
           },
           orderBy: { position: "asc" },
         },
-        messages: { orderBy: { createdAt: "asc" } },
+        messages: {
+          orderBy: { createdAt: "desc" },
+          take: 40,
+        },
       },
     });
 
@@ -141,7 +145,7 @@ export async function completeConversationAction(
         uses: target.uses,
         successfulUses: target.successfulUses,
       })),
-      messages: session.messages.map((message) => ({
+      messages: [...session.messages].reverse().map((message) => ({
         role: message.role === "USER" ? "user" as const : "assistant" as const,
         content: message.content,
       })),

@@ -162,7 +162,7 @@ export function AppNavigation() {
               key={item.section}
               href={item.href}
               className={"mobile-nav-item " + (isActive ? "is-active" : "")}
-              aria-current={isActive ? "page" : undefined}
+              aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
               <span>{item.label}</span>

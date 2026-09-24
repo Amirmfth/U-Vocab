@@ -65,6 +65,19 @@ export async function evaluateVocabularyProduction(input: {
       },
     });
 
+    if (!response.output_parsed) {
+      await recordAIUsage({
+        userId: input.userId,
+        operation: "answer_evaluation",
+        model: AI_MODEL,
+        status: "ERROR",
+        usage: response.usage,
+        requestId: response.id,
+        errorMessage: "OpenAI returned no parsed production evaluation.",
+      });
+      throw new Error("OpenAI did not return a valid production evaluation.");
+    }
+
     await recordAIUsage({
       userId: input.userId,
       operation: "answer_evaluation",
@@ -74,19 +87,17 @@ export async function evaluateVocabularyProduction(input: {
       requestId: response.id,
     });
 
-    if (!response.output_parsed) {
-      throw new Error("OpenAI did not return a valid production evaluation.");
-    }
-
     return response.output_parsed;
   } catch (error) {
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "answer_evaluation",
-      model: AI_MODEL,
-      status: "ERROR",
-      errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-    });
+    if (!(error instanceof Error && error.message === "OpenAI did not return a valid production evaluation.")) {
+      await recordAIUsage({
+        userId: input.userId,
+        operation: "answer_evaluation",
+        model: AI_MODEL,
+        status: "ERROR",
+        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
+      });
+    }
     throw error;
   }
 }

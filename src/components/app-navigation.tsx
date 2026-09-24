@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   BookOpen,
+  BookOpenText,
   Brain,
   CircleGauge,
   Home,
+  Layers3,
   Plus,
   Settings,
   Sparkles,
@@ -23,6 +25,8 @@ const primary = [
 ];
 
 const secondary = [
+  { href: "/topic-packs", label: "Topic packs", icon: Layers3 },
+  { href: "/stories", label: "Stories", icon: BookOpenText },
   { href: "/mistakes", label: "Mistakes", icon: TriangleAlert },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

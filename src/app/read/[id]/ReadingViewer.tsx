@@ -56,11 +56,11 @@ export function ReadingViewer({
     if (!bySurface.size) return [content];
 
     const regex = new RegExp(
-      "(" +
+      "(?<![\\p{L}\\p{N}])(" +
         Array.from(bySurface.keys())
           .map(escapeRegex)
           .join("|") +
-        ")",
+        ")(?![\\p{L}\\p{N}])",
       "giu",
     );
 

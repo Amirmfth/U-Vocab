@@ -22,7 +22,7 @@ export default async function Home() {
       where: { userId: user.id, production: { lt: 0.4 } },
     }),
     db.mistake.count({ where: { userId: user.id, resolvedAt: null } }),
-    db.aIUsageEvent.aggregate({
+    db.aiUsageEvent.aggregate({
       where: { userId: user.id },
       _sum: { totalTokens: true },
     }),

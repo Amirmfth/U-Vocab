@@ -18,6 +18,19 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
       text: { format: zodTextFormat(lexicalAnalysisSchema, "lexical_analysis") },
     });
 
+    if (!response.output_parsed) {
+      await recordAIUsage({
+        userId,
+        operation: "lexical_analysis",
+        model: AI_MODEL,
+        status: "ERROR",
+        usage: response.usage,
+        requestId: response.id,
+        errorMessage: "OpenAI returned no parsed lexical analysis.",
+      });
+      throw new Error("OpenAI did not return a valid lexical analysis.");
+    }
+
     await recordAIUsage({
       userId,
       operation: "lexical_analysis",
@@ -27,19 +40,17 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
       requestId: response.id,
     });
 
-    if (!response.output_parsed) {
-      throw new Error("OpenAI did not return a valid lexical analysis.");
-    }
-
     return response.output_parsed;
   } catch (error) {
-    await recordAIUsage({
-      userId,
-      operation: "lexical_analysis",
-      model: AI_MODEL,
-      status: "ERROR",
-      errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-    });
+    if (!(error instanceof Error && error.message === "OpenAI did not return a valid lexical analysis.")) {
+      await recordAIUsage({
+        userId,
+        operation: "lexical_analysis",
+        model: AI_MODEL,
+        status: "ERROR",
+        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
+      });
+    }
     throw error;
   }
 }

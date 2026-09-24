@@ -162,7 +162,9 @@ export async function generateExpansionAction(
       return { status: "error", message: "This lexical unit is not in your vocabulary." };
     }
 
+    const refresh = String(formData.get("refresh") ?? "") === "true";
     const result = await generateWordExpansion({
+      refresh,
       userId: user.id,
       lemma: lexeme.lemma,
       partOfSpeech: lexeme.partOfSpeech,

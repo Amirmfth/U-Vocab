@@ -1,5 +1,6 @@
 import { AI_MODEL, getOpenAI } from "@/lib/ai/client";
 import { recordAIUsage } from "@/lib/ai/usage";
+import { AI_RESPONSE_COMPLETED_EVENT, AI_TEXT_DELTA_EVENT } from "@/lib/ai/streaming";
 import { buildConversationContext } from "@/lib/conversation/context";
 import { processConversationTurn } from "@/lib/conversation/process-turn";
 import { buildTutorInstructions } from "@/lib/conversation/tutor-prompt";
@@ -122,12 +123,12 @@ export async function POST(
 
       try {
         for await (const event of stream) {
-          if (event.type === "response.output_text.delta") {
+          if (event.type === AI_TEXT_DELTA_EVENT) {
             output += event.delta;
             controller.enqueue(encoder.encode(event.delta));
           }
 
-          if (event.type === "response.completed") {
+          if (event.type === AI_RESPONSE_COMPLETED_EVENT) {
             completedResponse = event.response;
           }
         }

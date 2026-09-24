@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const productionEvaluationSchema = z.object({
@@ -45,6 +45,12 @@ export async function evaluateVocabularyProduction(input: {
   answer: string;
 }) {
   const perf = startOperation("ai.answer_evaluation", { model: AI_MODEL, answerChars: input.answer.length, exerciseType: input.exerciseType });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "answer_evaluation",
+    model: AI_MODEL,
+    metadata: { answerChars: input.answer.length, exerciseType: input.exerciseType, patternCount: input.patterns.length, exampleCount: input.examples.length },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -68,26 +74,12 @@ export async function evaluateVocabularyProduction(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "answer_evaluation",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed production evaluation.",
-      });
-      throw new Error("OpenAI did not return a valid production evaluation.");
+      const parseError = new Error("OpenAI did not return a valid production evaluation.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "answer_evaluation",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -99,13 +91,7 @@ export async function evaluateVocabularyProduction(input: {
   } catch (error) {
     perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid production evaluation.")) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "answer_evaluation",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

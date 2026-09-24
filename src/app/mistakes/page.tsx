@@ -14,41 +14,34 @@ export default async function MistakesPage() {
   });
 
   return (
-    <main>
-      <div className="hero">
-        <p className="muted">MISTAKE MEMORY</p>
-        <h1 style={{ fontSize: "3rem" }}>Recurring weaknesses</h1>
-        <p className="muted">
-          U-Vocab stores recurring lexical patterns and feeds them back into
-          adaptive practice until a targeted attempt resolves them.
-        </p>
-      </div>
+    <main className="page">
+      <section className="page-header compact">
+        <h1>Mistakes</h1>
+        <p className="muted">{mistakes.length} open</p>
+      </section>
 
-      <div className="grid">
-        {mistakes.map((mistake) => (
-          <article className="card" key={mistake.id}>
-            <small className="muted">{mistake.type}</small>
-            <h2>{mistake.lexeme?.lemma ?? "General German"}</h2>
-            <p>{mistake.explanation}</p>
-            {mistake.actual && <p><b>You wrote:</b> {mistake.actual}</p>}
-            {mistake.expected && <p><b>Expected:</b> {mistake.expected}</p>}
-            <p className="muted">
-              Seen {mistake.occurrences} {mistake.occurrences === 1 ? "time" : "times"}
-            </p>
-            {mistake.lexemeId && (
-              <Link
-                className="button secondary"
-                href={"/practice?lexeme=" + mistake.lexemeId}
-              >
-                Practice this weakness
-              </Link>
-            )}
-          </article>
-        ))}
-      </div>
-
-      {!mistakes.length && (
-        <p className="muted">No recurring lexical mistakes have been recorded yet.</p>
+      {mistakes.length ? (
+        <div className="mistake-list">
+          {mistakes.map((mistake) => (
+            <article className="mistake-row" key={mistake.id}>
+              <div className="mistake-copy">
+                <div className="word-meta">
+                  <span className="badge">{mistake.type.replaceAll("_", " ").toLowerCase()}</span>
+                  <span className="muted">{mistake.occurrences}×</span>
+                </div>
+                <h2>{mistake.lexeme?.lemma ?? "General German"}</h2>
+                {mistake.actual ? <p><span className="muted">You wrote:</span> {mistake.actual}</p> : null}
+                {mistake.expected ? <p><span className="muted">Expected:</span> <strong>{mistake.expected}</strong></p> : null}
+                {mistake.explanation ? <p className="muted">{mistake.explanation}</p> : null}
+              </div>
+              {mistake.lexemeId ? (
+                <Link className="button button-secondary" href={"/practice?lexeme=" + mistake.lexemeId}>Practice</Link>
+              ) : null}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state compact-empty"><strong>No open mistakes</strong></div>
       )}
     </main>
   );

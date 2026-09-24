@@ -8,80 +8,48 @@ export const dynamic = "force-dynamic";
 
 export default async function StoriesPage() {
   const user = await getCurrentUser();
-
   const [stories, vocabulary] = await Promise.all([
     db.story.findMany({
       where: { userId: user.id },
       include: { _count: { select: { targets: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 30,
+      orderBy: { createdAt: "desc" }, take: 30,
     }),
     db.userVocabulary.findMany({
-      where: { userId: user.id },
-      include: { lexeme: true },
-      orderBy: [
-        { production: "asc" },
-        { contextualUsage: "asc" },
-        { addedAt: "desc" },
-      ],
+      where: { userId: user.id }, include: { lexeme: true },
+      orderBy: [{ production: "asc" }, { contextualUsage: "asc" }, { addedAt: "desc" }],
       take: 20,
     }),
   ]);
 
   return (
     <main className="page">
-      <section className="page-header">
-        <p className="eyebrow">CONTEXTUAL READING</p>
-        <h1>AI stories</h1>
-        <p className="page-description">
-          Turn weak and learning vocabulary into natural German reading material
-          with comprehension and vocabulary questions.
-        </p>
-      </section>
+      <section className="page-header compact"><h1>Stories</h1></section>
 
       <StoryForm
         defaultLevel={user.targetLevel}
         targets={vocabulary.map((item) => ({
           lexemeId: item.lexemeId,
-          label: item.lexeme.article
-            ? item.lexeme.article + " " + item.lexeme.lemma
-            : item.lexeme.lemma,
+          label: item.lexeme.article ? item.lexeme.article + " " + item.lexeme.lemma : item.lexeme.lemma,
           state: item.state,
         }))}
       />
 
       <section className="page-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">LIBRARY</p>
-            <h2>Saved stories</h2>
-          </div>
-          <BookOpenText size={20} />
-        </div>
-
+        <h2 className="section-title">Saved</h2>
         {stories.length ? (
-          <div className="grid">
+          <div className="collection-list">
             {stories.map((story) => (
-              <Link className="card story-card" href={"/stories/" + story.id} key={story.id}>
-                <div className="word-meta">
-                  <span className="badge">{story.level}</span>
-                  <span className="badge">{story.length}</span>
-                  <span className="badge">{story._count.targets} targets</span>
+              <Link className="collection-row" href={"/stories/" + story.id} key={story.id}>
+                <div>
+                  <strong>{story.title}</strong>
+                  <span>{story.level} · {story.length.toLowerCase()} · {story._count.targets} target words</span>
                 </div>
-                <h3>{story.title}</h3>
-                {story.topic ? <p className="muted">{story.topic}</p> : null}
-                <span className="text-link">
-                  Read story <ArrowRight size={15} />
-                </span>
+                <ArrowRight size={17} />
               </Link>
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <BookOpenText size={22} />
-            <strong>No generated stories yet.</strong>
-            <span>Create one above from your current learning vocabulary.</span>
-          </div>
+          <div className="empty-state compact-empty"><BookOpenText size={22} /><strong>No saved stories</strong></div>
         )}
       </section>
     </main>

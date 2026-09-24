@@ -1,5 +1,4 @@
-import { BarChart3, Bot, Coins, Cpu, Gauge, TriangleAlert } from "lucide-react";
-import { StatCard } from "@/components/stat-card";
+import { TriangleAlert } from "lucide-react";
 import { db } from "@/lib/db";
 import { formatCompactNumber, formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/lib/current-user";
@@ -7,10 +6,7 @@ import { getCurrentUser } from "@/lib/current-user";
 export const dynamic = "force-dynamic";
 
 function operationLabel(operation: string) {
-  return operation
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  return operation.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 }
 
 export default async function UsagePage() {
@@ -18,15 +14,7 @@ export default async function UsagePage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const [
-    allTime,
-    last30Days,
-    successfulCalls,
-    failedCalls,
-    byOperation,
-    byModel,
-    recent,
-  ] = await Promise.all([
+  const [allTime, last30Days, failedCalls, byOperation, recent] = await Promise.all([
     db.aiUsageEvent.aggregate({
       where: { userId: user.id },
       _sum: { inputTokens: true, outputTokens: true, totalTokens: true },
@@ -34,185 +22,54 @@ export default async function UsagePage() {
     }),
     db.aiUsageEvent.aggregate({
       where: { userId: user.id, createdAt: { gte: thirtyDaysAgo } },
-      _sum: { totalTokens: true },
-      _count: { _all: true },
+      _sum: { totalTokens: true }, _count: { _all: true },
     }),
-    db.aiUsageEvent.count({ where: { userId: user.id, status: "SUCCESS" } }),
     db.aiUsageEvent.count({ where: { userId: user.id, status: "ERROR" } }),
     db.aiUsageEvent.groupBy({
-      by: ["operation"],
-      where: { userId: user.id },
-      _sum: { totalTokens: true, inputTokens: true, outputTokens: true },
-      _count: { _all: true },
+      by: ["operation"], where: { userId: user.id },
+      _sum: { totalTokens: true }, _count: { _all: true },
       orderBy: { _sum: { totalTokens: "desc" } },
     }),
-    db.aiUsageEvent.groupBy({
-      by: ["model"],
-      where: { userId: user.id },
-      _sum: { totalTokens: true },
-      _count: { _all: true },
-      orderBy: { _sum: { totalTokens: "desc" } },
-    }),
-    db.aiUsageEvent.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
+    db.aiUsageEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 12 }),
   ]);
-
-  const totalTokens = allTime._sum.totalTokens ?? 0;
-  const totalCalls = allTime._count._all;
-  const maxOperationTokens = Math.max(
-    1,
-    ...byOperation.map((item) => item._sum.totalTokens ?? 0),
-  );
 
   return (
     <main className="page">
-      <section className="page-header">
-        <p className="eyebrow">OPENAI USAGE</p>
-        <h1>Usage</h1>
-        <p className="page-description">
-          Token counts are recorded from OpenAI response metadata and persisted
-          in Neon for every implemented AI operation.
-        </p>
+      <section className="page-header compact"><h1>Usage</h1></section>
+
+      <section className="usage-summary">
+        <div><span>30 days</span><strong>{formatCompactNumber(last30Days._sum.totalTokens ?? 0)}</strong><small>tokens</small></div>
+        <div><span>All time</span><strong>{formatCompactNumber(allTime._sum.totalTokens ?? 0)}</strong><small>tokens</small></div>
+        <div><span>Requests</span><strong>{formatNumber(allTime._count._all)}</strong><small>{failedCalls ? failedCalls + " failed" : "no failures"}</small></div>
       </section>
 
-      <section className="stats-grid">
-        <StatCard
-          label="Total tokens"
-          value={formatCompactNumber(totalTokens)}
-          detail={formatNumber(totalTokens) + " all time"}
-        />
-        <StatCard
-          label="Input tokens"
-          value={formatCompactNumber(allTime._sum.inputTokens ?? 0)}
-        />
-        <StatCard
-          label="Output tokens"
-          value={formatCompactNumber(allTime._sum.outputTokens ?? 0)}
-        />
-        <StatCard
-          label="AI requests"
-          value={formatNumber(totalCalls)}
-          detail={successfulCalls + " successful · " + failedCalls + " failed"}
-        />
-      </section>
-
-      <section className="usage-grid">
-        <article className="panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">LAST 30 DAYS</p>
-              <h2>Recent volume</h2>
+      <section className="usage-section">
+        <h2>By feature</h2>
+        <div className="usage-list">
+          {byOperation.map((item) => (
+            <div className="usage-row" key={item.operation}>
+              <div className="usage-name"><strong>{operationLabel(item.operation)}</strong><span>{item._count._all} requests</span></div>
+              <span className="usage-number">{formatNumber(item._sum.totalTokens ?? 0)}</span>
             </div>
-            <Gauge size={20} />
-          </div>
-          <p className="usage-hero-number">
-            {formatCompactNumber(last30Days._sum.totalTokens ?? 0)}
-          </p>
-          <p className="muted">
-            {formatNumber(last30Days._count._all)} OpenAI requests
-          </p>
-        </article>
-
-        <article className="panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">OPERATIONS</p>
-              <h2>Where tokens go</h2>
-            </div>
-            <BarChart3 size={20} />
-          </div>
-          {byOperation.length ? (
-            byOperation.map((item) => {
-              const tokens = item._sum.totalTokens ?? 0;
-              return (
-                <div className="usage-breakdown" key={item.operation}>
-                  <div className="usage-row">
-                    <div className="usage-name">
-                      <strong>{operationLabel(item.operation)}</strong>
-                      <span>{item._count._all} requests</span>
-                    </div>
-                    <span className="usage-number">{formatNumber(tokens)}</span>
-                  </div>
-                  <div className="metric-bar" aria-hidden="true">
-                    <span style={{ width: Math.max(3, (tokens / maxOperationTokens) * 100) + "%" }} />
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <p className="muted">No AI usage has been recorded yet.</p>
-          )}
-        </article>
-
-        <article className="panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">MODELS</p>
-              <h2>Model distribution</h2>
-            </div>
-            <Cpu size={20} />
-          </div>
-          {byModel.length ? (
-            byModel.map((item) => (
-              <div className="usage-row" key={item.model}>
-                <div className="usage-name">
-                  <strong>{item.model}</strong>
-                  <span>{item._count._all} requests</span>
-                </div>
-                <span className="usage-number">
-                  {formatNumber(item._sum.totalTokens ?? 0)}
-                </span>
-              </div>
-            ))
-          ) : (
-            <p className="muted">No model usage yet.</p>
-          )}
-        </article>
-      </section>
-
-      <section className="panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">HISTORY</p>
-            <h2>Recent AI requests</h2>
-          </div>
-          <Bot size={20} />
+          ))}
+          {!byOperation.length ? <p className="muted">No usage yet</p> : null}
         </div>
+      </section>
 
-        {recent.length ? (
-          recent.map((event) => (
+      <section className="usage-section">
+        <h2>Recent</h2>
+        <div className="usage-list">
+          {recent.map((event) => (
             <div className="usage-row" key={event.id}>
-              <div className="usage-name">
-                <strong>{operationLabel(event.operation)}</strong>
-                <span>
-                  {event.model} · {event.createdAt.toLocaleString()}
-                </span>
-              </div>
+              <div className="usage-name"><strong>{operationLabel(event.operation)}</strong><span>{event.createdAt.toLocaleString()}</span></div>
               <div className="usage-event-number">
-                <span className="usage-number">
-                  {formatNumber(event.totalTokens)} tokens
-                </span>
-                {event.status === "ERROR" ? (
-                  <TriangleAlert size={15} className="usage-error-icon" />
-                ) : (
-                  <Coins size={15} />
-                )}
+                <span className="usage-number">{formatNumber(event.totalTokens)}</span>
+                {event.status === "ERROR" ? <TriangleAlert size={15} className="usage-error-icon" aria-label="Failed request" /> : null}
               </div>
             </div>
-          ))
-        ) : (
-          <div className="empty-state">
-            <Bot size={22} />
-            <strong>No AI usage yet</strong>
-            <span>
-              Analyze vocabulary or submit an AI-evaluated exercise to start
-              collecting token metrics.
-            </span>
-          </div>
-        )}
+          ))}
+          {!recent.length ? <p className="muted">No requests yet</p> : null}
+        </div>
       </section>
     </main>
   );

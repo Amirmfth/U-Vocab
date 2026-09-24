@@ -15,6 +15,7 @@ type RouteOwner = {
 };
 
 const ROUTE_OWNERS: RouteOwner[] = [
+  { prefix: "/vocabulary/new", section: "words", label: "Add word" },
   { prefix: "/vocabulary", section: "words", label: "My words" },
   { prefix: "/topic-packs", section: "words", label: "Topic packs" },
   { prefix: "/recommendations", section: "words", label: "Recommendations" },
@@ -27,8 +28,8 @@ const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/focus", section: "review", label: "Focus session" },
 
   { prefix: "/practice", section: "practice", label: "Practice" },
-  { prefix: "/writing", section: "practice", label: "Writing", group: "Writing" },
-  { prefix: "/read", section: "practice", label: "Reading", group: "Reading" },
+  { prefix: "/writing", section: "practice", label: "Writing" },
+  { prefix: "/read", section: "practice", label: "Reading" },
   { prefix: "/stories", section: "practice", label: "Stories", group: "Reading" },
   { prefix: "/conversation", section: "practice", label: "Conversation", group: "Speaking" },
   { prefix: "/missions", section: "practice", label: "Missions", group: "Speaking" },

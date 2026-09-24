@@ -95,6 +95,11 @@ export async function createReadingDocument(
           (unit) =>
             !existingKeys.has(unit.normalized + ":" + unit.partOfSpeech),
         );
+        const missingKeys = new Set(
+          missingUnits.map(
+            (unit) => unit.normalized + ":" + unit.partOfSpeech,
+          ),
+        );
 
         const document = await perf.span("dbWrite", () =>
           db.$transaction(
@@ -167,11 +172,7 @@ export async function createReadingDocument(
                     explanation: unit.patternExplanation,
                   });
                 }
-                if (missingUnits.some(
-                  (missing) =>
-                    missing.normalized === unit.normalized &&
-                    missing.partOfSpeech === unit.partOfSpeech,
-                ) && unit.example) {
+                if (missingKeys.has(key) && unit.example) {
                   examples.push({
                     lexemeId: lexeme.id,
                     german: unit.example,
@@ -324,7 +325,11 @@ export async function recordReadingEncounters(
     const user = await getCurrentUser();
     const document = await db.readingDocument.findFirst({
       where: { id: documentId, userId: user.id },
-      include: { items: true },
+      select: {
+        id: true,
+        content: true,
+        items: { select: { lexemeId: true } },
+      },
     });
 
     if (!document) {

@@ -1,9 +1,12 @@
 import type { TranslationLanguage } from "@prisma/client";
 
-export function visibleTranslationCodes(preference: TranslationLanguage) {
-  if (preference === "PERSIAN") return ["fa"] as const;
-  if (preference === "BOTH") return ["en", "fa"] as const;
-  return ["en"] as const;
+export function isTranslationVisible(
+  preference: TranslationLanguage,
+  language: string,
+) {
+  if (preference === "BOTH") return language === "en" || language === "fa";
+  if (preference === "PERSIAN") return language === "fa";
+  return language === "en";
 }
 
 export function translationLabel(code: string) {

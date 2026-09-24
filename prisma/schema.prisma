@@ -361,24 +361,39 @@ enum AIUsageStatus {
 }
 
 model AiUsageEvent {
-  id           String        @id @default(cuid())
-  userId       String
-  operation    String
-  provider     String        @default("openai")
-  model        String
-  promptVersion String?
-  status       AIUsageStatus
-  inputTokens  Int           @default(0)
-  outputTokens Int           @default(0)
-  totalTokens  Int           @default(0)
-  requestId    String?
-  errorMessage String?
-  createdAt    DateTime      @default(now())
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String        @id @default(cuid())
+  userId             String
+  operation          String
+  provider           String        @default("openai")
+  model              String
+  promptVersion      String?
+  status             AIUsageStatus
+  inputTokens        Int           @default(0)
+  cachedInputTokens  Int           @default(0)
+  outputTokens       Int           @default(0)
+  reasoningTokens    Int           @default(0)
+  totalTokens        Int           @default(0)
+  inputCost          Decimal?      @db.Decimal(18, 10)
+  cachedInputCost    Decimal?      @db.Decimal(18, 10)
+  outputCost         Decimal?      @db.Decimal(18, 10)
+  reasoningCost      Decimal?      @db.Decimal(18, 10)
+  totalCost          Decimal?      @db.Decimal(18, 10)
+  currency           String        @default("USD")
+  pricingKey         String?
+  durationMs         Int?
+  timeToFirstTokenMs Int?
+  retryCount         Int?
+  requestId          String?
+  errorMessage       String?
+  errorCategory      String?
+  metadata           Json?
+  createdAt          DateTime      @default(now())
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([userId, operation, createdAt])
   @@index([userId, model, createdAt])
+  @@index([userId, status, createdAt])
   @@map("AIUsageEvent")
 }
 

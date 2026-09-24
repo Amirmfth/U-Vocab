@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const readingAnalysisSchema = z.object({
@@ -37,6 +37,12 @@ export async function analyzeReadingText(input: {
   targetLevel: string;
 }) {
   const perf = startOperation("ai.reading_analysis", { model: AI_MODEL, inputChars: input.text.length, targetLevel: input.targetLevel });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "reading_analysis",
+    model: AI_MODEL,
+    metadata: { inputChars: input.text.length, targetLevel: input.targetLevel, lengthBucket: input.text.length < 2000 ? "short" : input.text.length < 8000 ? "medium" : "long" },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -60,26 +66,12 @@ export async function analyzeReadingText(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "reading_analysis",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed reading analysis.",
-      });
-      throw new Error("OpenAI did not return a valid reading analysis.");
+      const parseError = new Error("OpenAI did not return a valid reading analysis.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "reading_analysis",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -91,13 +83,7 @@ export async function analyzeReadingText(input: {
   } catch (error) {
     perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid reading analysis.")) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "reading_analysis",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

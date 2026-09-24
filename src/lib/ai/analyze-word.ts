@@ -1,11 +1,17 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { lexicalAnalysisSchema } from "./schemas";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export async function analyzeGermanLexeme(input: string, userId: string) {
   const perf = startOperation("ai.lexical_analysis", { model: AI_MODEL, inputChars: input.length });
+  const usageRecorder = createAIUsageRecorder({
+    userId,
+    operation: "lexical_analysis",
+    model: AI_MODEL,
+    metadata: { inputChars: input.length },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -21,26 +27,12 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId,
-        operation: "lexical_analysis",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed lexical analysis.",
-      });
-      throw new Error("OpenAI did not return a valid lexical analysis.");
+      const parseError = new Error("OpenAI did not return a valid lexical analysis.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId,
-      operation: "lexical_analysis",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -52,13 +44,7 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
   } catch (error) {
     perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid lexical analysis.")) {
-      await recordAIUsage({
-        userId,
-        operation: "lexical_analysis",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

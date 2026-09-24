@@ -58,9 +58,8 @@ export async function POST(
   });
   const instructions = buildTutorInstructions(context, correction);
 
-  let stream;
-  try {
-    stream = await getOpenAI().responses.create({
+  const stream = await getOpenAI().responses
+    .create({
       model: AI_MODEL,
       input: [
         { role: "system", content: instructions },
@@ -70,16 +69,20 @@ export async function POST(
         })),
       ],
       stream: true,
-    });
-  } catch (error) {
-    await recordAIUsage({
-      userId: user.id,
-      operation: "conversation_tutor",
-      model: AI_MODEL,
-      status: "ERROR",
-      errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
+    })
+    .catch(async (error) => {
+      await recordAIUsage({
+        userId: user.id,
+        operation: "conversation_tutor",
+        model: AI_MODEL,
+        status: "ERROR",
+        errorMessage:
+          error instanceof Error ? error.message : "Unknown OpenAI error",
+      });
+      return null;
     });
 
+  if (!stream) {
     return Response.json(
       { error: "Could not start the tutor response." },
       { status: 502 },

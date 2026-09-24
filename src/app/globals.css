@@ -3581,3 +3581,350 @@ summary {
     flex-direction: row;
   }
 }
+
+
+.battle-start-form,
+.battle-runner,
+.battle-result-list,
+.writing-start-form,
+.writing-editor,
+.writing-result-grid,
+.writing-feedback-section,
+.writing-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.battle-hud {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 2px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.battle-hud strong {
+  color: var(--text);
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 1rem;
+}
+
+.battle-hud > :last-child {
+  justify-self: end;
+}
+
+.battle-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.battle-question-card,
+.battle-finished {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.battle-question-card h2,
+.battle-finished h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 6vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+}
+
+.battle-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.battle-option {
+  min-height: 54px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+
+.battle-option:hover:not(:disabled),
+.battle-option:focus-visible:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+  transform: translateY(-1px);
+}
+
+.battle-option:disabled {
+  cursor: default;
+}
+
+.battle-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.battle-feedback.is-correct {
+  background: rgba(73, 201, 139, 0.08);
+  color: var(--success);
+}
+
+.battle-feedback.is-wrong {
+  background: rgba(255, 107, 122, 0.07);
+  color: var(--danger);
+}
+
+.battle-feedback > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.battle-feedback span {
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.battle-result-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.battle-result-row > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.battle-result-row span {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.writing-topic-field {
+  grid-column: 1 / -1;
+}
+
+.writing-task {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.writing-task pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font: inherit;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.writing-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.writing-targets span {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  font-size: 0.7rem;
+}
+
+.writing-editor textarea {
+  min-height: 44vh;
+  resize: vertical;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.writing-editor-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.writing-editor-footer > span {
+  color: var(--text-muted);
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 0.74rem;
+}
+
+.writing-editor-footer > span.is-under {
+  color: var(--warning);
+}
+
+.writing-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.writing-score-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.writing-score-grid > div:nth-child(odd) {
+  border-right: 1px solid var(--border);
+}
+
+.writing-score-grid strong {
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 1.15rem;
+}
+
+.writing-score-grid span {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  text-transform: capitalize;
+}
+
+.writing-summary > p:last-child,
+.improved-writing > p:last-child,
+.writing-comparison article > p:last-child {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.writing-result-grid ul,
+.writing-feedback-section ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.writing-result-grid li,
+.writing-feedback-section li {
+  margin: 6px 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.writing-feedback-row,
+.writing-correction {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.writing-feedback-row:last-child,
+.writing-correction:last-child {
+  border-bottom: 0;
+}
+
+.writing-feedback-row > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.writing-feedback-row span,
+.writing-correction span {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.writing-correction del {
+  color: var(--danger);
+}
+
+.writing-correction strong {
+  color: var(--success);
+}
+
+.writing-improvement-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 13px;
+  border: 1px solid rgba(73, 201, 139, 0.28);
+  border-radius: 13px;
+  background: rgba(73, 201, 139, 0.08);
+}
+
+.writing-improvement-banner > svg {
+  color: var(--success);
+  flex: 0 0 auto;
+}
+
+.writing-improvement-banner > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.writing-improvement-banner span {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+@media (min-width: 620px) {
+  .battle-start-form,
+  .writing-start-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .battle-start-form > .status-notice,
+  .battle-start-form > .button,
+  .writing-start-form > .status-notice,
+  .writing-start-form > .button {
+    grid-column: 1 / -1;
+  }
+
+  .battle-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .writing-editor-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .writing-score-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .writing-score-grid > div,
+  .writing-score-grid > div:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .writing-score-grid > div + div {
+    border-left: 1px solid var(--border);
+  }
+
+  .writing-result-grid,
+  .writing-comparison {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

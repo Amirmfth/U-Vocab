@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, BookOpenText, Brain, FileUp, GitCompareArrows, Home, Layers3, MessageCircle, Network, Plus, ScanText,
+  BarChart3, BookOpen, BookOpenText, Brain, FileUp, GitCompareArrows, Home, Layers3, MessageCircle, Network, PenLine, Plus, ScanText, Swords,
   Settings, Sparkles, Star, Target, TimerReset, TrendingUp, TriangleAlert, type LucideIcon,
 } from "lucide-react";
 
@@ -20,6 +20,8 @@ const explore = [
   { href: "/compare", label: "Compare", icon: GitCompareArrows },
   { href: "/conversation", label: "Conversation", icon: MessageCircle },
   { href: "/missions", label: "Missions", icon: Target },
+  { href: "/battles", label: "Battles", icon: Swords },
+  { href: "/writing", label: "Writing", icon: PenLine },
   { href: "/topic-packs", label: "Topic packs", icon: Layers3 },
   { href: "/stories", label: "Stories", icon: BookOpenText },
   { href: "/read", label: "Reading", icon: ScanText },

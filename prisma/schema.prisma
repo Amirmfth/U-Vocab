@@ -95,6 +95,30 @@ enum ConversationStatus {
   COMPLETED
 }
 
+enum BattleGame {
+  RAPID_RECALL
+  ARTICLE
+  COLLOCATION
+  ODD_ONE_OUT
+  SYNONYM
+  PREPOSITION
+}
+
+enum BattleMode {
+  TIMED
+  UNTIMED
+}
+
+enum WritingMode {
+  GUIDED
+  OPEN
+}
+
+enum WritingStatus {
+  ACTIVE
+  EVALUATED
+}
+
 enum ConversationRole {
   USER
   ASSISTANT
@@ -141,6 +165,8 @@ model User {
   confusionPairs         ConfusionPair[]
   conversationSessions   ConversationSession[]
   conversationMessages   ConversationMessage[]
+  battleSessions         BattleSession[]
+  writingSessions        WritingSession[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -172,6 +198,8 @@ model Lexeme {
   confusionLeft  ConfusionPair[] @relation("confusionLeft")
   confusionRight ConfusionPair[] @relation("confusionRight")
   conversationTargets ConversationTarget[]
+  battleQuestions BattleQuestion[]
+  writingTargets WritingTarget[]
   createdAt    DateTime         @default(now())
   embedding      Unsupported("vector(1536)")?
   embeddingModel String?
@@ -329,7 +357,9 @@ model AiUsageEvent {
   id           String        @id @default(cuid())
   userId       String
   operation    String
+  provider     String        @default("openai")
   model        String
+  promptVersion String?
   status       AIUsageStatus
   inputTokens  Int           @default(0)
   outputTokens Int           @default(0)
@@ -544,6 +574,7 @@ model ConversationSession {
   objective     String?
   revealTargets Boolean            @default(true)
   summary       Json?
+  turnInFlight  Boolean            @default(false)
   startedAt     DateTime            @default(now())
   completedAt   DateTime?
   updatedAt     DateTime            @updatedAt
@@ -580,4 +611,77 @@ model ConversationTarget {
 
   @@unique([sessionId, lexemeId])
   @@index([sessionId, position])
+}
+
+
+model BattleSession {
+  id          String       @id @default(cuid())
+  userId      String
+  game        BattleGame
+  mode        BattleMode
+  durationSec Int?
+  score       Int          @default(0)
+  correct     Int          @default(0)
+  total       Int          @default(0)
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions   BattleQuestion[]
+
+  @@index([userId, startedAt])
+}
+
+model BattleQuestion {
+  id          String        @id @default(cuid())
+  sessionId   String
+  lexemeId    String?
+  position    Int
+  prompt      String
+  options     Json
+  expected    String
+  explanation String?
+  answer      String?
+  correct     Boolean?
+  responseMs  Int?
+  answeredAt  DateTime?
+  session     BattleSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  lexeme      Lexeme?       @relation(fields: [lexemeId], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, position])
+  @@index([sessionId, position])
+}
+
+model WritingSession {
+  id           String        @id @default(cuid())
+  userId       String
+  parentId     String?
+  mode         WritingMode
+  status       WritingStatus @default(ACTIVE)
+  level        String
+  taskType     String
+  topic        String
+  targetWords  Int
+  task         String
+  draft        String        @default("")
+  wordCount    Int           @default(0)
+  evaluation   Json?
+  createdAt    DateTime      @default(now())
+  evaluatedAt  DateTime?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targets      WritingTarget[]
+
+  @@index([userId, createdAt])
+  @@index([parentId])
+}
+
+model WritingTarget {
+  id               String         @id @default(cuid())
+  writingSessionId String
+  lexemeId         String
+  position         Int            @default(0)
+  writingSession   WritingSession @relation(fields: [writingSessionId], references: [id], onDelete: Cascade)
+  lexeme           Lexeme         @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([writingSessionId, lexemeId])
+  @@index([writingSessionId, position])
 }

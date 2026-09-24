@@ -1,5 +1,6 @@
 import { AI_MODEL, getOpenAI } from "@/lib/ai/client";
 import { recordAIUsage } from "@/lib/ai/usage";
+import { AI_RESPONSE_COMPLETED_EVENT, AI_TEXT_DELTA_EVENT } from "@/lib/ai/streaming";
 import { buildConversationContext } from "@/lib/conversation/context";
 import { processConversationTurn } from "@/lib/conversation/process-turn";
 import { buildTutorInstructions } from "@/lib/conversation/tutor-prompt";
@@ -26,14 +27,19 @@ export async function POST(
     );
   }
 
-  const session = await db.conversationSession.findFirst({
-    where: { id, userId: user.id, status: "ACTIVE" },
-    select: { id: true },
+  const locked = await db.conversationSession.updateMany({
+    where: {
+      id,
+      userId: user.id,
+      status: "ACTIVE",
+      turnInFlight: false,
+    },
+    data: { turnInFlight: true },
   });
-  if (!session) {
+  if (!locked.count) {
     return Response.json(
-      { error: "Conversation session not found or already completed." },
-      { status: 404 },
+      { error: "Conversation is busy, completed, or not found." },
+      { status: 409 },
     );
   }
 
@@ -89,6 +95,10 @@ export async function POST(
     });
 
   if (!stream) {
+    await db.conversationSession.updateMany({
+      where: { id, userId: user.id },
+      data: { turnInFlight: false },
+    });
     return Response.json(
       { error: "Could not start the tutor response." },
       { status: 502 },
@@ -113,12 +123,12 @@ export async function POST(
 
       try {
         for await (const event of stream) {
-          if (event.type === "response.output_text.delta") {
+          if (event.type === AI_TEXT_DELTA_EVENT) {
             output += event.delta;
             controller.enqueue(encoder.encode(event.delta));
           }
 
-          if (event.type === "response.completed") {
+          if (event.type === AI_RESPONSE_COMPLETED_EVENT) {
             completedResponse = event.response;
           }
         }
@@ -143,6 +153,11 @@ export async function POST(
           requestId: completedResponse?.id ?? null,
         });
 
+        await db.conversationSession.updateMany({
+          where: { id, userId: user.id },
+          data: { turnInFlight: false },
+        });
+
         controller.close();
       } catch (error) {
         await recordAIUsage({
@@ -152,6 +167,10 @@ export async function POST(
           status: "ERROR",
           errorMessage:
             error instanceof Error ? error.message : "Unknown streaming error",
+        });
+        await db.conversationSession.updateMany({
+          where: { id, userId: user.id },
+          data: { turnInFlight: false },
         });
         controller.error(error);
       }

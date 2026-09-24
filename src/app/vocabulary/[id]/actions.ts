@@ -205,7 +205,15 @@ export async function generateExpansionAction(
   }
 }
 
-export async function addExpansionAction(formData: FormData) {
+export type AddExpansionState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+};
+
+export async function addExpansionAction(
+  _previous: AddExpansionState,
+  formData: FormData,
+): Promise<AddExpansionState> {
   const sourceId = String(formData.get("sourceId") ?? "");
   const lemma = String(formData.get("lemma") ?? "").trim();
   const partOfSpeech = String(formData.get("partOfSpeech") ?? "") as PartOfSpeech;
@@ -215,72 +223,83 @@ export async function addExpansionAction(formData: FormData) {
   const persianMeaning = String(formData.get("persianMeaning") ?? "").trim();
   const relationType = String(formData.get("relationType") ?? "") as RelationType;
 
-  const user = await getCurrentUser();
-  const source = await db.lexeme.findFirst({
-    where: {
-      id: sourceId,
-      userStates: { some: { userId: user.id } },
-    },
-  });
-  if (!source) throw new Error("Source vocabulary item not found.");
-
-  const normalized = lemma.toLocaleLowerCase("de-DE");
-  const target = await db.lexeme.upsert({
-    where: {
-      language_normalized_partOfSpeech: {
-        language: "de",
-        normalized,
-        partOfSpeech,
-      },
-    },
-    create: {
-      lemma,
-      normalized,
-      partOfSpeech,
-      article,
-      plural,
-      translations: {
-        create: [
-          { language: "en", text: englishMeaning },
-          { language: "fa", text: persianMeaning },
-        ],
-      },
-    },
-    update: {},
-  });
-
-  await db.$transaction([
-    db.userVocabulary.upsert({
+  try {
+    const user = await getCurrentUser();
+    const source = await db.lexeme.findFirst({
       where: {
-        userId_lexemeId: { userId: user.id, lexemeId: target.id },
+        id: sourceId,
+        userStates: { some: { userId: user.id } },
+      },
+    });
+    if (!source) {
+      return { status: "error", message: "Source vocabulary item not found." };
+    }
+
+    const normalized = lemma.toLocaleLowerCase("de-DE");
+    const target = await db.lexeme.upsert({
+      where: {
+        language_normalized_partOfSpeech: {
+          language: "de",
+          normalized,
+          partOfSpeech,
+        },
       },
       create: {
-        userId: user.id,
-        lexemeId: target.id,
-        state: "NEW",
-        nextReviewAt: new Date(),
+        lemma,
+        normalized,
+        partOfSpeech,
+        article,
+        plural,
+        translations: {
+          create: [
+            { language: "en", text: englishMeaning },
+            { language: "fa", text: persianMeaning },
+          ],
+        },
       },
       update: {},
-    }),
-    db.lexemeRelation.upsert({
-      where: {
-        sourceId_targetId_type: {
+    });
+
+    await db.$transaction([
+      db.userVocabulary.upsert({
+        where: {
+          userId_lexemeId: { userId: user.id, lexemeId: target.id },
+        },
+        create: {
+          userId: user.id,
+          lexemeId: target.id,
+          state: "NEW",
+          nextReviewAt: new Date(),
+        },
+        update: {},
+      }),
+      db.lexemeRelation.upsert({
+        where: {
+          sourceId_targetId_type: {
+            sourceId: source.id,
+            targetId: target.id,
+            type: relationType,
+          },
+        },
+        create: {
           sourceId: source.id,
           targetId: target.id,
           type: relationType,
         },
-      },
-      create: {
-        sourceId: source.id,
-        targetId: target.id,
-        type: relationType,
-      },
-      update: {},
-    }),
-  ]);
+        update: {},
+      }),
+    ]);
 
-  revalidatePath(`/vocabulary/${source.id}`);
-  revalidatePath("/vocabulary");
+    revalidatePath(`/vocabulary/${source.id}`);
+    revalidatePath("/vocabulary");
+
+    return { status: "success", message: "Added to vocabulary and linked in the lexical graph." };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Could not add this lexical unit.",
+    };
+  }
 }
 
 export async function scheduleTeachReviewAction(formData: FormData) {

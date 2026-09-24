@@ -8,6 +8,7 @@ import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { deduplicateLexicalItems } from "@/lib/lexical-batch";
+import { buildReadingExcerpt, rankReadingCandidates } from "@/lib/ai/preprocess";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -45,10 +46,25 @@ export async function createReadingDocument(
 
       try {
         const user = await perf.span("auth", () => getCurrentUser());
+        const known = await perf.span("dbRead", () =>
+          db.userVocabulary.findMany({
+            where: { userId: user.id },
+            select: { lexeme: { select: { normalized: true } } },
+            take: 2000,
+          }),
+        );
+        const knownLemmas = new Set(
+          known.map((item) => item.lexeme.normalized),
+        );
+        const candidates = rankReadingCandidates(content, knownLemmas, 30);
+        const excerpt = buildReadingExcerpt(content, candidates, 12_000);
+
         const analysis = await perf.span("ai", () =>
           analyzeReadingText({
             userId: user.id,
-            text: content,
+            text: excerpt,
+            originalTextChars: content.length,
+            candidates,
             targetLevel: user.targetLevel,
           }),
         );

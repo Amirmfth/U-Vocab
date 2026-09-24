@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 const lexicalMistakeSchema = z.object({
@@ -85,6 +85,12 @@ export async function evaluateWriting(input: {
   }>;
 }) {
   const perf = startOperation("ai.writing_evaluation", { model: AI_MODEL, draftChars: input.draft.length, targetCount: input.targets.length, level: input.level });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "writing_evaluation",
+    model: AI_MODEL,
+    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\\s+\/u).length : 0, targetCount: input.targets.length },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -102,17 +108,12 @@ export async function evaluateWriting(input: {
     }));
 
     if (!response.output_parsed) {
-      throw new Error("OpenAI did not return a valid writing evaluation.");
+      const parseError = new Error("OpenAI did not return a valid writing evaluation.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "writing_evaluation",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -123,13 +124,7 @@ export async function evaluateWriting(input: {
     return response.output_parsed;
   } catch (error) {
     perf.fail(error);
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "writing_evaluation",
-      model: AI_MODEL,
-      status: "ERROR",
-      errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-    });
+    await usageRecorder.failure(error);
     throw error;
   }
 }

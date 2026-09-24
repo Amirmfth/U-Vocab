@@ -428,6 +428,7 @@ model LearningSession {
   startedAt       DateTime              @default(now())
   lastActiveAt    DateTime              @default(now())
   completedAt     DateTime?
+  summary         Json?
   user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   items           LearningSessionItem[]
 

@@ -26,6 +26,11 @@ export default async function ReadingDocumentPage({
               translations: true,
               patterns: true,
               examples: { take: 2 },
+              outgoing: {
+                where: { type: "COLLOCATION" },
+                include: { target: true },
+                take: 6,
+              },
               userStates: {
                 where: { userId: user.id },
                 take: 1,
@@ -70,6 +75,7 @@ export default async function ReadingDocumentPage({
         english: example.english,
         persian: example.persian,
       })),
+      collocations: item.lexeme.outgoing.map((relation) => relation.target.lemma),
     };
   });
 

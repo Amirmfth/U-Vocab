@@ -85,7 +85,7 @@ model User {
   attempts             Attempt[]
   mistakes             Mistake[]
   encounters           Encounter[]
-  aiUsage              AIUsageEvent[]
+  aiUsage              AiUsageEvent[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -249,7 +249,7 @@ enum AIUsageStatus {
   ERROR
 }
 
-model AIUsageEvent {
+model AiUsageEvent {
   id           String        @id @default(cuid())
   userId       String
   operation    String
@@ -266,4 +266,5 @@ model AIUsageEvent {
   @@index([userId, createdAt])
   @@index([userId, operation, createdAt])
   @@index([userId, model, createdAt])
+  @@map("AIUsageEvent")
 }

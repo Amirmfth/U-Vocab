@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { CheckCircle2, Send, XCircle } from "lucide-react";
-import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
 import type { ComparisonContent } from "@/lib/ai/compare-words";
 import {
@@ -117,8 +116,9 @@ export function ComparisonTrainer({
                 }
                 placeholder="Schreibe einen natürlichen deutschen Satz…"
               />
-              <ActionButton
-                pendingLabel="Evaluating…"
+              <button
+                type="button"
+                className="button button-primary"
                 disabled={pendingProduction || !(productionAnswers[key] ?? "").trim()}
                 onClick={() =>
                   startProduction(async () => {
@@ -135,8 +135,8 @@ export function ComparisonTrainer({
                 }
               >
                 <Send size={17} />
-                Evaluate
-              </ActionButton>
+                {pendingProduction ? "Evaluating…" : "Evaluate"}
+              </button>
 
               {result ? (
                 <StatusNotice tone={result.correct ? "success" : "error"}>

@@ -1,9 +1,10 @@
+import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { SettingsForm } from "./SettingsForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
+  await connection();
   const user = await getCurrentUser();
 
   return (

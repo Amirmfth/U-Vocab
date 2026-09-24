@@ -24,9 +24,11 @@ function SecondaryWordSkeleton() {
   return (
     <>
       <section className="panel intelligence-panel" aria-busy="true">
-        <div className="skeleton skeleton-kicker" />
-        <div className="skeleton skeleton-title" />
-        <div className="skeleton skeleton-copy" />
+        <div className="skeleton-stack">
+          <div className="skeleton skeleton-kicker" />
+          <div className="skeleton skeleton-title" />
+          <div className="skeleton skeleton-copy" />
+        </div>
       </section>
       <section className="word-history-grid" aria-busy="true">
         <div className="skeleton skeleton-card" />

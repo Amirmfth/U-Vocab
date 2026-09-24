@@ -12,7 +12,7 @@ export function RouteLoading({
       </section>
 
       {variant === "list" ? (
-        <div className="vocabulary-list">
+        <div className="vocabulary-list skeleton-list">
           {Array.from({ length: 6 }, (_, index) => (
             <div className="skeleton skeleton-card" key={index} />
           ))}
@@ -28,9 +28,11 @@ export function RouteLoading({
         </>
       ) : variant === "session" ? (
         <section className="panel">
-          <div className="skeleton skeleton-copy" />
-          <div className="skeleton skeleton-title" />
-          <div className="skeleton skeleton-card" />
+          <div className="skeleton-stack">
+            <div className="skeleton skeleton-copy" />
+            <div className="skeleton skeleton-title" />
+            <div className="skeleton skeleton-card" />
+          </div>
         </section>
       ) : (
         <section className="stats-grid">

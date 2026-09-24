@@ -3,7 +3,7 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
 
-export const comparisonSchema = z.object({
+const comparisonBaseSchema = z.object({
   germanDistinction: z.string(),
   englishDistinction: z.string(),
   persianDistinction: z.string(),
@@ -34,6 +34,34 @@ export const comparisonSchema = z.object({
     leftPrompt: z.string(),
     rightPrompt: z.string(),
   }),
+});
+
+const legacyComparisonSchema = comparisonBaseSchema.extend({
+  production: z.array(
+    z.object({
+      target: z.enum(["LEFT", "RIGHT"]),
+      prompt: z.string(),
+    }),
+  ).length(2),
+});
+
+export const comparisonSchema = z.union([
+  comparisonBaseSchema,
+  legacyComparisonSchema,
+]).transform((value) => {
+  if (!Array.isArray(value.production)) return value;
+
+  return {
+    ...value,
+    production: {
+      leftPrompt:
+        value.production.find((item) => item.target === "LEFT")?.prompt ??
+        "Use the first word naturally in a German sentence.",
+      rightPrompt:
+        value.production.find((item) => item.target === "RIGHT")?.prompt ??
+        "Use the second word naturally in a German sentence.",
+    },
+  };
 });
 
 export type ComparisonContent = z.infer<typeof comparisonSchema>;
@@ -68,7 +96,7 @@ export async function generateWordComparison(input: {
         { role: "user", content: JSON.stringify(input) },
       ],
       text: {
-        format: zodTextFormat(comparisonSchema, "german_word_comparison"),
+        format: zodTextFormat(comparisonBaseSchema, "german_word_comparison"),
       },
     });
 

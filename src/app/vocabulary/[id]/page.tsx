@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import {
   ArrowRight,
   BookOpenCheck,
@@ -7,71 +8,284 @@ import {
   Sparkles,
 } from "lucide-react";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
+import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { startOperation } from "@/lib/performance";
+import {
+  getCachedWordPrimary,
+  getCachedWordSecondary,
+} from "@/lib/cached-data";
 import { isTranslationVisible, translationLabel } from "@/lib/translations";
 import { LexicalInsightPanel } from "./LexicalInsightPanel";
 import { TranslationModeControl } from "@/components/translation-mode-control";
 import { ExpansionPanel } from "./ExpansionPanel";
 
-export const dynamic = "force-dynamic";
+function SecondaryWordSkeleton() {
+  return (
+    <>
+      <section className="panel intelligence-panel" aria-busy="true">
+        <div className="skeleton skeleton-kicker" />
+        <div className="skeleton skeleton-title" />
+        <div className="skeleton skeleton-copy" />
+      </section>
+      <section className="word-history-grid" aria-busy="true">
+        <div className="skeleton skeleton-card" />
+        <div className="skeleton skeleton-card" />
+        <div className="skeleton skeleton-card" />
+      </section>
+    </>
+  );
+}
+
+async function DeferredWordDetails({
+  userId,
+  lexemeId,
+  level,
+  preferredTranslation,
+}: {
+  userId: string;
+  lexemeId: string;
+  level: string;
+  preferredTranslation: "ENGLISH" | "PERSIAN" | "BOTH";
+}) {
+  const word = await getCachedWordSecondary(userId, lexemeId, level);
+  if (!word) return null;
+
+  const state = word.userStates[0];
+  const insight = word.insights[0];
+
+  return (
+    <>
+      <section className="panel intelligence-panel" id="compare">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">OPENAI · GENERATED CONTENT</p>
+            <h2>Contextual explanation</h2>
+          </div>
+          <Sparkles size={20} />
+        </div>
+
+        {insight ? (
+          <div className="insight-content">
+            <div>
+              <h3>German definition</h3>
+              <p>{insight.germanDefinition}</p>
+            </div>
+
+            {preferredTranslation !== "PERSIAN" ? (
+              <div>
+                <h3>English explanation</h3>
+                <p className="muted">{insight.englishExplanation}</p>
+              </div>
+            ) : null}
+
+            {preferredTranslation !== "ENGLISH" ? (
+              <div className="rtl">
+                <h3>توضیح فارسی</h3>
+                <p className="muted">{insight.persianExplanation}</p>
+              </div>
+            ) : null}
+
+            <div>
+              <h3>Grammar notes</h3>
+              <p>{insight.grammarNotes}</p>
+            </div>
+
+            {insight.comparisonTarget && insight.comparisonNotes ? (
+              <div className="comparison-box">
+                <p className="eyebrow">COMPARE</p>
+                <h3>
+                  {word.lemma} vs. {insight.comparisonTarget}
+                </h3>
+                <p>{insight.comparisonNotes}</p>
+              </div>
+            ) : null}
+
+            <p className="generated-meta">
+              AI-generated · {insight.level} · version {insight.version}
+            </p>
+          </div>
+        ) : (
+          <div className="empty-state compact-empty">
+            <Sparkles size={22} />
+            <strong>No contextual explanation generated yet.</strong>
+            <span>Generate one at your current {level} target level.</span>
+          </div>
+        )}
+
+        <LexicalInsightPanel
+          lexemeId={word.id}
+          hasInsight={Boolean(insight)}
+        />
+      </section>
+
+      <section className="page-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">CONTEXT</p>
+            <h2>Examples</h2>
+          </div>
+          <BookOpenCheck size={20} />
+        </div>
+
+        <div className="grid">
+          {word.examples.map((example) => (
+            <article className="card example-card" key={example.id}>
+              <div className="word-meta">
+                {example.level ? (
+                  <span className="badge">{example.level}</span>
+                ) : null}
+                {example.register ? (
+                  <span className="badge">{example.register}</span>
+                ) : null}
+                <span className="badge">
+                  {example.generatedByAi ? "AI generated" : "canonical"}
+                </span>
+              </div>
+              <strong>{example.german}</strong>
+              {preferredTranslation !== "PERSIAN" && example.english ? (
+                <p className="muted">{example.english}</p>
+              ) : null}
+              {preferredTranslation !== "ENGLISH" && example.persian ? (
+                <p className="rtl muted">{example.persian}</p>
+              ) : null}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {word.outgoing.length ? (
+        <section className="panel intelligence-panel">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">LEXICAL GRAPH</p>
+              <h2>Connections</h2>
+            </div>
+            <Network size={20} />
+          </div>
+
+          <div className="relation-list">
+            {word.outgoing.map((relation) => (
+              <Link
+                href={"/vocabulary/" + relation.target.id}
+                className="relation-chip"
+                key={relation.id}
+                prefetch
+              >
+                <span>{relation.target.lemma}</span>
+                <small>{relation.type.replaceAll("_", " ")}</small>
+              </Link>
+            ))}
+          </div>
+
+          <Link href="/vocabulary" className="text-link" prefetch>
+            Browse vocabulary <ArrowRight size={16} />
+          </Link>
+        </section>
+      ) : null}
+
+      <section className="word-history-grid">
+        <article className="panel word-detail-card">
+          <p className="eyebrow">REVIEW HISTORY</p>
+          <h2>Recent reviews</h2>
+          {state?.reviews.length ? (
+            <div className="history-list">
+              {state.reviews.map((review) => (
+                <div className="history-row" key={review.id}>
+                  <span>{review.rating.toLowerCase()}</span>
+                  <small>{review.reviewedAt.toLocaleString()}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No reviews yet.</p>
+          )}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">ENCOUNTERS</p>
+          <h2>Where you met it</h2>
+          {word.encounters.length ? (
+            <div className="history-list">
+              {word.encounters.map((encounter) => (
+                <div className="history-row" key={encounter.id}>
+                  <span>{encounter.source}</span>
+                  <small>{encounter.createdAt.toLocaleString()}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No tracked encounters yet.</p>
+          )}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">MISTAKE MEMORY</p>
+          <h2>Recurring weaknesses</h2>
+          {word.mistakes.length ? (
+            <div className="history-list">
+              {word.mistakes.map((mistake) => (
+                <div className="history-row stacked" key={mistake.id}>
+                  <span>
+                    {mistake.type.replaceAll("_", " ").toLowerCase()} ·{" "}
+                    {mistake.occurrences}×
+                  </span>
+                  <small>
+                    {mistake.resolvedAt
+                      ? "resolved"
+                      : mistake.explanation ?? "open"}
+                  </small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No recorded mistakes.</p>
+          )}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">COLLECTIONS</p>
+          <h2>Saved context</h2>
+          {word.topicPackItems.length ? (
+            <div className="relation-list">
+              {word.topicPackItems.map((item) => (
+                <Link
+                  href={"/topic-packs/" + item.topicPack.id}
+                  className="relation-chip"
+                  key={item.id}
+                  prefetch
+                >
+                  <span>{item.topicPack.title}</span>
+                  <small>{item.topicPack.level}</small>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">Not in a topic pack yet.</p>
+          )}
+        </article>
+      </section>
+
+      <ExpansionPanel lexemeId={word.id} />
+    </>
+  );
+}
 
 export default async function Word({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const perf = startOperation("page.word_detail");
   const [{ id }, user] = await Promise.all([
     params,
     perf.span("auth", () => getCurrentUser()),
   ]);
 
-  const word = await perf.span("dbRead", () => db.lexeme.findUnique({
-    where: { id },
-    include: {
-      translations: true,
-      patterns: true,
-      examples: true,
-      insights: {
-        where: { level: user.targetLevel },
-        take: 1,
-      },
-      outgoing: {
-        include: { target: true },
-        take: 10,
-      },
-      incoming: {
-        include: { source: true },
-        take: 10,
-      },
-      encounters: {
-        where: { userId: user.id },
-        orderBy: { createdAt: "desc" },
-        take: 8,
-      },
-      mistakes: {
-        where: { userId: user.id },
-        orderBy: { lastOccurredAt: "desc" },
-        take: 8,
-      },
-      topicPackItems: {
-        include: { topicPack: true },
-        take: 8,
-      },
-      userStates: {
-        where: { userId: user.id },
-        include: {
-          reviews: {
-            orderBy: { reviewedAt: "desc" },
-            take: 8,
-          },
-        },
-        take: 1,
-      },
-    },
-  }));
+  const word = await perf.span("dbRead", () =>
+    getCachedWordPrimary(user.id, id),
+  );
 
   if (!word || word.userStates.length === 0) {
     perf.success({ found: false });
@@ -79,15 +293,16 @@ export default async function Word({
   }
 
   const state = word.userStates[0];
-  const insight = word.insights[0];
   const translations = word.translations.filter((translation) =>
-    isTranslationVisible(user.preferredTranslation, translation.language),
+    isTranslationVisible(
+      user.preferredTranslation,
+      translation.language,
+    ),
   );
 
   perf.success({
     found: true,
-    exampleCount: word.examples.length,
-    relationCount: word.outgoing.length + word.incoming.length,
+    primaryPatternCount: word.patterns.length,
   });
 
   return (
@@ -95,9 +310,9 @@ export default async function Word({
       <section className="page-header">
         <div className="word-detail-topline">
           <div className="word-meta">
-          <span className="badge">{word.partOfSpeech}</span>
-          <span className="badge">{state.state}</span>
-          <span className="badge">{user.targetLevel} explanations</span>
+            <span className="badge">{word.partOfSpeech}</span>
+            <span className="badge">{state.state}</span>
+            <span className="badge">{user.targetLevel} explanations</span>
           </div>
           <TranslationModeControl value={user.preferredTranslation} />
         </div>
@@ -115,6 +330,7 @@ export default async function Word({
           <Link
             href={"/vocabulary/" + word.id + "/teach"}
             className="button button-primary"
+            prefetch
           >
             <BookOpenCheck size={18} />
             Teach me this word
@@ -122,6 +338,7 @@ export default async function Word({
           <Link
             href={"/practice?lexeme=" + word.id}
             className="button button-secondary"
+            prefetch
           >
             <Brain size={18} />
             Practice
@@ -175,7 +392,9 @@ export default async function Word({
                   <strong>{Math.round(score * 100)}%</strong>
                 </div>
                 <div className="metric-bar">
-                  <span style={{ width: Math.round(score * 100) + "%" }} />
+                  <span
+                    style={{ width: Math.round(score * 100) + "%" }}
+                  />
                 </div>
               </div>
             );
@@ -206,199 +425,14 @@ export default async function Word({
         </article>
       </section>
 
-      <section className="panel intelligence-panel" id="compare">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">OPENAI · GENERATED CONTENT</p>
-            <h2>Contextual explanation</h2>
-          </div>
-          <Sparkles size={20} />
-        </div>
-
-        {insight ? (
-          <div className="insight-content">
-            <div>
-              <h3>German definition</h3>
-              <p>{insight.germanDefinition}</p>
-            </div>
-
-            {user.preferredTranslation !== "PERSIAN" ? (
-              <div>
-                <h3>English explanation</h3>
-                <p className="muted">{insight.englishExplanation}</p>
-              </div>
-            ) : null}
-
-            {user.preferredTranslation !== "ENGLISH" ? (
-              <div className="rtl">
-                <h3>توضیح فارسی</h3>
-                <p className="muted">{insight.persianExplanation}</p>
-              </div>
-            ) : null}
-
-            <div>
-              <h3>Grammar notes</h3>
-              <p>{insight.grammarNotes}</p>
-            </div>
-
-            {insight.comparisonTarget && insight.comparisonNotes ? (
-              <div className="comparison-box">
-                <p className="eyebrow">COMPARE</p>
-                <h3>{word.lemma} vs. {insight.comparisonTarget}</h3>
-                <p>{insight.comparisonNotes}</p>
-              </div>
-            ) : null}
-
-            <p className="generated-meta">
-              AI-generated · {insight.level} · version {insight.version}
-            </p>
-          </div>
-        ) : (
-          <div className="empty-state compact-empty">
-            <Sparkles size={22} />
-            <strong>No contextual explanation generated yet.</strong>
-            <span>
-              Generate one at your current {user.targetLevel} target level.
-            </span>
-          </div>
-        )}
-
-        <LexicalInsightPanel lexemeId={word.id} hasInsight={Boolean(insight)} />
-      </section>
-
-      <section className="page-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">CONTEXT</p>
-            <h2>Examples</h2>
-          </div>
-          <BookOpenCheck size={20} />
-        </div>
-
-        <div className="grid">
-          {word.examples.map((example) => (
-            <article className="card example-card" key={example.id}>
-              <div className="word-meta">
-                {example.level ? <span className="badge">{example.level}</span> : null}
-                {example.register ? <span className="badge">{example.register}</span> : null}
-                {example.generatedByAi ? (
-                  <span className="badge">AI generated</span>
-                ) : (
-                  <span className="badge">canonical</span>
-                )}
-              </div>
-              <strong>{example.german}</strong>
-              {user.preferredTranslation !== "PERSIAN" && example.english ? (
-                <p className="muted">{example.english}</p>
-              ) : null}
-              {user.preferredTranslation !== "ENGLISH" && example.persian ? (
-                <p className="rtl muted">{example.persian}</p>
-              ) : null}
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {word.outgoing.length ? (
-        <section className="panel intelligence-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">LEXICAL GRAPH</p>
-              <h2>Connections</h2>
-            </div>
-            <Network size={20} />
-          </div>
-
-          <div className="relation-list">
-            {word.outgoing.map((relation) => (
-              <Link
-                href={"/vocabulary/" + relation.target.id}
-                className="relation-chip"
-                key={relation.id}
-              >
-                <span>{relation.target.lemma}</span>
-                <small>{relation.type.replaceAll("_", " ")}</small>
-              </Link>
-            ))}
-          </div>
-
-          <Link href="/vocabulary" className="text-link">
-            Browse vocabulary <ArrowRight size={16} />
-          </Link>
-        </section>
-      ) : null}
-
-      <section className="word-history-grid">
-        <article className="panel word-detail-card">
-          <p className="eyebrow">REVIEW HISTORY</p>
-          <h2>Recent reviews</h2>
-          {state.reviews.length ? (
-            <div className="history-list">
-              {state.reviews.map((review) => (
-                <div className="history-row" key={review.id}>
-                  <span>{review.rating.toLowerCase()}</span>
-                  <small>{review.reviewedAt.toLocaleString()}</small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="muted">No reviews yet.</p>
-          )}
-        </article>
-
-        <article className="panel word-detail-card">
-          <p className="eyebrow">ENCOUNTERS</p>
-          <h2>Where you met it</h2>
-          {word.encounters.length ? (
-            <div className="history-list">
-              {word.encounters.map((encounter) => (
-                <div className="history-row" key={encounter.id}>
-                  <span>{encounter.source}</span>
-                  <small>{encounter.createdAt.toLocaleString()}</small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="muted">No tracked encounters yet.</p>
-          )}
-        </article>
-
-        <article className="panel word-detail-card">
-          <p className="eyebrow">MISTAKE MEMORY</p>
-          <h2>Recurring weaknesses</h2>
-          {word.mistakes.length ? (
-            <div className="history-list">
-              {word.mistakes.map((mistake) => (
-                <div className="history-row stacked" key={mistake.id}>
-                  <span>{mistake.type.replaceAll("_", " ").toLowerCase()} · {mistake.occurrences}×</span>
-                  <small>{mistake.resolvedAt ? "resolved" : mistake.explanation ?? "open"}</small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="muted">No recorded mistakes.</p>
-          )}
-        </article>
-
-        <article className="panel word-detail-card">
-          <p className="eyebrow">COLLECTIONS</p>
-          <h2>Saved context</h2>
-          {word.topicPackItems.length ? (
-            <div className="relation-list">
-              {word.topicPackItems.map((item) => (
-                <Link href={"/topic-packs/" + item.topicPack.id} className="relation-chip" key={item.id}>
-                  <span>{item.topicPack.title}</span>
-                  <small>{item.topicPack.level}</small>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="muted">Not in a topic pack yet.</p>
-          )}
-        </article>
-      </section>
-
-      <ExpansionPanel lexemeId={word.id} />
+      <Suspense fallback={<SecondaryWordSkeleton />}>
+        <DeferredWordDetails
+          userId={user.id}
+          lexemeId={word.id}
+          level={user.targetLevel}
+          preferredTranslation={user.preferredTranslation}
+        />
+      </Suspense>
     </main>
   );
 }

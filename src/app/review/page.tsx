@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
@@ -6,9 +7,9 @@ import { buildExercise } from "@/lib/exercises/build";
 import { selectReviewExerciseType } from "@/lib/exercises/review-select";
 import { ReviewCard } from "./ReviewCard";
 
-export const dynamic = "force-dynamic";
 
 export default async function ReviewPage() {
+  await connection();
   const user = await getCurrentUser();
   const item = await db.userVocabulary.findFirst({
     where: {

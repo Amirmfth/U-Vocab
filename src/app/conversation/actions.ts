@@ -147,6 +147,27 @@ export async function completeConversationAction(
       })),
     });
 
+    const targetEvaluation = new Map(
+      evaluation.targetResults.map((result) => [result.lexemeId, result]),
+    );
+    const normalizedEvaluation = {
+      ...evaluation,
+      targetResults: session.targets.map((target) => {
+        const result = targetEvaluation.get(target.lexemeId);
+        return result ?? {
+          lexemeId: target.lexemeId,
+          used: target.uses > 0,
+          correct: target.successfulUses > 0,
+          naturalness:
+            target.uses > 0 ? target.successfulUses / target.uses : 0,
+          note:
+            target.uses > 0
+              ? "Usage was tracked during the conversation."
+              : "This target was not used.",
+        };
+      }),
+    };
+
     const now = new Date();
 
     await db.$transaction(async (tx) => {
@@ -155,7 +176,7 @@ export async function completeConversationAction(
         data: {
           status: "COMPLETED",
           completedAt: now,
-          summary: evaluation,
+          summary: normalizedEvaluation,
         },
       });
 

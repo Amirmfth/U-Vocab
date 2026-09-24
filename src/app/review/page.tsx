@@ -33,7 +33,7 @@ export default async function ReviewPage() {
         <section className="page-header compact">
           <p className="eyebrow">REVIEW</p>
           <h1 style={{ fontSize: "3rem" }}>You are caught up.</h1>
-          <p className="eyebrow">FSRS will surface vocabulary here when it becomes due.</p>
+          <p className="page-description">FSRS will surface vocabulary here when it becomes due.</p>
         </section>
       </main>
     );

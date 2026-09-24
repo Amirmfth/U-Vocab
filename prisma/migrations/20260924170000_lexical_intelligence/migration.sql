@@ -1,6 +1,9 @@
 ALTER TABLE "User"
 ADD COLUMN "targetLevel" TEXT NOT NULL DEFAULT 'B2';
 
+ALTER TABLE "Example"
+ADD COLUMN "register" TEXT;
+
 CREATE TABLE "LexemeInsight" (
     "id" TEXT NOT NULL,
     "lexemeId" TEXT NOT NULL,

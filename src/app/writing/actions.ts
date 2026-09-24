@@ -51,7 +51,15 @@ async function selectGuidedTargets(input: {
 
   const weak = await db.userVocabulary.findMany({
     where: { userId: input.userId },
-    include: { lexeme: { include: { patterns: true } } },
+    select: {
+      lexemeId: true,
+      lexeme: {
+        select: {
+          lemma: true,
+          patterns: { select: { pattern: true } },
+        },
+      },
+    },
     orderBy: [
       { production: "asc" },
       { contextualUsage: "asc" },
@@ -185,7 +193,15 @@ export async function createWritingSessionAction(
 async function detectKnownLexemes(userId: string, draft: string) {
   const vocabulary = await db.userVocabulary.findMany({
     where: { userId },
-    include: { lexeme: { include: { patterns: true } } },
+    select: {
+      lexemeId: true,
+      lexeme: {
+        select: {
+          lemma: true,
+          patterns: { select: { pattern: true } },
+        },
+      },
+    },
     orderBy: { addedAt: "desc" },
     take: 300,
   });

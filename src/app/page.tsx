@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, Layers3, Plus, Sparkles } from "lucide-react";
 import { StatCard } from "@/components/stat-card";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
@@ -59,6 +59,27 @@ export default async function Home() {
         <StatCard label="Due now" value={due} detail="FSRS review queue" />
         <StatCard label="Weak production" value={weakProduction} detail="Need active recall" />
         <StatCard label="Open mistakes" value={mistakes} detail="Targeted weaknesses" />
+      </section>
+
+      <section className="discovery-grid">
+        <Link href="/topic-packs" className="panel discovery-card">
+          <Layers3 size={22} />
+          <div>
+            <p className="eyebrow">TOPIC PACKS</p>
+            <h2>Learn for a real situation</h2>
+            <p className="muted">Generate focused lexical collections for work, travel, bureaucracy, technology, and more.</p>
+          </div>
+          <ArrowRight size={18} />
+        </Link>
+        <Link href="/stories" className="panel discovery-card">
+          <BookOpenText size={22} />
+          <div>
+            <p className="eyebrow">AI STORIES</p>
+            <h2>Meet weak words in context</h2>
+            <p className="muted">Generate level-appropriate German reading around vocabulary you are learning.</p>
+          </div>
+          <ArrowRight size={18} />
+        </Link>
       </section>
 
       <section className="panel dashboard-callout">

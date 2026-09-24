@@ -5,6 +5,18 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateStory } from "@/lib/ai/story";
 
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\export type StoryState = {");
+}
+
+function storyContainsLemma(content: string, lemma: string) {
+  const pattern = new RegExp(
+    "(?<![\\p{L}\\p{N}_])" + escapeRegex(lemma) + "(?![\\p{L}\\p{N}_])",
+    "iu",
+  );
+  return pattern.test(content);
+}
+
 export type StoryState = {
   status: "idle" | "success" | "error";
   message?: string;
@@ -72,9 +84,11 @@ export async function createStory(
       generated.usedTargets.map((lemma) => lemma.toLocaleLowerCase("de-DE").trim()),
     );
 
-    const usedTargets = targets.filter((item) =>
-      normalizedUsed.has(item.lexeme.lemma.toLocaleLowerCase("de-DE").trim()),
-    );
+    const usedTargets = targets.filter((item) => {
+      const normalizedLemma = item.lexeme.lemma.toLocaleLowerCase("de-DE").trim();
+      return normalizedUsed.has(normalizedLemma) &&
+        storyContainsLemma(generated.content, item.lexeme.lemma);
+    });
 
     const story = await db.story.create({
       data: {
@@ -131,37 +145,23 @@ export async function markStoryRead(
 
     if (!story) return { status: "error", message: "Story not found." };
 
-    const existing = await db.encounter.findMany({
-      where: {
+    const created = await db.encounter.createMany({
+      data: story.targets.map((target) => ({
         userId: user.id,
+        lexemeId: target.lexemeId,
         source: "story",
         sourceRef: story.id,
-        lexemeId: { in: story.targets.map((target) => target.lexemeId) },
-      },
-      select: { lexemeId: true },
+        context: story.content.slice(0, 1000),
+      })),
+      skipDuplicates: true,
     });
-    const seen = new Set(existing.map((item) => item.lexemeId));
-
-    const missing = story.targets.filter((target) => !seen.has(target.lexemeId));
-
-    if (missing.length) {
-      await db.encounter.createMany({
-        data: missing.map((target) => ({
-          userId: user.id,
-          lexemeId: target.lexemeId,
-          source: "story",
-          sourceRef: story.id,
-          context: story.content.slice(0, 1000),
-        })),
-      });
-    }
 
     revalidatePath("/stories/" + story.id);
 
     return {
       status: "success",
-      message: missing.length
-        ? `Recorded ${missing.length} vocabulary encounter${missing.length === 1 ? "" : "s"}.`
+      message: created.count
+        ? `Recorded ${created.count} vocabulary encounter${created.count === 1 ? "" : "s"}.`
         : "This story was already recorded as read.",
     };
   } catch (error) {

@@ -248,6 +248,7 @@ model Encounter {
   lexeme    Lexeme   @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
 
   @@index([userId, lexemeId, createdAt])
+  @@unique([userId, lexemeId, source, sourceRef])
 }
 
 

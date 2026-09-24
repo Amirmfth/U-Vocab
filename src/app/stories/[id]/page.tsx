@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { isTranslationVisible } from "@/lib/translations";
 import { ReadStoryButton } from "./ReadStoryButton";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,9 @@ function highlightStory(
   if (!sorted.length) return [content];
 
   const regex = new RegExp(
-    "(" + sorted.map((target) => escapeRegex(target.lexeme.lemma)).join("|") + ")",
+    "(?<![\\p{L}\\p{N}_])(" +
+      sorted.map((target) => escapeRegex(target.lexeme.lemma)).join("|") +
+      ")(?![\\p{L}\\p{N}_])",
     "giu",
   );
   const lookup = new Map(
@@ -123,13 +126,18 @@ export default async function StoryDetailPage({
               key={target.id}
             >
               <span>{target.lexeme.lemma}</span>
-              <small>
-                {target.lexeme.translations.find((item) =>
-                  user.preferredTranslation === "PERSIAN"
-                    ? item.language === "fa"
-                    : item.language === "en",
-                )?.text ?? "Open details"}
-              </small>
+              {target.lexeme.translations
+                .filter((item) =>
+                  isTranslationVisible(user.preferredTranslation, item.language),
+                )
+                .map((item) => (
+                  <small
+                    key={item.id}
+                    className={item.language === "fa" ? "rtl" : undefined}
+                  >
+                    {item.text}
+                  </small>
+                ))}
             </Link>
           ))}
         </div>

@@ -46,7 +46,9 @@ export async function generateComparisonAction(
     const left = words.find((word) => word.id === leftId)!;
     const right = words.find((word) => word.id === rightId)!;
 
+    const refresh = String(formData.get("refresh") ?? "") === "true";
     const content = await generateWordComparison({
+      refresh,
       userId: user.id,
       level: user.targetLevel,
       left: {

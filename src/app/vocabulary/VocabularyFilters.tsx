@@ -13,6 +13,7 @@ export function VocabularyFilters({
   partOfSpeechOptions,
   levelOptions,
   topicOptions,
+  collectionOptions,
 }: {
   current: {
     q: string;
@@ -20,11 +21,13 @@ export function VocabularyFilters({
     pos: string;
     level: string;
     topic: string;
+    collection: string;
     relation: string;
   };
   partOfSpeechOptions: Array<{ value: string; label: string }>;
   levelOptions: Array<{ value: string; label: string }>;
   topicOptions: Array<{ value: string; label: string }>;
+  collectionOptions: Array<{ value: string; label: string }>;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -69,6 +72,7 @@ export function VocabularyFilters({
         {current.pos !== "ALL" ? <input type="hidden" name="pos" value={current.pos} /> : null}
         {current.level !== "ALL" ? <input type="hidden" name="level" value={current.level} /> : null}
         {current.topic !== "ALL" ? <input type="hidden" name="topic" value={current.topic} /> : null}
+        {current.collection !== "ALL" ? <input type="hidden" name="collection" value={current.collection} /> : null}
         {current.relation !== "ALL" ? <input type="hidden" name="relation" value={current.relation} /> : null}
         <button type="submit" className="icon-button" aria-label="Search">
           <Search size={17} />
@@ -105,8 +109,16 @@ export function VocabularyFilters({
           id="topic"
           name="topic"
           defaultValue={current.topic}
-          options={withAll("Any collection", topicOptions)}
+          options={withAll("Any topic", topicOptions)}
           onValueChange={(value) => setParam("topic", value)}
+        />
+        <ActivitySelect
+          key={"collection-" + current.collection}
+          id="collection"
+          name="collection"
+          defaultValue={current.collection}
+          options={withAll("Any collection", collectionOptions)}
+          onValueChange={(value) => setParam("collection", value)}
         />
         <ActivitySelect
           key={"relation-" + current.relation}
@@ -123,6 +135,7 @@ export function VocabularyFilters({
         current.pos !== "ALL" ||
         current.level !== "ALL" ||
         current.topic !== "ALL" ||
+        current.collection !== "ALL" ||
         current.relation !== "ALL") ? (
         <button
           type="button"

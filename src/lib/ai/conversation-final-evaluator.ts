@@ -62,7 +62,7 @@ export async function evaluateConversationSession(input: {
           content:
             "Evaluate the completed German conversation. For a mission, taskSuccess means the conversational objective was actually achieved, not merely mentioned. Assess grammar, naturalness, vocabulary, and each target lexical unit. Be constructive and concise. Do not treat the score as an official CEFR assessment.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: {
         format: zodTextFormat(

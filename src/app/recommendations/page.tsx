@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Sparkles } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { getVocabularyRecommendations } from "@/lib/recommendations";
@@ -7,9 +8,9 @@ import {
   RefreshSemanticButton,
 } from "./RecommendationActions";
 
-export const dynamic = "force-dynamic";
 
 export default async function RecommendationsPage() {
+  await connection();
   const user = await getCurrentUser();
   const recommendations = await getVocabularyRecommendations(user.id, 24);
 

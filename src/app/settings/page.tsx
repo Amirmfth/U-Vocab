@@ -9,15 +9,18 @@ export default async function SettingsPage() {
   return (
     <main className="page">
       <section className="page-header compact">
-        <p className="eyebrow">PREFERENCES</p>
+        <p className="eyebrow">LEARNING PREFERENCES</p>
         <h1>Settings</h1>
         <p className="page-description">
-          Choose which translation language U-Vocab reveals throughout
-          learning, review, and practice.
+          Choose the translations U-Vocab reveals and the German level used
+          when OpenAI creates explanations, examples, and guided lessons.
         </p>
       </section>
 
-      <SettingsForm preference={user.preferredTranslation} />
+      <SettingsForm
+        preference={user.preferredTranslation}
+        targetLevel={user.targetLevel}
+      />
     </main>
   );
 }

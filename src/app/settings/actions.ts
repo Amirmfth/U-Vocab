@@ -15,16 +15,24 @@ export async function updateTranslationPreference(
   formData: FormData,
 ): Promise<SettingsState> {
   const value = String(formData.get("translation"));
+  const targetLevel = String(formData.get("targetLevel"));
 
   if (!["ENGLISH", "PERSIAN", "BOTH"].includes(value)) {
     return { status: "error", message: "Choose a valid translation language." };
+  }
+
+  if (!["A1", "A2", "B1", "B2", "C1", "C2"].includes(targetLevel)) {
+    return { status: "error", message: "Choose a valid CEFR target level." };
   }
 
   try {
     const user = await getCurrentUser();
     await db.user.update({
       where: { id: user.id },
-      data: { preferredTranslation: value as TranslationLanguage },
+      data: {
+        preferredTranslation: value as TranslationLanguage,
+        targetLevel,
+      },
     });
 
     revalidatePath("/");
@@ -33,7 +41,7 @@ export async function updateTranslationPreference(
     revalidatePath("/practice");
     revalidatePath("/settings");
 
-    return { status: "success" };
+    return { status: "success", message: "Learning preferences saved." };
   } catch (error) {
     return {
       status: "error",

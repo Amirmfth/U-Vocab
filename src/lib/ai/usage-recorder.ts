@@ -25,7 +25,7 @@ export function createAIUsageRecorder(input: {
   model: string;
   provider?: string;
   metadata?: SafeAIMetadata;
-}) {
+}, persistUsage: typeof recordAIUsage = recordAIUsage) {
   const startedAt = nowMs();
   let recorded = false;
 
@@ -40,7 +40,7 @@ export function createAIUsageRecorder(input: {
     if (recorded) return;
     recorded = true;
 
-    await recordAIUsage({
+    await persistUsage({
       userId: input.userId,
       operation: input.operation,
       model: input.model,

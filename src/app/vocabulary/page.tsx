@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { RelationType } from "@prisma/client";
 import { BookOpen, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
@@ -137,7 +138,7 @@ export default async function Vocabulary({
       if (
         current.relation === "RELATED" &&
         !["RELATED", "SYNONYM", "ANTONYM", "PHRASE"].some((type) =>
-          relationTypes.has(type as never),
+          relationTypes.has(type as RelationType),
         )
       ) {
         return false;

@@ -31,7 +31,7 @@ export const writingEvaluationSchema = z.object({
   vocabularyAccuracy: z.number().min(0).max(1),
   naturalness: z.number().min(0).max(1),
   overall: z.number().min(0).max(1),
-  summary: z.string(),
+  summary: z.string().max(700),
   strengths: z.array(z.string().max(280)).max(4),
   improvements: z.array(z.string().max(320)).max(5),
   targetUsage: z.array(
@@ -49,7 +49,7 @@ export const writingEvaluationSchema = z.object({
       count: z.number().int().min(2),
       suggestion: z.string(),
     }),
-  ).max(8),
+  ).max(6),
   collocationFeedback: z.array(z.string().max(280)).max(5),
   lexicalMistakes: z.array(lexicalMistakeSchema).max(12),
   strongerVocabulary: z.array(
@@ -58,14 +58,14 @@ export const writingEvaluationSchema = z.object({
       meaning: z.string(),
       rationale: z.string(),
     }),
-  ).max(8),
+  ).max(5),
   corrections: z.array(
     z.object({
       original: z.string(),
       corrected: z.string(),
       explanation: z.string(),
     }),
-  ).max(12),
+  ).max(8),
   improvedVersion: z.string().max(4000),
 });
 

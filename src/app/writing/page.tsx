@@ -1,12 +1,13 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, PenLine } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { WritingStartForm } from "./WritingStartForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function WritingPage() {
+  await connection();
   const user = await getCurrentUser();
   const [collections, sessions] = await Promise.all([
     db.topicPack.findMany({

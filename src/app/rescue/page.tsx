@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, LifeBuoy } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { getRescueWords } from "@/lib/rescue";
 import { buildExercise } from "@/lib/exercises/build";
@@ -17,10 +17,81 @@ export default async function RescuePage({
   const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
   const ranked = await getRescueWords(user.id, 100);
 
-  const requestedIds = query.ids
-    ? query.ids.split(",").filter(Boolean)
-    : ranked.slice(0, 10).map((item) => item.id);
+  if (!query.ids) {
+    const top = ranked.slice(0, 20);
+    const rescueSet = top.slice(0, 10);
 
+    return (
+      <main className="page">
+        <section className="page-header compact">
+          <Link href="/progress" className="back-link">
+            <ArrowLeft size={16} />
+            Progress
+          </Link>
+          <p className="eyebrow">RETENTION</p>
+          <h1>Rescue words</h1>
+          <p className="page-description">
+            Ranked from current FSRS retrievability, overdue status, recent failed retrievals, and stability.
+          </p>
+        </section>
+
+        {top.length ? (
+          <>
+            <section className="rescue-list">
+              {top.map((item, index) => (
+                <article className="rescue-row" key={item.id}>
+                  <div className="rescue-rank">{String(index + 1).padStart(2, "0")}</div>
+                  <div className="rescue-row-copy">
+                    <div>
+                      <strong>
+                        {item.lexeme.article ? item.lexeme.article + " " : ""}
+                        {item.lexeme.lemma}
+                      </strong>
+                      <span>{Math.round(item.risk.retrievability * 100)}% retrievable now</span>
+                    </div>
+                    <div className="rescue-reasons">
+                      {item.risk.reasons.map((reason) => (
+                        <span key={reason}>{reason}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <strong className="rescue-score">
+                    {Math.round(item.risk.score * 100)}
+                  </strong>
+                </article>
+              ))}
+            </section>
+
+            <div className="progress-actions">
+              <Link
+                href={
+                  "/rescue?ids=" +
+                  encodeURIComponent(rescueSet.map((item) => item.id).join(",")) +
+                  "&step=0"
+                }
+                className="button button-primary"
+              >
+                <LifeBuoy size={18} />
+                Rescue {rescueSet.length} words
+                <ArrowRight size={17} />
+              </Link>
+              <Link href="/review" className="button button-secondary">
+                Regular review
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="empty-state">
+            <CheckCircle2 size={22} />
+            <strong>No words need rescue right now.</strong>
+            <span>Your current FSRS state does not show meaningful forgetting risk.</span>
+          </div>
+        )}
+      </main>
+    );
+  }
+
+  const requestedIds = query.ids.split(",").filter(Boolean);
   const stableIds = requestedIds.filter((id) =>
     ranked.some((item) => item.id === id),
   );
@@ -37,15 +108,13 @@ export default async function RescuePage({
             Progress
           </Link>
           <CheckCircle2 size={28} className="rescue-complete-icon" />
-          <h1>{stableIds.length ? "Rescue complete" : "No rescue words"}</h1>
+          <h1>Rescue complete</h1>
           <p className="page-description">
-            {stableIds.length
-              ? "The selected words have been reviewed and their learner state has been updated."
-              : "No vocabulary currently meets the deterministic at-risk threshold."}
+            The selected words have been reviewed and their learner state has been updated.
           </p>
           <div className="hero-actions">
-            <Link href="/progress" className="button button-primary">
-              Back to progress
+            <Link href="/rescue" className="button button-primary">
+              Back to rescue words
             </Link>
             <Link href="/review" className="button button-secondary">
               Regular review
@@ -80,12 +149,12 @@ export default async function RescuePage({
   return (
     <main className="page focus-page">
       <section className="focus-meta">
-        <Link href="/progress" className="back-link">
+        <Link href="/rescue" className="back-link">
           <ArrowLeft size={16} />
-          Progress
+          Rescue words
         </Link>
         <span>
-          Rescue {step + 1} / {stableIds.length}
+          {step + 1} / {stableIds.length}
         </span>
       </section>
 

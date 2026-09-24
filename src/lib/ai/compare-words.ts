@@ -136,7 +136,7 @@ export async function generateWordComparison(input: {
           content:
             "Teach the practical distinction between two commonly confused German lexical units. Be concise but precise. Explain the distinction in level-appropriate German and also in natural English and Persian. Contrast register, meaning, collocation, grammar, and usage only where relevant. Create contrastive examples, short discrimination questions, and one production prompt for each word. Avoid trick questions and accept that close synonyms can overlap.",
         },
-        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined, refresh: undefined }) },
       ],
       text: {
         format: zodTextFormat(comparisonBaseSchema, "german_word_comparison"),

@@ -35,25 +35,28 @@ export async function generateWordExpansion(input: {
   partOfSpeech: string;
   patterns: string[];
   level: string;
+  refresh?: boolean;
 }) {
   const route = aiRoute("word_expansion");
   const perf = startOperation("ai.word_expansion", { model: route.model });
   const source = {
     lemma: input.lemma,
     partOfSpeech: input.partOfSpeech,
-    patterns: input.patterns,
+    patterns: [...input.patterns].sort(),
   };
   const dimensions = {
     level: input.level,
     lemma: input.lemma.toLocaleLowerCase("de-DE"),
     partOfSpeech: input.partOfSpeech,
   };
-  const cached = await getGenerationCache<unknown>({
-    operation: "word_expansion",
-    dimensions,
-    source,
-    schemaVersion: "v2",
-  });
+  const cached = input.refresh
+    ? null
+    : await getGenerationCache<unknown>({
+        operation: "word_expansion",
+        dimensions,
+        source,
+        schemaVersion: "v2",
+      });
   const parsedCached = expansionSchema.safeParse(cached);
   if (parsedCached.success) {
     perf.success({ cacheHit: true });

@@ -712,3 +712,164 @@ summary {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+.form-panel {
+  width: 100%;
+  max-width: 680px;
+}
+
+.form-help {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.learning-card {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.learning-card-head,
+.section-heading,
+.dashboard-callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.learning-card-head > .muted {
+  font-size: 0.78rem;
+}
+
+.learning-prompt {
+  margin: 0;
+  font-size: clamp(1.35rem, 6vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+  font-weight: 560;
+}
+
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.grade-grid form {
+  display: block;
+}
+
+.text-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.feedback-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-callout {
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.dashboard-callout h2,
+.section-heading h2 {
+  margin: 5px 0 0;
+  font-size: 1.1rem;
+  letter-spacing: -0.025em;
+}
+
+.dashboard-callout .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.vocabulary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 178px;
+}
+
+.translation-stack p {
+  margin: 4px 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.mastery-line {
+  height: 4px;
+  margin-top: auto;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-soft);
+}
+
+.mastery-line span {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6657ee, var(--primary-strong));
+}
+
+.section-heading {
+  margin-bottom: 12px;
+  color: var(--text-soft);
+}
+
+.usage-hero-number {
+  margin: 22px 0 8px;
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: clamp(2.4rem, 12vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+  font-variant-numeric: tabular-nums;
+}
+
+.usage-breakdown + .usage-breakdown {
+  margin-top: 2px;
+}
+
+.usage-breakdown .metric-bar {
+  margin: -6px 0 10px;
+}
+
+.usage-event-number {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+}
+
+.usage-error-icon {
+  color: var(--danger);
+}
+
+@media (min-width: 620px) {
+  .dashboard-callout {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .grade-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

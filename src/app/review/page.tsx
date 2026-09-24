@@ -29,12 +29,12 @@ export default async function ReviewPage() {
 
   if (!item) {
     return (
-      <main>
-        <div className="hero">
-          <p className="muted">REVIEW</p>
+      <main className="page">
+        <section className="page-header compact">
+          <p className="eyebrow">REVIEW</p>
           <h1 style={{ fontSize: "3rem" }}>You are caught up.</h1>
-          <p className="muted">FSRS will surface vocabulary here when it becomes due.</p>
-        </div>
+          <p className="eyebrow">FSRS will surface vocabulary here when it becomes due.</p>
+        </section>
       </main>
     );
   }
@@ -70,11 +70,11 @@ export default async function ReviewPage() {
   );
 
   return (
-    <main>
-      <div className="hero">
-        <p className="muted">DUE NOW · CONTEXTUAL SRS</p>
+    <main className="page">
+      <section className="page-header compact">
+        <p className="eyebrow">DUE NOW · CONTEXTUAL SRS</p>
         <h1 style={{ fontSize: "3rem" }}>Review</h1>
-      </div>
+      </section>
       <ReviewCard
         userVocabularyId={item.id}
         lemma={item.lexeme.lemma}

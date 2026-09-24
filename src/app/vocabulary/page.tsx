@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BookOpen, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
@@ -15,45 +16,73 @@ export default async function Vocabulary() {
   });
 
   return (
-    <main>
-      <div className="hero">
-        <p className="muted">PERSONAL LIBRARY</p>
-        <h1 style={{ fontSize: "3rem" }}>Vocabulary</h1>
-        <p className="muted">
-          {items.length} lexical {items.length === 1 ? "unit" : "units"} in your library.
+    <main className="page">
+      <section className="page-header">
+        <p className="eyebrow">PERSONAL LIBRARY</p>
+        <h1>Vocabulary</h1>
+        <p className="page-description">
+          {items.length} lexical {items.length === 1 ? "unit" : "units"} stored
+          with grammar, context, bilingual meanings, and learner state.
         </p>
-      </div>
+        <div className="hero-actions">
+          <Link href="/vocabulary/new" className="button button-primary">
+            <Plus size={18} />
+            Add vocabulary
+          </Link>
+        </div>
+      </section>
 
-      <div className="grid">
-        {items.map((item) => {
-          const word = item.lexeme;
-          const translations = word.translations.filter((translation) =>
-            isTranslationVisible(user.preferredTranslation, translation.language),
-          );
+      {items.length ? (
+        <div className="grid vocabulary-grid">
+          {items.map((item) => {
+            const word = item.lexeme;
+            const translations = word.translations.filter((translation) =>
+              isTranslationVisible(user.preferredTranslation, translation.language),
+            );
 
-          return (
-            <Link className="card" key={item.id} href={`/vocabulary/${word.id}`}>
-              <div className="word">
-                {word.article ? `${word.article} ` : ""}{word.lemma}
-              </div>
-              {translations.map((translation) => (
-                <p
-                  key={translation.id}
-                  className={translation.language === "fa" ? "rtl" : undefined}
-                >
-                  {translation.text}
-                </p>
-              ))}
-              <small className="muted">
-                {word.partOfSpeech} · {item.state}
-              </small>
-            </Link>
-          );
-        })}
-      </div>
-
-      {!items.length && (
-        <p className="muted">No vocabulary yet. Add your first lexical unit.</p>
+            return (
+              <Link className="card vocabulary-card" key={item.id} href={"/vocabulary/" + word.id}>
+                <div className="word-meta">
+                  <span className="badge">{word.partOfSpeech}</span>
+                  <span className="badge">{item.state}</span>
+                </div>
+                <div className="word">
+                  {word.article ? word.article + " " : ""}{word.lemma}
+                </div>
+                <div className="translation-stack">
+                  {translations.map((translation) => (
+                    <p
+                      key={translation.id}
+                      className={translation.language === "fa" ? "rtl" : undefined}
+                    >
+                      {translation.text}
+                    </p>
+                  ))}
+                </div>
+                <div className="mastery-line">
+                  <span
+                    style={{
+                      width:
+                        Math.round(
+                          ((item.recognition + item.meaningRecall + item.production + item.contextualUsage) / 4) * 100,
+                        ) + "%",
+                    }}
+                  />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <BookOpen size={24} />
+          <strong>Your vocabulary library is empty.</strong>
+          <span>Add your first German lexical unit to begin.</span>
+          <Link href="/vocabulary/new" className="button button-primary">
+            <Plus size={18} />
+            Add first word
+          </Link>
+        </div>
       )}
     </main>
   );

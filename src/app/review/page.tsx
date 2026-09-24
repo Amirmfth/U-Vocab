@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/current-user";
-import { visibleTranslationCodes } from "@/lib/translations";
+import { isTranslationVisible } from "@/lib/translations";
 import { db } from "@/lib/db";
 import { ReviewCard } from "./ReviewCard";
 
@@ -30,9 +30,8 @@ export default async function ReviewPage() {
     );
   }
 
-  const allowed = visibleTranslationCodes(user.preferredTranslation);
   const translations = item.lexeme.translations.filter((translation) =>
-    allowed.includes(translation.language as "en" | "fa"),
+    isTranslationVisible(user.preferredTranslation, translation.language),
   );
 
   return (

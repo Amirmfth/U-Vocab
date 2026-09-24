@@ -71,6 +71,43 @@ export async function completeFocusStep(formData: FormData) {
   const complete = nextStep >= session.items.length;
   const now = new Date();
 
+  let summary:
+    | {
+        reviews: number;
+        attempts: number;
+        correctAttempts: number;
+        durationMs: number;
+      }
+    | undefined;
+
+  if (complete) {
+    const [attempts, reviews] = await Promise.all([
+      db.attempt.findMany({
+        where: {
+          userId: user.id,
+          createdAt: { gte: session.startedAt, lte: now },
+        },
+        select: { correct: true, durationMs: true },
+      }),
+      db.review.count({
+        where: {
+          userVocabulary: { userId: user.id },
+          reviewedAt: { gte: session.startedAt, lte: now },
+        },
+      }),
+    ]);
+
+    summary = {
+      reviews,
+      attempts: attempts.length,
+      correctAttempts: attempts.filter((attempt) => attempt.correct).length,
+      durationMs: attempts.reduce(
+        (sum, attempt) => sum + (attempt.durationMs ?? 0),
+        0,
+      ),
+    };
+  }
+
   await db.$transaction([
     db.learningSessionItem.update({
       where: { id: item.id },
@@ -83,6 +120,7 @@ export async function completeFocusStep(formData: FormData) {
         lastActiveAt: now,
         status: complete ? "COMPLETED" : "ACTIVE",
         completedAt: complete ? now : null,
+        summary: summary ?? undefined,
       },
     }),
   ]);

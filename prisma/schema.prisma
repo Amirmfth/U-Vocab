@@ -398,6 +398,21 @@ model AiUsageEvent {
 }
 
 
+
+model AiGenerationCache {
+  id            String   @id @default(cuid())
+  cacheKey      String   @unique
+  operation     String
+  promptVersion String
+  schemaVersion String
+  sourceHash    String
+  payload       Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([operation, updatedAt])
+}
+
 model LexemeInsight {
   id                 String   @id @default(cuid())
   lexemeId           String

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -33,16 +34,18 @@ export async function generateLexicalInsight(input: {
   level: string;
   compareWith?: string | null;
 }) {
-  const perf = startOperation("ai.lexical_insight", { model: AI_MODEL });
+  const route = aiRoute("lexical_insight");
+  const perf = startOperation("ai.lexical_insight", { model: route.model });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "lexical_insight",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, patternCount: input.patterns.length, hasComparison: Boolean(input.compareWith) },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
@@ -51,7 +54,7 @@ export async function generateLexicalInsight(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: {

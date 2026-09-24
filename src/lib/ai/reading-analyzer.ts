@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -26,7 +27,7 @@ export const readingAnalysisSchema = z.object({
       occurrences: z.number().int().min(1),
       importance: z.number().int().min(1).max(5),
     }),
-  ).min(1).max(120),
+  ).min(1).max(30),
 });
 
 export type ReadingAnalysis = z.infer<typeof readingAnalysisSchema>;
@@ -34,29 +35,34 @@ export type ReadingAnalysis = z.infer<typeof readingAnalysisSchema>;
 export async function analyzeReadingText(input: {
   userId: string;
   text: string;
+  originalTextChars: number;
+  candidates: Array<{ token: string; count: number }>;
   targetLevel: string;
 }) {
-  const perf = startOperation("ai.reading_analysis", { model: AI_MODEL, inputChars: input.text.length, targetLevel: input.targetLevel });
+  const route = aiRoute("reading_analysis");
+  const perf = startOperation("ai.reading_analysis", { model: route.model, inputChars: input.text.length, targetLevel: input.targetLevel });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "reading_analysis",
-    model: AI_MODEL,
-    metadata: { inputChars: input.text.length, targetLevel: input.targetLevel, lengthBucket: input.text.length < 2000 ? "short" : input.text.length < 8000 ? "medium" : "long" },
+    model: route.model,
+    metadata: { inputChars: input.text.length, originalTextChars: input.originalTextChars, candidateCount: input.candidates.length, targetLevel: input.targetLevel, lengthBucket: input.originalTextChars < 2000 ? "short" : input.originalTextChars < 8000 ? "medium" : "long" },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
           content:
-            "Analyze German reading text into useful lexical units for a vocabulary learner. Prefer multi-word phrases, verb-preposition patterns, collocations, separable/reflexive constructions, and meaningful lemmas over naive token-by-token extraction. Keep surfaceText exactly as a representative form from the submitted text and return every distinct observed inflected/conjugated spelling in surfaceForms. Provide concise English and Persian meanings plus one useful grammatical pattern when relevant. Deduplicate lexical units and report occurrence counts.",
+            "Analyze this bounded German excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, verb-preposition patterns, separable/reflexive constructions, and meaningful lemmas; do not turn every token into an item. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, concise English/Persian meanings, and at most one useful grammar pattern.",
         },
         {
           role: "user",
           content: JSON.stringify({
             targetLevel: input.targetLevel,
-            text: input.text,
+            candidates: input.candidates,
+            excerpt: input.text,
           }),
         },
       ],

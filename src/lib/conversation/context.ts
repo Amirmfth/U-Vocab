@@ -24,7 +24,7 @@ export async function buildConversationContext(input: {
                     },
                   },
                 },
-                take: 5,
+                take: 3,
               },
               incoming: {
                 include: {
@@ -37,7 +37,7 @@ export async function buildConversationContext(input: {
                     },
                   },
                 },
-                take: 5,
+                take: 3,
               },
             },
           },
@@ -46,7 +46,7 @@ export async function buildConversationContext(input: {
       },
       messages: {
         orderBy: { createdAt: "desc" },
-        take: input.messageLimit ?? 12,
+        take: input.messageLimit ?? 8,
       },
       user: {
         select: {
@@ -68,7 +68,7 @@ export async function buildConversationContext(input: {
     },
     include: { lexeme: true },
     orderBy: [{ occurrences: "desc" }, { lastOccurredAt: "desc" }],
-    take: 12,
+    take: 6,
   });
 
   const relatedKnown = new Map<string, string>();
@@ -109,7 +109,7 @@ export async function buildConversationContext(input: {
       uses: target.uses,
       successfulUses: target.successfulUses,
     })),
-    relatedKnown: Array.from(relatedKnown.values()).slice(0, 12),
+    relatedKnown: Array.from(relatedKnown.values()).slice(0, 8),
     mistakes: mistakes.map((mistake) => ({
       lexeme: mistake.lexeme?.lemma ?? null,
       type: mistake.type,

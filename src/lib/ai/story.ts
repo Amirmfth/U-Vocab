@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -26,16 +27,18 @@ export async function generateStory(input: {
   topic?: string | null;
   targets: Array<{ lemma: string; pattern?: string | null }>;
 }) {
-  const perf = startOperation("ai.story_generation", { model: AI_MODEL });
+  const route = aiRoute("story_generation");
+  const perf = startOperation("ai.story_generation", { model: route.model });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "story_generation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, length: input.length, targetCount: input.targets.length, hasTopic: Boolean(input.topic) },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
@@ -44,7 +47,7 @@ export async function generateStory(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: { format: zodTextFormat(storySchema, "vocabulary_story") },

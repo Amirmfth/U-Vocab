@@ -1,4 +1,5 @@
-import { AI_MODEL, getOpenAI } from "@/lib/ai/client";
+import { getOpenAI } from "@/lib/ai/client";
+import { aiRoute } from "@/lib/ai/routing";
 import { createAIUsageRecorder } from "@/lib/ai/usage-recorder";
 import {
   AI_RESPONSE_COMPLETED_EVENT,
@@ -92,15 +93,16 @@ export async function POST(
     }),
   );
   const instructions = buildTutorInstructions(context, correction);
+  const tutorRoute = aiRoute("conversation_tutor");
   const tutorPerf = startOperation("ai.conversation_tutor", {
-    model: AI_MODEL,
+    model: tutorRoute.model,
     messageChars: message.length,
     contextMessages: context.messages.length,
   });
   const tutorUsage = createAIUsageRecorder({
     userId: user.id,
     operation: "conversation_tutor",
-    model: AI_MODEL,
+    model: tutorRoute.model,
     metadata: {
       messageChars: message.length,
       contextMessages: context.messages.length,
@@ -112,7 +114,8 @@ export async function POST(
   const stream = await tutorPerf
     .span("providerStart", () =>
       getOpenAI().responses.create({
-        model: AI_MODEL,
+        model: tutorRoute.model,
+        max_output_tokens: tutorRoute.maxOutputTokens,
         input: [
           { role: "system", content: instructions },
           ...context.messages.map((item) => ({

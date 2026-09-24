@@ -137,7 +137,7 @@ export async function completeConversationAction(
         messages: {
           select: { role: true, content: true },
           orderBy: { createdAt: "desc" },
-          take: 40,
+          take: 24,
         },
       },
     });

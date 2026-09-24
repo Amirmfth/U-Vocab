@@ -9,6 +9,7 @@ import { recordMistakesBatch } from "@/lib/mistakes-batch";
 import { updateVocabularyMasteryBatch } from "@/lib/vocabulary-batch";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { detectLexemePresence, detectRepeatedWords } from "@/lib/ai/preprocess";
 
 export type WritingActionState = {
   status: "idle" | "success" | "error";
@@ -195,6 +196,31 @@ async function detectKnownLexemes(userId: string, draft: string) {
     where: { userId },
     select: {
       lexemeId: true,
+      lexeme: { select: { lemma: true } },
+    },
+    orderBy: { addedAt: "desc" },
+    take: 300,
+  });
+
+  const present = new Set(
+    detectLexemePresence(
+      draft,
+      vocabulary.map((item) => item.lexeme.lemma),
+    ),
+  );
+  const selected = vocabulary
+    .filter((item) => present.has(item.lexeme.lemma))
+    .slice(0, 12);
+
+  if (!selected.length) return [];
+
+  return db.userVocabulary.findMany({
+    where: {
+      userId,
+      lexemeId: { in: selected.map((item) => item.lexemeId) },
+    },
+    select: {
+      lexemeId: true,
       lexeme: {
         select: {
           lemma: true,
@@ -202,22 +228,13 @@ async function detectKnownLexemes(userId: string, draft: string) {
         },
       },
     },
-    orderBy: { addedAt: "desc" },
-    take: 300,
-  });
-
-  const haystack = " " + draft.toLocaleLowerCase("de-DE") + " ";
-  return vocabulary
-    .filter((item) => {
-      const needle = item.lexeme.lemma.toLocaleLowerCase("de-DE").trim();
-      return needle.length >= 3 && haystack.includes(needle);
-    })
-    .slice(0, 30)
-    .map((item) => ({
+  }).then((items) =>
+    items.map((item) => ({
       id: item.lexemeId,
       lemma: item.lexeme.lemma,
-      patterns: item.lexeme.patterns.map((pattern) => pattern.pattern),
-    }));
+      patterns: item.lexeme.patterns.map((pattern) => pattern.pattern).slice(0, 3),
+    })),
+  );
 }
 
 export async function evaluateWritingAction(
@@ -289,7 +306,8 @@ export async function evaluateWritingAction(
           ]),
         );
         for (const item of observed) lexical.set(item.id, item);
-        const lexicalContext = Array.from(lexical.values()).slice(0, 35);
+        const lexicalContext = Array.from(lexical.values()).slice(0, 18);
+        const repetitions = detectRepeatedWords(draft);
 
         const evaluation = await perf.span("ai", () =>
           evaluateWriting({
@@ -300,6 +318,8 @@ export async function evaluateWritingAction(
             task: session.task,
             targetWords: session.targetWords,
             draft,
+            precomputedWordCount: countWords(draft),
+            repeatedWords: repetitions,
             targets: lexicalContext.map((item) => ({
               lexemeId: item.id,
               lemma: item.lemma,

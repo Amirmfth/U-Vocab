@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -8,9 +9,9 @@ export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
   score: z.number().min(0).max(1),
   confidence: z.number().min(0).max(1),
-  feedback: z.string(),
-  retryPrompt: z.string().nullable(),
-  improvedSentence: z.string().nullable(),
+  feedback: z.string().max(600),
+  retryPrompt: z.string().max(300).nullable(),
+  improvedSentence: z.string().max(600).nullable(),
   mistakes: z.array(
     z.object({
       type: z.enum([
@@ -28,7 +29,7 @@ export const productionEvaluationSchema = z.object({
       actual: z.string().nullable(),
       explanation: z.string(),
     }),
-  ),
+  ).max(6),
 });
 
 export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
@@ -44,16 +45,18 @@ export async function evaluateVocabularyProduction(input: {
   examples: string[];
   answer: string;
 }) {
-  const perf = startOperation("ai.answer_evaluation", { model: AI_MODEL, answerChars: input.answer.length, exerciseType: input.exerciseType });
+  const route = aiRoute("answer_evaluation");
+  const perf = startOperation("ai.answer_evaluation", { model: route.model, answerChars: input.answer.length, exerciseType: input.exerciseType });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "answer_evaluation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { answerChars: input.answer.length, exerciseType: input.exerciseType, patternCount: input.patterns.length, exampleCount: input.examples.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
@@ -62,7 +65,7 @@ export async function evaluateVocabularyProduction(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: {

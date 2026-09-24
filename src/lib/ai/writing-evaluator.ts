@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -30,9 +31,9 @@ export const writingEvaluationSchema = z.object({
   vocabularyAccuracy: z.number().min(0).max(1),
   naturalness: z.number().min(0).max(1),
   overall: z.number().min(0).max(1),
-  summary: z.string(),
-  strengths: z.array(z.string()).max(6),
-  improvements: z.array(z.string()).max(8),
+  summary: z.string().max(700),
+  strengths: z.array(z.string().max(280)).max(4),
+  improvements: z.array(z.string().max(320)).max(5),
   targetUsage: z.array(
     z.object({
       lexemeId: z.string(),
@@ -48,24 +49,24 @@ export const writingEvaluationSchema = z.object({
       count: z.number().int().min(2),
       suggestion: z.string(),
     }),
-  ).max(8),
-  collocationFeedback: z.array(z.string()).max(8),
-  lexicalMistakes: z.array(lexicalMistakeSchema).max(20),
+  ).max(6),
+  collocationFeedback: z.array(z.string().max(280)).max(5),
+  lexicalMistakes: z.array(lexicalMistakeSchema).max(12),
   strongerVocabulary: z.array(
     z.object({
       german: z.string(),
       meaning: z.string(),
       rationale: z.string(),
     }),
-  ).max(8),
+  ).max(5),
   corrections: z.array(
     z.object({
       original: z.string(),
       corrected: z.string(),
       explanation: z.string(),
     }),
-  ).max(12),
-  improvedVersion: z.string(),
+  ).max(8),
+  improvedVersion: z.string().max(4000),
 });
 
 export type WritingEvaluation = z.infer<typeof writingEvaluationSchema>;
@@ -78,29 +79,33 @@ export async function evaluateWriting(input: {
   task: string;
   targetWords: number;
   draft: string;
+  precomputedWordCount: number;
+  repeatedWords: Array<{ word: string; count: number }>;
   targets: Array<{
     lexemeId: string;
     lemma: string;
     patterns: string[];
   }>;
 }) {
-  const perf = startOperation("ai.writing_evaluation", { model: AI_MODEL, draftChars: input.draft.length, targetCount: input.targets.length, level: input.level });
+  const route = aiRoute("writing_evaluation");
+  const perf = startOperation("ai.writing_evaluation", { model: route.model, draftChars: input.draft.length, targetCount: input.targets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "writing_evaluation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.targets.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
           content:
-            "Evaluate this German writing practice. Scores are internal learning signals only, never official CEFR certification. Assess task completion, organization/coherence, grammar, vocabulary range, lexical accuracy/naturalness, repetition, collocations, and supplied target vocabulary. Only create lexicalMistakes for vocabulary-related errors. targetUsage must use only supplied lexeme IDs. Give concise corrections and a polished improved version that preserves the learner's intended content.",
+            "Evaluate this German writing practice. Scores are internal learning signals only. Word count and repeated-word counts are precomputed; use them instead of recounting. Judge grammar, organization, lexical accuracy/naturalness, collocations, and supplied targets. targetUsage must use only supplied lexeme IDs. Keep feedback prioritized and concise: at most four strengths, five improvements, five collocation notes, twelve lexical mistakes, eight corrections, and a concise improved version preserving the learner intent.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: {
         format: zodTextFormat(writingEvaluationSchema, "writing_evaluation"),

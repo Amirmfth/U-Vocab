@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -49,23 +50,25 @@ export async function evaluateConversationTurn(input: {
     patterns: string[];
   }>;
 }) {
-  const perf = startOperation("ai.conversation_turn_evaluation", { model: AI_MODEL, messageChars: input.message.length, targetCount: input.targets.length, level: input.level });
+  const route = aiRoute("conversation_turn_evaluation");
+  const perf = startOperation("ai.conversation_turn_evaluation", { model: route.model, messageChars: input.message.length, targetCount: input.targets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "conversation_turn_evaluation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, messageChars: input.message.length, targetCount: input.targets.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
           content:
             "Evaluate only the learner's use of the supplied German target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, case/preposition, form, spelling, and naturalness. Do not penalize unrelated grammar. relevantCorrection should be a very short conversational correction only when useful; otherwise null.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: {
         format: zodTextFormat(

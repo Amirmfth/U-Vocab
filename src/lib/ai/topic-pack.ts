@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -30,16 +31,18 @@ export async function generateTopicPack(input: {
   level: string;
   size: number;
 }) {
-  const perf = startOperation("ai.topic_pack_generation", { model: AI_MODEL });
+  const route = aiRoute("topic_pack_generation");
+  const perf = startOperation("ai.topic_pack_generation", { model: route.model });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "topic_pack_generation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, requestedSize: input.size, topicChars: input.topic.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
@@ -48,7 +51,7 @@ export async function generateTopicPack(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: { format: zodTextFormat(topicPackSchema, "topic_pack") },

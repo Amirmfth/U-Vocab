@@ -1,20 +1,23 @@
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { lexicalAnalysisSchema } from "./schemas";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export async function analyzeGermanLexeme(input: string, userId: string) {
-  const perf = startOperation("ai.lexical_analysis", { model: AI_MODEL, inputChars: input.length });
+  const route = aiRoute("lexical_analysis");
+  const perf = startOperation("ai.lexical_analysis", { model: route.model, inputChars: input.length });
   const usageRecorder = createAIUsageRecorder({
     userId,
     operation: "lexical_analysis",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { inputChars: input.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",

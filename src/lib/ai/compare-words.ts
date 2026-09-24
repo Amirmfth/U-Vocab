@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { getGenerationCache, putGenerationCache } from "./generation-cache";
 
 const comparisonBaseSchema = z.object({
   germanDistinction: z.string(),
@@ -77,6 +79,7 @@ export async function generateWordComparison(input: {
     patterns: string[];
     examples: string[];
   };
+  refresh?: boolean;
   right: {
     lemma: string;
     article: string | null;
@@ -85,23 +88,55 @@ export async function generateWordComparison(input: {
     examples: string[];
   };
 }) {
-  const perf = startOperation("ai.word_comparison", { model: AI_MODEL });
+  const route = aiRoute("word_comparison");
+  const perf = startOperation("ai.word_comparison", { model: route.model });
+  const source = {
+    left: {
+      ...input.left,
+      patterns: [...input.left.patterns].sort(),
+      examples: [...input.left.examples].sort(),
+    },
+    right: {
+      ...input.right,
+      patterns: [...input.right.patterns].sort(),
+      examples: [...input.right.examples].sort(),
+    },
+  };
+  const dimensions = {
+    level: input.level,
+    left: input.left.lemma.toLocaleLowerCase("de-DE"),
+    right: input.right.lemma.toLocaleLowerCase("de-DE"),
+  };
+  const cached = input.refresh
+    ? null
+    : await getGenerationCache<unknown>({
+        operation: "word_comparison",
+        dimensions,
+        source,
+        schemaVersion: "v2",
+      });
+  const parsedCached = comparisonSchema.safeParse(cached);
+  if (parsedCached.success) {
+    perf.success({ cacheHit: true });
+    return parsedCached.data;
+  }
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "word_comparison",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
           content:
             "Teach the practical distinction between two commonly confused German lexical units. Be concise but precise. Explain the distinction in level-appropriate German and also in natural English and Persian. Contrast register, meaning, collocation, grammar, and usage only where relevant. Create contrastive examples, short discrimination questions, and one production prompt for each word. Avoid trick questions and accept that close synonyms can overlap.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined, refresh: undefined }) },
       ],
       text: {
         format: zodTextFormat(comparisonBaseSchema, "german_word_comparison"),
@@ -115,6 +150,13 @@ export async function generateWordComparison(input: {
     }
 
     await usageRecorder.success(response);
+    await putGenerationCache({
+      operation: "word_comparison",
+      dimensions,
+      source,
+      schemaVersion: "v2",
+      payload: response.output_parsed,
+    });
 
     perf.success({
       requestId: response.id,

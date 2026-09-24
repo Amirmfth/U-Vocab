@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -43,23 +44,25 @@ export async function evaluateConversationSession(input: {
   }>;
   messages: Array<{ role: "user" | "assistant"; content: string }>;
 }) {
-  const perf = startOperation("ai.conversation_final_evaluation", { model: AI_MODEL, messageCount: input.messages.length, targetCount: input.targets.length, level: input.level });
+  const route = aiRoute("conversation_final_evaluation");
+  const perf = startOperation("ai.conversation_final_evaluation", { model: route.model, messageCount: input.messages.length, targetCount: input.targets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "conversation_final_evaluation",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, messageCount: input.messages.length, targetCount: input.targets.length, kind: input.kind },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",
           content:
             "Evaluate the completed German conversation. For a mission, taskSuccess means the conversational objective was actually achieved, not merely mentioned. Assess grammar, naturalness, vocabulary, and each target lexical unit. Be constructive and concise. Do not treat the score as an official CEFR assessment.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: {
         format: zodTextFormat(

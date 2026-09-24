@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/current-user";
 import { applyReviewResult } from "@/lib/review-service";
 import type { ReviewGrade } from "@/lib/fsrs";
+import { revalidateUserDomains } from "@/lib/cache-tags";
 
 function safeDuration(value: FormDataEntryValue | null) {
   const startedAt = Number(value);
@@ -27,7 +28,7 @@ export async function submitReview(formData: FormData) {
   }
 
   const user = await getCurrentUser();
-  await applyReviewResult({
+  const result = await applyReviewResult({
     userId: user.id,
     userVocabularyId: id,
     grade,
@@ -35,6 +36,12 @@ export async function submitReview(formData: FormData) {
     prompt,
     durationMs: safeDuration(formData.get("startedAt")),
   });
+
+  revalidateUserDomains(
+    user.id,
+    ["home", "vocabulary", "review", "progress"],
+    [result.item.lexemeId],
+  );
 
   redirect("/review");
 }

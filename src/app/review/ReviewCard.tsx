@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { submitReview } from "./actions";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
   article: string | null;
   patterns: string[];
   translations: { language: string; text: string }[];
+  exercise: ExerciseDefinition;
 };
 
 export function ReviewCard(props: Props) {
@@ -16,22 +18,33 @@ export function ReviewCard(props: Props) {
 
   return (
     <section className="card" style={{ maxWidth: 720 }}>
-      <p className="muted">ACTIVE RECALL</p>
-      <h2 style={{ fontSize: "2.5rem" }}>
-        {props.article ? `${props.article} ` : ""}{props.lemma}
-      </h2>
-      <p>Before revealing the answer, recall its meaning, pattern, and a natural sentence.</p>
+      <p className="muted">{props.exercise.type.replaceAll("_", " ")}</p>
+      <h2 style={{ fontSize: "2rem" }}>{props.exercise.prompt}</h2>
 
       {!revealed ? (
-        <button className="button" type="button" onClick={() => setRevealed(true)}>
-          Reveal
-        </button>
+        <>
+          {props.exercise.hint && (
+            <details>
+              <summary>Show hint</summary>
+              <p className="muted">{props.exercise.hint}</p>
+            </details>
+          )}
+          <button className="button" type="button" onClick={() => setRevealed(true)}>
+            Reveal answer and self-grade
+          </button>
+        </>
       ) : (
         <>
           <div className="answerPanel">
+            {props.exercise.expected && (
+              <p><b>Expected:</b> {props.exercise.expected}</p>
+            )}
+            <p>
+              <b>{props.article ? props.article + " " : ""}{props.lemma}</b>
+            </p>
             {props.translations.map((translation) => (
               <p
-                key={`${translation.language}:${translation.text}`}
+                key={translation.language + ":" + translation.text}
                 className={translation.language === "fa" ? "rtl" : undefined}
               >
                 {translation.text}
@@ -39,12 +52,15 @@ export function ReviewCard(props: Props) {
             ))}
             {props.patterns.map((pattern) => <p key={pattern}><b>{pattern}</b></p>)}
           </div>
-          <p className="muted">How difficult was the recall?</p>
+
+          <p className="muted">How difficult was this retrieval?</p>
           <div className="toolbar">
             {(["AGAIN", "HARD", "GOOD", "EASY"] as const).map((grade) => (
               <form action={submitReview} key={grade}>
                 <input type="hidden" name="userVocabularyId" value={props.userVocabularyId} />
                 <input type="hidden" name="grade" value={grade} />
+                <input type="hidden" name="exerciseType" value={props.exercise.type} />
+                <input type="hidden" name="prompt" value={props.exercise.prompt} />
                 <button className="button secondary" type="submit">{grade}</button>
               </form>
             ))}

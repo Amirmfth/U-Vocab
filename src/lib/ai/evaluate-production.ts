@@ -7,6 +7,7 @@ export const productionEvaluationSchema = z.object({
   score: z.number().min(0).max(1),
   confidence: z.number().min(0).max(1),
   feedback: z.string(),
+  retryPrompt: z.string().nullable(),
   improvedSentence: z.string().nullable(),
   mistakes: z.array(
     z.object({
@@ -31,6 +32,9 @@ export const productionEvaluationSchema = z.object({
 export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
 
 export async function evaluateVocabularyProduction(input: {
+  exerciseType: string;
+  exercisePrompt: string;
+  expected?: string;
   lemma: string;
   partOfSpeech: string;
   patterns: string[];
@@ -43,7 +47,7 @@ export async function evaluateVocabularyProduction(input: {
       {
         role: "system",
         content:
-          "You are U-Vocab's German vocabulary evaluator. Judge whether the learner used the target lexical unit naturally and correctly. Focus primarily on lexical usage: article, case, preposition, reflexive structure, collocation, word choice and word form. Mention unrelated grammar only when it prevents natural usage. Be concise and actionable.",
+          "You are U-Vocab's German vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, article, case, preposition, reflexive structure, collocation, word choice, word form, spelling, and naturalness. Accept valid alternatives. Give concise actionable feedback. If the answer is wrong or incomplete, provide a short retryPrompt that asks the learner to try again without simply giving away the full answer.",
       },
       {
         role: "user",

@@ -1,6 +1,10 @@
 "use server";
 
-import { ReviewRating, VocabularyState } from "@prisma/client";
+import {
+  type ExerciseType,
+  ReviewRating,
+  VocabularyState,
+} from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
@@ -16,6 +20,13 @@ function nextVocabularyState(stability: number): VocabularyState {
 export async function submitReview(formData: FormData) {
   const id = String(formData.get("userVocabularyId") ?? "");
   const grade = String(formData.get("grade") ?? "") as ReviewGrade;
+  const exerciseType = String(
+    formData.get("exerciseType") ?? "MEANING_RECALL",
+  ) as ExerciseType;
+  const prompt = String(
+    formData.get("prompt") ?? "Recall this lexical unit.",
+  );
+
   if (!id || !["AGAIN", "HARD", "GOOD", "EASY"].includes(grade)) {
     throw new Error("Invalid review submission.");
   }
@@ -42,6 +53,14 @@ export async function submitReview(formData: FormData) {
         nextReviewAt: scheduled.due,
         state,
         meaningRecall: Math.max(0, Math.min(1, item.meaningRecall + recallGain)),
+        production:
+          ["FREE_SENTENCE", "PARAPHRASE", "COLLOCATION", "CASE_PREPOSITION"].includes(exerciseType)
+            ? Math.max(0, Math.min(1, item.production + recallGain / 2))
+            : item.production,
+        contextualUsage:
+          ["CLOZE", "PARAPHRASE", "CONTEXTUAL_CHOICE"].includes(exerciseType)
+            ? Math.max(0, Math.min(1, item.contextualUsage + recallGain / 2))
+            : item.contextualUsage,
       },
     }),
     db.review.create({
@@ -56,8 +75,8 @@ export async function submitReview(formData: FormData) {
       data: {
         userId: user.id,
         userVocabularyId: item.id,
-        exerciseType: "MEANING_RECALL",
-        prompt: "Recall the meaning and usage of this lexical unit.",
+        exerciseType,
+        prompt,
         answer: grade,
         correct: grade !== "AGAIN",
         score: grade === "AGAIN" ? 0 : grade === "HARD" ? 0.5 : grade === "GOOD" ? 0.8 : 1,

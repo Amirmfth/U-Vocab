@@ -34,6 +34,7 @@ export async function embedText(input: {
       model: EMBEDDING_MODEL,
       input: cleaned,
       encoding_format: "float",
+      dimensions: EMBEDDING_DIMENSIONS,
     });
 
     await recordAIUsage({

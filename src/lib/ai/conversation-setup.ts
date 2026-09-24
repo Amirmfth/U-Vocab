@@ -57,6 +57,10 @@ export async function generateConversationSetup(input: {
       throw new Error("OpenAI did not return a valid conversation setup.");
     }
 
+    if (input.kind === "MISSION" && !response.output_parsed.objective?.trim()) {
+      throw new Error("OpenAI did not return a mission objective.");
+    }
+
     await recordAIUsage({
       userId: input.userId,
       operation: "conversation_setup",

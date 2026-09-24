@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef } from "react";
 import { Check } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { ActionButton } from "@/components/action-button";
@@ -13,6 +13,7 @@ export function PracticeForm(props: {
   userVocabularyId: string; exercise: ExerciseDefinition;
 }) {
   const [state, action] = useActionState(evaluatePractice, initialState);
+  const startedAt = useRef(Date.now());
   return (
     <section className="panel learning-card">
       <span className="exercise-type">{props.exercise.type.replaceAll("_", " ").toLowerCase()}</span>
@@ -24,6 +25,7 @@ export function PracticeForm(props: {
         <input type="hidden" name="prompt" value={props.exercise.prompt} />
         <input type="hidden" name="expected" value={props.exercise.expected ?? ""} />
         <input type="hidden" name="requiresAI" value={String(props.exercise.requiresAI)} />
+        <input type="hidden" name="startedAt" value={startedAt.current} />
         <div className="field">
           <label htmlFor="answer">Your answer</label>
           <textarea id="answer" name="answer"

@@ -45,7 +45,7 @@ export default async function PracticePage({ searchParams }: {
   return (
     <main className="page focus-page">
       <div className="focus-meta"><span>Practice</span><span>{item.lexeme.lemma}</span></div>
-      <PracticeForm userVocabularyId={item.id} lemma={item.lexeme.lemma} exercise={exercise} />
+      <PracticeForm userVocabularyId={item.id} exercise={exercise} />
     </main>
   );
 }

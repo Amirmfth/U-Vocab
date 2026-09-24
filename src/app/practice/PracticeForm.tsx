@@ -10,7 +10,7 @@ import { evaluatePractice, type PracticeState } from "./actions";
 const initialState: PracticeState = { status: "idle" };
 
 export function PracticeForm(props: {
-  userVocabularyId: string; lemma: string; exercise: ExerciseDefinition;
+  userVocabularyId: string; exercise: ExerciseDefinition;
 }) {
   const [state, action] = useActionState(evaluatePractice, initialState);
   return (

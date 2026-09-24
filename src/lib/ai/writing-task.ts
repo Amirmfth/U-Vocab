@@ -38,7 +38,7 @@ export async function generateWritingTask(input: {
           content:
             "Create a realistic German writing-practice task. Match the requested CEFR level, writing type, topic, and approximate word count. Do not claim this is an official exam or official CEFR certification. In GUIDED mode, make the supplied target lexical units naturally useful without requiring awkward use of every item. In OPEN mode, do not prescribe vocabulary. Return a concise title, the task instructions, and a short content checklist.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: { format: zodTextFormat(writingTaskSchema, "writing_task") },
     }));

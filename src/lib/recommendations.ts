@@ -26,6 +26,7 @@ export function scoreRecommendation(input: {
   recentEncounter: boolean;
   levelMatch: boolean;
   weakAnchor: boolean;
+  usefulness: number;
 }) {
   const reasons: RecommendationReason[] = [];
   let score = 0;
@@ -49,6 +50,15 @@ export function scoreRecommendation(input: {
   if (input.weakAnchor) {
     score += 0.08;
     reasons.push({ label: "reinforces a recurring weak area", weight: 0.08 });
+  }
+
+  if (input.usefulness >= 4) {
+    const usefulnessWeight = input.usefulness === 5 ? 0.08 : 0.05;
+    score += usefulnessWeight;
+    reasons.push({
+      label: "high-usefulness vocabulary",
+      weight: usefulnessWeight,
+    });
   }
 
   if (input.similarity > 0) {
@@ -88,7 +98,7 @@ export async function getVocabularyRecommendations(
           include: {
             outgoing: { select: { targetId: true } },
             incoming: { select: { sourceId: true } },
-            topicPackItems: { select: { topicPackId: true } },
+            topicPackItems: { select: { topicPackId: true, usefulness: true } },
             mistakes: {
               where: { userId, resolvedAt: null },
               select: { occurrences: true },
@@ -203,6 +213,10 @@ export async function getVocabularyRecommendations(
         (insight) => insight.level === user.targetLevel,
       );
       const semanticWeakLink = similarity >= 0.72;
+      const usefulness = candidate.topicPackItems.reduce(
+        (max, item) => Math.max(max, item.usefulness),
+        0,
+      );
 
       const ranked = scoreRecommendation({
         similarity,
@@ -211,6 +225,7 @@ export async function getVocabularyRecommendations(
         recentEncounter,
         levelMatch,
         weakAnchor: semanticWeakLink,
+        usefulness,
       });
 
       const english =

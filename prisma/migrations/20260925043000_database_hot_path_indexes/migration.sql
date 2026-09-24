@@ -15,3 +15,7 @@ ON "UserVocabulary"("userId", "addedAt");
 
 CREATE INDEX "Mistake_userId_resolvedAt_lastOccurredAt_idx"
 ON "Mistake"("userId", "resolvedAt", "lastOccurredAt");
+
+
+CREATE INDEX "TopicPackItem_lexemeId_idx"
+ON "TopicPackItem"("lexemeId");

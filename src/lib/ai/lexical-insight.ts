@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
 import { recordAIUsage } from "./usage";
+import { startOperation } from "@/lib/performance";
 
 export const lexicalInsightSchema = z.object({
   germanDefinition: z.string(),
@@ -32,8 +33,9 @@ export async function generateLexicalInsight(input: {
   level: string;
   compareWith?: string | null;
 }) {
+  const perf = startOperation("ai.lexical_insight", { model: AI_MODEL });
   try {
-    const response = await getOpenAI().responses.parse({
+    const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
       input: [
         {
@@ -49,7 +51,7 @@ export async function generateLexicalInsight(input: {
       text: {
         format: zodTextFormat(lexicalInsightSchema, "lexical_insight"),
       },
-    });
+    }));
 
     if (!response.output_parsed) {
       await recordAIUsage({
@@ -73,8 +75,15 @@ export async function generateLexicalInsight(input: {
       requestId: response.id,
     });
 
+    perf.success({
+      requestId: response.id,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    });
+
     return response.output_parsed;
   } catch (error) {
+    perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid lexical insight.")) {
       await recordAIUsage({
         userId: input.userId,

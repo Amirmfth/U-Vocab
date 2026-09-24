@@ -21,11 +21,11 @@ export async function updateVocabularyMasteryBatch(
   const values = Prisma.join(
     unique.map((update) =>
       Prisma.sql`(
-        ${update.id},
-        ${update.production ?? null},
-        ${update.contextualUsage ?? null},
-        ${update.recognition ?? null},
-        ${update.meaningRecall ?? null}
+        ${update.id}::text,
+        ${update.production ?? null}::double precision,
+        ${update.contextualUsage ?? null}::double precision,
+        ${update.recognition ?? null}::double precision,
+        ${update.meaningRecall ?? null}::double precision
       )`,
     ),
   );

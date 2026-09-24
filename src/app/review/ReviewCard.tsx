@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Eye, RotateCcw } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { ActionButton } from "@/components/action-button";
@@ -17,6 +17,7 @@ type Props = {
 
 export function ReviewCard(props: Props) {
   const [revealed, setRevealed] = useState(false);
+  const startedAt = useRef(Date.now());
 
   return (
     <section className="panel learning-card">
@@ -85,6 +86,7 @@ export function ReviewCard(props: Props) {
                 <input type="hidden" name="grade" value={grade} />
                 <input type="hidden" name="exerciseType" value={props.exercise.type} />
                 <input type="hidden" name="prompt" value={props.exercise.prompt} />
+                <input type="hidden" name="startedAt" value={startedAt.current} />
                 <ActionButton
                   variant={grade === "AGAIN" ? "danger" : grade === "EASY" ? "success" : "secondary"}
                   pendingLabel="Saving…"

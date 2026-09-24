@@ -12,6 +12,7 @@ CREATE TABLE "LearningSession" (
   "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "lastActiveAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "completedAt" TIMESTAMP(3),
+  "summary" JSONB,
   CONSTRAINT "LearningSession_pkey" PRIMARY KEY ("id")
 );
 

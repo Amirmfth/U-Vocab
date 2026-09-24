@@ -2875,3 +2875,361 @@ summary {
     align-items: center;
   }
 }
+
+
+.mistake-refresh,
+.quick-compare-action {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compare-form,
+.compare-trainer,
+.compare-questions,
+.compare-production {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compare-select-grid,
+.compare-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.compare-suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compare-suggestion {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-suggestion > svg {
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.compare-suggestion > div:nth-child(2) {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.compare-suggestion span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.quick-compare-action {
+  grid-column: 1 / -1;
+}
+
+.compare-learned {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--success);
+  font-size: 0.82rem;
+}
+
+.compare-distinction,
+.compare-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.compare-german {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.65;
+}
+
+.compare-contrast-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-top: 1px solid var(--border);
+}
+
+.compare-contrast-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.7fr) 1fr 1fr;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+
+.compare-contrast-row strong {
+  color: var(--text-muted);
+}
+
+.compare-example {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-example:last-child {
+  border-bottom: 0;
+}
+
+.compare-example > span,
+.compare-example > small {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.compare-question,
+.compare-production-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-question:last-child,
+.compare-production-item:last-child {
+  border-bottom: 0;
+}
+
+.compare-question > p,
+.compare-production-item > p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.universe-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.universe-canvas-wrap {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.universe-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.universe-toolbar > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.universe-toolbar-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.universe-canvas {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 8px;
+  padding-bottom: 4px;
+}
+
+.universe-canvas svg {
+  display: block;
+  width: 100%;
+  min-width: 680px;
+  min-height: 480px;
+}
+
+.universe-edge {
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.universe-edge.semantic {
+  stroke: var(--primary);
+  stroke-dasharray: 5 5;
+  opacity: 0.8;
+}
+
+.universe-edge-label {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+}
+
+.universe-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.universe-node circle {
+  fill: var(--surface-raised);
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: stroke 140ms ease, fill 140ms ease, transform 140ms ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.universe-node:hover circle,
+.universe-node:focus-visible circle {
+  stroke: var(--text-soft);
+  transform: scale(1.04);
+}
+
+.universe-node.is-active circle {
+  stroke: var(--text);
+  stroke-width: 3;
+}
+
+.universe-state-mastered circle {
+  fill: rgba(73, 201, 139, 0.16);
+  stroke: var(--success);
+}
+
+.universe-state-learning circle {
+  fill: rgba(240, 179, 91, 0.14);
+  stroke: var(--warning);
+}
+
+.universe-state-weak circle {
+  fill: rgba(255, 107, 122, 0.12);
+  stroke: var(--danger);
+}
+
+.universe-state-unknown circle {
+  fill: rgba(139, 124, 255, 0.12);
+  stroke: var(--primary);
+}
+
+.universe-state-topic circle {
+  fill: var(--surface-soft);
+  stroke: var(--text-muted);
+  stroke-dasharray: 4 3;
+}
+
+.universe-node text {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.universe-node .universe-node-sub {
+  fill: var(--text-muted);
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.universe-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.universe-detail h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.035em;
+}
+
+.universe-meaning {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.universe-detail-actions,
+.universe-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.universe-status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.universe-suggestion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.universe-suggestion > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.universe-suggestion span,
+.universe-suggestion small {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 620px) {
+  .compare-select-grid,
+  .compare-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .compare-suggestion {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .quick-compare-action {
+    grid-column: auto;
+    min-width: 130px;
+  }
+
+  .universe-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .universe-toolbar-actions {
+    width: auto;
+    grid-template-columns: auto auto;
+  }
+}
+
+@media (min-width: 940px) {
+  .universe-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.72fr);
+    gap: 18px;
+  }
+
+  .universe-detail {
+    position: sticky;
+    top: 26px;
+  }
+}

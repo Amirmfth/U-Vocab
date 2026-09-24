@@ -3,6 +3,7 @@ import { Brain, Layers3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { clusterOpenMistakes } from "@/lib/semantic/clusters";
 import { MistakeResolveButton } from "./MistakeResolveButton";
+import { MistakeRefreshButton } from "./MistakeRefreshButton";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function MistakesPage() {
           not just individual corrections.
         </p>
         <p className="muted">{total} open mistakes · {clusters.length} patterns</p>
+        <MistakeRefreshButton />
       </section>
 
       {clusters.length ? (

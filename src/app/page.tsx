@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenText, FileUp, Layers3, Plus, ScanText, Star, TimerReset, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpenText, FileUp, GitCompareArrows, Layers3, Network, Plus, ScanText, Star, TimerReset, TrendingUp } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -46,6 +46,12 @@ export default async function Home() {
         </Link>
         <Link href="/recommendations" className="discovery-link">
           <Star size={20} /><span>Recommendations</span><ArrowRight size={17} />
+        </Link>
+        <Link href="/universe" className="discovery-link">
+          <Network size={20} /><span>Vocabulary Universe</span><ArrowRight size={17} />
+        </Link>
+        <Link href="/compare" className="discovery-link">
+          <GitCompareArrows size={20} /><span>Compare words</span><ArrowRight size={17} />
         </Link>
         <Link href="/topic-packs" className="discovery-link">
           <Layers3 size={20} /><span>Topic packs</span><ArrowRight size={17} />

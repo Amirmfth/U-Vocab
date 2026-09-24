@@ -1,14 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { Check, Network, Plus, Sparkles } from "lucide-react";
+import { Check, Network, Sparkles } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
 import {
-  addExpansionAction,
   generateExpansionAction,
   type ExpansionState,
 } from "./actions";
+import { ExpansionAddForm } from "./ExpansionAddForm";
 
 const initialState: ExpansionState = { status: "idle" };
 
@@ -70,20 +70,7 @@ export function ExpansionPanel({
                   In vocabulary
                 </span>
               ) : (
-                <form action={addExpansionAction}>
-                  <input type="hidden" name="sourceId" value={lexemeId} />
-                  <input type="hidden" name="lemma" value={item.lemma} />
-                  <input type="hidden" name="partOfSpeech" value={item.partOfSpeech} />
-                  <input type="hidden" name="article" value={item.article ?? ""} />
-                  <input type="hidden" name="plural" value={item.plural ?? ""} />
-                  <input type="hidden" name="englishMeaning" value={item.englishMeaning} />
-                  <input type="hidden" name="persianMeaning" value={item.persianMeaning} />
-                  <input type="hidden" name="relationType" value={item.relationType} />
-                  <ActionButton variant="secondary" pendingLabel="Adding…">
-                    <Plus size={17} />
-                    Add
-                  </ActionButton>
-                </form>
+                <ExpansionAddForm sourceId={lexemeId} item={item} />
               )}
             </article>
           ))}

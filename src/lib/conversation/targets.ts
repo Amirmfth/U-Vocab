@@ -14,6 +14,32 @@ export async function selectConversationTargets(input: {
     patterns: string[];
   }>();
 
+  if (input.collectionId) {
+    const pack = await db.topicPack.findFirst({
+      where: { id: input.collectionId, userId: input.userId },
+      include: {
+        items: {
+          include: {
+            lexeme: { include: { patterns: true } },
+          },
+          orderBy: [{ usefulness: "desc" }, { position: "asc" }],
+        },
+      },
+    });
+
+    for (const item of pack?.items ?? []) {
+      selected.set(item.lexemeId, {
+        id: item.lexemeId,
+        lemma: item.lexeme.lemma,
+        article: item.lexeme.article,
+        partOfSpeech: item.lexeme.partOfSpeech,
+        patterns: item.lexeme.patterns.map((pattern) => pattern.pattern),
+      });
+      if (selected.size >= limit) return Array.from(selected.values());
+    }
+  }
+
+
   const activeSession = await db.learningSession.findFirst({
     where: { userId: input.userId, status: "ACTIVE" },
     include: {
@@ -38,31 +64,6 @@ export async function selectConversationTargets(input: {
       patterns: item.lexeme.patterns.map((pattern) => pattern.pattern),
     });
     if (selected.size >= limit) return Array.from(selected.values());
-  }
-
-  if (input.collectionId) {
-    const pack = await db.topicPack.findFirst({
-      where: { id: input.collectionId, userId: input.userId },
-      include: {
-        items: {
-          include: {
-            lexeme: { include: { patterns: true } },
-          },
-          orderBy: [{ usefulness: "desc" }, { position: "asc" }],
-        },
-      },
-    });
-
-    for (const item of pack?.items ?? []) {
-      selected.set(item.lexemeId, {
-        id: item.lexemeId,
-        lemma: item.lexeme.lemma,
-        article: item.lexeme.article,
-        partOfSpeech: item.lexeme.partOfSpeech,
-        patterns: item.lexeme.patterns.map((pattern) => pattern.pattern),
-      });
-      if (selected.size >= limit) return Array.from(selected.values());
-    }
   }
 
   const weak = await db.userVocabulary.findMany({

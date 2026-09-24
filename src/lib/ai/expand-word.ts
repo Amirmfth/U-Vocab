@@ -53,7 +53,7 @@ export async function generateWordExpansion(input: {
           content:
             "Expand a German lexical unit into useful high-value related vocabulary. Prefer common derivations, word-family members, collocations, phrases, and practical semantic neighbors. Avoid obscure compounds. Return English and Persian meanings. Rank usefulness from 1 to 5.",
         },
-        { role: "user", content: JSON.stringify(input) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
       text: { format: zodTextFormat(expansionSchema, "word_expansion") },
     }));

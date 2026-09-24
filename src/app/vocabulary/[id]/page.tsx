@@ -11,6 +11,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible, translationLabel } from "@/lib/translations";
 import { LexicalInsightPanel } from "./LexicalInsightPanel";
+import { TranslationModeControl } from "@/components/translation-mode-control";
 import { ExpansionPanel } from "./ExpansionPanel";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +37,34 @@ export default async function Word({
         include: { target: true },
         take: 10,
       },
-      userStates: { where: { userId: user.id }, take: 1 },
+      incoming: {
+        include: { source: true },
+        take: 10,
+      },
+      encounters: {
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+      },
+      mistakes: {
+        where: { userId: user.id },
+        orderBy: { lastOccurredAt: "desc" },
+        take: 8,
+      },
+      topicPackItems: {
+        include: { topicPack: true },
+        take: 8,
+      },
+      userStates: {
+        where: { userId: user.id },
+        include: {
+          reviews: {
+            orderBy: { reviewedAt: "desc" },
+            take: 8,
+          },
+        },
+        take: 1,
+      },
     },
   });
 
@@ -51,10 +79,13 @@ export default async function Word({
   return (
     <main className="page">
       <section className="page-header">
-        <div className="word-meta">
+        <div className="word-detail-topline">
+          <div className="word-meta">
           <span className="badge">{word.partOfSpeech}</span>
           <span className="badge">{state.state}</span>
           <span className="badge">{user.targetLevel} explanations</span>
+          </div>
+          <TranslationModeControl value={user.preferredTranslation} />
         </div>
 
         <h1>
@@ -81,6 +112,12 @@ export default async function Word({
             <Brain size={18} />
             Practice
           </Link>
+          <a href="#compare" className="button button-secondary">
+            Compare
+          </a>
+          <a href="#expand" className="button button-secondary">
+            Expand
+          </a>
         </div>
       </section>
 
@@ -155,7 +192,7 @@ export default async function Word({
         </article>
       </section>
 
-      <section className="panel intelligence-panel">
+      <section className="panel intelligence-panel" id="compare">
         <div className="section-heading">
           <div>
             <p className="eyebrow">OPENAI · GENERATED CONTENT</p>
@@ -276,6 +313,76 @@ export default async function Word({
           </Link>
         </section>
       ) : null}
+
+      <section className="word-history-grid">
+        <article className="panel word-detail-card">
+          <p className="eyebrow">REVIEW HISTORY</p>
+          <h2>Recent reviews</h2>
+          {state.reviews.length ? (
+            <div className="history-list">
+              {state.reviews.map((review) => (
+                <div className="history-row" key={review.id}>
+                  <span>{review.rating.toLowerCase()}</span>
+                  <small>{review.reviewedAt.toLocaleString()}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No reviews yet.</p>
+          )}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">ENCOUNTERS</p>
+          <h2>Where you met it</h2>
+          {word.encounters.length ? (
+            <div className="history-list">
+              {word.encounters.map((encounter) => (
+                <div className="history-row" key={encounter.id}>
+                  <span>{encounter.source}</span>
+                  <small>{encounter.createdAt.toLocaleString()}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No tracked encounters yet.</p>
+          )}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">MISTAKE MEMORY</p>
+          <h2>Recurring weaknesses</h2>
+          {word.mistakes.length ? (
+            <div className="history-list">
+              {word.mistakes.map((mistake) => (
+                <div className="history-row stacked" key={mistake.id}>
+                  <span>{mistake.type.replaceAll("_", " ").toLowerCase()} · {mistake.occurrences}×</span>
+                  <small>{mistake.resolvedAt ? "resolved" : mistake.explanation ?? "open"}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No recorded mistakes.</p>
+          )}
+        </article>
+
+        <article className="panel word-detail-card">
+          <p className="eyebrow">COLLECTIONS</p>
+          <h2>Saved context</h2>
+          {word.topicPackItems.length ? (
+            <div className="relation-list">
+              {word.topicPackItems.map((item) => (
+                <Link href={"/topic-packs/" + item.topicPack.id} className="relation-chip" key={item.id}>
+                  <span>{item.topicPack.title}</span>
+                  <small>{item.topicPack.level}</small>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">Not in a topic pack yet.</p>
+          )}
+        </article>
+      </section>
 
       <ExpansionPanel lexemeId={word.id} />
     </main>

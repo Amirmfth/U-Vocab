@@ -21,5 +21,5 @@ export const AI_PROMPT_VERSIONS: Record<string, string> = {
 };
 
 export function promptVersionFor(operation: string) {
-  return AI_PROMPT_VERSIONS[operation] ?? "unversioned";
+  return AI_PROMPT_VERSIONS[operation] ?? "v1";
 }

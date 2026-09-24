@@ -123,8 +123,8 @@ export async function evaluatePractice(
             expected: expected || undefined,
             lemma: item.lexeme.lemma,
             partOfSpeech: item.lexeme.partOfSpeech,
-            patterns: item.lexeme.patterns.map((pattern) => pattern.pattern),
-            examples: item.lexeme.examples.map((example) => example.german),
+            patterns: item.lexeme.patterns.map((pattern) => pattern.pattern).slice(0, 3),
+            examples: item.lexeme.examples.map((example) => example.german).slice(0, 2),
             answer,
           }),
         );

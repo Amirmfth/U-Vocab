@@ -302,26 +302,40 @@ export async function addExpansionAction(
   }
 }
 
-export async function scheduleTeachReviewAction(formData: FormData) {
+export async function scheduleTeachReviewAction(
+  _previous: InsightActionState,
+  formData: FormData,
+): Promise<InsightActionState> {
   const lexemeId = String(formData.get("lexemeId") ?? "");
-  const user = await getCurrentUser();
 
-  const item = await db.userVocabulary.findUnique({
-    where: {
-      userId_lexemeId: { userId: user.id, lexemeId },
-    },
-  });
+  try {
+    const user = await getCurrentUser();
+    const item = await db.userVocabulary.findUnique({
+      where: {
+        userId_lexemeId: { userId: user.id, lexemeId },
+      },
+    });
 
-  if (!item) throw new Error("Vocabulary item not found.");
+    if (!item) {
+      return { status: "error", message: "Vocabulary item not found." };
+    }
 
-  await db.userVocabulary.update({
-    where: { id: item.id },
-    data: {
-      nextReviewAt: new Date(),
-      state: item.state === "NEW" ? "LEARNING" : item.state,
-    },
-  });
+    await db.userVocabulary.update({
+      where: { id: item.id },
+      data: {
+        nextReviewAt: new Date(),
+        state: item.state === "NEW" ? "LEARNING" : item.state,
+      },
+    });
 
-  revalidatePath(`/vocabulary/${lexemeId}/teach`);
-  revalidatePath("/review");
+    revalidatePath(`/vocabulary/${lexemeId}/teach`);
+    revalidatePath("/review");
+
+    return { status: "success", message: "Added to the review queue." };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Could not schedule this review.",
+    };
+  }
 }

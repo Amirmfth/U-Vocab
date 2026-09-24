@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const storySchema = z.object({
@@ -27,6 +27,12 @@ export async function generateStory(input: {
   targets: Array<{ lemma: string; pattern?: string | null }>;
 }) {
   const perf = startOperation("ai.story_generation", { model: AI_MODEL });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "story_generation",
+    model: AI_MODEL,
+    metadata: { level: input.level, length: input.length, targetCount: input.targets.length, hasTopic: Boolean(input.topic) },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -45,26 +51,12 @@ export async function generateStory(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "story_generation",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed story.",
-      });
-      throw new Error("OpenAI did not return a valid story.");
+      const parseError = new Error("OpenAI did not return a valid story.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "story_generation",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -76,13 +68,7 @@ export async function generateStory(input: {
   } catch (error) {
     perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid story.")) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "story_generation",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

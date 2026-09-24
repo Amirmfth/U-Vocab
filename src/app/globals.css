@@ -2278,3 +2278,62 @@ summary {
     flex-direction: row;
   }
 }
+
+
+.rescue-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.rescue-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.rescue-rank,
+.rescue-score {
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.rescue-rank {
+  padding-top: 2px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+.rescue-row-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rescue-row-copy > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rescue-row-copy > div:first-child span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.rescue-score {
+  min-width: 34px;
+  text-align: right;
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
+@media (min-width: 620px) {
+  .rescue-row {
+    align-items: center;
+  }
+}

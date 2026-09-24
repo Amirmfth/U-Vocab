@@ -114,14 +114,28 @@ export async function completeConversationAction(
         status: "ACTIVE",
         turnInFlight: false,
       },
-      include: {
+      select: {
+        id: true,
+        kind: true,
+        level: true,
+        scenario: true,
+        objective: true,
         targets: {
-          include: {
-            lexeme: { include: { patterns: true } },
+          select: {
+            lexemeId: true,
+            uses: true,
+            successfulUses: true,
+            lexeme: {
+              select: {
+                lemma: true,
+                patterns: { select: { pattern: true } },
+              },
+            },
           },
           orderBy: { position: "asc" },
         },
         messages: {
+          select: { role: true, content: true },
           orderBy: { createdAt: "desc" },
           take: 40,
         },

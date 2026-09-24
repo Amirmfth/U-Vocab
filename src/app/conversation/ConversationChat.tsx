@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Send } from "lucide-react";
 
@@ -20,6 +20,10 @@ export function ConversationChat({
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
   const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    if (!streaming) setMessages(initialMessages);
+  }, [initialMessages, streaming]);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const temporaryId = useRef(0);

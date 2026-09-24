@@ -29,6 +29,26 @@ export default async function FocusSessionPage({
   const completed = session.items.filter((item) => item.completedAt).length;
   const planned = session.items.reduce((sum, item) => sum + item.plannedMinutes, 0);
 
+  const sessionEnd = session.completedAt ?? new Date();
+  const [sessionAttempts, sessionReviews] =
+    session.status === "COMPLETED"
+      ? await Promise.all([
+          db.attempt.findMany({
+            where: {
+              userId: user.id,
+              createdAt: { gte: session.startedAt, lte: sessionEnd },
+            },
+            select: { correct: true, durationMs: true },
+          }),
+          db.review.count({
+            where: {
+              userVocabulary: { userId: user.id },
+              reviewedAt: { gte: session.startedAt, lte: sessionEnd },
+            },
+          }),
+        ])
+      : [[], 0];
+
   if (session.status === "COMPLETED") {
     return (
       <main className="page focus-page">
@@ -47,6 +67,27 @@ export default async function FocusSessionPage({
           <p className="page-description">
             {completed} activities completed · {planned} planned minutes
           </p>
+
+          <div className="session-result-metrics">
+            <div><strong>{sessionReviews}</strong><span>reviews</span></div>
+            <div><strong>{sessionAttempts.length}</strong><span>attempts</span></div>
+            <div>
+              <strong>
+                {sessionAttempts.length
+                  ? Math.round((sessionAttempts.filter((attempt) => attempt.correct).length / sessionAttempts.length) * 100)
+                  : 0}%
+              </strong>
+              <span>accuracy</span>
+            </div>
+            <div>
+              <strong>
+                {Math.round(
+                  sessionAttempts.reduce((sum, attempt) => sum + (attempt.durationMs ?? 0), 0) / 60000,
+                )}
+              </strong>
+              <span>measured min</span>
+            </div>
+          </div>
         </section>
 
         <section className="session-summary-list">

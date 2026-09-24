@@ -65,7 +65,7 @@ export async function evaluateVocabularyProduction(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: {

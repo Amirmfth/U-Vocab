@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PartOfSpeech {
+  NOUN
+  VERB
+  ADJECTIVE
+  ADVERB
+  PRONOUN
+  PREPOSITION
+  CONJUNCTION
+  INTERJECTION
+  OTHER
+}
+
+enum VocabularyState {
+  NEW
+  LEARNING
+  FAMILIAR
+  ACTIVE
+  MASTERED
+  MAINTENANCE
+}
+
+enum TranslationLanguage {
+  ENGLISH
+  PERSIAN
+  BOTH
+}
+
+enum RelationType {
+  WORD_FAMILY
+  SYNONYM
+  ANTONYM
+  DERIVED
+  RELATED
+  COLLOCATION
+  PHRASE
+}
+
+model User {
+  id                   String              @id @default(cuid())
+  email                String              @unique
+  preferredTranslation TranslationLanguage @default(ENGLISH)
+  vocabulary           UserVocabulary[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+}
+
+model Lexeme {
+  id           String           @id @default(cuid())
+  lemma        String
+  normalized   String
+  language     String           @default("de")
+  partOfSpeech PartOfSpeech
+  article      String?
+  gender       String?
+  plural       String?
+  notes        String?
+  translations Translation[]
+  examples     Example[]
+  patterns     LexicalPattern[]
+  userStates   UserVocabulary[]
+  outgoing     LexemeRelation[] @relation("source")
+  incoming     LexemeRelation[] @relation("target")
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([language, normalized, partOfSpeech])
+  @@index([lemma])
+}
+
+model Translation {
+  id       String @id @default(cuid())
+  lexemeId String
+  language String
+  text     String
+  lexeme   Lexeme @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@index([lexemeId, language])
+}
+
+model LexicalPattern {
+  id          String  @id @default(cuid())
+  lexemeId    String
+  pattern     String
+  explanation String?
+  lexeme      Lexeme  @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+}
+
+model Example {
+  id            String  @id @default(cuid())
+  lexemeId      String
+  german        String
+  english       String?
+  persian       String?
+  level         String?
+  generatedByAi Boolean @default(false)
+  lexeme        Lexeme  @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+}
+
+model LexemeRelation {
+  id       String       @id @default(cuid())
+  sourceId String
+  targetId String
+  type     RelationType
+  source   Lexeme       @relation("source", fields: [sourceId], references: [id], onDelete: Cascade)
+  target   Lexeme       @relation("target", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId, type])
+}
+
+model UserVocabulary {
+  id              String          @id @default(cuid())
+  userId          String
+  lexemeId        String
+  state           VocabularyState @default(NEW)
+  recognition     Float           @default(0)
+  meaningRecall   Float           @default(0)
+  production      Float           @default(0)
+  listening       Float           @default(0)
+  contextualUsage Float           @default(0)
+  difficulty      Float?
+  stability       Float?
+  retrievability  Float?
+  nextReviewAt    DateTime?
+  addedAt         DateTime        @default(now())
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lexeme          Lexeme          @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lexemeId])
+  @@index([userId, state])
+  @@index([userId, nextReviewAt])
+}

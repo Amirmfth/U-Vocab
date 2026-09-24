@@ -184,7 +184,7 @@ a {
   z-index: 50;
   inset: auto 10px max(10px, env(safe-area-inset-bottom)) 10px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 2px;
   padding: 7px;
   border: 1px solid rgba(255, 255, 255, 0.08);

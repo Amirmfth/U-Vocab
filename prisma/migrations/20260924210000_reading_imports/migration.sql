@@ -16,6 +16,7 @@ CREATE TABLE "ReadingItem" (
   "readingDocumentId" TEXT NOT NULL,
   "lexemeId" TEXT NOT NULL,
   "surfaceText" TEXT NOT NULL,
+  "surfaceForms" JSONB NOT NULL,
   "occurrences" INTEGER NOT NULL DEFAULT 1,
   "position" INTEGER NOT NULL DEFAULT 0,
   CONSTRAINT "ReadingItem_pkey" PRIMARY KEY ("id")

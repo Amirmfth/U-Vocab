@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -19,16 +20,18 @@ export async function generateWritingTask(input: {
   targetWords: number;
   targets: Array<{ lemma: string; patterns: string[] }>;
 }) {
-  const perf = startOperation("ai.writing_task", { model: AI_MODEL, mode: input.mode, level: input.level, targetCount: input.targets.length });
+  const route = aiRoute("writing_task");
+  const perf = startOperation("ai.writing_task", { model: route.model, mode: input.mode, level: input.level, targetCount: input.targets.length });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "writing_task",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { level: input.level, mode: input.mode, taskType: input.taskType, targetWords: input.targetWords, targetCount: input.targets.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",

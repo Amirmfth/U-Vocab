@@ -91,6 +91,7 @@ export async function evaluatePractice(
     };
   } else {
     const ai = await evaluateVocabularyProduction({
+      userId: user.id,
       exerciseType,
       exercisePrompt: prompt,
       expected: expected || undefined,

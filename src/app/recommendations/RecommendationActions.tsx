@@ -7,6 +7,7 @@ import { StatusNotice } from "@/components/status-notice";
 import {
   addRecommendation,
   dismissRecommendation,
+  refreshSemanticRecommendations,
   type RecommendationActionState,
 } from "./actions";
 
@@ -63,10 +64,7 @@ export function RecommendationActions({
 
 export function RefreshSemanticButton() {
   const [state, action] = useActionState(
-    async (_previous: RecommendationActionState) => {
-      const { refreshSemanticRecommendations } = await import("./actions");
-      return refreshSemanticRecommendations(_previous);
-    },
+    refreshSemanticRecommendations,
     initialState,
   );
 

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, CheckCircle2, ExternalLink, X } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -6,13 +7,13 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { abandonFocusSession, completeFocusStep } from "../actions";
 
-export const dynamic = "force-dynamic";
 
 export default async function FocusSessionPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
   const session = await db.learningSession.findFirst({
     where: { id, userId: user.id },

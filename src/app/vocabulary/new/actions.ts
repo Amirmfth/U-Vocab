@@ -20,6 +20,8 @@ export async function createLexeme(
     return { status: "error", message: "Enter a German word or lexical phrase." };
   }
 
+  let lexemeId: string;
+
   try {
     const user = await getCurrentUser();
     const analysis = await analyzeGermanLexeme(input, user.id);
@@ -67,15 +69,8 @@ export async function createLexeme(
       update: {},
     });
 
-    redirect(`/vocabulary/${lexeme.id}`);
+    lexemeId = lexeme.id;
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === "NEXT_REDIRECT"
-    ) {
-      throw error;
-    }
-
     return {
       status: "error",
       message:
@@ -84,4 +79,6 @@ export async function createLexeme(
           : "Could not analyze this lexical unit. Try again.",
     };
   }
+
+  redirect(`/vocabulary/${lexemeId}`);
 }

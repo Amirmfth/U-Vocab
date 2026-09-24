@@ -1,6 +1,9 @@
+import { getCurrentUser } from "@/lib/current-user";
 import { ImportWorkspace } from "./ImportWorkspace";
 
-export default function ImportPage() {
+export default async function ImportPage() {
+  const user = await getCurrentUser();
+
   return (
     <main className="page">
       <section className="page-header compact">
@@ -11,7 +14,7 @@ export default function ImportPage() {
         </p>
       </section>
 
-      <ImportWorkspace />
+      <ImportWorkspace translationPreference={user.preferredTranslation} />
     </main>
   );
 }

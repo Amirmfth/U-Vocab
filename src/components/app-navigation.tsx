@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3, BookOpen, BookOpenText, Brain, FileUp, Home, Layers3, Plus, ScanText,
-  Settings, Sparkles, TrendingUp, TriangleAlert, type LucideIcon,
+  Settings, Sparkles, TimerReset, TrendingUp, TriangleAlert, type LucideIcon,
 } from "lucide-react";
 
 const primary = [
@@ -14,6 +14,7 @@ const primary = [
   { href: "/practice", label: "Practice", icon: Sparkles },
 ];
 const explore = [
+  { href: "/focus", label: "Focus", icon: TimerReset },
   { href: "/topic-packs", label: "Topic packs", icon: Layers3 },
   { href: "/stories", label: "Stories", icon: BookOpenText },
   { href: "/read", label: "Reading", icon: ScanText },

@@ -21,7 +21,11 @@ const sourceOptions = [
   { value: "CSV", label: "CSV", description: "Import a spreadsheet export" },
 ];
 
-export function ImportWorkspace() {
+export function ImportWorkspace({
+  translationPreference,
+}: {
+  translationPreference: "ENGLISH" | "PERSIAN" | "BOTH";
+}) {
   const [sourceType, setSourceType] = useState("MANUAL");
   const [preview, previewAction] = useActionState(previewImport, previewInitial);
   const [commit, commitAction] = useActionState(confirmImport, commitInitial);
@@ -130,8 +134,12 @@ export function ImportWorkspace() {
                       {candidate.userVocabularyId ? candidate.state?.toLowerCase() : candidate.existingLexemeId ? "known lexeme" : "new"}
                     </span>
                   </div>
-                  <span>{candidate.englishMeaning}</span>
-                  <span className="rtl">{candidate.persianMeaning}</span>
+{translationPreference !== "PERSIAN" ? (
+                    <span>{candidate.englishMeaning}</span>
+                  ) : null}
+                  {translationPreference !== "ENGLISH" ? (
+                    <span className="rtl">{candidate.persianMeaning}</span>
+                  ) : null}
                   {candidate.pattern ? <small>{candidate.pattern}</small> : null}
                 </div>
               </label>

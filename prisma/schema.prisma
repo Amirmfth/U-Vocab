@@ -65,6 +65,26 @@ enum ExerciseType {
   CONTEXTUAL_CHOICE
 }
 
+enum SessionKind {
+  DAILY_CHALLENGE
+  FOCUS
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum SessionActivity {
+  WARMUP
+  DUE_REVIEW
+  NEW_WORD
+  CONTEXT
+  PRODUCTION
+  FINAL_CHALLENGE
+}
+
 enum MistakeType {
   ARTICLE
   CASE
@@ -91,6 +111,7 @@ model User {
   topicPacks           TopicPack[]
   stories              Story[]
   readingDocuments     ReadingDocument[]
+  learningSessions     LearningSession[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -117,6 +138,7 @@ model Lexeme {
   topicPackItems TopicPackItem[]
   storyTargets StoryTarget[]
   readingItems ReadingItem[]
+  sessionItems LearningSessionItem[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -393,4 +415,40 @@ model ReadingItem {
 
   @@unique([readingDocumentId, lexemeId])
   @@index([readingDocumentId, position])
+}
+
+
+model LearningSession {
+  id              String                @id @default(cuid())
+  userId          String
+  kind            SessionKind
+  status          SessionStatus         @default(ACTIVE)
+  plannedMinutes  Int
+  currentStep     Int                   @default(0)
+  startedAt       DateTime              @default(now())
+  lastActiveAt    DateTime              @default(now())
+  completedAt     DateTime?
+  summary         Json?
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items           LearningSessionItem[]
+
+  @@index([userId, status, lastActiveAt])
+}
+
+model LearningSessionItem {
+  id               String          @id @default(cuid())
+  learningSessionId String
+  activity         SessionActivity
+  lexemeId         String?
+  title            String
+  description      String?
+  href             String
+  position         Int
+  plannedMinutes   Int
+  completedAt      DateTime?
+  learningSession  LearningSession @relation(fields: [learningSessionId], references: [id], onDelete: Cascade)
+  lexeme           Lexeme?         @relation(fields: [lexemeId], references: [id], onDelete: SetNull)
+
+  @@unique([learningSessionId, position])
+  @@index([learningSessionId, position])
 }

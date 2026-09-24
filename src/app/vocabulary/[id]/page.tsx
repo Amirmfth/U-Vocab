@@ -9,6 +9,7 @@ import {
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { startOperation } from "@/lib/performance";
 import { isTranslationVisible, translationLabel } from "@/lib/translations";
 import { LexicalInsightPanel } from "./LexicalInsightPanel";
 import { TranslationModeControl } from "@/components/translation-mode-control";
@@ -21,9 +22,13 @@ export default async function Word({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+  const perf = startOperation("page.word_detail");
+  const [{ id }, user] = await Promise.all([
+    params,
+    perf.span("auth", () => getCurrentUser()),
+  ]);
 
-  const word = await db.lexeme.findUnique({
+  const word = await perf.span("dbRead", () => db.lexeme.findUnique({
     where: { id },
     include: {
       translations: true,
@@ -66,15 +71,24 @@ export default async function Word({
         take: 1,
       },
     },
-  });
+  }));
 
-  if (!word || word.userStates.length === 0) notFound();
+  if (!word || word.userStates.length === 0) {
+    perf.success({ found: false });
+    notFound();
+  }
 
   const state = word.userStates[0];
   const insight = word.insights[0];
   const translations = word.translations.filter((translation) =>
     isTranslationVisible(user.preferredTranslation, translation.language),
   );
+
+  perf.success({
+    found: true,
+    exampleCount: word.examples.length,
+    relationCount: word.outgoing.length + word.incoming.length,
+  });
 
   return (
     <main className="page">

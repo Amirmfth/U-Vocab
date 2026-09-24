@@ -1,3 +1,5 @@
+// Standard text-token prices verified against the official OpenAI model/pricing pages on 2026-09-25.
+// Costs are stored on each usage event so later price changes do not alter history.
 export type ModelPricing = {
   key: string;
   provider: string;

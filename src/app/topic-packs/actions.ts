@@ -102,6 +102,7 @@ export async function createTopicPack(
                 id: true,
                 normalized: true,
                 partOfSpeech: true,
+                translations: { select: { language: true } },
               },
             })
           : [];
@@ -113,16 +114,37 @@ export async function createTopicPack(
         );
 
         if (missing.length) {
+          const lexemeByFullKey = new Map(
+            lexemes.map((lexeme) => [
+              lexeme.normalized + ":" + lexeme.partOfSpeech,
+              lexeme,
+            ]),
+          );
           const translations = missing.flatMap((item) => {
-            const lexemeId = lexemeByKey.get(
+            const lexeme = lexemeByFullKey.get(
               item.normalized + ":" + item.partOfSpeech,
             );
-            return lexemeId
-              ? [
-                  { lexemeId, language: "en", text: item.englishMeaning },
-                  { lexemeId, language: "fa", text: item.persianMeaning },
-                ]
-              : [];
+            if (!lexeme) return [];
+
+            const languages = new Set(
+              lexeme.translations.map((translation) => translation.language),
+            );
+            return [
+              ...(!languages.has("en")
+                ? [{
+                    lexemeId: lexeme.id,
+                    language: "en",
+                    text: item.englishMeaning,
+                  }]
+                : []),
+              ...(!languages.has("fa")
+                ? [{
+                    lexemeId: lexeme.id,
+                    language: "fa",
+                    text: item.persianMeaning,
+                  }]
+                : []),
+            ];
           });
           if (translations.length) {
             await tx.translation.createMany({ data: translations });

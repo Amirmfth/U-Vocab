@@ -168,10 +168,22 @@ export async function generateExpansionAction(
       level: user.targetLevel,
     });
 
+    const uniqueSuggestions = Array.from(
+      new Map(
+        result.suggestions
+          .filter(
+            (suggestion) =>
+              suggestion.lemma.toLocaleLowerCase("de-DE").trim() !== lexeme.normalized,
+          )
+          .map((suggestion) => [
+            suggestion.lemma.toLocaleLowerCase("de-DE").trim() + ":" + suggestion.partOfSpeech,
+            suggestion,
+          ]),
+      ).values(),
+    ).sort((a, b) => b.usefulness - a.usefulness);
+
     const suggestions = await Promise.all(
-      result.suggestions
-        .sort((a, b) => b.usefulness - a.usefulness)
-        .map(async (suggestion) => {
+      uniqueSuggestions.map(async (suggestion) => {
           const existing = await db.lexeme.findUnique({
             where: {
               language_normalized_partOfSpeech: {

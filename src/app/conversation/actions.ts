@@ -21,7 +21,9 @@ export async function createConversationSessionAction(
     String(formData.get("kind") ?? "PRACTICE") === "MISSION"
       ? "MISSION"
       : "PRACTICE";
-  const collectionId = String(formData.get("collectionId") ?? "").trim() || null;
+  const collectionRaw = String(formData.get("collectionId") ?? "").trim();
+  const collectionId =
+    collectionRaw && collectionRaw !== "NONE" ? collectionRaw : null;
   const topic = String(formData.get("topic") ?? "").trim() || null;
   const revealTargets = String(formData.get("revealTargets") ?? "") === "on";
   const targetCount = Math.max(

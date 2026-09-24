@@ -1,24 +1,19 @@
 import Link from "next/link";
 import { ArrowRight, BookOpenText, FileUp, GitCompareArrows, Layers3, MessageCircle, Network, PenLine, Plus, ScanText, Star, Swords, Target, TimerReset, TrendingUp } from "lucide-react";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { startOperation } from "@/lib/performance";
+import { connection } from "next/server";
+import { getCachedHomeStats } from "@/lib/cached-data";
 
-export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  await connection();
   const perf = startOperation("page.home");
   const user = await perf.span("auth", () => getCurrentUser());
-  const now = new Date();
-
-  const [total, due, weakProduction, mistakes] = await perf.span("dbRead", () => Promise.all([
-    db.userVocabulary.count({ where: { userId: user.id } }),
-    db.userVocabulary.count({
-      where: { userId: user.id, OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }] },
-    }),
-    db.userVocabulary.count({ where: { userId: user.id, production: { lt: 0.4 } } }),
-    db.mistake.count({ where: { userId: user.id, resolvedAt: null } }),
-  ]));
+  const { total, due, weakProduction, mistakes } = await perf.span(
+    "dbRead",
+    () => getCachedHomeStats(user.id),
+  );
 
   perf.success({ totalWords: total, dueWords: due, openMistakes: mistakes });
 

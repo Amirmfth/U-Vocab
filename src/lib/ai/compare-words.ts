@@ -79,6 +79,7 @@ export async function generateWordComparison(input: {
     patterns: string[];
     examples: string[];
   };
+  refresh?: boolean;
   right: {
     lemma: string;
     article: string | null;
@@ -89,18 +90,31 @@ export async function generateWordComparison(input: {
 }) {
   const route = aiRoute("word_comparison");
   const perf = startOperation("ai.word_comparison", { model: route.model });
-  const source = { left: input.left, right: input.right };
+  const source = {
+    left: {
+      ...input.left,
+      patterns: [...input.left.patterns].sort(),
+      examples: [...input.left.examples].sort(),
+    },
+    right: {
+      ...input.right,
+      patterns: [...input.right.patterns].sort(),
+      examples: [...input.right.examples].sort(),
+    },
+  };
   const dimensions = {
     level: input.level,
     left: input.left.lemma.toLocaleLowerCase("de-DE"),
     right: input.right.lemma.toLocaleLowerCase("de-DE"),
   };
-  const cached = await getGenerationCache<unknown>({
-    operation: "word_comparison",
-    dimensions,
-    source,
-    schemaVersion: "v2",
-  });
+  const cached = input.refresh
+    ? null
+    : await getGenerationCache<unknown>({
+        operation: "word_comparison",
+        dimensions,
+        source,
+        schemaVersion: "v2",
+      });
   const parsedCached = comparisonSchema.safeParse(cached);
   if (parsedCached.success) {
     perf.success({ cacheHit: true });

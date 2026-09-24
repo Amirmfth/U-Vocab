@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, BookOpenText, Brain, FileUp, GitCompareArrows, Home, Layers3, Network, Plus, ScanText,
-  Settings, Sparkles, Star, TimerReset, TrendingUp, TriangleAlert, type LucideIcon,
+  BarChart3, BookOpen, BookOpenText, Brain, FileUp, GitCompareArrows, Home, Layers3, MessageCircle, Network, Plus, ScanText,
+  Settings, Sparkles, Star, Target, TimerReset, TrendingUp, TriangleAlert, type LucideIcon,
 } from "lucide-react";
 
 const primary = [
@@ -18,6 +18,8 @@ const explore = [
   { href: "/recommendations", label: "Recommendations", icon: Star },
   { href: "/universe", label: "Universe", icon: Network },
   { href: "/compare", label: "Compare", icon: GitCompareArrows },
+  { href: "/conversation", label: "Conversation", icon: MessageCircle },
+  { href: "/missions", label: "Missions", icon: Target },
   { href: "/topic-packs", label: "Topic packs", icon: Layers3 },
   { href: "/stories", label: "Stories", icon: BookOpenText },
   { href: "/read", label: "Reading", icon: ScanText },

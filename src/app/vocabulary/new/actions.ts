@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { analyzeGermanLexeme } from "@/lib/ai/analyze-word";
 import { getCurrentUser } from "@/lib/current-user";
+import { commitIngestionCandidates } from "@/lib/ingestion/service";
 
 export type CreateLexemeState = {
   status: "idle" | "error";
@@ -27,49 +28,31 @@ export async function createLexeme(
     const analysis = await analyzeGermanLexeme(input, user.id);
     const normalized = analysis.lemma.toLocaleLowerCase("de-DE");
 
-    const existing = await db.lexeme.findUnique({
-      where: {
-        language_normalized_partOfSpeech: {
-          language: "de",
-          normalized,
-          partOfSpeech: analysis.partOfSpeech,
-        },
-      },
+    const ids = await commitIngestionCandidates(db, {
+      userId: user.id,
+      sourceType: "MANUAL",
+      sourceRef: "manual:" + crypto.randomUUID(),
+      candidates: [{
+        key: normalized + ":" + analysis.partOfSpeech,
+        sourceType: "MANUAL",
+        lemma: analysis.lemma,
+        normalized,
+        partOfSpeech: analysis.partOfSpeech,
+        article: analysis.article,
+        plural: analysis.plural,
+        englishMeaning: analysis.englishMeanings.join("; "),
+        persianMeaning: analysis.persianMeanings.join("؛ "),
+        pattern: analysis.patterns[0]?.pattern ?? null,
+        patternExplanation: analysis.patterns[0]?.explanation ?? null,
+        example: analysis.examples[0]?.german ?? null,
+      }],
     });
 
-    const lexeme =
-      existing ??
-      (await db.lexeme.create({
-        data: {
-          lemma: analysis.lemma,
-          normalized,
-          partOfSpeech: analysis.partOfSpeech,
-          article: analysis.article,
-          gender: analysis.gender,
-          plural: analysis.plural,
-          translations: {
-            create: [
-              ...analysis.englishMeanings.map((text) => ({ language: "en", text })),
-              ...analysis.persianMeanings.map((text) => ({ language: "fa", text })),
-            ],
-          },
-          patterns: { create: analysis.patterns },
-          examples: {
-            create: analysis.examples.map((example) => ({
-              ...example,
-              generatedByAi: true,
-            })),
-          },
-        },
-      }));
+    if (!ids[0]) {
+      return { status: "error", message: "Could not add this lexical unit." };
+    }
 
-    await db.userVocabulary.upsert({
-      where: { userId_lexemeId: { userId: user.id, lexemeId: lexeme.id } },
-      create: { userId: user.id, lexemeId: lexeme.id, nextReviewAt: new Date() },
-      update: {},
-    });
-
-    lexemeId = lexeme.id;
+    lexemeId = ids[0];
   } catch (error) {
     return {
       status: "error",

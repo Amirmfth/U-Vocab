@@ -3,6 +3,7 @@ import { ArrowRight, GitCompareArrows } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { CompareForm } from "./CompareForm";
+import { QuickCompareSuggestion } from "./QuickCompareSuggestion";
 
 export const dynamic = "force-dynamic";
 
@@ -87,10 +88,9 @@ export default async function ComparePage() {
                     <strong>{left.lexeme.lemma} / {right.lexeme.lemma}</strong>
                     <span>{suggestion.mistake.occurrences} recurring word-choice mistakes</span>
                   </div>
-                  <CompareForm
-                    options={options}
-                    defaultLeft={suggestion.left}
-                    defaultRight={suggestion.right}
+                  <QuickCompareSuggestion
+                    leftLexemeId={suggestion.left}
+                    rightLexemeId={suggestion.right}
                   />
                 </article>
               );

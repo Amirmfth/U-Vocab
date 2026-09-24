@@ -16,7 +16,7 @@ export async function recordAIUsage(input: {
   errorMessage?: string | null;
 }) {
   try {
-    await db.aIUsageEvent.create({
+    await db.aiUsageEvent.create({
       data: {
         userId: input.userId,
         operation: input.operation,

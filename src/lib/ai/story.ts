@@ -47,7 +47,7 @@ export async function generateStory(input: {
         },
         {
           role: "user",
-          content: JSON.stringify(input),
+          content: JSON.stringify({ ...input, userId: undefined }),
         },
       ],
       text: { format: zodTextFormat(storySchema, "vocabulary_story") },

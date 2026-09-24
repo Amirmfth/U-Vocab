@@ -225,7 +225,7 @@ export async function addPackToVocabulary(
     const user = await getCurrentUser();
     const pack = await db.topicPack.findFirst({
       where: { id: packId, userId: user.id },
-      include: { items: true },
+      select: { id: true, items: { select: { lexemeId: true } } },
     });
 
     if (!pack) return { status: "error", message: "Topic pack not found." };
@@ -265,29 +265,19 @@ export async function launchPackSession(formData: FormData) {
 
   const pack = await db.topicPack.findFirst({
     where: { id: packId, userId: user.id },
-    include: { items: true },
+    select: { id: true, items: { select: { lexemeId: true } } },
   });
 
   if (!pack) throw new Error("Topic pack not found.");
 
-  await db.$transaction(
-    pack.items.map((item) =>
-      db.userVocabulary.upsert({
-        where: {
-          userId_lexemeId: {
-            userId: user.id,
-            lexemeId: item.lexemeId,
-          },
-        },
-        create: {
-          userId: user.id,
-          lexemeId: item.lexemeId,
-          nextReviewAt: new Date(),
-        },
-        update: {},
-      }),
-    ),
-  );
+  await db.userVocabulary.createMany({
+    data: pack.items.map((item) => ({
+      userId: user.id,
+      lexemeId: item.lexemeId,
+      nextReviewAt: new Date(),
+    })),
+    skipDuplicates: true,
+  });
 
   revalidateUserDomains(
     user.id,

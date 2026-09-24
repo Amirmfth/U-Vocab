@@ -32,8 +32,8 @@ export const writingEvaluationSchema = z.object({
   naturalness: z.number().min(0).max(1),
   overall: z.number().min(0).max(1),
   summary: z.string(),
-  strengths: z.array(z.string()).max(6),
-  improvements: z.array(z.string()).max(8),
+  strengths: z.array(z.string().max(280)).max(4),
+  improvements: z.array(z.string().max(320)).max(5),
   targetUsage: z.array(
     z.object({
       lexemeId: z.string(),
@@ -50,8 +50,8 @@ export const writingEvaluationSchema = z.object({
       suggestion: z.string(),
     }),
   ).max(8),
-  collocationFeedback: z.array(z.string()).max(8),
-  lexicalMistakes: z.array(lexicalMistakeSchema).max(20),
+  collocationFeedback: z.array(z.string().max(280)).max(5),
+  lexicalMistakes: z.array(lexicalMistakeSchema).max(12),
   strongerVocabulary: z.array(
     z.object({
       german: z.string(),
@@ -66,7 +66,7 @@ export const writingEvaluationSchema = z.object({
       explanation: z.string(),
     }),
   ).max(12),
-  improvedVersion: z.string(),
+  improvedVersion: z.string().max(4000),
 });
 
 export type WritingEvaluation = z.infer<typeof writingEvaluationSchema>;
@@ -79,6 +79,8 @@ export async function evaluateWriting(input: {
   task: string;
   targetWords: number;
   draft: string;
+  precomputedWordCount: number;
+  repeatedWords: Array<{ word: string; count: number }>;
   targets: Array<{
     lexemeId: string;
     lemma: string;
@@ -101,7 +103,7 @@ export async function evaluateWriting(input: {
         {
           role: "system",
           content:
-            "Evaluate this German writing practice. Scores are internal learning signals only, never official CEFR certification. Assess task completion, organization/coherence, grammar, vocabulary range, lexical accuracy/naturalness, repetition, collocations, and supplied target vocabulary. Only create lexicalMistakes for vocabulary-related errors. targetUsage must use only supplied lexeme IDs. Give concise corrections and a polished improved version that preserves the learner's intended content.",
+            "Evaluate this German writing practice. Scores are internal learning signals only. Word count and repeated-word counts are precomputed; use them instead of recounting. Judge grammar, organization, lexical accuracy/naturalness, collocations, and supplied targets. targetUsage must use only supplied lexeme IDs. Keep feedback prioritized and concise: at most four strengths, five improvements, five collocation notes, twelve lexical mistakes, eight corrections, and a concise improved version preserving the learner intent.",
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],

@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { getGenerationCache, putGenerationCache } from "./generation-cache";
 
 export const expansionSchema = z.object({
   suggestions: z.array(
@@ -37,6 +38,27 @@ export async function generateWordExpansion(input: {
 }) {
   const route = aiRoute("word_expansion");
   const perf = startOperation("ai.word_expansion", { model: route.model });
+  const source = {
+    lemma: input.lemma,
+    partOfSpeech: input.partOfSpeech,
+    patterns: input.patterns,
+  };
+  const dimensions = {
+    level: input.level,
+    lemma: input.lemma.toLocaleLowerCase("de-DE"),
+    partOfSpeech: input.partOfSpeech,
+  };
+  const cached = await getGenerationCache<unknown>({
+    operation: "word_expansion",
+    dimensions,
+    source,
+    schemaVersion: "v2",
+  });
+  const parsedCached = expansionSchema.safeParse(cached);
+  if (parsedCached.success) {
+    perf.success({ cacheHit: true });
+    return parsedCached.data;
+  }
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "word_expansion",
@@ -65,6 +87,13 @@ export async function generateWordExpansion(input: {
     }
 
     await usageRecorder.success(response);
+    await putGenerationCache({
+      operation: "word_expansion",
+      dimensions,
+      source,
+      schemaVersion: "v2",
+      payload: response.output_parsed,
+    });
 
     perf.success({
       requestId: response.id,

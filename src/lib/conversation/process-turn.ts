@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { evaluateConversationTurn } from "@/lib/ai/conversation-turn-evaluator";
-import { recordMistakes } from "@/lib/mistakes";
+import { recordMistakesBatch } from "@/lib/mistakes-batch";
+import { updateVocabularyMasteryBatch } from "@/lib/vocabulary-batch";
 
 export async function processConversationTurn(input: {
   userId: string;
@@ -38,76 +39,122 @@ export async function processConversationTurn(input: {
   const targetByLexeme = new Map(
     session.targets.map((target) => [target.lexemeId, target]),
   );
+  const used = evaluation.targetUsage.filter(
+    (usage) => usage.used && targetByLexeme.has(usage.lexemeId),
+  );
+  const usedLexemeIds = used.map((usage) => usage.lexemeId);
 
-  for (const usage of evaluation.targetUsage) {
-    if (!usage.used) continue;
+  const vocabularyRows = usedLexemeIds.length
+    ? await db.userVocabulary.findMany({
+        where: {
+          userId: input.userId,
+          lexemeId: { in: usedLexemeIds },
+        },
+        select: {
+          id: true,
+          lexemeId: true,
+          production: true,
+          contextualUsage: true,
+        },
+      })
+    : [];
+  const vocabularyByLexeme = new Map(
+    vocabularyRows.map((item) => [item.lexemeId, item]),
+  );
+
+  const targetUpdates = [];
+  const attempts = [];
+  const masteryUpdates = [];
+  const mistakes = [];
+  const now = new Date();
+
+  for (const usage of used) {
     const target = targetByLexeme.get(usage.lexemeId);
     if (!target) continue;
+    const userVocabulary = vocabularyByLexeme.get(usage.lexemeId);
 
-    const userVocabulary = await db.userVocabulary.findUnique({
-      where: {
-        userId_lexemeId: {
-          userId: input.userId,
-          lexemeId: usage.lexemeId,
-        },
-      },
-    });
-
-    await db.$transaction(async (tx) => {
-      await tx.conversationTarget.update({
+    targetUpdates.push(
+      db.conversationTarget.update({
         where: { id: target.id },
         data: {
           uses: { increment: 1 },
           successfulUses: usage.correct ? { increment: 1 } : undefined,
-          lastUsedAt: new Date(),
+          lastUsedAt: now,
         },
-      });
+      }),
+    );
 
-      await tx.attempt.create({
-        data: {
-          userId: input.userId,
-          userVocabularyId: userVocabulary?.id ?? null,
-          exerciseType: "FREE_SENTENCE",
-          prompt: "Use " + target.lexeme.lemma + " naturally in conversation.",
-          answer: input.message,
-          expected: target.lexeme.lemma,
-          correct: usage.correct,
-          score: usage.score,
-          feedback: usage.feedback,
-        },
-      });
-
-      if (userVocabulary) {
-        await tx.userVocabulary.update({
-          where: { id: userVocabulary.id },
-          data: {
-            production: Math.max(
-              0,
-              Math.min(
-                1,
-                userVocabulary.production + (usage.correct ? 0.08 : -0.025),
-              ),
-            ),
-            contextualUsage: Math.max(
-              0,
-              Math.min(
-                1,
-                userVocabulary.contextualUsage + (usage.correct ? 0.1 : -0.02),
-              ),
-            ),
-          },
-        });
-      }
+    attempts.push({
+      userId: input.userId,
+      userVocabularyId: userVocabulary?.id ?? null,
+      exerciseType: "FREE_SENTENCE" as const,
+      prompt: "Use " + target.lexeme.lemma + " naturally in conversation.",
+      answer: input.message,
+      expected: target.lexeme.lemma,
+      correct: usage.correct,
+      score: usage.score,
+      feedback: usage.feedback,
     });
 
-    if (usage.mistakes.length) {
-      await recordMistakes(db, {
-        userId: input.userId,
-        lexemeId: usage.lexemeId,
-        embed: false,
-        mistakes: usage.mistakes,
+    if (userVocabulary) {
+      masteryUpdates.push({
+        id: userVocabulary.id,
+        production: Math.max(
+          0,
+          Math.min(
+            1,
+            userVocabulary.production + (usage.correct ? 0.08 : -0.025),
+          ),
+        ),
+        contextualUsage: Math.max(
+          0,
+          Math.min(
+            1,
+            userVocabulary.contextualUsage + (usage.correct ? 0.1 : -0.02),
+          ),
+        ),
       });
     }
+
+    for (const mistake of usage.mistakes) {
+      mistakes.push({
+        lexemeId: usage.lexemeId,
+        ...mistake,
+      });
+    }
+  }
+
+  if (used.length) {
+    await db.$transaction(async (tx) => {
+      if (targetUpdates.length) {
+        await Promise.all(
+          used.map((usage) => {
+            const target = targetByLexeme.get(usage.lexemeId)!;
+            return tx.conversationTarget.update({
+              where: { id: target.id },
+              data: {
+                uses: { increment: 1 },
+                successfulUses: usage.correct ? { increment: 1 } : undefined,
+                lastUsedAt: now,
+              },
+            });
+          }),
+        );
+      }
+
+      if (attempts.length) {
+        await tx.attempt.createMany({ data: attempts });
+      }
+
+      await updateVocabularyMasteryBatch(tx, masteryUpdates);
+    });
+  }
+
+  if (mistakes.length) {
+    await recordMistakesBatch(db, {
+      userId: input.userId,
+      mistakes,
+    });
   }
 
   return evaluation;

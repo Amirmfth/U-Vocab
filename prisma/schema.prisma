@@ -87,6 +87,8 @@ model User {
   mistakes             Mistake[]
   encounters           Encounter[]
   aiUsage              AiUsageEvent[]
+  topicPacks           TopicPack[]
+  stories              Story[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -110,6 +112,8 @@ model Lexeme {
   mistakes     Mistake[]
   encounters   Encounter[]
   insights     LexemeInsight[]
+  topicPackItems TopicPackItem[]
+  storyTargets StoryTarget[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -291,4 +295,64 @@ model LexemeInsight {
 
   @@unique([lexemeId, level])
   @@index([lexemeId, updatedAt])
+}
+
+
+model TopicPack {
+  id        String          @id @default(cuid())
+  userId    String
+  title     String
+  topic     String
+  level     String
+  description String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     TopicPackItem[]
+
+  @@index([userId, createdAt])
+}
+
+model TopicPackItem {
+  id             String    @id @default(cuid())
+  topicPackId    String
+  lexemeId       String
+  rationale      String?
+  usefulness     Int       @default(3)
+  position       Int       @default(0)
+  topicPack      TopicPack @relation(fields: [topicPackId], references: [id], onDelete: Cascade)
+  lexeme         Lexeme    @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([topicPackId, lexemeId])
+  @@index([topicPackId, position])
+}
+
+model Story {
+  id           String       @id @default(cuid())
+  userId       String
+  title        String
+  topic        String?
+  level        String
+  length       String
+  content      String
+  englishSummary String?
+  persianSummary String?
+  questions    Json
+  createdAt    DateTime     @default(now())
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targets      StoryTarget[]
+
+  @@index([userId, createdAt])
+}
+
+model StoryTarget {
+  id        String @id @default(cuid())
+  storyId   String
+  lexemeId  String
+  position  Int    @default(0)
+  story     Story  @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  lexeme    Lexeme @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, lexemeId])
+  @@index([storyId, position])
 }

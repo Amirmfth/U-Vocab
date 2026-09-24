@@ -26,7 +26,15 @@ async function selectGuidedTargets(input: {
       where: { id: input.collectionId, userId: input.userId },
       include: {
         items: {
-          include: { lexeme: { include: { patterns: true } } },
+          select: {
+      lexemeId: true,
+      lexeme: {
+        select: {
+          lemma: true,
+          patterns: { select: { pattern: true } },
+        },
+      },
+    },
           orderBy: [{ usefulness: "desc" }, { position: "asc" }],
           take: input.limit,
         },
@@ -223,9 +231,23 @@ export async function evaluateWritingAction(
         const session = await perf.span("dbRead", () =>
           db.writingSession.findFirst({
             where: { id: sessionId, userId: user.id },
-            include: {
+            select: {
+              id: true,
+              level: true,
+              mode: true,
+              taskType: true,
+              task: true,
+              targetWords: true,
               targets: {
-                include: { lexeme: { include: { patterns: true } } },
+                select: {
+                  lexemeId: true,
+                  lexeme: {
+                    select: {
+                      lemma: true,
+                      patterns: { select: { pattern: true } },
+                    },
+                  },
+                },
                 orderBy: { position: "asc" },
               },
             },

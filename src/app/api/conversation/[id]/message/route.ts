@@ -26,14 +26,19 @@ export async function POST(
     );
   }
 
-  const session = await db.conversationSession.findFirst({
-    where: { id, userId: user.id, status: "ACTIVE" },
-    select: { id: true },
+  const locked = await db.conversationSession.updateMany({
+    where: {
+      id,
+      userId: user.id,
+      status: "ACTIVE",
+      turnInFlight: false,
+    },
+    data: { turnInFlight: true },
   });
-  if (!session) {
+  if (!locked.count) {
     return Response.json(
-      { error: "Conversation session not found or already completed." },
-      { status: 404 },
+      { error: "Conversation is busy, completed, or not found." },
+      { status: 409 },
     );
   }
 
@@ -89,6 +94,10 @@ export async function POST(
     });
 
   if (!stream) {
+    await db.conversationSession.updateMany({
+      where: { id, userId: user.id },
+      data: { turnInFlight: false },
+    });
     return Response.json(
       { error: "Could not start the tutor response." },
       { status: 502 },
@@ -143,6 +152,11 @@ export async function POST(
           requestId: completedResponse?.id ?? null,
         });
 
+        await db.conversationSession.updateMany({
+          where: { id, userId: user.id },
+          data: { turnInFlight: false },
+        });
+
         controller.close();
       } catch (error) {
         await recordAIUsage({
@@ -152,6 +166,10 @@ export async function POST(
           status: "ERROR",
           errorMessage:
             error instanceof Error ? error.message : "Unknown streaming error",
+        });
+        await db.conversationSession.updateMany({
+          where: { id, userId: user.id },
+          data: { turnInFlight: false },
         });
         controller.error(error);
       }

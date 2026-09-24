@@ -81,13 +81,15 @@ export async function completeFocusStep(formData: FormData) {
     | undefined;
 
   if (complete) {
-    const [attempts, reviews] = await Promise.all([
-      db.attempt.findMany({
+    const [attemptGroups, reviews] = await Promise.all([
+      db.attempt.groupBy({
+        by: ["correct"],
         where: {
           userId: user.id,
           createdAt: { gte: session.startedAt, lte: now },
         },
-        select: { correct: true, durationMs: true },
+        _count: { _all: true },
+        _sum: { durationMs: true },
       }),
       db.review.count({
         where: {
@@ -99,10 +101,14 @@ export async function completeFocusStep(formData: FormData) {
 
     summary = {
       reviews,
-      attempts: attempts.length,
-      correctAttempts: attempts.filter((attempt) => attempt.correct).length,
-      durationMs: attempts.reduce(
-        (sum, attempt) => sum + (attempt.durationMs ?? 0),
+      attempts: attemptGroups.reduce(
+        (sum, group) => sum + group._count._all,
+        0,
+      ),
+      correctAttempts:
+        attemptGroups.find((group) => group.correct)?._count._all ?? 0,
+      durationMs: attemptGroups.reduce(
+        (sum, group) => sum + (group._sum.durationMs ?? 0),
         0,
       ),
     };

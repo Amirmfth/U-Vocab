@@ -14,7 +14,12 @@ function unique(values: Array<string | null | undefined>) {
 }
 
 function deterministicOptions(expected: string, pool: string[], limit = 4) {
-  return unique([expected, ...pool.filter((item) => item !== expected)]).slice(0, limit);
+  const values = unique([expected, ...pool.filter((item) => item !== expected)]).slice(0, limit);
+  if (values.length < 2) return values;
+  const offset =
+    Array.from(expected).reduce((sum, character) => sum + character.codePointAt(0)!, 0) %
+    values.length;
+  return [...values.slice(offset), ...values.slice(0, offset)];
 }
 
 function prepositionFrom(pattern: string) {
@@ -153,10 +158,10 @@ export async function buildBattleQuestions(input: {
         (item) => item.lexeme.partOfSpeech !== group[0].lexeme.partOfSpeech,
       );
       if (!odd) continue;
-      const options = [
-        ...group.slice(0, 3).map((item) => item.lexeme.lemma),
+      const options = deterministicOptions(
         odd.lexeme.lemma,
-      ];
+        group.slice(0, 3).map((item) => item.lexeme.lemma),
+      );
       drafts.push({
         lexemeId: odd.lexemeId,
         prompt:

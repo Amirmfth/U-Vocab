@@ -13,7 +13,7 @@ function intensity(day: ActivityDay | undefined) {
     day.reviewed +
     day.learned +
     day.produced +
-    day.encounters +
+    day.readingEncounters +
     day.mistakesCorrected;
   if (total === 0) return 0;
   if (total <= 2) return 1;

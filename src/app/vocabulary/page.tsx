@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { RelationType } from "@prisma/client";
-import { ArrowRight, BookOpen, GitCompareArrows, Layers3, Network, Plus, Sparkles, Star, Upload } from "lucide-react";
+import { BookOpen, GitCompareArrows, Layers3, Network, Plus, Star, Upload } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { currentRetrievability } from "@/lib/fsrs";

@@ -102,8 +102,11 @@ export function ComparisonTrainer({
           </div>
         </div>
 
-        {content.production.map((prompt) => {
-          const key = prompt.target;
+        {([
+          { target: "LEFT" as const, prompt: content.production.leftPrompt },
+          { target: "RIGHT" as const, prompt: content.production.rightPrompt },
+        ]).map((item) => {
+          const key = item.target;
           const result = productionResults[key];
 
           return (
@@ -113,7 +116,7 @@ export function ComparisonTrainer({
                   Target: {key === "LEFT" ? leftLabel : rightLabel}
                 </span>
               </div>
-              <p>{prompt.prompt}</p>
+              <p>{item.prompt}</p>
               <textarea
                 rows={4}
                 value={productionAnswers[key] ?? ""}

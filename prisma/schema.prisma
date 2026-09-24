@@ -85,6 +85,21 @@ enum SessionActivity {
   FINAL_CHALLENGE
 }
 
+enum ConversationKind {
+  PRACTICE
+  MISSION
+}
+
+enum ConversationStatus {
+  ACTIVE
+  COMPLETED
+}
+
+enum ConversationRole {
+  USER
+  ASSISTANT
+}
+
 enum ConfusionState {
   TRACKED
   LEARNED
@@ -124,6 +139,8 @@ model User {
   learningSessions     LearningSession[]
   recommendationFeedback RecommendationFeedback[]
   confusionPairs         ConfusionPair[]
+  conversationSessions   ConversationSession[]
+  conversationMessages   ConversationMessage[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -154,6 +171,7 @@ model Lexeme {
   recommendationFeedback RecommendationFeedback[]
   confusionLeft  ConfusionPair[] @relation("confusionLeft")
   confusionRight ConfusionPair[] @relation("confusionRight")
+  conversationTargets ConversationTarget[]
   createdAt    DateTime         @default(now())
   embedding      Unsupported("vector(1536)")?
   embeddingModel String?
@@ -511,4 +529,55 @@ model ConfusionPair {
 
   @@unique([userId, leftLexemeId, rightLexemeId])
   @@index([userId, state, updatedAt])
+}
+
+
+model ConversationSession {
+  id            String             @id @default(cuid())
+  userId        String
+  kind          ConversationKind
+  status        ConversationStatus @default(ACTIVE)
+  level         String
+  title         String
+  scenario      String
+  aiRole        String
+  objective     String?
+  revealTargets Boolean            @default(true)
+  summary       Json?
+  startedAt     DateTime            @default(now())
+  completedAt   DateTime?
+  updatedAt     DateTime            @updatedAt
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages      ConversationMessage[]
+  targets       ConversationTarget[]
+
+  @@index([userId, status, updatedAt])
+}
+
+model ConversationMessage {
+  id        String           @id @default(cuid())
+  sessionId String
+  userId    String
+  role      ConversationRole
+  content   String
+  createdAt DateTime         @default(now())
+  session   ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+model ConversationTarget {
+  id             String              @id @default(cuid())
+  sessionId      String
+  lexemeId       String
+  position       Int                 @default(0)
+  uses           Int                 @default(0)
+  successfulUses Int                 @default(0)
+  lastUsedAt     DateTime?
+  session        ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  lexeme         Lexeme              @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, lexemeId])
+  @@index([sessionId, position])
 }

@@ -241,14 +241,16 @@ export async function rebuildMistakeEmbeddings(input: {
   });
 
   let completed = 0;
+  let failed = 0;
   for (const row of rows) {
     try {
       await ensureMistakeEmbedding(row.id, input.userId, Boolean(input.force));
       completed += 1;
     } catch (error) {
+      failed += 1;
       console.error("Failed to rebuild mistake embedding", row.id, error);
     }
   }
 
-  return completed;
+  return { completed, failed, attempted: rows.length };
 }

@@ -64,6 +64,7 @@ export async function getUniverseBranch(input: {
         take: 20,
       },
       topicPackItems: {
+        where: { topicPack: { userId: input.userId } },
         include: { topicPack: true },
         take: 12,
       },

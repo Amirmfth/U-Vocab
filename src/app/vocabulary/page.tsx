@@ -46,8 +46,8 @@ export default async function Vocabulary({
             translations: true,
             patterns: true,
             insights: { select: { level: true } },
-            outgoing: { select: { type: true } },
-            incoming: { select: { type: true } },
+            outgoing: { select: { type: true, target: { select: { lemma: true } } } },
+            incoming: { select: { type: true, source: { select: { lemma: true } } } },
             topicPackItems: { select: { topicPackId: true } },
             encounters: {
               where: { userId: user.id },
@@ -88,6 +88,8 @@ export default async function Vocabulary({
             isTranslationVisible(user.preferredTranslation, translation.language),
           )
           .map((translation) => translation.text),
+        ...word.outgoing.map((relation) => relation.target.lemma),
+        ...word.incoming.map((relation) => relation.source.lemma),
       ]
         .join(" ")
         .toLocaleLowerCase("de-DE");

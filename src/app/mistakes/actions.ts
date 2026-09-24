@@ -47,13 +47,15 @@ export async function refreshMistakeEmbeddings(
 ): Promise<MistakeActionState> {
   try {
     const user = await getCurrentUser();
-    const count = await rebuildMistakeEmbeddings({ userId: user.id, limit: 30 });
+    const result = await rebuildMistakeEmbeddings({ userId: user.id, limit: 30 });
     revalidatePath("/mistakes");
     return {
-      status: "success",
-      message: count
-        ? "Indexed " + count + " mistake patterns."
-        : "Mistake embeddings are already current.",
+      status: result.failed ? "error" : "success",
+      message: result.failed
+        ? "Indexed " + result.completed + " mistake patterns; " + result.failed + " failed."
+        : result.completed
+          ? "Indexed " + result.completed + " mistake patterns."
+          : "Mistake embeddings are already current.",
     };
   } catch (error) {
     return {

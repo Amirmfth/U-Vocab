@@ -30,12 +30,10 @@ export const comparisonSchema = z.object({
       explanation: z.string(),
     }),
   ).min(3).max(6),
-  production: z.array(
-    z.object({
-      target: z.enum(["LEFT", "RIGHT"]),
-      prompt: z.string(),
-    }),
-  ).length(2),
+  production: z.object({
+    leftPrompt: z.string(),
+    rightPrompt: z.string(),
+  }),
 });
 
 export type ComparisonContent = z.infer<typeof comparisonSchema>;
@@ -65,7 +63,7 @@ export async function generateWordComparison(input: {
         {
           role: "system",
           content:
-            "Teach the practical distinction between two commonly confused German lexical units. Be concise but precise. Explain the distinction in level-appropriate German and also in natural English and Persian. Contrast register, meaning, collocation, grammar, and usage only where relevant. Create contrastive examples, short discrimination questions, and two production prompts. Avoid trick questions and accept that close synonyms can overlap.",
+            "Teach the practical distinction between two commonly confused German lexical units. Be concise but precise. Explain the distinction in level-appropriate German and also in natural English and Persian. Contrast register, meaning, collocation, grammar, and usage only where relevant. Create contrastive examples, short discrimination questions, and one production prompt for each word. Avoid trick questions and accept that close synonyms can overlap.",
         },
         { role: "user", content: JSON.stringify(input) },
       ],

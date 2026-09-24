@@ -44,7 +44,7 @@ function sanitizeMetadata(
   );
 }
 
-export async function recordAIUsage(input: {
+export type AIUsageRecordInput = {
   userId: string;
   operation: string;
   model: string;
@@ -59,7 +59,9 @@ export async function recordAIUsage(input: {
   durationMs?: number | null;
   timeToFirstTokenMs?: number | null;
   metadata?: Record<string, SafeMetadataValue>;
-}) {
+};
+
+export async function recordAIUsage(input: AIUsageRecordInput) {
   try {
     const provider = input.provider ?? AI_PROVIDER;
     const inputTokens = input.usage?.input_tokens ?? 0;

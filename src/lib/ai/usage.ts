@@ -17,13 +17,26 @@ export type AIUsageLike = {
 
 type SafeMetadataValue = string | number | boolean | null | undefined;
 
+const SENSITIVE_METADATA_KEYS = new Set([
+  "answer",
+  "content",
+  "draft",
+  "instructions",
+  "message",
+  "prompt",
+  "response",
+  "text",
+]);
+
 function sanitizeMetadata(
   metadata: Record<string, SafeMetadataValue> | undefined,
 ) {
   if (!metadata) return undefined;
   return Object.fromEntries(
     Object.entries(metadata)
-      .filter(([, value]) => value !== undefined)
+      .filter(([key, value]) =>
+        value !== undefined && !SENSITIVE_METADATA_KEYS.has(key.toLowerCase()),
+      )
       .map(([key, value]) => [
         key,
         typeof value === "string" ? value.slice(0, 160) : value ?? null,

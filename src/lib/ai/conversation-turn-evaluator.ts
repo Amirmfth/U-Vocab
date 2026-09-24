@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const conversationTurnEvaluationSchema = z.object({
@@ -50,6 +50,12 @@ export async function evaluateConversationTurn(input: {
   }>;
 }) {
   const perf = startOperation("ai.conversation_turn_evaluation", { model: AI_MODEL, messageChars: input.message.length, targetCount: input.targets.length, level: input.level });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "conversation_turn_evaluation",
+    model: AI_MODEL,
+    metadata: { level: input.level, messageChars: input.message.length, targetCount: input.targets.length },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -70,26 +76,12 @@ export async function evaluateConversationTurn(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "conversation_turn_evaluation",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed turn evaluation.",
-      });
-      throw new Error("OpenAI did not return a valid turn evaluation.");
+      const parseError = new Error("OpenAI did not return a valid turn evaluation.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "conversation_turn_evaluation",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -106,13 +98,7 @@ export async function evaluateConversationTurn(input: {
         error.message === "OpenAI did not return a valid turn evaluation."
       )
     ) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "conversation_turn_evaluation",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

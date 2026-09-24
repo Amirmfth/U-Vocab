@@ -77,3 +77,8 @@ ALTER TABLE "BattleQuestion" ADD CONSTRAINT "BattleQuestion_lexemeId_fkey" FOREI
 ALTER TABLE "WritingSession" ADD CONSTRAINT "WritingSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "WritingTarget" ADD CONSTRAINT "WritingTarget_writingSessionId_fkey" FOREIGN KEY ("writingSessionId") REFERENCES "WritingSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "WritingTarget" ADD CONSTRAINT "WritingTarget_lexemeId_fkey" FOREIGN KEY ("lexemeId") REFERENCES "Lexeme"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+ALTER TABLE "AIUsageEvent"
+ADD COLUMN "provider" TEXT NOT NULL DEFAULT 'openai',
+ADD COLUMN "promptVersion" TEXT;

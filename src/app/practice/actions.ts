@@ -1,6 +1,6 @@
 "use server";
 
-import type { ExerciseType } from "@prisma/client";
+import type { ExerciseType, MistakeType } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { evaluateVocabularyProduction } from "@/lib/ai/evaluate-production";
@@ -65,7 +65,7 @@ export async function evaluatePractice(
     retryPrompt?: string | null;
     improvedSentence?: string | null;
     mistakes: Array<{
-      type: "ARTICLE" | "CASE" | "PREPOSITION" | "REFLEXIVE" | "COLLOCATION" | "WORD_CHOICE" | "WORD_FORM" | "SPELLING" | "OTHER";
+      type: MistakeType;
       expected: string | null;
       actual: string | null;
       explanation: string;
@@ -76,7 +76,9 @@ export async function evaluatePractice(
     const deterministic = checkDeterministicAnswer(answer, expected);
     evaluation = {
       ...deterministic,
-      retryPrompt: deterministic.correct ? null : "Try once more before revealing the expected form.",
+      retryPrompt: deterministic.correct
+        ? null
+        : "Try once more before revealing the expected form.",
       improvedSentence: null,
       mistakes: deterministic.correct
         ? []
@@ -88,7 +90,7 @@ export async function evaluatePractice(
           }],
     };
   } else {
-    evaluation = await evaluateVocabularyProduction({
+    const ai = await evaluateVocabularyProduction({
       exerciseType,
       exercisePrompt: prompt,
       expected: expected || undefined,
@@ -98,6 +100,14 @@ export async function evaluatePractice(
       examples: item.lexeme.examples.map((example) => example.german),
       answer,
     });
+
+    evaluation = {
+      ...ai,
+      feedback:
+        ai.confidence < 0.65
+          ? "The evaluation is uncertain. " + ai.feedback
+          : ai.feedback,
+    };
   }
 
   await db.attempt.create({
@@ -121,7 +131,7 @@ export async function evaluatePractice(
   });
 
   if (evaluation.correct) {
-    const relatedTypes =
+    const relatedTypes: MistakeType[] =
       exerciseType === "ARTICLE"
         ? ["ARTICLE"]
         : exerciseType === "CASE_PREPOSITION"
@@ -135,7 +145,7 @@ export async function evaluatePractice(
         where: {
           userId: user.id,
           lexemeId: item.lexemeId,
-          type: { in: relatedTypes as never[] },
+          type: { in: relatedTypes },
           resolvedAt: null,
         },
         data: { resolvedAt: new Date() },

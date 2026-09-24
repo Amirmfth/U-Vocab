@@ -19,6 +19,12 @@ export async function POST(
   if (!message) {
     return Response.json({ error: "Message is required." }, { status: 400 });
   }
+  if (message.length > 4000) {
+    return Response.json(
+      { error: "Keep each message under 4,000 characters." },
+      { status: 400 },
+    );
+  }
 
   const session = await db.conversationSession.findFirst({
     where: { id, userId: user.id, status: "ACTIVE" },

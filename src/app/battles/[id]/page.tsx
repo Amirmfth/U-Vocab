@@ -91,6 +91,7 @@ export default async function BattlePage({
         sessionId={session.id}
         mode={session.mode}
         durationSec={session.durationSec}
+        startedAt={session.startedAt.toISOString()}
         initialScore={session.score}
         questions={options}
       />

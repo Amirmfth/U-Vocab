@@ -1,10 +1,7 @@
 import { db } from "@/lib/db";
-import { rebuildMistakeEmbeddings } from "./embeddings";
 import { similarMistakePairs } from "./search";
 
 export async function clusterOpenMistakes(userId: string) {
-  await rebuildMistakeEmbeddings({ userId, limit: 30 });
-
   const mistakes = await db.mistake.findMany({
     where: { userId, resolvedAt: null },
     include: { lexeme: true },

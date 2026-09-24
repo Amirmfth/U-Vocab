@@ -1,7 +1,6 @@
-import type { AwaitedReturn } from "./types";
 import { buildConversationContext } from "./context";
 
-export type ConversationContext = AwaitedReturn<typeof buildConversationContext>;
+export type ConversationContext = Awaited<ReturnType<typeof buildConversationContext>>;
 
 export function buildTutorInstructions(
   context: ConversationContext,

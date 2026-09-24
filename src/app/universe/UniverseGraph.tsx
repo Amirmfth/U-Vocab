@@ -284,6 +284,7 @@ export function UniverseGraph({
         </div>
         <h2>{selected.label}</h2>
         {selected.sublabel ? <p className="muted">{selected.sublabel}</p> : null}
+        {selected.meaning ? <p className="universe-meaning">{selected.meaning}</p> : null}
 
         {selected.lexemeId ? (
           <div className="universe-detail-actions">

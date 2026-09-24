@@ -89,6 +89,7 @@ model User {
   aiUsage              AiUsageEvent[]
   topicPacks           TopicPack[]
   stories              Story[]
+  readingDocuments     ReadingDocument[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -114,6 +115,7 @@ model Lexeme {
   insights     LexemeInsight[]
   topicPackItems TopicPackItem[]
   storyTargets StoryTarget[]
+  readingItems ReadingItem[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -356,4 +358,35 @@ model StoryTarget {
 
   @@unique([storyId, lexemeId])
   @@index([storyId, position])
+}
+
+
+model ReadingDocument {
+  id        String        @id @default(cuid())
+  userId    String
+  title     String?
+  sourceType String       @default("PASTED_TEXT")
+  sourceRef String?
+  content   String
+  level     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     ReadingItem[]
+
+  @@index([userId, createdAt])
+}
+
+model ReadingItem {
+  id                String          @id @default(cuid())
+  readingDocumentId String
+  lexemeId          String
+  surfaceText       String
+  occurrences       Int             @default(1)
+  position          Int             @default(0)
+  readingDocument   ReadingDocument @relation(fields: [readingDocumentId], references: [id], onDelete: Cascade)
+  lexeme            Lexeme          @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([readingDocumentId, lexemeId])
+  @@index([readingDocumentId, position])
 }

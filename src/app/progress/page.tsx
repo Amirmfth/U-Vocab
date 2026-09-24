@@ -33,6 +33,16 @@ function minutes(ms: number) {
   return Math.round(ms / 60000);
 }
 
+function lastMonthKeys(todayKey: string) {
+  const [year, month] = todayKey.split("-").map(Number);
+  const result: string[] = [];
+  for (let offset = 11; offset >= 0; offset -= 1) {
+    const date = new Date(Date.UTC(year, month - 1 - offset, 1));
+    result.push(date.toISOString().slice(0, 7));
+  }
+  return result;
+}
+
 export default async function ProgressPage({
   searchParams,
 }: {
@@ -224,6 +234,23 @@ export default async function ProgressPage({
   const selectedDay = query.day ?? today;
   const selectedActivity = activityDays.find((day) => day.date === selectedDay);
 
+  const monthKeys = lastMonthKeys(today);
+  const monthlyTrend = monthKeys.map((month) => ({
+    month,
+    learned: vocabulary.filter(
+      (item) => localDateKey(item.addedAt, user.timezone).slice(0, 7) === month,
+    ).length,
+    mastered: vocabulary.filter(
+      (item) =>
+        item.masteredAt &&
+        localDateKey(item.masteredAt, user.timezone).slice(0, 7) === month,
+    ).length,
+  }));
+  const maxTrend = Math.max(
+    1,
+    ...monthlyTrend.map((item) => Math.max(item.learned, item.mastered)),
+  );
+
   const topicCoverage = topicPacks.map((pack) => {
     const covered = pack.items.filter((item) => {
       const state = item.lexeme.userStates[0]?.state;
@@ -367,6 +394,41 @@ export default async function ProgressPage({
             <p className="muted">No unresolved weakness patterns.</p>
           )}
         </article>
+      </section>
+
+      <section className="panel progress-panel">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">GROWTH</p>
+            <h2>12-month learning trend</h2>
+          </div>
+        </div>
+        <div className="trend-chart" aria-label="Words learned and mastered by month">
+          {monthlyTrend.map((item) => (
+            <div className="trend-month" key={item.month}>
+              <div className="trend-bars">
+                <span
+                  className="trend-bar learned"
+                  style={{ height: Math.max(3, (item.learned / maxTrend) * 100) + "%" }}
+                  title={item.learned + " learned"}
+                />
+                <span
+                  className="trend-bar mastered"
+                  style={{ height: Math.max(3, (item.mastered / maxTrend) * 100) + "%" }}
+                  title={item.mastered + " mastered"}
+                />
+              </div>
+              <small>{item.month.slice(5)}</small>
+            </div>
+          ))}
+        </div>
+        <div className="trend-legend">
+          <span><i className="trend-key learned" /> added</span>
+          <span><i className="trend-key mastered" /> mastered</span>
+        </div>
+        <p className="analytics-caveat">
+          Mastery transition history starts with the progress telemetry migration; older mastered items are included in current totals but cannot be backdated precisely.
+        </p>
       </section>
 
       <section className="panel heatmap-panel">

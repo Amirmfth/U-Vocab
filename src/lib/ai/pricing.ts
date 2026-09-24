@@ -38,6 +38,24 @@ const OPENAI_STANDARD_2026_09_25: ModelPricing[] = [
     cachedInputPerMillion: 0.125,
     outputPerMillion: 10,
   },
+  {
+    key: "openai-standard-2026-09-25:gpt-6-luna",
+    provider: "openai",
+    model: "gpt-6-luna",
+    currency: "USD",
+    inputPerMillion: 0.1,
+    cachedInputPerMillion: 0.01,
+    outputPerMillion: 0.5,
+  },
+  {
+    key: "openai-standard-2026-09-25:text-embedding-3-small",
+    provider: "openai",
+    model: "text-embedding-3-small",
+    currency: "USD",
+    inputPerMillion: 0.02,
+    cachedInputPerMillion: 0,
+    outputPerMillion: 0,
+  },
 ];
 
 export function pricingFor(provider: string, model: string) {

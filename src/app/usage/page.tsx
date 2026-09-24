@@ -9,6 +9,7 @@ import {
   summarizeUsage,
   type UsageAnalyticsEvent,
 } from "@/lib/ai/usage-analytics";
+import { UsageFilters } from "./UsageFilters";
 
 const PERIOD_DAYS: Record<string, number | null> = {
   "7": 7,
@@ -309,50 +310,14 @@ export default async function UsagePage({
         </article>
       </section>
 
-      <form className="usage-filters" method="get">
-        <label>
-          Period
-          <select name="period" defaultValue={period}>
-            <option value="7">7 days</option>
-            <option value="30">30 days</option>
-            <option value="90">90 days</option>
-            <option value="all">All time</option>
-          </select>
-        </label>
-        <label>
-          Feature
-          <select name="operation" defaultValue={operation}>
-            <option value="">All features</option>
-            {operations.map((item) => (
-              <option value={item.operation} key={item.operation}>
-                {operationLabel(item.operation)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Model
-          <select name="model" defaultValue={model}>
-            <option value="">All models</option>
-            {models.map((item) => (
-              <option value={item.model} key={item.model}>
-                {item.model}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Status
-          <select name="status" defaultValue={status}>
-            <option value="">All statuses</option>
-            <option value="SUCCESS">Success</option>
-            <option value="ERROR">Error</option>
-          </select>
-        </label>
-        <button className="button button-secondary" type="submit">
-          Apply filters
-        </button>
-      </form>
+      <UsageFilters
+        current={{ period, operation, model, status }}
+        operations={operations.map((item) => ({
+          value: item.operation,
+          label: operationLabel(item.operation),
+        }))}
+        models={models.map((item) => ({ value: item.model, label: item.model }))}
+      />
 
       <section className="usage-summary-grid">
         <article className="panel">

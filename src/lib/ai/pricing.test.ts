@@ -48,6 +48,38 @@ test("reasoning cost is reported as a subset of output cost", () => {
   assert.equal(result.totalCost, 0.2);
 });
 
+test("calculates gpt-6-luna standard pricing", () => {
+  const result = calculateUsageCost({
+    provider: "openai",
+    model: "gpt-6-luna",
+    inputTokens: 1_000_000,
+    cachedInputTokens: 500_000,
+    outputTokens: 1_000_000,
+    reasoningTokens: 0,
+  });
+
+  assert.equal(result.pricingKey, "openai-standard-2026-09-25:gpt-6-luna");
+  assert.equal(result.inputCost, 0.05);
+  assert.equal(result.cachedInputCost, 0.005);
+  assert.equal(result.outputCost, 0.5);
+  assert.equal(result.totalCost, 0.555);
+});
+
+test("calculates text-embedding-3-small input-only pricing", () => {
+  const result = calculateUsageCost({
+    provider: "openai",
+    model: "text-embedding-3-small",
+    inputTokens: 1_000_000,
+    cachedInputTokens: 0,
+    outputTokens: 0,
+    reasoningTokens: 0,
+  });
+
+  assert.equal(result.pricingKey, "openai-standard-2026-09-25:text-embedding-3-small");
+  assert.equal(result.inputCost, 0.02);
+  assert.equal(result.totalCost, 0.02);
+});
+
 test("unknown model pricing remains explicitly unavailable", () => {
   assert.equal(pricingFor("openai", "future-model"), null);
 

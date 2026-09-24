@@ -40,19 +40,23 @@ function errorCategory(error: unknown) {
   const name = error.name.toLowerCase();
   const message = error.message.toLowerCase();
   if (name.includes("timeout") || message.includes("timeout")) return "timeout";
-  if (message.includes("rate") && message.includes("limit")) return "rate_limit";
+  if (message.includes("rate") && message.includes("limit"))
+    return "rate_limit";
   if (message.includes("parse") || message.includes("valid")) return "parse";
   if (message.includes("auth") || message.includes("api key")) return "auth";
   return name || "error";
 }
 
-export function createAIUsageRecorder(input: {
-  userId: string;
-  operation: string;
-  model: string;
-  provider?: string;
-  metadata?: SafeAIMetadata;
-}, persistUsage: (input: AIUsageRecordInput) => Promise<void> = recordAIUsage) {
+export function createAIUsageRecorder(
+  input: {
+    userId: string;
+    operation: string;
+    model: string;
+    provider?: string;
+    metadata?: SafeAIMetadata;
+  },
+  persistUsage: (input: AIUsageRecordInput) => Promise<void> = recordAIUsage,
+) {
   const startedAt = nowMs();
   let recorded = false;
 
@@ -90,10 +94,7 @@ export function createAIUsageRecorder(input: {
   }
 
   return {
-    success(response: {
-      usage?: AIUsageLike | null;
-      id?: string | null;
-    }) {
+    success(response: { usage?: AIUsageLike | null; id?: string | null }) {
       return persist({
         status: "SUCCESS",
         usage: response.usage,

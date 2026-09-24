@@ -211,6 +211,10 @@ export default async function Vocabulary({
                 4) *
                 100,
             );
+            const levels = Array.from(new Set(word.insights.map((insight) => insight.level)));
+            const topics = Array.from(
+              new Set(word.topicPackItems.map((packItem) => packItem.topicPack.topic)),
+            );
 
             return (
               <Link
@@ -240,8 +244,13 @@ export default async function Vocabulary({
                 <div className="vocabulary-row-meta">
                   <span>{word.partOfSpeech}</span>
                   <span>{item.state.toLowerCase()}</span>
-                  <span>{mastery}%</span>
                 </div>
+                {(levels.length || topics.length) ? (
+                  <div className="vocabulary-row-context">
+                    {levels.map((level) => <span className="badge" key={level}>{level}</span>)}
+                    {topics.map((topic) => <span className="badge vocabulary-topic" key={topic}>{topic}</span>)}
+                  </div>
+                ) : null}
                 <div className="mastery-line" aria-hidden="true">
                   <span style={{ width: mastery + "%" }} />
                 </div>

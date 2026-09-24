@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, BookOpenText, Brain, FileUp, GitCompareArrows, Home, Layers3, MessageCircle, Network, PenLine, Plus, ScanText, Swords,
+  BarChart3, BookOpen, BookOpenText, Brain, GitCompareArrows, Home, Layers3, MessageCircle, Network, PenLine, Plus, ScanText, Swords,
   Settings, Sparkles, Star, Target, TimerReset, TrendingUp, TriangleAlert, type LucideIcon,
 } from "lucide-react";
 
@@ -25,7 +25,6 @@ const explore = [
   { href: "/topic-packs", label: "Topic packs", icon: Layers3 },
   { href: "/stories", label: "Stories", icon: BookOpenText },
   { href: "/read", label: "Reading", icon: ScanText },
-  { href: "/import", label: "Import", icon: FileUp },
 ];
 const more = [
   { href: "/progress", label: "Progress", icon: TrendingUp },

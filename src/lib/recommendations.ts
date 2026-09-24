@@ -165,7 +165,7 @@ export async function getVocabularyRecommendations(
     include: {
       translations: true,
       insights: { select: { level: true } },
-      topicPackItems: { select: { topicPackId: true } },
+      topicPackItems: { select: { topicPackId: true, usefulness: true } },
     },
     orderBy: { updatedAt: "desc" },
     take: 120,

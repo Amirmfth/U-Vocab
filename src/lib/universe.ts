@@ -46,7 +46,6 @@ export async function getUniverseBranch(input: {
           target: {
             include: {
               translations: true,
-              translations: true,
               userStates: { where: { userId: input.userId }, take: 1 },
             },
           },
@@ -57,6 +56,7 @@ export async function getUniverseBranch(input: {
         include: {
           source: {
             include: {
+              translations: true,
               userStates: { where: { userId: input.userId }, take: 1 },
             },
           },

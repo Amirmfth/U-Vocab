@@ -61,7 +61,7 @@ export async function updateConversationTargetsBatch(
       Prisma.sql`(
         ${update.id}::text,
         ${update.successful ? 1 : 0}::integer,
-        ${update.lastUsedAt}::timestamptz
+        ${update.lastUsedAt}::timestamp
       )`,
     ),
   );

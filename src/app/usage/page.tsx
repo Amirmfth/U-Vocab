@@ -27,33 +27,33 @@ export default async function UsagePage() {
     byModel,
     recent,
   ] = await Promise.all([
-    db.aIUsageEvent.aggregate({
+    db.aiUsageEvent.aggregate({
       where: { userId: user.id },
       _sum: { inputTokens: true, outputTokens: true, totalTokens: true },
       _count: { _all: true },
     }),
-    db.aIUsageEvent.aggregate({
+    db.aiUsageEvent.aggregate({
       where: { userId: user.id, createdAt: { gte: thirtyDaysAgo } },
       _sum: { totalTokens: true },
       _count: { _all: true },
     }),
-    db.aIUsageEvent.count({ where: { userId: user.id, status: "SUCCESS" } }),
-    db.aIUsageEvent.count({ where: { userId: user.id, status: "ERROR" } }),
-    db.aIUsageEvent.groupBy({
+    db.aiUsageEvent.count({ where: { userId: user.id, status: "SUCCESS" } }),
+    db.aiUsageEvent.count({ where: { userId: user.id, status: "ERROR" } }),
+    db.aiUsageEvent.groupBy({
       by: ["operation"],
       where: { userId: user.id },
       _sum: { totalTokens: true, inputTokens: true, outputTokens: true },
       _count: { _all: true },
       orderBy: { _sum: { totalTokens: "desc" } },
     }),
-    db.aIUsageEvent.groupBy({
+    db.aiUsageEvent.groupBy({
       by: ["model"],
       where: { userId: user.id },
       _sum: { totalTokens: true },
       _count: { _all: true },
       orderBy: { _sum: { totalTokens: "desc" } },
     }),
-    db.aIUsageEvent.findMany({
+    db.aiUsageEvent.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       take: 20,

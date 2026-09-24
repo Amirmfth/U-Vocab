@@ -28,6 +28,8 @@ export async function submitReview(formData: FormData) {
 
   const scheduled = scheduleReview(item.fsrsCard, grade);
   const state = nextVocabularyState(scheduled.stability);
+  const recallGain =
+    grade === "AGAIN" ? -0.03 : grade === "HARD" ? 0.03 : grade === "GOOD" ? 0.06 : 0.09;
 
   await db.$transaction([
     db.userVocabulary.update({
@@ -39,9 +41,7 @@ export async function submitReview(formData: FormData) {
         retrievability: scheduled.retrievability,
         nextReviewAt: scheduled.due,
         state,
-        meaningRecall: {
-          increment: grade === "AGAIN" ? 0 : grade === "HARD" ? 0.03 : grade === "GOOD" ? 0.06 : 0.09,
-        },
+        meaningRecall: Math.max(0, Math.min(1, item.meaningRecall + recallGain)),
       },
     }),
     db.review.create({

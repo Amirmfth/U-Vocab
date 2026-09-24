@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, BookOpenText, Brain, Home, Layers3, Plus,
+  BarChart3, BookOpen, BookOpenText, Brain, FileUp, Home, Layers3, Plus, ScanText,
   Settings, Sparkles, TriangleAlert, type LucideIcon,
 } from "lucide-react";
 
@@ -16,6 +16,8 @@ const primary = [
 const explore = [
   { href: "/topic-packs", label: "Topic packs", icon: Layers3 },
   { href: "/stories", label: "Stories", icon: BookOpenText },
+  { href: "/read", label: "Reading", icon: ScanText },
+  { href: "/import", label: "Import", icon: FileUp },
 ];
 const more = [
   { href: "/mistakes", label: "Mistakes", icon: TriangleAlert },

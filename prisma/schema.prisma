@@ -17,6 +17,7 @@ enum PartOfSpeech {
   PREPOSITION
   CONJUNCTION
   INTERJECTION
+  PHRASE
   OTHER
 }
 
@@ -45,11 +46,45 @@ enum RelationType {
   PHRASE
 }
 
+enum ReviewRating {
+  AGAIN
+  HARD
+  GOOD
+  EASY
+}
+
+enum ExerciseType {
+  MEANING_RECALL
+  REVERSE_RECALL
+  CLOZE
+  COLLOCATION
+  ARTICLE
+  CASE_PREPOSITION
+  FREE_SENTENCE
+  PARAPHRASE
+  CONTEXTUAL_CHOICE
+}
+
+enum MistakeType {
+  ARTICLE
+  CASE
+  PREPOSITION
+  REFLEXIVE
+  COLLOCATION
+  WORD_CHOICE
+  WORD_FORM
+  SPELLING
+  OTHER
+}
+
 model User {
   id                   String              @id @default(cuid())
   email                String              @unique
   preferredTranslation TranslationLanguage @default(ENGLISH)
   vocabulary           UserVocabulary[]
+  attempts             Attempt[]
+  mistakes             Mistake[]
+  encounters           Encounter[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -70,6 +105,8 @@ model Lexeme {
   userStates   UserVocabulary[]
   outgoing     LexemeRelation[] @relation("source")
   incoming     LexemeRelation[] @relation("target")
+  mistakes     Mistake[]
+  encounters   Encounter[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -131,11 +168,76 @@ model UserVocabulary {
   stability       Float?
   retrievability  Float?
   nextReviewAt    DateTime?
+  fsrsCard        Json?
   addedAt         DateTime        @default(now())
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   lexeme          Lexeme          @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  reviews         Review[]
+  attempts        Attempt[]
 
   @@unique([userId, lexemeId])
   @@index([userId, state])
   @@index([userId, nextReviewAt])
+}
+
+model Review {
+  id               String       @id @default(cuid())
+  userVocabularyId String
+  rating           ReviewRating
+  reviewedAt       DateTime     @default(now())
+  previousCard     Json
+  nextCard         Json
+  userVocabulary   UserVocabulary @relation(fields: [userVocabularyId], references: [id], onDelete: Cascade)
+
+  @@index([userVocabularyId, reviewedAt])
+}
+
+model Attempt {
+  id               String          @id @default(cuid())
+  userId           String
+  userVocabularyId String?
+  exerciseType     ExerciseType
+  prompt           String
+  answer           String
+  expected         String?
+  correct          Boolean
+  score            Float?
+  feedback         String?
+  createdAt        DateTime        @default(now())
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userVocabulary   UserVocabulary? @relation(fields: [userVocabularyId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model Mistake {
+  id             String      @id @default(cuid())
+  userId         String
+  lexemeId       String?
+  type           MistakeType
+  expected       String?
+  actual         String?
+  explanation    String?
+  occurrences    Int         @default(1)
+  lastOccurredAt DateTime     @default(now())
+  resolvedAt     DateTime?
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lexeme         Lexeme?     @relation(fields: [lexemeId], references: [id], onDelete: SetNull)
+
+  @@index([userId, type, lastOccurredAt])
+  @@index([userId, lexemeId, type])
+}
+
+model Encounter {
+  id        String   @id @default(cuid())
+  userId    String
+  lexemeId  String
+  source    String
+  sourceRef String?
+  context   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lexeme    Lexeme   @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lexemeId, createdAt])
 }

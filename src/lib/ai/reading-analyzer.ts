@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -36,16 +37,18 @@ export async function analyzeReadingText(input: {
   text: string;
   targetLevel: string;
 }) {
-  const perf = startOperation("ai.reading_analysis", { model: AI_MODEL, inputChars: input.text.length, targetLevel: input.targetLevel });
+  const route = aiRoute("reading_analysis");
+  const perf = startOperation("ai.reading_analysis", { model: route.model, inputChars: input.text.length, targetLevel: input.targetLevel });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "reading_analysis",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { inputChars: input.text.length, targetLevel: input.targetLevel, lengthBucket: input.text.length < 2000 ? "short" : input.text.length < 8000 ? "medium" : "long" },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",

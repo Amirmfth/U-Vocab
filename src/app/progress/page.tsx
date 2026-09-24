@@ -135,11 +135,13 @@ export default async function ProgressPage({
     }),
     db.topicPack.findMany({
       where: { userId: user.id },
-      include: {
+      select: {
+        id: true,
+        title: true,
         items: {
-          include: {
+          select: {
             lexeme: {
-              include: {
+              select: {
                 userStates: {
                   where: { userId: user.id },
                   select: { state: true },

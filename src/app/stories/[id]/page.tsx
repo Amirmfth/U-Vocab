@@ -15,7 +15,11 @@ type StoryQuestion = {
 };
 
 function escapeRegex(value: string) {
-  return value.replace(/[.*+?^$()|[\\]\\]/g, "\\$&");
+  const special = "\\^$.*+?()[]{}|";
+  return value
+    .split("")
+    .map((character) => (special.includes(character) ? "\\" + character : character))
+    .join("");
 }
 
 function highlightStory(

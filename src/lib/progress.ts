@@ -6,7 +6,7 @@ export type ActivityDay = {
   reviewed: number;
   learned: number;
   produced: number;
-  encounters: number;
+  readingEncounters: number;
   mistakesCorrected: number;
   durationMs: number;
 };
@@ -24,7 +24,7 @@ export function buildActivityDays(input: {
   timeZone: string;
   attempts: Array<{ createdAt: Date; exerciseType: ExerciseType; durationMs: number | null }>;
   reviews: Array<{ reviewedAt: Date }>;
-  encounters: Array<{ createdAt: Date }>;
+  encounters: Array<{ createdAt: Date; source: string }>;
   vocabulary: Array<{ addedAt: Date }>;
   mistakes: Array<{ resolvedAt: Date | null }>;
 }) {
@@ -39,7 +39,7 @@ export function buildActivityDays(input: {
       reviewed: 0,
       learned: 0,
       produced: 0,
-      encounters: 0,
+      readingEncounters: 0,
       mistakesCorrected: 0,
       durationMs: 0,
     };
@@ -49,7 +49,11 @@ export function buildActivityDays(input: {
 
   for (const review of input.reviews) day(review.reviewedAt).reviewed += 1;
   for (const item of input.vocabulary) day(item.addedAt).learned += 1;
-  for (const encounter of input.encounters) day(encounter.createdAt).encounters += 1;
+  for (const encounter of input.encounters) {
+    if (encounter.source === "reading" || encounter.source === "story") {
+      day(encounter.createdAt).readingEncounters += 1;
+    }
+  }
   for (const mistake of input.mistakes) {
     if (mistake.resolvedAt) day(mistake.resolvedAt).mistakesCorrected += 1;
   }

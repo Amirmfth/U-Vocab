@@ -9,9 +9,9 @@ export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
   score: z.number().min(0).max(1),
   confidence: z.number().min(0).max(1),
-  feedback: z.string(),
-  retryPrompt: z.string().nullable(),
-  improvedSentence: z.string().nullable(),
+  feedback: z.string().max(600),
+  retryPrompt: z.string().max(300).nullable(),
+  improvedSentence: z.string().max(600).nullable(),
   mistakes: z.array(
     z.object({
       type: z.enum([
@@ -29,7 +29,7 @@ export const productionEvaluationSchema = z.object({
       actual: z.string().nullable(),
       explanation: z.string(),
     }),
-  ),
+  ).max(6),
 });
 
 export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;

@@ -382,6 +382,7 @@ model ReadingItem {
   readingDocumentId String
   lexemeId          String
   surfaceText       String
+  surfaceForms      Json
   occurrences       Int             @default(1)
   position          Int             @default(0)
   readingDocument   ReadingDocument @relation(fields: [readingDocumentId], references: [id], onDelete: Cascade)

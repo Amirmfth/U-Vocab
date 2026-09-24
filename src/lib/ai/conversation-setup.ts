@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { AI_MODEL, getOpenAI } from "./client";
+import { getOpenAI } from "./client";
+import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
@@ -26,16 +27,18 @@ export async function generateConversationSetup(input: {
     patterns: string[];
   }>;
 }) {
-  const perf = startOperation("ai.conversation_setup", { model: AI_MODEL });
+  const route = aiRoute("conversation_setup");
+  const perf = startOperation("ai.conversation_setup", { model: route.model });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "conversation_setup",
-    model: AI_MODEL,
+    model: route.model,
     metadata: { kind: input.kind, level: input.level, targetCount: input.targets.length, hasTopic: Boolean(input.topic) },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: AI_MODEL,
+      model: route.model,
+      max_output_tokens: route.maxOutputTokens,
       input: [
         {
           role: "system",

@@ -182,3 +182,47 @@ export function getCachedWordSecondary(
     },
   )();
 }
+
+export function getCachedReadingIndex(userId: string) {
+  return unstable_cache(
+    async () =>
+      db.readingDocument.findMany({
+        where: { userId },
+        include: { _count: { select: { items: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 30,
+      }),
+    ["reading-index", userId],
+    {
+      tags: [cacheTags.reading(userId)],
+      revalidate: 300,
+    },
+  )();
+}
+
+export function getCachedWritingIndex(userId: string) {
+  return unstable_cache(
+    async () =>
+      Promise.all([
+        db.topicPack.findMany({
+          where: { userId },
+          select: { id: true, title: true },
+          orderBy: { createdAt: "desc" },
+          take: 50,
+        }),
+        db.writingSession.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+          take: 12,
+        }),
+      ]),
+    ["writing-index", userId],
+    {
+      tags: [
+        cacheTags.writing(userId),
+        cacheTags.topicPacks(userId),
+      ],
+      revalidate: 300,
+    },
+  )();
+}

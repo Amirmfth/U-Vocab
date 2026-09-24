@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const conversationSetupSchema = z.object({
@@ -27,6 +27,12 @@ export async function generateConversationSetup(input: {
   }>;
 }) {
   const perf = startOperation("ai.conversation_setup", { model: AI_MODEL });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "conversation_setup",
+    model: AI_MODEL,
+    metadata: { kind: input.kind, level: input.level, targetCount: input.targets.length, hasTopic: Boolean(input.topic) },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -47,30 +53,18 @@ export async function generateConversationSetup(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "conversation_setup",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed conversation setup.",
-      });
-      throw new Error("OpenAI did not return a valid conversation setup.");
+      const parseError = new Error("OpenAI did not return a valid conversation setup.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
     if (input.kind === "MISSION" && !response.output_parsed.objective?.trim()) {
-      throw new Error("OpenAI did not return a mission objective.");
+      const objectiveError = new Error("OpenAI did not return a mission objective.");
+      await usageRecorder.failure(objectiveError, response);
+      throw objectiveError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "conversation_setup",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -87,13 +81,7 @@ export async function generateConversationSetup(input: {
         error.message === "OpenAI did not return a valid conversation setup."
       )
     ) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "conversation_setup",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

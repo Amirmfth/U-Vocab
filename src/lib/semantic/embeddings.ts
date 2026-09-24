@@ -203,11 +203,17 @@ export async function rebuildLexemeEmbeddings(input: {
     orderBy: { updatedAt: "asc" },
   });
 
+  let completed = 0;
   for (const row of rows) {
-    await ensureLexemeEmbedding(row.id, input.userId, Boolean(input.force));
+    try {
+      await ensureLexemeEmbedding(row.id, input.userId, Boolean(input.force));
+      completed += 1;
+    } catch (error) {
+      console.error("Failed to rebuild lexeme embedding", row.id, error);
+    }
   }
 
-  return rows.length;
+  return completed;
 }
 
 export async function rebuildMistakeEmbeddings(input: {
@@ -233,9 +239,15 @@ export async function rebuildMistakeEmbeddings(input: {
     orderBy: { lastOccurredAt: "desc" },
   });
 
+  let completed = 0;
   for (const row of rows) {
-    await ensureMistakeEmbedding(row.id, input.userId, Boolean(input.force));
+    try {
+      await ensureMistakeEmbedding(row.id, input.userId, Boolean(input.force));
+      completed += 1;
+    } catch (error) {
+      console.error("Failed to rebuild mistake embedding", row.id, error);
+    }
   }
 
-  return rows.length;
+  return completed;
 }

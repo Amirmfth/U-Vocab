@@ -20,7 +20,7 @@ export function ExpansionPanel({
   const [state, action] = useActionState(generateExpansionAction, initialState);
 
   return (
-    <section className="panel intelligence-panel">
+    <section className="panel intelligence-panel" id="expand">
       <div className="section-heading">
         <div>
           <p className="eyebrow">WORD FAMILY</p>

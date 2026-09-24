@@ -14,8 +14,10 @@ const initialState: SettingsState = { status: "idle" };
 
 export function SettingsForm({
   preference,
+  targetLevel,
 }: {
   preference: TranslationLanguage;
+  targetLevel: string;
 }) {
   const [state, action] = useActionState(
     updateTranslationPreference,
@@ -37,19 +39,36 @@ export function SettingsForm({
         </select>
       </div>
 
+      <div className="field">
+        <label htmlFor="targetLevel">German target level</label>
+        <select id="targetLevel" name="targetLevel" defaultValue={targetLevel}>
+          <option value="A1">A1 · Beginner</option>
+          <option value="A2">A2 · Elementary</option>
+          <option value="B1">B1 · Intermediate</option>
+          <option value="B2">B2 · Upper intermediate</option>
+          <option value="C1">C1 · Advanced</option>
+          <option value="C2">C2 · Proficient</option>
+        </select>
+        <small className="muted">
+          AI explanations and guided lessons adapt to this level.
+        </small>
+      </div>
+
       {state.status === "success" ? (
-        <StatusNotice tone="success">Translation preference saved.</StatusNotice>
+        <StatusNotice tone="success">
+          {state.message ?? "Learning preferences saved."}
+        </StatusNotice>
       ) : null}
 
       {state.status === "error" ? (
         <StatusNotice tone="error">
-          {state.message ?? "Could not save this preference."}
+          {state.message ?? "Could not save these preferences."}
         </StatusNotice>
       ) : null}
 
       <ActionButton pendingLabel="Saving…">
         <Save size={18} />
-        Save preference
+        Save preferences
       </ActionButton>
     </form>
   );

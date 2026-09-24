@@ -4498,7 +4498,8 @@ summary {
 }
 
 .ia-secondary-panel,
-.home-progress-callout {
+.home-progress-callout,
+.home-continue {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -4530,7 +4531,8 @@ summary {
   }
 
   .ia-secondary-panel,
-  .home-progress-callout {
+  .home-progress-callout,
+  .home-continue {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;

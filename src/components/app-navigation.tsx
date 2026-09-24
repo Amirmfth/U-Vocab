@@ -54,7 +54,7 @@ function NavLink({
     <Link
       href={href}
       className={"nav-link " + (isActive ? "is-active" : "")}
-      aria-current={isActive ? "page" : undefined}
+      aria-current={isActive ? (pathname === href ? "page" : "location") : undefined}
     >
       <Icon size={18} />
       <span>{label}</span>
@@ -123,7 +123,7 @@ export function AppNavigation() {
                 key={item.href}
                 href={item.href}
                 className={"nav-link " + (isActive ? "is-active" : "")}
-                aria-current={isActive ? "page" : undefined}
+                aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
                 <Icon size={18} />
                 <span>{item.label}</span>

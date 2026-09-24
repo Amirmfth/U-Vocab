@@ -1,12 +1,13 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, Target } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { ConversationStartForm } from "@/app/conversation/ConversationStartForm";
 
-export const dynamic = "force-dynamic";
 
 export default async function MissionsPage() {
+  await connection();
   const user = await getCurrentUser();
   const [collections, missions] = await Promise.all([
     db.topicPack.findMany({

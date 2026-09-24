@@ -32,7 +32,7 @@ export async function findSimilarLexemes(input: {
                   AND uv."lexemeId" = candidate."id"
               )
             `
-          : Prisma.empty}
+          : Prisma.sql``}
       ORDER BY candidate."embedding" <=> source."embedding"
       LIMIT ${input.limit ?? 12}
     `,
@@ -80,7 +80,7 @@ export async function semanticLexemeSearch(input: {
                   AND uv."lexemeId" = "Lexeme"."id"
               )
             `
-          : Prisma.empty}
+          : Prisma.sql``}
       ORDER BY "embedding" <=> ${vector}::vector
       LIMIT ${input.limit ?? 20}
     `,

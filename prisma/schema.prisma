@@ -357,7 +357,9 @@ model AiUsageEvent {
   id           String        @id @default(cuid())
   userId       String
   operation    String
+  provider     String        @default("openai")
   model        String
+  promptVersion String?
   status       AIUsageStatus
   inputTokens  Int           @default(0)
   outputTokens Int           @default(0)

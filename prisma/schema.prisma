@@ -431,6 +431,7 @@ model TopicPackItem {
 
   @@unique([topicPackId, lexemeId])
   @@index([topicPackId, position])
+  @@index([lexemeId])
 }
 
 model Story {

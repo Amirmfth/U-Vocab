@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
+import { instrumentOperation } from "@/lib/performance";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -19,158 +20,206 @@ export async function createReadingDocument(
   const content = String(formData.get("content") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim() || null;
 
-  if (content.length < 20) {
-    return { status: "error", message: "Paste a little more German text." };
-  }
-
-  if (content.length > 30_000) {
-    return { status: "error", message: "Reading texts are limited to 30,000 characters for now." };
-  }
-
-  try {
-    const user = await getCurrentUser();
-    const analysis = await analyzeReadingText({
-      userId: user.id,
-      text: content,
-      targetLevel: user.targetLevel,
-    });
-
-    const document = await db.$transaction(async (tx) => {
-      const created = await tx.readingDocument.create({
-        data: {
-          userId: user.id,
-          title: title ?? analysis.title,
-          content,
-          level: analysis.estimatedLevel,
-          sourceType: "PASTED_TEXT",
-        },
-      });
-
-      const seen = new Set<string>();
-      let position = 0;
-
-      for (const unit of analysis.lexicalUnits) {
-        const normalized = unit.lemma.toLocaleLowerCase("de-DE").trim();
-        const key = normalized + ":" + unit.partOfSpeech;
-        if (seen.has(key)) continue;
-        seen.add(key);
-
-        let lexeme = await tx.lexeme.findUnique({
-          where: {
-            language_normalized_partOfSpeech: {
-              language: "de",
-              normalized,
-              partOfSpeech: unit.partOfSpeech as PartOfSpeech,
-            },
-          },
-          include: {
-            translations: true,
-            patterns: true,
-          },
-        });
-
-        if (!lexeme) {
-          lexeme = await tx.lexeme.create({
-            data: {
-              lemma: unit.lemma,
-              normalized,
-              partOfSpeech: unit.partOfSpeech as PartOfSpeech,
-              article: unit.article,
-              plural: unit.plural,
-              translations: {
-                create: [
-                  { language: "en", text: unit.englishMeaning },
-                  { language: "fa", text: unit.persianMeaning },
-                ],
-              },
-              patterns: unit.pattern
-                ? {
-                    create: [{
-                      pattern: unit.pattern,
-                      explanation: unit.patternExplanation,
-                    }],
-                  }
-                : undefined,
-              examples: unit.example
-                ? {
-                    create: [{
-                      german: unit.example,
-                      generatedByAi: true,
-                    }],
-                  }
-                : undefined,
-            },
-            include: {
-              translations: true,
-              patterns: true,
-            },
-          });
-        } else {
-          const hasEnglish = lexeme.translations.some((item) => item.language === "en");
-          const hasPersian = lexeme.translations.some((item) => item.language === "fa");
-          const missingPatterns = !lexeme.patterns.length && unit.pattern;
-
-          if (!hasEnglish || !hasPersian || missingPatterns) {
-            lexeme = await tx.lexeme.update({
-              where: { id: lexeme.id },
-              data: {
-                translations: {
-                  create: [
-                    ...(!hasEnglish ? [{ language: "en", text: unit.englishMeaning }] : []),
-                    ...(!hasPersian ? [{ language: "fa", text: unit.persianMeaning }] : []),
-                  ],
-                },
-                patterns: missingPatterns
-                  ? {
-                      create: [{
-                        pattern: unit.pattern!,
-                        explanation: unit.patternExplanation,
-                      }],
-                    }
-                  : undefined,
-              },
-              include: {
-                translations: true,
-                patterns: true,
-              },
-            });
-          }
-        }
-
-        await tx.readingItem.create({
-          data: {
-            readingDocumentId: created.id,
-            lexemeId: lexeme.id,
-            surfaceText: unit.surfaceText,
-            surfaceForms: unit.surfaceForms,
-            occurrences: unit.occurrences,
-            position: position++,
-          },
-        });
+  return instrumentOperation(
+    "reading.create",
+    {
+      contentChars: content.length,
+      hasTitle: Boolean(title),
+    },
+    async (perf) => {
+      if (content.length < 20) {
+        return {
+          status: "error",
+          message: "Paste a little more German text.",
+        };
       }
 
-      return created;
-    }, {
-      // Reading analysis can contain up to 120 lexical units with dependent writes.
-      // Keep the document import atomic without Prisma closing its default 5-second transaction.
-      maxWait: 10_000,
-      timeout: 60_000,
+      if (content.length > 30_000) {
+        return {
+          status: "error",
+          message: "Reading texts are limited to 30,000 characters for now.",
+        };
+      }
+
+      try {
+        const user = await perf.span("auth", () => getCurrentUser());
+        const analysis = await perf.span("ai", () =>
+          analyzeReadingText({
+            userId: user.id,
+            text: content,
+            targetLevel: user.targetLevel,
+          }),
+        );
+
+        const document = await perf.span("dbWrite", () =>
+          db.$transaction(
+            async (tx) => {
+              const created = await tx.readingDocument.create({
+                data: {
+                  userId: user.id,
+                  title: title ?? analysis.title,
+                  content,
+                  level: analysis.estimatedLevel,
+                  sourceType: "PASTED_TEXT",
+                },
+              });
+
+              const seen = new Set<string>();
+              let position = 0;
+
+              for (const unit of analysis.lexicalUnits) {
+                const normalized = unit.lemma
+                  .toLocaleLowerCase("de-DE")
+                  .trim();
+                const key = normalized + ":" + unit.partOfSpeech;
+                if (seen.has(key)) continue;
+                seen.add(key);
+
+                let lexeme = await tx.lexeme.findUnique({
+                  where: {
+                    language_normalized_partOfSpeech: {
+                      language: "de",
+                      normalized,
+                      partOfSpeech: unit.partOfSpeech as PartOfSpeech,
+                    },
+                  },
+                  include: {
+                    translations: true,
+                    patterns: true,
+                  },
+                });
+
+                if (!lexeme) {
+                  lexeme = await tx.lexeme.create({
+                    data: {
+                      lemma: unit.lemma,
+                      normalized,
+                      partOfSpeech: unit.partOfSpeech as PartOfSpeech,
+                      article: unit.article,
+                      plural: unit.plural,
+                      translations: {
+                        create: [
+                          {
+                            language: "en",
+                            text: unit.englishMeaning,
+                          },
+                          {
+                            language: "fa",
+                            text: unit.persianMeaning,
+                          },
+                        ],
+                      },
+                      patterns: unit.pattern
+                        ? {
+                            create: [{
+                              pattern: unit.pattern,
+                              explanation: unit.patternExplanation,
+                            }],
+                          }
+                        : undefined,
+                      examples: unit.example
+                        ? {
+                            create: [{
+                              german: unit.example,
+                              generatedByAi: true,
+                            }],
+                          }
+                        : undefined,
+                    },
+                    include: {
+                      translations: true,
+                      patterns: true,
+                    },
+                  });
+                } else {
+                  const hasEnglish = lexeme.translations.some(
+                    (item) => item.language === "en",
+                  );
+                  const hasPersian = lexeme.translations.some(
+                    (item) => item.language === "fa",
+                  );
+                  const missingPatterns =
+                    !lexeme.patterns.length && unit.pattern;
+
+                  if (!hasEnglish || !hasPersian || missingPatterns) {
+                    lexeme = await tx.lexeme.update({
+                      where: { id: lexeme.id },
+                      data: {
+                        translations: {
+                          create: [
+                            ...(!hasEnglish
+                              ? [{
+                                  language: "en",
+                                  text: unit.englishMeaning,
+                                }]
+                              : []),
+                            ...(!hasPersian
+                              ? [{
+                                  language: "fa",
+                                  text: unit.persianMeaning,
+                                }]
+                              : []),
+                          ],
+                        },
+                        patterns: missingPatterns
+                          ? {
+                              create: [{
+                                pattern: unit.pattern!,
+                                explanation: unit.patternExplanation,
+                              }],
+                            }
+                          : undefined,
+                      },
+                      include: {
+                        translations: true,
+                        patterns: true,
+                      },
+                    });
+                  }
+                }
+
+                await tx.readingItem.create({
+                  data: {
+                    readingDocumentId: created.id,
+                    lexemeId: lexeme.id,
+                    surfaceText: unit.surfaceText,
+                    surfaceForms: unit.surfaceForms,
+                    occurrences: unit.occurrences,
+                    position: position++,
+                  },
+                });
+              }
+
+              return created;
+            },
+            {
+              maxWait: 10_000,
+              timeout: 60_000,
+            },
+          ),
+        );
+
+        await perf.span("revalidation", async () => {
+          revalidatePath("/read");
+        });
+
+        return {
+          status: "success",
+          message: "Text analyzed.",
+          documentId: document.id,
+        };
+      } catch (error) {
+        perf.fail(error, { stage: "reading.create" });
+        return {
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not analyze this text.",
+        };
+      }
     },
-    );
-
-    revalidatePath("/read");
-
-    return {
-      status: "success",
-      message: "Text analyzed.",
-      documentId: document.id,
-    };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not analyze this text.",
-    };
-  }
+  );
 }
 
 export type ReadingMutationState = {
@@ -195,7 +244,12 @@ export async function addReadingLexeme(
       },
     });
 
-    if (!item) return { status: "error", message: "Reading vocabulary item not found." };
+    if (!item) {
+      return {
+        status: "error",
+        message: "Reading vocabulary item not found.",
+      };
+    }
 
     await db.userVocabulary.upsert({
       where: {
@@ -219,7 +273,10 @@ export async function addReadingLexeme(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not add this lexical unit.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Could not add this lexical unit.",
     };
   }
 }
@@ -237,7 +294,12 @@ export async function recordReadingEncounters(
       include: { items: true },
     });
 
-    if (!document) return { status: "error", message: "Reading document not found." };
+    if (!document) {
+      return {
+        status: "error",
+        message: "Reading document not found.",
+      };
+    }
 
     await db.encounter.createMany({
       data: document.items.map((item) => ({
@@ -259,7 +321,10 @@ export async function recordReadingEncounters(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not record reading encounters.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Could not record reading encounters.",
     };
   }
 }

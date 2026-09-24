@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODEL, getOpenAI } from "./client";
-import { recordAIUsage } from "./usage";
+import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 
 export const expansionSchema = z.object({
@@ -35,6 +35,12 @@ export async function generateWordExpansion(input: {
   level: string;
 }) {
   const perf = startOperation("ai.word_expansion", { model: AI_MODEL });
+  const usageRecorder = createAIUsageRecorder({
+    userId: input.userId,
+    operation: "word_expansion",
+    model: AI_MODEL,
+    metadata: { level: input.level, patternCount: input.patterns.length },
+  });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
       model: AI_MODEL,
@@ -50,26 +56,12 @@ export async function generateWordExpansion(input: {
     }));
 
     if (!response.output_parsed) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "word_expansion",
-        model: AI_MODEL,
-        status: "ERROR",
-        usage: response.usage,
-        requestId: response.id,
-        errorMessage: "OpenAI returned no parsed word expansion.",
-      });
-      throw new Error("OpenAI did not return a valid word expansion.");
+      const parseError = new Error("OpenAI did not return a valid word expansion.");
+      await usageRecorder.failure(parseError, response);
+      throw parseError;
     }
 
-    await recordAIUsage({
-      userId: input.userId,
-      operation: "word_expansion",
-      model: AI_MODEL,
-      status: "SUCCESS",
-      usage: response.usage,
-      requestId: response.id,
-    });
+    await usageRecorder.success(response);
 
     perf.success({
       requestId: response.id,
@@ -81,13 +73,7 @@ export async function generateWordExpansion(input: {
   } catch (error) {
     perf.fail(error);
     if (!(error instanceof Error && error.message === "OpenAI did not return a valid word expansion.")) {
-      await recordAIUsage({
-        userId: input.userId,
-        operation: "word_expansion",
-        model: AI_MODEL,
-        status: "ERROR",
-        errorMessage: error instanceof Error ? error.message : "Unknown OpenAI error",
-      });
+      await usageRecorder.failure(error);
     }
     throw error;
   }

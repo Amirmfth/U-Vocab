@@ -210,6 +210,10 @@ export default async function ProgressPage({
     ? metricReviews.filter((review) => review.rating !== "AGAIN").length /
       metricReviews.length
     : 0;
+  const practiceAccuracy = metricAttempts.length
+    ? metricAttempts.filter((attempt) => attempt.correct).length /
+      metricAttempts.length
+    : 0;
 
   const weaknessMap = new Map<string, number>();
   for (const mistake of openMistakes) {
@@ -369,7 +373,8 @@ export default async function ProgressPage({
           </div>
           <p className="big-metric">{minutes(totalDurationMs)} min</p>
           <p className="analytics-caveat">
-            Measured from review/practice interactions. Timing starts with the progress telemetry migration.
+            {percent(practiceAccuracy)}% attempt accuracy · {metricEncounters.length} contextual encounters in range.
+            Timing starts with the progress telemetry migration.
           </p>
         </article>
 

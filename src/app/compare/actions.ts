@@ -100,24 +100,37 @@ export async function generateComparisonAction(
 }
 
 async function updatePairProgress(pairId: string, userId: string, correct: boolean) {
-  const pair = await db.confusionPair.findFirst({
-    where: { id: pairId, userId },
-  });
-  if (!pair) throw new Error("Comparison not found.");
+  await db.$transaction(async (tx) => {
+    const pair = await tx.confusionPair.findFirst({
+      where: { id: pairId, userId },
+    });
+    if (!pair) throw new Error("Comparison not found.");
 
-  const attempts = pair.attempts + 1;
-  const correctAttempts = pair.correctAttempts + (correct ? 1 : 0);
-  const learned = attempts >= 4 && correctAttempts / attempts >= 0.8;
+    const updated = await tx.confusionPair.update({
+      where: { id: pair.id },
+      data: {
+        attempts: { increment: 1 },
+        correctAttempts: correct ? { increment: 1 } : undefined,
+        lastPracticedAt: new Date(),
+      },
+    });
 
-  await db.confusionPair.update({
-    where: { id: pair.id },
-    data: {
-      attempts,
-      correctAttempts,
-      lastPracticedAt: new Date(),
-      state: learned ? "LEARNED" : "TRACKED",
-      learnedAt: learned ? pair.learnedAt ?? new Date() : pair.learnedAt,
-    },
+    const learned =
+      updated.attempts >= 4 &&
+      updated.correctAttempts / updated.attempts >= 0.8;
+
+    if (
+      updated.state !== (learned ? "LEARNED" : "TRACKED") ||
+      (learned && !updated.learnedAt)
+    ) {
+      await tx.confusionPair.update({
+        where: { id: pair.id },
+        data: {
+          state: learned ? "LEARNED" : "TRACKED",
+          learnedAt: learned ? updated.learnedAt ?? new Date() : null,
+        },
+      });
+    }
   });
 }
 
@@ -191,8 +204,10 @@ export async function evaluateComparisonProduction(input: {
 
   const parsed = comparisonSchema.safeParse(pair.content);
   if (!parsed.success) throw new Error("Comparison content is invalid.");
-  const prompt = parsed.data.production.find((item) => item.target === input.target);
-  if (!prompt) throw new Error("Production prompt not found.");
+  const prompt =
+    input.target === "LEFT"
+      ? parsed.data.production.leftPrompt
+      : parsed.data.production.rightPrompt;
 
   const lexeme = input.target === "LEFT" ? pair.leftLexeme : pair.rightLexeme;
   const userVocabulary = await db.userVocabulary.findUnique({
@@ -202,7 +217,7 @@ export async function evaluateComparisonProduction(input: {
   const evaluation = await evaluateVocabularyProduction({
     userId: user.id,
     exerciseType: "FREE_SENTENCE",
-    exercisePrompt: prompt.prompt,
+    exercisePrompt: prompt,
     lemma: lexeme.lemma,
     partOfSpeech: lexeme.partOfSpeech,
     patterns: lexeme.patterns.map((item) => item.pattern),
@@ -215,7 +230,7 @@ export async function evaluateComparisonProduction(input: {
       userId: user.id,
       userVocabularyId: userVocabulary?.id ?? null,
       exerciseType: "FREE_SENTENCE",
-      prompt: prompt.prompt,
+      prompt: prompt,
       answer,
       correct: evaluation.correct,
       score: evaluation.score,

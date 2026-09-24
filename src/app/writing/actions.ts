@@ -68,7 +68,15 @@ export async function createWritingSessionAction(
   const level = String(formData.get("level") ?? "B2");
   const taskType = String(formData.get("taskType") ?? "essay");
   const topic = String(formData.get("topic") ?? "").trim() || "Alltag und Gesellschaft";
-  const targetWords = Math.max(60, Math.min(500, Number(formData.get("targetWords") ?? 120) || 120));
+  const targetWordsRaw = String(formData.get("targetWords") ?? "120");
+  const requestedWords =
+    targetWordsRaw === "CUSTOM"
+      ? Number(formData.get("customWords") ?? 150)
+      : Number(targetWordsRaw);
+  const targetWords = Math.max(
+    60,
+    Math.min(500, Number.isFinite(requestedWords) ? requestedWords : 120),
+  );
   const rawCollection = String(formData.get("collectionId") ?? "").trim();
   const collectionId = rawCollection && rawCollection !== "NONE" ? rawCollection : null;
 
@@ -82,6 +90,13 @@ export async function createWritingSessionAction(
             limit: 6,
           })
         : [];
+
+    if (mode === "GUIDED" && targets.length < 2) {
+      return {
+        status: "error",
+        message: "Add more vocabulary before using Guided vocabulary mode.",
+      };
+    }
 
     const generated = await generateWritingTask({
       userId: user.id,

@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/vocabulary">Vocabulary</Link>
             <Link href="/review">Review</Link>
             <Link href="/practice">Practice</Link>
+            <Link href="/mistakes">Mistakes</Link>
             <Link href="/vocabulary/new">Add word</Link>
             <Link href="/settings">Settings</Link>
           </nav>

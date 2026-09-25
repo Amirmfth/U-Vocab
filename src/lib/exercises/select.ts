@@ -1,7 +1,7 @@
 import type { ExerciseType } from "@prisma/client";
 import type { LearnerSnapshot } from "./types";
 
-const fallback: ExerciseType[]=["REVERSE_RECALL","MEANING_RECALL"];
+const fallback: ExerciseType[]=["MEANING_RECALL","REVERSE_RECALL","ARTICLE","CLOZE","CONTEXTUAL_CHOICE","CASE_PREPOSITION","COLLOCATION"];
 
 export function selectExerciseType(
   snapshot: LearnerSnapshot,

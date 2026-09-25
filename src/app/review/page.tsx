@@ -33,7 +33,7 @@ function ReviewModes({
       </Link>
       <Link href="/focus">
         <TimerReset size={18} />
-        <span><strong>Focus</strong><small>Build a structured review block</small></span>
+        <span><strong>Focus block</strong><small>Mix review and targeted practice</small></span>
         <ArrowRight size={16} />
       </Link>
     </nav>
@@ -78,8 +78,8 @@ export default async function ReviewPage({
             <h1>{dueCount ? dueCount + " due now" : "You're caught up"}</h1>
             <p>
               {dueCount
-                ? "Keep recall stable with a short spaced-review session."
-                : "No scheduled reviews are due. Reinforce mistakes or weak words instead."}
+                ? "Use active recall on vocabulary that FSRS says is due."
+                : "No retention reviews are due. Practice mistakes or weak skills instead."}
             </p>
           </div>
           {dueCount ? (

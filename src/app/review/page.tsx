@@ -104,6 +104,6 @@ export default async function ReviewPage({
     preferredTranslation: user.preferredTranslation,
   });
 
-  return <ReviewSession initialData={initialQueue} />;
+  return <ReviewSession initialData={initialQueue} userScope={user.id} />;
 
 }

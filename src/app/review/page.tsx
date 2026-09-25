@@ -8,11 +8,9 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
-import { isTranslationVisible } from "@/lib/translations";
 import { db } from "@/lib/db";
-import { buildExercise } from "@/lib/exercises/build";
-import { selectReviewExerciseType } from "@/lib/exercises/review-select";
-import { ReviewCard } from "./ReviewCard";
+import { getReviewQueueData } from "@/lib/review-queue";
+import { ReviewSession } from "./ReviewSession";
 
 function ReviewModes({
   mistakes,
@@ -101,78 +99,11 @@ export default async function ReviewPage({
     );
   }
 
-  const item = await db.userVocabulary.findFirst({
-    where: {
-      userId: user.id,
-      OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
-    },
-    include: {
-      lexeme: {
-        include: { translations: true, patterns: true, examples: true },
-      },
-      attempts: {
-        orderBy: { createdAt: "desc" },
-        take: 3,
-        select: { exerciseType: true },
-      },
-    },
-    orderBy: [{ nextReviewAt: "asc" }, { addedAt: "asc" }],
+  const initialQueue = await getReviewQueueData({
+    userId: user.id,
+    preferredTranslation: user.preferredTranslation,
   });
 
-  if (!item) {
-    return (
-      <main className="page review-session-shell">
-        <section className="empty-state compact-empty">
-          <strong>Review complete</strong>
-          <span className="muted">Nothing else is due right now.</span>
-          <div className="ia-empty-actions">
-            <Link href="/review" className="button button-primary">Back to Review</Link>
-            <Link href="/practice" className="button button-secondary">Practice</Link>
-          </div>
-        </section>
-      </main>
-    );
-  }
+  return <ReviewSession initialData={initialQueue} />;
 
-  const mistakes = await db.mistake.findMany({
-    where: { userId: user.id, lexemeId: item.lexemeId, resolvedAt: null },
-    select: { type: true },
-  });
-
-  const exerciseType = selectReviewExerciseType(
-    {
-      recognition: item.recognition,
-      meaningRecall: item.meaningRecall,
-      production: item.production,
-      contextualUsage: item.contextualUsage,
-      mistakeTypes: mistakes.map((mistake) => mistake.type),
-    },
-    item.attempts.map((attempt) => attempt.exerciseType),
-  );
-
-  const exercise = buildExercise(
-    exerciseType,
-    item.lexeme,
-    user.preferredTranslation,
-  );
-  const translations = item.lexeme.translations.filter((translation) =>
-    isTranslationVisible(user.preferredTranslation, translation.language),
-  );
-
-  return (
-    <main className="page review-session-shell">
-      <header className="review-session-topbar">
-        <Link href="/review" className="text-link">Review</Link>
-        <span>{dueCount} remaining</span>
-      </header>
-      <ReviewCard
-        userVocabularyId={item.id}
-        lemma={item.lexeme.lemma}
-        article={item.lexeme.article}
-        patterns={item.lexeme.patterns.map((pattern) => pattern.pattern)}
-        translations={translations}
-        exercise={exercise}
-      />
-    </main>
-  );
 }

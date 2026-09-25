@@ -19,3 +19,7 @@ export function optimisticReviewAdvance(
     ),
   };
 }
+
+export function shouldRefillReviewQueue(queue: ReviewQueueData) {
+  return queue.cards.length <= 2 && queue.dueCount > queue.cards.length;
+}

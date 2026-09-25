@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, Plus, RotateCcw, X } from "lucide-react";
 import type { TranslationLanguage } from "@prisma/client";
@@ -37,6 +37,10 @@ export function RecommendationList({
   const [recommendations, setRecommendations] = useState(
     initialRecommendations,
   );
+
+  useEffect(() => {
+    setRecommendations(initialRecommendations);
+  }, [initialRecommendations]);
 
   const mutation = useMutation({
     mutationFn: async (input: MutationInput) => {

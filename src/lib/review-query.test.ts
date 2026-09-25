@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   optimisticReviewAdvance,
   REVIEW_QUEUE_QUERY_POLICY,
+  shouldRefillReviewQueue,
 } from "./review-query";
 import type { ReviewQueueData } from "./review-queue";
 
@@ -67,4 +68,15 @@ test("hydrated review data does not refetch immediately on mount", () => {
   assert.equal(REVIEW_QUEUE_QUERY_POLICY.refetchOnMount, false);
   assert.equal(REVIEW_QUEUE_QUERY_POLICY.refetchOnWindowFocus, false);
   assert.ok(REVIEW_QUEUE_QUERY_POLICY.staleTime > 0);
+});
+
+test("review queue refills only when the buffer is low and more are due", () => {
+  assert.equal(
+    shouldRefillReviewQueue({ ...queue, dueCount: 8, cards: queue.cards }),
+    true,
+  );
+  assert.equal(
+    shouldRefillReviewQueue({ ...queue, dueCount: 2, cards: queue.cards }),
+    false,
+  );
 });

@@ -2,11 +2,11 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { ReadStoryButton } from "./ReadStoryButton";
+import { StoryTargetReader } from "./StoryTargetReader";
 
 
 type StoryQuestion = {
@@ -14,53 +14,6 @@ type StoryQuestion = {
   question: string;
   answer: string;
 };
-
-function escapeRegex(value: string) {
-  const special = "\\^$.*+?()[]{}|";
-  return value
-    .split("")
-    .map((character) => (special.includes(character) ? "\\" + character : character))
-    .join("");
-}
-
-function highlightStory(
-  content: string,
-  targets: Array<{ lexeme: { id: string; lemma: string } }>,
-): ReactNode[] {
-  const sorted = [...targets].sort(
-    (a, b) => b.lexeme.lemma.length - a.lexeme.lemma.length,
-  );
-
-  if (!sorted.length) return [content];
-
-  const regex = new RegExp(
-    "(?<![\\p{L}\\p{N}_])(" +
-      sorted.map((target) => escapeRegex(target.lexeme.lemma)).join("|") +
-      ")(?![\\p{L}\\p{N}_])",
-    "giu",
-  );
-  const lookup = new Map(
-    sorted.map((target) => [
-      target.lexeme.lemma.toLocaleLowerCase("de-DE"),
-      target.lexeme,
-    ]),
-  );
-
-  return content.split(regex).map((part, index) => {
-    const lexeme = lookup.get(part.toLocaleLowerCase("de-DE"));
-    if (!lexeme) return part;
-
-    return (
-      <Link
-        key={index}
-        href={"/vocabulary/" + lexeme.id}
-        className="story-target"
-      >
-        {part}
-      </Link>
-    );
-  });
-}
 
 export default async function StoryDetailPage({
   params,
@@ -109,9 +62,11 @@ export default async function StoryDetailPage({
       </section>
 
       <article className="panel story-reader">
-        <div className="story-content">
-          {highlightStory(story.content, story.targets)}
-        </div>
+        <StoryTargetReader
+          content={story.content}
+          targets={story.targets}
+          translationPreference={user.preferredTranslation}
+        />
 
         <ReadStoryButton storyId={story.id} />
       </article>

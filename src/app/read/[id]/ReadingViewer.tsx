@@ -35,6 +35,27 @@ function classForState(state: ReadingLexeme["state"]) {
   return "reading-token unknown";
 }
 
+function afterScrollSettles(element: HTMLElement, callback: () => void) {
+  let previousTop = element.getBoundingClientRect().top;
+  let stableFrames = 0;
+  const startedAt = performance.now();
+
+  function check() {
+    const top = element.getBoundingClientRect().top;
+    stableFrames = Math.abs(top - previousTop) < 0.5 ? stableFrames + 1 : 0;
+    previousTop = top;
+
+    if (stableFrames >= 3 || performance.now() - startedAt > 900) {
+      callback();
+      return;
+    }
+
+    requestAnimationFrame(check);
+  }
+
+  requestAnimationFrame(check);
+}
+
 function ReadingDetail({
   documentId,
   selected,
@@ -192,13 +213,36 @@ export function ReadingViewer({
           className={classForState(item.state)}
           key={index}
           onClick={(event) => {
-            const token = event.currentTarget.getBoundingClientRect();
-            const panelWidth = Math.min(360, window.innerWidth - 32);
-            setSelectedId(item.id);
-            setMobileAnchor({
-              left: Math.min(Math.max(token.left, 16), window.innerWidth - panelWidth - 16),
-              top: token.bottom + 8,
-            });
+            const trigger = event.currentTarget;
+            const panelHeight = Math.min(520, window.innerHeight - 32);
+            const token = trigger.getBoundingClientRect();
+            const overflow = token.bottom + 8 + panelHeight - (window.innerHeight - 16);
+
+            const positionDetail = () => {
+              const nextToken = trigger.getBoundingClientRect();
+              const panelWidth = Math.min(360, window.innerWidth - 32);
+              const below = nextToken.bottom + 8;
+              const reachedPageEnd =
+                window.scrollY + window.innerHeight >=
+                document.documentElement.scrollHeight - 2;
+              const top =
+                reachedPageEnd && below + panelHeight > window.innerHeight - 16
+                  ? Math.max(16, nextToken.top - panelHeight - 8)
+                  : below;
+
+              setSelectedId(item.id);
+              setMobileAnchor({
+                left: Math.min(Math.max(nextToken.left, 16), window.innerWidth - panelWidth - 16),
+                top,
+              });
+            };
+
+            if (overflow > 0) {
+              window.scrollBy({ top: overflow, behavior: reduceMotion ? "auto" : "smooth" });
+              afterScrollSettles(trigger, positionDetail);
+            } else {
+              positionDetail();
+            }
           }}
           type="button"
         >
@@ -206,7 +250,7 @@ export function ReadingViewer({
         </button>
       );
     });
-  }, [content, items]);
+  }, [content, items, reduceMotion]);
 
   return (
     <div className="reading-layout">

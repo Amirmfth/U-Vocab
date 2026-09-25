@@ -173,33 +173,42 @@ export default async function Vocabulary({
         </div>
         <div className="library-header-actions">
           <TranslationModeControl value={user.preferredTranslation} />
-          <Link href="/vocabulary/new" className="button button-primary" prefetch>
-            <Plus size={18} />
-            Add word
-          </Link>
+          <div className="library-primary-actions">
+            <Link href="/vocabulary/new" className="button button-primary" prefetch>
+              <Plus size={18} />
+              Add word
+            </Link>
+            <Link href="/read" className="button button-secondary">
+              <Upload size={17} />
+              Import
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="ia-tool-strip" aria-label="Words tools">
-        <Link href="/vocabulary/new" className="ia-tool-link">
-          <Plus size={17} /><span><strong>Add word</strong><small>Create a lexical entry</small></span>
-        </Link>
-        <Link href="/read" className="ia-tool-link">
-          <Upload size={17} /><span><strong>Import from text</strong><small>Discover words in context</small></span>
-        </Link>
-        <Link href="/topic-packs" className="ia-tool-link">
-          <Layers3 size={17} /><span><strong>Packs</strong><small>Topic collections</small></span>
-        </Link>
-        <Link href="/recommendations" className="ia-tool-link">
-          <Star size={17} /><span><strong>Recommendations</strong><small>What to learn next</small></span>
-        </Link>
-        <Link href="/compare" className="ia-tool-link">
-          <GitCompareArrows size={17} /><span><strong>Compare</strong><small>Distinguish similar words</small></span>
-        </Link>
-        <Link href="/universe" className="ia-tool-link">
-          <Network size={17} /><span><strong>Universe</strong><small>Explore your lexical graph</small></span>
-        </Link>
-      </section>
+      <details className="words-explore">
+        <summary>
+          <span>
+            <strong>Explore & tools</strong>
+            <small>Packs, recommendations, compare, and universe</small>
+          </span>
+          <Layers3 size={18} />
+        </summary>
+        <div className="ia-tool-strip" aria-label="Words tools">
+          <Link href="/topic-packs" className="ia-tool-link">
+            <Layers3 size={17} /><span><strong>Packs</strong><small>Topic collections</small></span>
+          </Link>
+          <Link href="/recommendations" className="ia-tool-link">
+            <Star size={17} /><span><strong>Recommendations</strong><small>What to learn next</small></span>
+          </Link>
+          <Link href="/compare" className="ia-tool-link">
+            <GitCompareArrows size={17} /><span><strong>Compare</strong><small>Distinguish similar words</small></span>
+          </Link>
+          <Link href="/universe" className="ia-tool-link">
+            <Network size={17} /><span><strong>Universe</strong><small>Explore your lexical graph</small></span>
+          </Link>
+        </div>
+      </details>
 
       <nav className="ia-subnav" aria-label="Words views">
         <Link href="/vocabulary" className={current.status === "ALL" ? "is-active" : ""}>All</Link>
@@ -240,10 +249,8 @@ export default async function Vocabulary({
                 4) *
                 100,
             );
-            const levels = Array.from(new Set(word.insights.map((insight) => insight.level)));
-            const topics = Array.from(
-              new Set(word.topicPackItems.map((packItem) => packItem.topicPack.topic)),
-            );
+            const isDue = !item.nextReviewAt || item.nextReviewAt <= now;
+            const isWeak = mastery < 45;
 
             return (
               <Link
@@ -258,7 +265,7 @@ export default async function Vocabulary({
                     {word.lemma}
                   </div>
                   <div className="translation-line">
-                    {translations.map((translation) => (
+                    {translations.slice(0, 1).map((translation) => (
                       <span
                         key={translation.id}
                         className={
@@ -271,16 +278,12 @@ export default async function Vocabulary({
                   </div>
                 </div>
                 <div className="vocabulary-row-meta">
-                  <span>{word.partOfSpeech}</span>
                   <span>{item.state.toLowerCase()}</span>
+                  {isDue ? <span className="row-signal">due</span> : null}
+                  {isWeak ? <span className="row-signal">weak</span> : null}
+                  <strong>{mastery}%</strong>
                 </div>
-                {(levels.length || topics.length) ? (
-                  <div className="vocabulary-row-context">
-                    {levels.map((level) => <span className="badge" key={level}>{level}</span>)}
-                    {topics.map((topic) => <span className="badge vocabulary-topic" key={topic}>{topic}</span>)}
-                  </div>
-                ) : null}
-                <div className="mastery-line" aria-hidden="true">
+                <div className="mastery-line" aria-label={"Mastery " + mastery + "%"}>
                   <span style={{ width: mastery + "%" }} />
                 </div>
               </Link>

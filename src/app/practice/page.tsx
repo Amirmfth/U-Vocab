@@ -17,6 +17,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { buildExercise, eligibleExerciseTypes } from "@/lib/exercises/build";
 import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
+import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 
 function PracticeHub() {
   return (
@@ -136,6 +137,7 @@ export default async function PracticePage({
     userVocabularyId:string;
     lemma:string;
     exercise:ReturnType<typeof buildExercise>;
+    conjugation?:{ person:string };
   }>=[];
 
   for(const item of items){
@@ -157,6 +159,29 @@ export default async function PracticePage({
         lemma:item.lexeme.lemma,
         exercise:buildExercise(type,item.lexeme,user.preferredTranslation),
       });
+    }
+  }
+
+  if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
+    const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:items[0].lexemeId });
+    if(conjugation.status==="ok"){
+      const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
+      if(form){
+        exercises.push({
+          id:items[0].id+":verb-present-du",
+          userVocabularyId:items[0].id,
+          lemma:items[0].lexeme.lemma,
+          conjugation:{ person:"du" },
+          exercise:{
+            type:"REVERSE_RECALL",
+            prompt:"Conjugate “"+items[0].lexeme.lemma+"” for du in Präsens.",
+            expected:form.form,
+            interaction:"short_text",
+            skill:"production",
+            requiresAI:false,
+          },
+        });
+      }
     }
   }
 

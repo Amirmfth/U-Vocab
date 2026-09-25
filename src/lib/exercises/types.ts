@@ -1,12 +1,17 @@
 import type { ExerciseType } from "@prisma/client";
 
+export type ExerciseInteraction = "short_text" | "choice";
+export type ExerciseSkill = "meaning" | "production" | "grammar" | "context";
+
 export type ExerciseDefinition = {
   type: ExerciseType;
   prompt: string;
+  interaction: ExerciseInteraction;
+  skill: ExerciseSkill;
   hint?: string;
-  expected?: string;
+  expected: string;
   options?: string[];
-  requiresAI: boolean;
+  requiresAI: false;
 };
 
 export type ExerciseLexeme = {

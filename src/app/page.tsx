@@ -16,10 +16,10 @@ export default async function Home() {
   await connection();
   const perf = startOperation("page.home");
   const user = await perf.span("auth", () => getCurrentUser());
-  const { total, due, weakProduction, mistakes, recent } = await perf.span(
-    "dbRead",
-    () => getCachedHomeStats(user.id),
-  );
+  const { total, due, weakProduction, mistakes, recent, today } =
+    await perf.span("dbRead", () =>
+      getCachedHomeStats(user.id, user.timezone),
+    );
 
   perf.success({ totalWords: total, dueWords: due, openMistakes: mistakes });
 
@@ -79,6 +79,12 @@ export default async function Home() {
           </Link>
         </section>
       ) : null}
+
+      <section className="home-today-activity" aria-label="Today's activity">
+        <div><strong>{today.minutes}</strong><span>minutes</span></div>
+        <div><strong>{today.reviews}</strong><span>reviewed</span></div>
+        <div><strong>{today.added}</strong><span>added</span></div>
+      </section>
 
       <section className="home-metrics" aria-label="Learning status">
         <Link href="/vocabulary">

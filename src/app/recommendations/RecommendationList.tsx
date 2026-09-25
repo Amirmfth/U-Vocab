@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, Plus, RotateCcw, X } from "lucide-react";
 import type { TranslationLanguage } from "@prisma/client";
 import type { VocabularyRecommendation } from "@/lib/recommendations";
+import { optimisticRemoveRecommendation } from "@/lib/recommendation-query";
 import { isTranslationVisible } from "@/lib/translations";
 import {
   addRecommendation,
@@ -58,8 +59,9 @@ export function RecommendationList({
     onMutate: (input) => {
       const previous = recommendations;
       setRecommendations((current) =>
-        current.filter(
-          (item) => item.lexemeId !== input.recommendation.lexemeId,
+        optimisticRemoveRecommendation(
+          current,
+          input.recommendation.lexemeId,
         ),
       );
       return { previous };

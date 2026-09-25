@@ -4776,3 +4776,75 @@ summary {
 .conjugation-state > span { color: var(--text-muted); }
 @media (min-width:620px) { .conjugation-reference-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .conjugation-shell { min-height: 640px; } }
 @media (max-width:619px) { .conjugation-dialog { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border: 0; border-radius: 0; } .conjugation-shell { min-height: 100dvh; max-height: 100dvh; } .conjugation-table th, .conjugation-table td { padding: 12px 6px; } }
+
+
+/* Adaptive Practice + Active Recall Review */
+.practice-session-card,
+.practice-complete,
+.practice-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.practice-progress {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr);
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: .72rem;
+}
+.practice-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+.practice-session-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.practice-session-card input {
+  min-height: 50px;
+}
+.review-flashcard {
+  min-height: min(520px, 70dvh);
+  justify-content: space-between;
+}
+.review-card-front {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 0;
+}
+.review-card-back {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.review-card-back > strong {
+  font-size: clamp(1.3rem, 6vw, 2rem);
+  letter-spacing: -.025em;
+}
+.review-card-back p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.review-reveal {
+  min-height: 52px;
+}
+.review-grade-grid button {
+  min-height: 54px;
+  flex-direction: column;
+  gap: 2px;
+}
+.review-grade-grid button small {
+  opacity: .65;
+  font-size: .62rem;
+}
+@media (min-width:620px) {
+  .practice-choice-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}

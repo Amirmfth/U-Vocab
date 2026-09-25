@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
@@ -47,6 +47,7 @@ export function ReviewSession({
   const reduceMotion = useReducedMotion();
   const queueKey = queryKeys.review.queue(userScope);
   const repeatCounts = useRef<Record<string, number>>({});
+  const [sessionStats, setSessionStats] = useState({ reviewed: 0, again: 0 });
 
   const queue = useQuery({
     queryKey: queueKey,
@@ -96,6 +97,10 @@ export function ReviewSession({
     },
     onSuccess: async (_result, input, context) => {
       context?.perf.success({ rolledBack: false });
+      setSessionStats((value) => ({
+        reviewed: value.reviewed + 1,
+        again: value.again + (input.grade === "AGAIN" ? 1 : 0),
+      }));
       let current = queryClient.getQueryData<ReviewQueueData>(queueKey);
 
       if (
@@ -159,7 +164,9 @@ export function ReviewSession({
       <main className="page review-session-shell">
         <section className="empty-state compact-empty">
           <strong>Review complete</strong>
-          <span className="muted">Nothing else is due right now.</span>
+          <span className="muted">
+            {sessionStats.reviewed} reviewed · {sessionStats.again} marked Again
+          </span>
           <div className="ia-empty-actions">
             <Link href="/review" className="button button-primary">Back to Review</Link>
             <Link href="/practice" className="button button-secondary">Practice</Link>

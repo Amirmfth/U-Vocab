@@ -29,12 +29,14 @@ async function fetchReviewQueue(): Promise<ReviewQueueData> {
 
 export function ReviewSession({
   initialData,
+  userScope,
 }: {
   initialData: ReviewQueueData;
+  userScope: string;
 }) {
   const queryClient = useQueryClient();
   const reduceMotion = useReducedMotion();
-  const queueKey = queryKeys.review.queue();
+  const queueKey = queryKeys.review.queue(userScope);
 
   const queue = useQuery({
     queryKey: queueKey,

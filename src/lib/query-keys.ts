@@ -26,6 +26,7 @@ export const queryKeys = {
   word: {
     all: ["word"] as const,
     detail: (lexemeId: string) => ["word", lexemeId] as const,
+    conjugation: (lexemeId: string) => ["word", lexemeId, "conjugation"] as const,
   },
   review: {
     all: ["review"] as const,

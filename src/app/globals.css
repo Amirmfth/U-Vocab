@@ -4737,3 +4737,45 @@ summary {
     justify-content: space-between;
   }
 }
+
+
+/* Private deployment login */
+.auth-shell { min-height: 100dvh; width: 100%; }
+.login-page { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
+.login-card { width: min(100%, 420px); display: flex; flex-direction: column; gap: 18px; }
+.login-card h1 { margin: 4px 0 8px; font-size: clamp(1.8rem, 8vw, 2.6rem); letter-spacing: -0.045em; }
+.login-card p { margin: 0; line-height: 1.5; }
+.login-icon { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 13px; background: var(--surface-raised); color: var(--primary-strong); }
+
+/* Verb conjugation reference */
+.word-quick-action-button { appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 11px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-raised); color: var(--text-soft); cursor: pointer; font: inherit; font-size: .82rem; font-weight: 620; }
+.word-quick-action-button:active { transform: scale(.97); }
+.conjugation-overlay { position: fixed; z-index: 100; inset: 0; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.conjugation-backdrop { position: absolute; inset: 0; border: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(5px); }
+.conjugation-panel { position: relative; width: min(940px, 100%); max-height: min(860px, calc(100dvh - 24px)); overflow: hidden; overscroll-behavior: contain; border: 1px solid var(--border-strong); border-radius: 22px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.conjugation-sheet-handle { display: none; }
+.conjugation-shell { display: flex; flex-direction: column; min-height: min(720px, calc(100dvh - 24px)); max-height: min(860px, calc(100dvh - 24px)); }
+.conjugation-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 18px 14px; border-bottom: 1px solid var(--border); }
+.conjugation-header h2 { margin: 4px 0 0; font-size: 1.45rem; }
+.conjugation-meta { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 18px 0; }
+.conjugation-meta span { padding: 5px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); font-size: .68rem; }
+.conjugation-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+.conjugation-tabs button { min-height: 48px; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 7px 11px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface-raised); color: var(--text-soft); cursor: pointer; }
+.conjugation-tabs button small { color: var(--text-muted); font-size: .62rem; }
+.conjugation-tabs button.is-active { border-color: var(--primary); background: var(--primary-soft); color: var(--text); }
+.conjugation-content { flex: 1; overflow: auto; padding: 18px; }
+.conjugation-tense-heading { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.conjugation-tense-heading span { color: var(--text-muted); font-size: .76rem; line-height: 1.5; }
+.conjugation-table { width: 100%; border-collapse: collapse; }
+.conjugation-table th, .conjugation-table td { padding: 13px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+.conjugation-table thead th { color: var(--text-muted); font-size: .7rem; font-weight: 550; }
+.conjugation-table tbody th { width: 32%; color: var(--text-muted); font-weight: 550; }
+.conjugation-table tbody td { font-size: 1rem; font-weight: 620; }
+.conjugation-reference-grid { display: grid; grid-template-columns: 1fr; gap: 9px; }
+.conjugation-reference-grid > div { display: flex; flex-direction: column; gap: 4px; padding: 13px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-raised); }
+.conjugation-reference-grid span { color: var(--text-muted); font-size: .68rem; }
+.conjugation-reference-grid p { grid-column: 1/-1; color: var(--text-soft); line-height: 1.55; }
+.conjugation-state { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 24px; }
+.conjugation-state > span { color: var(--text-muted); }
+@media (min-width:620px) { .conjugation-reference-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .conjugation-shell { min-height: 640px; } }
+@media (max-width:619px) { .conjugation-overlay { align-items: flex-end; padding: 0; } .conjugation-panel { width: 100%; max-height: min(88dvh, 760px); border-bottom: 0; border-radius: 26px 26px 0 0; } .conjugation-sheet-handle { display: block; width: 38px; height: 4px; margin: 10px auto 0; border-radius: 999px; background: var(--border-strong); } .conjugation-shell { min-height: 0; max-height: min(88dvh, 760px); padding-bottom: env(safe-area-inset-bottom); } .conjugation-table th, .conjugation-table td { padding: 12px 6px; } }

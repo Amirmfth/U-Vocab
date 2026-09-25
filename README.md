@@ -479,3 +479,19 @@ The initial implementation focuses on the application's foundation and core voca
 ## License
 
 License information will be added as the project develops.
+
+
+---
+
+# Private deployment authentication
+
+U-Vocab is a personal single-user application. Configure `APP_AUTH_USERNAME`, `APP_AUTH_PASSWORD`, and `APP_USER_EMAIL` as server-only Vercel environment variables for Preview and Production. Do not prefix the credential variables with `NEXT_PUBLIC_`.
+
+The application issues a signed, HTTP-only, SameSite session cookie. Pages and `/api/*` routes are private by default, and the current-user boundary also asserts authentication for Server Actions. Changing either configured credential invalidates existing signed sessions.
+
+For local development only, `APP_AUTH_DISABLED=true` explicitly bypasses the gate. The bypass is ignored in production. Redeploy Vercel after credential changes.
+
+
+## Verb conjugation reference
+
+Verb detail pages expose a lazy **Conjugate** action. The first open generates a structured paradigm through the existing AI service, validates it with Zod, and stores it in the versioned `AiGenerationCache`. Reopening uses cached lexical data until source data, prompt version, or schema version changes.

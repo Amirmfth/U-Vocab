@@ -20,6 +20,7 @@ import { isTranslationVisible, translationLabel } from "@/lib/translations";
 import { LexicalInsightPanel } from "./LexicalInsightPanel";
 import { TranslationModeControl } from "@/components/translation-mode-control";
 import { ExpansionPanel } from "./ExpansionPanel";
+import { VerbConjugation } from "./VerbConjugation";
 
 function SecondaryWordSkeleton() {
   return (
@@ -349,6 +350,9 @@ export default async function Word({
               <Brain size={17} />
               Practice
             </Link>
+            {word.partOfSpeech === "VERB" ? (
+              <VerbConjugation lexemeId={word.id} />
+            ) : null}
             <a href="#compare">Explain</a>
             <a href="#expand">Expand</a>
           </nav>

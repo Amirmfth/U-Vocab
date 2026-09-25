@@ -1,9 +1,9 @@
 import { connection } from "next/server";
 import Link from "next/link";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, LogOut } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { SettingsForm } from "./SettingsForm";
-
+import { logout } from "./auth-actions";
 
 export default async function SettingsPage() {
   await connection();
@@ -21,9 +21,16 @@ export default async function SettingsPage() {
           <strong>AI operations</strong>
           <span className="muted">Review model usage, tokens, latency, and recorded cost.</span>
         </div>
-        <Link href="/usage" className="button button-secondary">
-          <BarChart3 size={17} /> AI Usage
-        </Link>
+        <Link href="/usage" className="button button-secondary"><BarChart3 size={17} /> AI Usage</Link>
+      </section>
+      <section className="panel account-links">
+        <div>
+          <strong>Private session</strong>
+          <span className="muted">Clear this browser's signed U-Vocab session.</span>
+        </div>
+        <form action={logout}>
+          <button className="button button-secondary" type="submit"><LogOut size={17} /> Sign out</button>
+        </form>
       </section>
     </main>
   );

@@ -11,6 +11,7 @@ export type VocabularyQueryFilters = {
 function normalizedFilters(filters: VocabularyQueryFilters = {}) {
   return Object.fromEntries(
     Object.entries(filters)
+      .map(([key, value]) => [key, value?.trim()] as const)
       .filter(([, value]) => value && value !== "ALL")
       .sort(([a], [b]) => a.localeCompare(b)),
   );
@@ -28,7 +29,7 @@ export const queryKeys = {
   },
   review: {
     all: ["review"] as const,
-    queue: () => ["review", "queue"] as const,
+    queue: (scope: string) => ["review", scope, "queue"] as const,
   },
   mistakes: {
     all: ["mistakes"] as const,

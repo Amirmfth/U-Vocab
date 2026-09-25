@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./core-experience.css";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { AppNavigation } from "@/components/app-navigation";

@@ -14,36 +14,97 @@ import { buildExercise } from "@/lib/exercises/build";
 import { selectReviewExerciseType } from "@/lib/exercises/review-select";
 import { ReviewCard } from "./ReviewCard";
 
-function ReviewTools() {
+function ReviewModes({
+  mistakes,
+  weak,
+}: {
+  mistakes: number;
+  weak: number;
+}) {
   return (
-    <section className="ia-tool-strip review-tool-strip" aria-label="Review modes">
-      <Link href="/review" className="ia-tool-link is-current">
-        <Brain size={17} />
-        <span><strong>Standard</strong><small>Due spaced reviews</small></span>
+    <nav className="review-mode-list" aria-label="Review modes">
+      <Link href="/mistakes">
+        <TriangleAlert size={18} />
+        <span><strong>Mistakes</strong><small>{mistakes} unresolved</small></span>
+        <ArrowRight size={16} />
       </Link>
-      <Link href="/mistakes" className="ia-tool-link">
-        <TriangleAlert size={17} />
-        <span><strong>Mistakes</strong><small>Fix recurring errors</small></span>
+      <Link href="/rescue">
+        <LifeBuoy size={18} />
+        <span><strong>Rescue</strong><small>{weak} weak-production words</small></span>
+        <ArrowRight size={16} />
       </Link>
-      <Link href="/rescue" className="ia-tool-link">
-        <LifeBuoy size={17} />
-        <span><strong>Rescue</strong><small>Reinforce weak words</small></span>
+      <Link href="/focus">
+        <TimerReset size={18} />
+        <span><strong>Focus</strong><small>Build a structured review block</small></span>
+        <ArrowRight size={16} />
       </Link>
-      <Link href="/focus" className="ia-tool-link">
-        <TimerReset size={17} />
-        <span><strong>Focus</strong><small>Structured review session</small></span>
-      </Link>
-    </section>
+    </nav>
   );
 }
 
-export default async function ReviewPage() {
+export default async function ReviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ start?: string }>;
+}) {
   await connection();
-  const user = await getCurrentUser();
+  const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
+  const now = new Date();
+
+  const [dueCount, mistakeCount, weakCount] = await Promise.all([
+    db.userVocabulary.count({
+      where: {
+        userId: user.id,
+        OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
+      },
+    }),
+    db.mistake.count({ where: { userId: user.id, resolvedAt: null } }),
+    db.userVocabulary.count({
+      where: { userId: user.id, production: { lt: 0.4 } },
+    }),
+  ]);
+
+  if (query.start !== "1") {
+    return (
+      <main className="page review-landing">
+        <section className="review-hero">
+          <div>
+            <p className="eyebrow">REVIEW</p>
+            <h1>{dueCount ? dueCount + " due now" : "You're caught up"}</h1>
+            <p>
+              {dueCount
+                ? "Keep recall stable with a short spaced-review session."
+                : "No scheduled reviews are due. Reinforce mistakes or weak words instead."}
+            </p>
+          </div>
+          {dueCount ? (
+            <Link href="/review?start=1" className="button button-primary review-start">
+              <Brain size={18} />
+              Start review
+            </Link>
+          ) : (
+            <Link href="/rescue" className="button button-primary review-start">
+              <LifeBuoy size={18} />
+              Reinforce weak words
+            </Link>
+          )}
+        </section>
+
+        <section className="review-queue-summary" aria-label="Review status">
+          <div><strong>{dueCount}</strong><span>due</span></div>
+          <div><strong>{mistakeCount}</strong><span>mistakes</span></div>
+          <div><strong>{weakCount}</strong><span>weak</span></div>
+        </section>
+
+        <ReviewModes mistakes={mistakeCount} weak={weakCount} />
+      </main>
+    );
+  }
+
   const item = await db.userVocabulary.findFirst({
     where: {
       userId: user.id,
-      OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: new Date() } }],
+      OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
     },
     include: {
       lexeme: {
@@ -60,26 +121,13 @@ export default async function ReviewPage() {
 
   if (!item) {
     return (
-      <main className="page">
-        <section className="page-header compact">
-          <p className="eyebrow">REVIEW</p>
-          <h1>Learning maintenance</h1>
-          <p className="page-description">
-            Keep recall healthy, revisit mistakes, and reinforce words that are
-            slipping.
-          </p>
-        </section>
-        <ReviewTools />
+      <main className="page review-session-shell">
         <section className="empty-state compact-empty">
-          <strong>All caught up</strong>
-          <span className="muted">There are no spaced reviews due right now.</span>
+          <strong>Review complete</strong>
+          <span className="muted">Nothing else is due right now.</span>
           <div className="ia-empty-actions">
-            <Link href="/rescue" className="button button-primary">
-              Rescue weak words <ArrowRight size={17} />
-            </Link>
-            <Link href="/practice" className="button button-secondary">
-              Practice anyway
-            </Link>
+            <Link href="/review" className="button button-primary">Back to Review</Link>
+            <Link href="/practice" className="button button-secondary">Practice</Link>
           </div>
         </section>
       </main>
@@ -112,29 +160,19 @@ export default async function ReviewPage() {
   );
 
   return (
-    <main className="page">
-      <section className="page-header compact">
-        <p className="eyebrow">REVIEW</p>
-        <h1>Learning maintenance</h1>
-        <p className="page-description">
-          Start with what is due, or switch to a focused reinforcement mode.
-        </p>
-      </section>
-      <ReviewTools />
-      <section className="focus-page">
-        <div className="focus-meta">
-          <span>Due now</span>
-          <span>{item.lexeme.lemma}</span>
-        </div>
-        <ReviewCard
-          userVocabularyId={item.id}
-          lemma={item.lexeme.lemma}
-          article={item.lexeme.article}
-          patterns={item.lexeme.patterns.map((pattern) => pattern.pattern)}
-          translations={translations}
-          exercise={exercise}
-        />
-      </section>
+    <main className="page review-session-shell">
+      <header className="review-session-topbar">
+        <Link href="/review" className="text-link">Review</Link>
+        <span>{dueCount} remaining</span>
+      </header>
+      <ReviewCard
+        userVocabularyId={item.id}
+        lemma={item.lexeme.lemma}
+        article={item.lexeme.article}
+        patterns={item.lexeme.patterns.map((pattern) => pattern.pattern)}
+        translations={translations}
+        exercise={exercise}
+      />
     </main>
   );
 }

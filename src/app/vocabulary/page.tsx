@@ -6,6 +6,7 @@ import { isTranslationVisible } from "@/lib/translations";
 import { currentRetrievability } from "@/lib/fsrs";
 import { TranslationModeControl } from "@/components/translation-mode-control";
 import { VocabularyFilters } from "./VocabularyFilters";
+import { VocabularyScrollRestoration } from "./VocabularyScrollRestoration";
 import { connection } from "next/server";
 import { getCachedVocabularyLibrary } from "@/lib/cached-data";
 
@@ -164,6 +165,7 @@ export default async function Vocabulary({
 
   return (
     <main className="page">
+      <VocabularyScrollRestoration />
       <section className="page-header compact library-header">
         <div>
           <h1>Vocabulary</h1>

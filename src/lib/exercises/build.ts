@@ -51,7 +51,7 @@ export function buildExercise(
     case "MEANING_RECALL":
       return { type, prompt:"What does “"+lexeme.lemma+"” mean?", expected:meaning, interaction:"short_text", skill:"meaning", requiresAI:false };
     case "REVERSE_RECALL":
-      return { type, prompt:"Write the German lexical unit for: "+meaning, expected:lexeme.lemma, interaction:"short_text", skill:"production", hint:pattern??undefined, requiresAI:false };
+      return { type, prompt:"Write the German lexical unit for: "+meaning, expected:lexeme.partOfSpeech==="NOUN"?formatLexemeLabel(lexeme):lexeme.lemma, interaction:"short_text", skill:"production", hint:pattern??undefined, requiresAI:false };
     case "ARTICLE":
       return { type, prompt:"Choose the article for “"+lexeme.lemma+"”.", expected:lexeme.article??"", options:["der","die","das"], interaction:"choice", skill:"grammar", requiresAI:false };
     case "CASE_PREPOSITION":

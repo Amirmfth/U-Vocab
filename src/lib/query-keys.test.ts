@@ -11,7 +11,7 @@ test("query filters normalize ordering and omit empty/all values", () => {
       level: "",
     }),
     {
-      q: "  Haus  ",
+      q: "Haus",
       topic: "Travel",
     },
   );

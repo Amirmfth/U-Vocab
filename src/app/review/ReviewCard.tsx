@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Eye, LoaderCircle, RotateCcw } from "lucide-react";
+import { Eye, RotateCcw } from "lucide-react";
 import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueCard } from "@/lib/review-queue";
 
@@ -97,9 +97,6 @@ export function ReviewCard({
                 onClick={() => onGrade(grade, startedAt.current)}
                 type="button"
               >
-                {isSubmitting ? (
-                  <LoaderCircle className="spinner" size={16} aria-hidden="true" />
-                ) : null}
                 {grade.charAt(0) + grade.slice(1).toLowerCase()}
               </button>
             ))}

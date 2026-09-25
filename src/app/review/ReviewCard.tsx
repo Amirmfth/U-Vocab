@@ -1,41 +1,41 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Eye, RotateCcw } from "lucide-react";
-import type { ExerciseDefinition } from "@/lib/exercises/types";
-import { ActionButton } from "@/components/action-button";
-import { submitReview } from "./actions";
+import { Eye, LoaderCircle, RotateCcw } from "lucide-react";
+import type { ReviewGrade } from "@/lib/fsrs";
+import type { ReviewQueueCard } from "@/lib/review-queue";
 
-type Props = {
-  userVocabularyId: string;
-  lemma: string;
-  article: string | null;
-  patterns: string[];
-  translations: { language: string; text: string }[];
-  exercise: ExerciseDefinition;
-};
-
-export function ReviewCard(props: Props) {
+export function ReviewCard({
+  card,
+  onGrade,
+  isSubmitting,
+}: {
+  card: ReviewQueueCard;
+  onGrade: (grade: ReviewGrade, startedAt: number) => void;
+  isSubmitting: boolean;
+}) {
   const [revealed, setRevealed] = useState(false);
   const startedAt = useRef(Date.now());
 
   return (
     <section className="panel learning-card">
       <div className="learning-card-head">
-        <span className="badge">{props.exercise.type.replaceAll("_", " ")}</span>
-        <span className="muted">{props.lemma}</span>
+        <span className="badge">
+          {card.exercise.type.replaceAll("_", " ")}
+        </span>
+        <span className="muted">{card.lemma}</span>
       </div>
 
-      <h2 className="learning-prompt">{props.exercise.prompt}</h2>
+      <h2 className="learning-prompt">{card.exercise.prompt}</h2>
 
       {!revealed ? (
         <>
-          {props.exercise.hint && (
+          {card.exercise.hint ? (
             <details>
               <summary>Show hint</summary>
-              <p className="muted">{props.exercise.hint}</p>
+              <p className="muted">{card.exercise.hint}</p>
             </details>
-          )}
+          ) : null}
           <button
             className="button button-primary"
             type="button"
@@ -48,13 +48,14 @@ export function ReviewCard(props: Props) {
       ) : (
         <>
           <div className="answer-panel">
-            {props.exercise.expected ? (
-              <p><b>Expected:</b> {props.exercise.expected}</p>
+            {card.exercise.expected ? (
+              <p><b>Expected:</b> {card.exercise.expected}</p>
             ) : null}
             <p className="word">
-              {props.article ? props.article + " " : ""}{props.lemma}
+              {card.article ? card.article + " " : ""}
+              {card.lemma}
             </p>
-            {props.translations.map((translation) => (
+            {card.translations.map((translation) => (
               <p
                 key={translation.language + ":" + translation.text}
                 className={translation.language === "fa" ? "rtl" : undefined}
@@ -62,7 +63,7 @@ export function ReviewCard(props: Props) {
                 {translation.text}
               </p>
             ))}
-            {props.patterns.map((pattern) => (
+            {card.patterns.map((pattern) => (
               <p key={pattern}><b>{pattern}</b></p>
             ))}
           </div>
@@ -73,27 +74,34 @@ export function ReviewCard(props: Props) {
               className="text-button"
               type="button"
               onClick={() => setRevealed(false)}
+              disabled={isSubmitting}
             >
               <RotateCcw size={15} />
               Hide
             </button>
           </div>
 
-          <div className="grade-grid">
+          <div className="grade-grid" aria-busy={isSubmitting}>
             {(["AGAIN", "HARD", "GOOD", "EASY"] as const).map((grade) => (
-              <form action={submitReview} key={grade}>
-                <input type="hidden" name="userVocabularyId" value={props.userVocabularyId} />
-                <input type="hidden" name="grade" value={grade} />
-                <input type="hidden" name="exerciseType" value={props.exercise.type} />
-                <input type="hidden" name="prompt" value={props.exercise.prompt} />
-                <input type="hidden" name="startedAt" value={startedAt.current} />
-                <ActionButton
-                  variant={grade === "AGAIN" ? "danger" : grade === "EASY" ? "success" : "secondary"}
-                  pendingLabel="Saving review…"
-                >
-                  {grade.charAt(0) + grade.slice(1).toLowerCase()}
-                </ActionButton>
-              </form>
+              <button
+                className={
+                  "button " +
+                  (grade === "AGAIN"
+                    ? "button-danger"
+                    : grade === "EASY"
+                      ? "button-success"
+                      : "button-secondary")
+                }
+                disabled={isSubmitting}
+                key={grade}
+                onClick={() => onGrade(grade, startedAt.current)}
+                type="button"
+              >
+                {isSubmitting ? (
+                  <LoaderCircle className="spinner" size={16} aria-hidden="true" />
+                ) : null}
+                {grade.charAt(0) + grade.slice(1).toLowerCase()}
+              </button>
             ))}
           </div>
         </>

@@ -9,12 +9,14 @@ import { applyMasteryDelta, practiceMasteryDelta } from "@/lib/exercises/mastery
 import { recordMistakes } from "@/lib/mistakes";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 
 export type PracticeAnswerInput={
   userVocabularyId:string;
   exerciseType:ExerciseType;
   answer:string;
   startedAt:number;
+  conjugation?:{ person:string };
 };
 
 export type PracticeAnswerResult=
@@ -42,7 +44,21 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
     }));
     if(!item) return { status:"error",message:"Vocabulary item not found." };
 
-    const exercise=buildExercise(input.exerciseType,item.lexeme,user.preferredTranslation);
+    let exercise=buildExercise(input.exerciseType,item.lexeme,user.preferredTranslation);
+    if(input.conjugation){
+      const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:item.lexemeId });
+      if(conjugation.status!=="ok") return { status:"error",message:"Verb conjugation is unavailable." };
+      const row=conjugation.data.indicative.present.forms.find((form)=>form.person===input.conjugation?.person);
+      if(!row) return { status:"error",message:"Requested verb form is unavailable." };
+      exercise={
+        type:"REVERSE_RECALL",
+        prompt:"Conjugate “"+item.lexeme.lemma+"” for "+row.person+" in Präsens.",
+        expected:row.form,
+        interaction:"short_text",
+        skill:"production",
+        requiresAI:false,
+      };
+    }
     const evaluation=checkDeterministicAnswer(answer,exercise.expected);
     const durationMs=Number.isFinite(input.startedAt)&&input.startedAt>0
       ?Math.max(0,Math.min(Date.now()-input.startedAt,30*60*1000))

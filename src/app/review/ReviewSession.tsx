@@ -51,7 +51,15 @@ export function ReviewSession({
   const review = useMutation({
     mutationFn: async (input: ReviewMutationInput) => {
       const result = await submitReviewMutation(input);
-      if (result.status === "error") throw new Error(result.message);
+      if (result.status === "error") {
+        if (result.message.includes("Unauthorized")) {
+          window.location.assign(
+            "/login?returnTo=" +
+              encodeURIComponent(window.location.pathname + window.location.search),
+          );
+        }
+        throw new Error(result.message);
+      }
       return result;
     },
     onMutate: async (input) => {

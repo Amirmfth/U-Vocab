@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { PracticeForm } from "@/app/practice/PracticeForm";
 import { LexicalInsightPanel } from "../LexicalInsightPanel";
 import { ScheduleReviewForm } from "./ScheduleReviewForm";
@@ -65,7 +66,7 @@ export default async function TeachWordPage({
           Back to word
         </Link>
         <p className="eyebrow">GUIDED WORD LESSON · {user.targetLevel}</p>
-        <h1>{word.article ? word.article + " " : ""}{word.lemma}</h1>
+        <h1>{formatLexemeLabel(word)}</h1>
         <p className="page-description">
           Understand the lexical unit, see how it behaves, then produce it yourself.
         </p>

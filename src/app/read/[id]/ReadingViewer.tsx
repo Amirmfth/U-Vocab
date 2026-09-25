@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BookOpenCheck, Plus } from "lucide-react";
 import { AddReadingLexemeForm } from "./AddReadingLexemeForm";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 type ReadingLexeme = {
   id: string;
@@ -75,8 +76,7 @@ function ReadingDetail({
       </div>
 
       <h2>
-        {selected.article ? selected.article + " " : ""}
-        {selected.lemma}
+        {formatLexemeLabel(selected)}
       </h2>
 
       <div className="reading-meanings">

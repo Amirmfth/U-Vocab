@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { conversationFinalEvaluationSchema } from "@/lib/ai/conversation-final-evaluator";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { ConversationChat } from "../ConversationChat";
 import {
   ConversationFinish,
@@ -80,8 +81,7 @@ export default async function ConversationSessionPage({
               key={target.id}
             >
               <span>
-                {target.lexeme.article ? target.lexeme.article + " " : ""}
-                {target.lexeme.lemma}
+                {formatLexemeLabel(target.lexeme)}
               </span>
               <small>
                 {target.successfulUses}/{target.uses} correct uses

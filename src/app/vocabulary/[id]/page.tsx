@@ -10,6 +10,7 @@ import {
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { startOperation } from "@/lib/performance";
 import {
   getCachedWordPrimary,
@@ -328,10 +329,7 @@ export default async function Word({
           <TranslationModeControl value={user.preferredTranslation} />
         </div>
 
-        <h1>
-          {word.article ? word.article + " " : ""}
-          {word.lemma}
-        </h1>
+        <h1>{formatLexemeLabel(word)}</h1>
 
         {word.plural ? (
           <p className="page-description">Plural: {word.plural}</p>

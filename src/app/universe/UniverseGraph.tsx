@@ -10,6 +10,7 @@ import {
   Plus,
   Sparkles,
 } from "lucide-react";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import type {
   UniverseEdge,
   UniverseNode,
@@ -331,7 +332,7 @@ export function UniverseGraph({
                 key={item.lemma + ":" + item.partOfSpeech}
               >
                 <div>
-                  <strong>{item.article ? item.article + " " : ""}{item.lemma}</strong>
+                  <strong>{formatLexemeLabel(item)}</strong>
                   <span>{item.relationType.replaceAll("_", " ").toLowerCase()} · usefulness {item.usefulness}/5</span>
                   <small>{item.rationale}</small>
                 </div>

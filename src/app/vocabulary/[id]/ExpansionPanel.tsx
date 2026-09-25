@@ -9,6 +9,7 @@ import {
   type ExpansionState,
 } from "./actions";
 import { ExpansionAddForm } from "./ExpansionAddForm";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 const initialState: ExpansionState = { status: "idle" };
 
@@ -58,7 +59,7 @@ export function ExpansionPanel({
                   <span className="badge">usefulness {item.usefulness}/5</span>
                   {item.userState ? <span className="badge">{item.userState}</span> : null}
                 </div>
-                <h3>{item.article ? item.article + " " : ""}{item.lemma}</h3>
+                <h3>{formatLexemeLabel(item)}</h3>
                 <p>{item.englishMeaning}</p>
                 <p className="rtl">{item.persianMeaning}</p>
                 <small className="muted">{item.rationale}</small>

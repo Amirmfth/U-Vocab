@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, GitCompareArrows } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { CompareForm } from "./CompareForm";
 import { QuickCompareSuggestion } from "./QuickCompareSuggestion";
 
@@ -51,9 +52,7 @@ export default async function ComparePage() {
 
   const options = vocabulary.map((item) => ({
     value: item.lexeme.id,
-    label:
-      (item.lexeme.article ? item.lexeme.article + " " : "") +
-      item.lexeme.lemma,
+    label: formatLexemeLabel(item.lexeme),
   }));
 
   return (

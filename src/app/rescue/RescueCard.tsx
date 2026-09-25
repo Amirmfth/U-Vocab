@@ -5,6 +5,7 @@ import { Eye } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { ActionButton } from "@/components/action-button";
 import { submitRescueReview } from "./actions";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 export function RescueCard(props: {
   userVocabularyId: string;
@@ -53,8 +54,7 @@ export function RescueCard(props: {
               <p><b>Expected:</b> {props.exercise.expected}</p>
             ) : null}
             <p className="word">
-              {props.article ? props.article + " " : ""}
-              {props.lemma}
+              {formatLexemeLabel(props)}
             </p>
             {props.translations.map((translation) => (
               <p

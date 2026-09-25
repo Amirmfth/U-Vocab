@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono";
 import { AppNavigation } from "@/components/app-navigation";
 import { PageTransition } from "@/components/page-transition";
 import { WebVitals } from "@/components/web-vitals";
+import { QueryProvider } from "@/components/query-provider";
 import { getCurrentUser } from "@/lib/current-user";
 
 export const metadata = {
@@ -25,9 +26,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <WebVitals />
         <AppNavigation translationPreference={user.preferredTranslation} />
-        <div className="app-shell">
-          <PageTransition>{children}</PageTransition>
-        </div>
+        <QueryProvider>
+          <div className="app-shell">
+            <PageTransition>{children}</PageTransition>
+          </div>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { RelationType } from "@prisma/client";
-import { BookOpen, GitCompareArrows, Layers3, Network, Plus, Star, Upload } from "lucide-react";
+import { BookOpen, GitCompareArrows, Layers3, Network, Plus, ScanText, Star } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { currentRetrievability } from "@/lib/fsrs";
 import { TranslationModeControl } from "@/components/translation-mode-control";
 import { VocabularyFilters } from "./VocabularyFilters";
+import { VocabularyScrollRestoration } from "./VocabularyScrollRestoration";
 import { connection } from "next/server";
 import { getCachedVocabularyLibrary } from "@/lib/cached-data";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -21,7 +23,6 @@ export default async function Vocabulary({
     pos?: string;
     level?: string;
     topic?: string;
-    collection?: string;
     relation?: string;
   }>;
 }) {
@@ -37,7 +38,6 @@ export default async function Vocabulary({
     pos: query.pos ?? "ALL",
     level: query.level ?? "ALL",
     topic: query.topic ?? "ALL",
-    collection: query.collection ?? "ALL",
     relation: query.relation ?? "ALL",
   };
 
@@ -83,13 +83,6 @@ export default async function Vocabulary({
     if (
       current.topic !== "ALL" &&
       !word.topicPackItems.some((item) => item.topicPack.topic === current.topic)
-    ) {
-      return false;
-    }
-
-    if (
-      current.collection !== "ALL" &&
-      !word.topicPackItems.some((item) => item.topicPackId === current.collection)
     ) {
       return false;
     }
@@ -164,6 +157,7 @@ export default async function Vocabulary({
 
   return (
     <main className="page">
+      <VocabularyScrollRestoration />
       <section className="page-header compact library-header">
         <div>
           <h1>Vocabulary</h1>
@@ -179,8 +173,8 @@ export default async function Vocabulary({
               Add word
             </Link>
             <Link href="/read" className="button button-secondary">
-              <Upload size={17} />
-              Import
+              <ScanText size={17} />
+              Scan
             </Link>
           </div>
         </div>
@@ -225,10 +219,6 @@ export default async function Vocabulary({
         topicOptions={Array.from(
           new Map(packs.map((pack) => [pack.topic, { value: pack.topic, label: pack.topic }])).values(),
         )}
-        collectionOptions={packs.map((pack) => ({
-          value: pack.id,
-          label: pack.title,
-        }))}
       />
 
       {filtered.length ? (
@@ -261,8 +251,7 @@ export default async function Vocabulary({
               >
                 <div className="vocabulary-row-main">
                   <div className="word">
-                    {word.article ? word.article + " " : ""}
-                    {word.lemma}
+                    {formatLexemeLabel(word)}
                   </div>
                   <div className="translation-line">
                     {translations.slice(0, 1).map((translation) => (

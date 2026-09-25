@@ -4,6 +4,7 @@ import { useActionState, useMemo } from "react";
 import { Check, ScanText } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import {
   addSelectedVocabulary,
   previewVocabularyText,
@@ -76,10 +77,7 @@ export function AddLexemeForm({
                 />
                 <div className="import-row-copy">
                   <div className="word-meta">
-                    <strong>
-                      {candidate.article ? candidate.article + " " : ""}
-                      {candidate.lemma}
-                    </strong>
+                    <strong>{formatLexemeLabel(candidate)}</strong>
                     <span className="badge">{candidate.partOfSpeech}</span>
                     <span className="badge">
                       {candidate.userVocabularyId

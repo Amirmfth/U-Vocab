@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findSimilarLexemes } from "@/lib/semantic/search";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 export type UniverseNode = {
   id: string;
@@ -79,7 +80,7 @@ export async function getUniverseBranch(input: {
   nodes.set(root.id, {
     id: root.id,
     kind: "LEXEME",
-    label: (root.article ? root.article + " " : "") + root.lemma,
+    label: formatLexemeLabel(root),
     sublabel: root.partOfSpeech,
     meaning: root.translations.find((translation) => translation.language === "en")?.text ?? root.translations[0]?.text ?? null,
     state: learnerState(
@@ -96,8 +97,7 @@ export async function getUniverseBranch(input: {
       id: relation.target.id,
       kind: "LEXEME",
       label:
-        (relation.target.article ? relation.target.article + " " : "") +
-        relation.target.lemma,
+        formatLexemeLabel(relation.target),
       sublabel: relation.target.partOfSpeech,
       meaning: relation.target.translations.find((translation) => translation.language === "en")?.text ?? relation.target.translations[0]?.text ?? null,
       state: learnerState(
@@ -121,8 +121,7 @@ export async function getUniverseBranch(input: {
       id: relation.source.id,
       kind: "LEXEME",
       label:
-        (relation.source.article ? relation.source.article + " " : "") +
-        relation.source.lemma,
+        formatLexemeLabel(relation.source),
       sublabel: relation.source.partOfSpeech,
       meaning: relation.source.translations.find((translation) => translation.language === "en")?.text ?? relation.source.translations[0]?.text ?? null,
       state: learnerState(
@@ -180,8 +179,7 @@ export async function getUniverseBranch(input: {
           id: item.lexeme.id,
           kind: "LEXEME",
           label:
-            (item.lexeme.article ? item.lexeme.article + " " : "") +
-            item.lexeme.lemma,
+            formatLexemeLabel(item.lexeme),
           sublabel: "semantic " + Math.round(item.similarity * 100) + "%",
           meaning: item.lexeme.translations.find((translation) => translation.language === "en")?.text ?? item.lexeme.translations[0]?.text ?? null,
           state: learnerState(

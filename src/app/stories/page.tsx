@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpenText } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { StoryForm } from "./StoryForm";
 
 
@@ -36,7 +37,7 @@ export default async function StoriesPage() {
         defaultLevel={user.targetLevel}
         targets={vocabulary.map((item) => ({
           lexemeId: item.lexemeId,
-          label: item.lexeme.article ? item.lexeme.article + " " + item.lexeme.lemma : item.lexeme.lemma,
+          label: formatLexemeLabel(item.lexeme),
           state: item.state,
         }))}
         topicPacks={topicPacks.map((pack) => ({
@@ -44,7 +45,7 @@ export default async function StoriesPage() {
           title: pack.title,
           items: pack.items.map((item) => ({
             lexemeId: item.lexemeId,
-            label: item.lexeme.article ? item.lexeme.article + " " + item.lexeme.lemma : item.lexeme.lemma,
+            label: formatLexemeLabel(item.lexeme),
           })),
         }))}
       />

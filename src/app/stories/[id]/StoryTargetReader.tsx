@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { BookOpenCheck } from "lucide-react";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 type StoryTarget = {
   id: string;
@@ -170,7 +171,7 @@ export function StoryTargetReader({
             <div className="word-meta">
               <span className="badge">{selected.lexeme.partOfSpeech}</span>
             </div>
-            <h2>{selected.lexeme.article ? selected.lexeme.article + " " : ""}{selected.lexeme.lemma}</h2>
+            <h2>{formatLexemeLabel(selected.lexeme)}</h2>
             <div className="story-word-meanings">
               {translations?.map((translation) => (
                 <p className={translation.language === "fa" ? "rtl" : undefined} key={translation.id}>

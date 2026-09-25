@@ -1036,3 +1036,61 @@ body {
     gap: 3px;
   }
 }
+
+
+/* Selective Query / optimistic interaction feedback — issue #55 */
+.optimistic-error {
+  width: min(100%, 760px);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid rgba(239, 91, 91, 0.35);
+  border-radius: 13px;
+  background: rgba(239, 91, 91, 0.08);
+  color: var(--text-soft);
+  font-size: 0.74rem;
+}
+
+.optimistic-error > svg {
+  color: var(--danger);
+}
+
+.optimistic-error .text-button {
+  min-height: 36px;
+}
+
+.optimistic-next-card {
+  width: min(100%, 760px);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.optimistic-next-card > span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.recommendation-list[aria-busy="true"] {
+  pointer-events: none;
+}
+
+.recommendation-actions .button:disabled,
+.grade-grid .button:disabled {
+  cursor: wait;
+}
+
+@media (max-width: 480px) {
+  .optimistic-error {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+
+  .optimistic-error .text-button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

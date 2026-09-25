@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ActionButton } from "@/components/action-button";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { abandonFocusSession, completeFocusStep } from "../actions";
 
 
@@ -150,7 +151,7 @@ export default async function FocusSessionPage({
 
         {current.lexeme ? (
           <p className="session-target">
-            Target: {current.lexeme.article ? current.lexeme.article + " " : ""}{current.lexeme.lemma}
+            Target: {formatLexemeLabel(current.lexeme)}
           </p>
         ) : null}
 

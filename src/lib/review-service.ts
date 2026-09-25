@@ -5,6 +5,7 @@ import {
 } from "@prisma/client";
 import { db } from "@/lib/db";
 import { scheduleReview, type ReviewGrade } from "@/lib/fsrs";
+import { applyMasteryDelta, reviewMasteryDelta } from "@/lib/exercises/mastery";
 
 function nextVocabularyState(stability: number): VocabularyState {
   if (stability >= 90) return "MASTERED";
@@ -28,14 +29,7 @@ export async function applyReviewResult(input: {
 
   const scheduled = scheduleReview(item.fsrsCard, input.grade);
   const state = nextVocabularyState(scheduled.stability);
-  const recallGain =
-    input.grade === "AGAIN"
-      ? -0.03
-      : input.grade === "HARD"
-        ? 0.03
-        : input.grade === "GOOD"
-          ? 0.06
-          : 0.09;
+  const mastery = applyMasteryDelta(item, reviewMasteryDelta(input.exerciseType, input.grade));
 
   const masteredAt =
     state === "MASTERED" && !item.masteredAt ? new Date() : item.masteredAt;
@@ -51,17 +45,10 @@ export async function applyReviewResult(input: {
         nextReviewAt: scheduled.due,
         state,
         masteredAt,
-        meaningRecall: Math.max(0, Math.min(1, item.meaningRecall + recallGain)),
-        production:
-          ["FREE_SENTENCE", "PARAPHRASE", "COLLOCATION", "CASE_PREPOSITION"].includes(
-            input.exerciseType,
-          )
-            ? Math.max(0, Math.min(1, item.production + recallGain / 2))
-            : item.production,
-        contextualUsage:
-          ["CLOZE", "PARAPHRASE", "CONTEXTUAL_CHOICE"].includes(input.exerciseType)
-            ? Math.max(0, Math.min(1, item.contextualUsage + recallGain / 2))
-            : item.contextualUsage,
+        recognition: mastery.recognition,
+        meaningRecall: mastery.meaningRecall,
+        production: mastery.production,
+        contextualUsage: mastery.contextualUsage,
       },
     }),
     db.review.create({

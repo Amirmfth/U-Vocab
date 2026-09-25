@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
+import { startOperation } from "@/lib/performance";
 import { optimisticReviewAdvance, REVIEW_QUEUE_QUERY_POLICY, shouldRefillReviewQueue } from "@/lib/review-query";
 import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueData } from "@/lib/review-queue";
@@ -52,6 +53,10 @@ export function ReviewSession({
       return result;
     },
     onMutate: async (input) => {
+      const perf = startOperation("interaction.review_rating", {
+        grade: input.grade,
+        optimistic: true,
+      });
       await queryClient.cancelQueries({ queryKey: queueKey });
       const previous = queryClient.getQueryData<ReviewQueueData>(queueKey);
 
@@ -61,14 +66,16 @@ export function ReviewSession({
           : current,
       );
 
-      return { previous };
+      return { previous, perf };
     },
-    onError: (_error, _input, context) => {
+    onError: (error, _input, context) => {
       if (context?.previous) {
         queryClient.setQueryData(queueKey, context.previous);
       }
+      context?.perf.fail(error, { rolledBack: true });
     },
-    onSuccess: async () => {
+    onSuccess: async (_result, _input, context) => {
+      context?.perf.success({ rolledBack: false });
       const current = queryClient.getQueryData<ReviewQueueData>(queueKey);
       if (!current || shouldRefillReviewQueue(current)) {
         await queryClient.invalidateQueries({ queryKey: queueKey });

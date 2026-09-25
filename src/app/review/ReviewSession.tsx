@@ -5,6 +5,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
+import { optimisticReviewAdvance, REVIEW_QUEUE_QUERY_POLICY } from "@/lib/review-query";
+import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueData } from "@/lib/review-queue";
 import {
   submitReviewMutation,
@@ -38,9 +40,7 @@ export function ReviewSession({
     queryKey: queueKey,
     queryFn: fetchReviewQueue,
     initialData,
-    staleTime: 30_000,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    ...REVIEW_QUEUE_QUERY_POLICY,
   });
 
   const review = useMutation({
@@ -53,15 +53,11 @@ export function ReviewSession({
       await queryClient.cancelQueries({ queryKey: queueKey });
       const previous = queryClient.getQueryData<ReviewQueueData>(queueKey);
 
-      queryClient.setQueryData<ReviewQueueData>(queueKey, (current) => {
-        if (!current) return current;
-        return {
-          dueCount: Math.max(0, current.dueCount - 1),
-          cards: current.cards.filter(
-            (card) => card.userVocabularyId !== input.userVocabularyId,
-          ),
-        };
-      });
+      queryClient.setQueryData<ReviewQueueData>(queueKey, (current) =>
+        current
+          ? optimisticReviewAdvance(current, input.userVocabularyId)
+          : current,
+      );
 
       return { previous };
     },
@@ -80,14 +76,11 @@ export function ReviewSession({
 
   const card = queue.data.cards[0];
 
-  function grade(
-    input: Parameters<typeof review.mutate>[0]["grade"],
-    startedAt: number,
-  ) {
+  function grade(grade: ReviewGrade, startedAt: number) {
     if (!card || review.isPending) return;
     review.mutate({
       userVocabularyId: card.userVocabularyId,
-      grade: input,
+      grade,
       exerciseType: card.exercise.type,
       prompt: card.exercise.prompt,
       startedAt,

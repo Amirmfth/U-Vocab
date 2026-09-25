@@ -7,27 +7,24 @@ import { PageTransition } from "@/components/page-transition";
 import { WebVitals } from "@/components/web-vitals";
 import { QueryProvider } from "@/components/query-provider";
 import { getCurrentUser } from "@/lib/current-user";
+import { isAppAuthenticated } from "@/lib/auth";
 
 export const metadata = {
-  title: {
-    default: "U-Vocab",
-    template: "%s · U-Vocab",
-  },
+  title: { default: "U-Vocab", template: "%s · U-Vocab" },
   description: "Your personal German lexical knowledge system",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
+  const authenticated = await isAppAuthenticated();
+  const user = authenticated ? await getCurrentUser() : null;
+
   return (
-    <html
-      lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
-    >
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
-        <WebVitals />
-        <AppNavigation translationPreference={user.preferredTranslation} />
+        {authenticated ? <WebVitals /> : null}
+        {user ? <AppNavigation translationPreference={user.preferredTranslation} /> : null}
         <QueryProvider>
-          <div className="app-shell">
+          <div className={authenticated ? "app-shell" : "auth-shell"}>
             <PageTransition>{children}</PageTransition>
           </div>
         </QueryProvider>

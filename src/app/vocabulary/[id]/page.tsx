@@ -186,7 +186,14 @@ async function DeferredWordDetails({
         </section>
       ) : null}
 
-      <section className="word-history-grid">
+      <details className="word-history-disclosure">
+        <summary>
+          <span>
+            <strong>Learning history & collections</strong>
+            <small>Reviews, encounters, mistakes, and saved packs</small>
+          </span>
+        </summary>
+        <section className="word-history-grid">
         <article className="panel word-detail-card">
           <p className="eyebrow">REVIEW HISTORY</p>
           <h2>Recent reviews</h2>
@@ -266,7 +273,9 @@ async function DeferredWordDetails({
             <p className="muted">Not in a topic pack yet.</p>
           )}
         </article>
-      </section>
+
+        </section>
+      </details>
 
       <ExpansionPanel lexemeId={word.id} />
     </>
@@ -328,7 +337,7 @@ export default async function Word({
           <p className="page-description">Plural: {word.plural}</p>
         ) : null}
 
-        <div className="hero-actions">
+        <div className="word-primary-actions">
           <Link
             href={"/vocabulary/" + word.id + "/teach"}
             className="button button-primary"
@@ -337,20 +346,14 @@ export default async function Word({
             <BookOpenCheck size={18} />
             Teach me this word
           </Link>
-          <Link
-            href={"/practice?lexeme=" + word.id}
-            className="button button-secondary"
-            prefetch
-          >
-            <Brain size={18} />
-            Practice
-          </Link>
-          <a href="#compare" className="button button-secondary">
-            Compare
-          </a>
-          <a href="#expand" className="button button-secondary">
-            Expand
-          </a>
+          <nav className="word-quick-actions" aria-label="Word actions">
+            <Link href={"/practice?lexeme=" + word.id} prefetch>
+              <Brain size={17} />
+              Practice
+            </Link>
+            <a href="#compare">Explain</a>
+            <a href="#expand">Expand</a>
+          </nav>
         </div>
       </section>
 
@@ -409,22 +412,29 @@ export default async function Word({
           ) : null}
         </article>
 
-        <article className="panel word-detail-card">
-          <p className="eyebrow">LEXICAL PATTERNS</p>
-          <h2>Grammar & usage</h2>
-          {word.patterns.length ? (
-            word.patterns.map((pattern) => (
-              <div className="pattern-block" key={pattern.id}>
-                <strong>{pattern.pattern}</strong>
-                {pattern.explanation ? (
-                  <p className="muted">{pattern.explanation}</p>
-                ) : null}
-              </div>
-            ))
-          ) : (
-            <p className="muted">No stored patterns yet.</p>
-          )}
-        </article>
+        <details className="panel word-detail-card word-detail-disclosure">
+          <summary>
+            <span>
+              <small className="eyebrow">LEXICAL PATTERNS</small>
+              <strong>Grammar & usage</strong>
+            </span>
+            <span className="disclosure-hint">{word.patterns.length} saved</span>
+          </summary>
+          <div className="word-disclosure-content">
+            {word.patterns.length ? (
+              word.patterns.map((pattern) => (
+                <div className="pattern-block" key={pattern.id}>
+                  <strong>{pattern.pattern}</strong>
+                  {pattern.explanation ? (
+                    <p className="muted">{pattern.explanation}</p>
+                  ) : null}
+                </div>
+              ))
+            ) : (
+              <p className="muted">No stored patterns yet.</p>
+            )}
+          </div>
+        </details>
       </section>
 
       <Suspense fallback={<SecondaryWordSkeleton />}>

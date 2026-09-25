@@ -6,6 +6,7 @@ import { ActionButton } from "@/components/action-button";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { launchPackSession } from "../actions";
 import { PackActions } from "./PackActions";
 import { PackItemActions } from "./PackItemActions";
@@ -55,7 +56,7 @@ export default async function TopicPackDetail({ params }: { params: Promise<{ id
                   <span className="badge">{item.lexeme.partOfSpeech}</span>
                   <span className="badge">{state.toLowerCase()}</span>
                 </div>
-                <h2>{item.lexeme.article ? item.lexeme.article + " " : ""}{item.lexeme.lemma}</h2>
+                <h2>{formatLexemeLabel(item.lexeme)}</h2>
                 <div className="translation-line">
                   {translations.map((translation) => (
                     <span key={translation.id} className={translation.language === "fa" ? "rtl" : undefined}>{translation.text}</span>

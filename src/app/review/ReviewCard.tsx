@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Eye, RotateCcw } from "lucide-react";
 import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueCard } from "@/lib/review-queue";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 export function ReviewCard({
   card,
@@ -52,8 +53,7 @@ export function ReviewCard({
               <p><b>Expected:</b> {card.exercise.expected}</p>
             ) : null}
             <p className="word">
-              {card.article ? card.article + " " : ""}
-              {card.lemma}
+              {formatLexemeLabel(card)}
             </p>
             {card.translations.map((translation) => (
               <p

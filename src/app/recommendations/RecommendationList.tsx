@@ -8,6 +8,7 @@ import type { VocabularyRecommendation } from "@/lib/recommendations";
 import { optimisticRemoveRecommendation } from "@/lib/recommendation-query";
 import { startOperation } from "@/lib/performance";
 import { isTranslationVisible } from "@/lib/translations";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import {
   addRecommendation,
   dismissRecommendation,
@@ -143,12 +144,7 @@ export function RecommendationList({
                   ) : null}
                 </div>
 
-                <h2>
-                  {recommendation.article
-                    ? recommendation.article + " "
-                    : ""}
-                  {recommendation.lemma}
-                </h2>
+                <h2>{formatLexemeLabel(recommendation)}</h2>
 
                 {isTranslationVisible(translationPreference, "en") &&
                 recommendation.english ? (

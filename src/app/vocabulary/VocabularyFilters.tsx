@@ -4,7 +4,7 @@ import { ChevronLeft, Filter, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-type FilterKey = "status" | "pos" | "level" | "topic" | "collection" | "relation";
+type FilterKey = "status" | "pos" | "level" | "topic" | "relation";
 
 type FilterOption = {
   label: string;
@@ -26,13 +26,11 @@ export function VocabularyFilters({
   partOfSpeechOptions,
   levelOptions,
   topicOptions,
-  collectionOptions,
 }: {
   current: Record<FilterKey | "q", string>;
   partOfSpeechOptions: FilterOption[];
   levelOptions: FilterOption[];
   topicOptions: FilterOption[];
-  collectionOptions: FilterOption[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,7 +57,6 @@ export function VocabularyFilters({
     { key: "pos", label: "Part of speech", options: withAll("Any part of speech", partOfSpeechOptions) },
     { key: "level", label: "CEFR level", options: withAll("Any CEFR level", levelOptions) },
     { key: "topic", label: "Topic", options: withAll("Any topic", topicOptions) },
-    { key: "collection", label: "Collection", options: withAll("Any collection", collectionOptions) },
     {
       key: "relation",
       label: "Relationship",
@@ -117,7 +114,6 @@ export function VocabularyFilters({
   return (
     <section className="library-tools">
       <form className="library-search" action="/vocabulary">
-        <Search size={17} />
         <input
           name="q"
           defaultValue={current.q}

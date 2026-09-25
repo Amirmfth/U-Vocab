@@ -6,6 +6,7 @@ import { comparisonSchema } from "@/lib/ai/compare-words";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { ComparisonTrainer } from "./ComparisonTrainer";
 
 
@@ -29,12 +30,8 @@ export default async function ComparisonPage({
   if (!parsed.success) notFound();
 
   const content = parsed.data;
-  const leftLabel =
-    (pair.leftLexeme.article ? pair.leftLexeme.article + " " : "") +
-    pair.leftLexeme.lemma;
-  const rightLabel =
-    (pair.rightLexeme.article ? pair.rightLexeme.article + " " : "") +
-    pair.rightLexeme.lemma;
+  const leftLabel = formatLexemeLabel(pair.leftLexeme);
+  const rightLabel = formatLexemeLabel(pair.rightLexeme);
 
   return (
     <main className="page">

@@ -6,6 +6,7 @@ import { getRescueWords } from "@/lib/rescue";
 import { buildExercise } from "@/lib/exercises/build";
 import { selectReviewExerciseType } from "@/lib/exercises/review-select";
 import { isTranslationVisible } from "@/lib/translations";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { RescueCard } from "./RescueCard";
 
 
@@ -45,8 +46,7 @@ export default async function RescuePage({
                   <div className="rescue-row-copy">
                     <div>
                       <strong>
-                        {item.lexeme.article ? item.lexeme.article + " " : ""}
-                        {item.lexeme.lemma}
+                        {formatLexemeLabel(item.lexeme)}
                       </strong>
                       <span>{Math.round(item.risk.retrievability * 100)}% retrievable now</span>
                     </div>

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { WritingEditor } from "./WritingEditor";
 import { RewriteButton } from "./RewriteButton";
 
@@ -83,8 +84,7 @@ export default async function WritingSessionPage({
           <div className="writing-targets">
             {session.targets.slice(0, 10).map((target) => (
               <span key={target.id}>
-                {target.lexeme.article ? target.lexeme.article + " " : ""}
-                {target.lexeme.lemma}
+                {formatLexemeLabel(target.lexeme)}
               </span>
             ))}
           </div>

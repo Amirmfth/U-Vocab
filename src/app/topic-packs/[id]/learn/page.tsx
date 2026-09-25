@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 
 export default async function TopicPackLearnPage({ params, searchParams }: {
@@ -55,7 +56,7 @@ export default async function TopicPackLearnPage({ params, searchParams }: {
       </div>
 
       <section className="panel pack-session-card">
-        <h1 className="session-word">{current.lexeme.article ? current.lexeme.article + " " : ""}{current.lexeme.lemma}</h1>
+        <h1 className="session-word">{formatLexemeLabel(current.lexeme)}</h1>
         <div className="translation-stack">
           {translations.map((translation) => (
             <p key={translation.id} className={translation.language === "fa" ? "rtl" : undefined}>{translation.text}</p>

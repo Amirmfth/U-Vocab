@@ -1,5 +1,6 @@
 import type { BattleGame } from "@prisma/client";
 import { db } from "@/lib/db";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 type BattleQuestionDraft = {
   lexemeId: string | null;
@@ -96,7 +97,7 @@ export async function buildBattleQuestions(input: {
         options: ["der", "die", "das"],
         expected: lexeme.article,
         explanation:
-          (lexeme.article + " " + lexeme.lemma) +
+          formatLexemeLabel(lexeme) +
           (lexeme.plural ? " · Plural: " + lexeme.plural : ""),
       });
     }

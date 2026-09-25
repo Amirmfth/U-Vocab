@@ -1,6 +1,7 @@
 import type { TranslationLanguage } from "@prisma/client";
 import { isTranslationVisible } from "@/lib/translations";
 import type { ExerciseDefinition, ExerciseLexeme } from "./types";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 function preferredMeaning(lexeme: ExerciseLexeme, preference: TranslationLanguage) {
   return (
@@ -33,7 +34,7 @@ export function buildExercise(
     case "REVERSE_RECALL":
       return { type, prompt: "Write the German lexical unit for: " + meaning, expected: lexeme.lemma, hint: pattern ?? undefined, requiresAI: false };
     case "ARTICLE":
-      return { type, prompt: "Write the correct article + noun for “" + lexeme.lemma + "”.", expected: lexeme.article ? lexeme.article + " " + lexeme.lemma : lexeme.lemma, requiresAI: false };
+      return { type, prompt: "Write the correct article + noun for “" + lexeme.lemma + "”.", expected: formatLexemeLabel(lexeme), requiresAI: false };
     case "CASE_PREPOSITION":
       return { type, prompt: pattern ? "Write the complete grammatical pattern for “" + lexeme.lemma + "”." : "Use “" + lexeme.lemma + "” in a sentence with the correct grammatical pattern.", expected: pattern, requiresAI: !pattern };
     case "COLLOCATION":

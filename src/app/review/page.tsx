@@ -47,8 +47,16 @@ export default async function ReviewPage({
 }) {
   await connection();
   const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
-  const now = new Date();
+  if (query.start === "1") {
+    const initialQueue = await getReviewQueueData({
+      userId: user.id,
+      preferredTranslation: user.preferredTranslation,
+    });
 
+    return <ReviewSession initialData={initialQueue} userScope={user.id} />;
+  }
+
+  const now = new Date();
   const [dueCount, mistakeCount, weakCount] = await Promise.all([
     db.userVocabulary.count({
       where: {
@@ -62,7 +70,7 @@ export default async function ReviewPage({
     }),
   ]);
 
-  if (query.start !== "1") {
+  {
     return (
       <main className="page review-landing">
         <section className="review-hero">
@@ -99,11 +107,5 @@ export default async function ReviewPage({
     );
   }
 
-  const initialQueue = await getReviewQueueData({
-    userId: user.id,
-    preferredTranslation: user.preferredTranslation,
-  });
-
-  return <ReviewSession initialData={initialQueue} userScope={user.id} />;
-
+  }
 }

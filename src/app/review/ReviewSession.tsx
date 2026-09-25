@@ -22,6 +22,13 @@ async function fetchReviewQueue(): Promise<ReviewQueueData> {
     headers: { Accept: "application/json" },
   });
 
+  if (response.status === 401) {
+    window.location.assign(
+      "/login?returnTo=" +
+        encodeURIComponent(window.location.pathname + window.location.search),
+    );
+    throw new Error("Unauthorized");
+  }
   if (!response.ok) {
     throw new Error("Could not refresh the review queue.");
   }

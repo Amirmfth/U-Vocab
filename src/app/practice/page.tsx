@@ -7,6 +7,7 @@ import {
   PenLine,
   Plus,
   ScanText,
+  Sparkles,
   Swords,
   Target,
 } from "lucide-react";
@@ -18,78 +19,65 @@ import { PracticeForm } from "./PracticeForm";
 
 function PracticeHub() {
   return (
-    <main className="page">
-      <section className="page-header compact">
+    <main className="page practice-hub">
+      <section className="page-header compact practice-header">
         <p className="eyebrow">PRACTICE</p>
         <h1>Use your German</h1>
         <p className="page-description">
-          Choose a skill direction. Vocabulary drills stay available as a
-          quick secondary mode.
+          Pick one skill and get into practice quickly.
         </p>
       </section>
 
-      <section className="ia-skill-grid" aria-label="Practice skills">
-        <article className="panel ia-skill-card">
-          <div className="ia-card-icon"><PenLine size={21} /></div>
-          <div>
-            <p className="eyebrow">WRITING</p>
-            <h2>Writing</h2>
-            <p>Guided vocabulary, open tasks, exam-style prompts, and rewrites.</p>
-          </div>
-          <Link href="/writing" className="ia-card-link">
-            Open Writing <ArrowRight size={16} />
-          </Link>
-        </article>
+      <nav className="practice-lanes" aria-label="Practice skills">
+        <Link href="/writing" className="practice-lane">
+          <span className="practice-lane-icon"><PenLine size={21} /></span>
+          <span className="practice-lane-copy">
+            <strong>Writing</strong>
+            <small>Guided, open, exam-style, and rewrite practice</small>
+          </span>
+          <ArrowRight size={18} />
+        </Link>
 
-        <article className="panel ia-skill-card">
-          <div className="ia-card-icon"><ScanText size={21} /></div>
-          <div>
-            <p className="eyebrow">READING</p>
-            <h2>Reading</h2>
-            <p>Analyze pasted text, revisit your reading library, or practice with stories.</p>
-          </div>
-          <div className="ia-card-actions">
-            <Link href="/read" className="ia-card-link">
-              Reading library <ArrowRight size={16} />
-            </Link>
-            <Link href="/stories" className="ia-card-link secondary-link">
-              <BookOpenText size={15} /> Stories
-            </Link>
-          </div>
-        </article>
+        <Link href="/read" className="practice-lane">
+          <span className="practice-lane-icon"><ScanText size={21} /></span>
+          <span className="practice-lane-copy">
+            <strong>Reading</strong>
+            <small>Paste text, revisit your library, and discover vocabulary</small>
+          </span>
+          <ArrowRight size={18} />
+        </Link>
 
-        <article className="panel ia-skill-card">
-          <div className="ia-card-icon"><MessageCircle size={21} /></div>
-          <div>
-            <p className="eyebrow">SPEAKING</p>
-            <h2>Speaking</h2>
-            <p>Free conversation, scenarios, and vocabulary missions.</p>
-          </div>
-          <div className="ia-card-actions">
-            <Link href="/conversation" className="ia-card-link">
-              Conversation <ArrowRight size={16} />
-            </Link>
-            <Link href="/missions" className="ia-card-link secondary-link">
-              <Target size={15} /> Missions
-            </Link>
-          </div>
-        </article>
-      </section>
+        <Link href="/conversation" className="practice-lane">
+          <span className="practice-lane-icon"><MessageCircle size={21} /></span>
+          <span className="practice-lane-copy">
+            <strong>Speaking</strong>
+            <small>Free conversation, scenarios, and vocabulary missions</small>
+          </span>
+          <ArrowRight size={18} />
+        </Link>
+      </nav>
 
-      <section className="panel ia-secondary-panel">
-        <div>
-          <p className="eyebrow">QUICK MODES</p>
-          <h2>Vocabulary practice</h2>
-          <p className="muted">
-            Drill one weak word or jump into a fast vocabulary battle.
-          </p>
+      <section className="practice-shortcuts">
+        <div className="practice-shortcuts-heading">
+          <p className="eyebrow">MORE IN PRACTICE</p>
+          <span>Secondary modes</span>
         </div>
-        <div className="ia-secondary-actions">
-          <Link href="/practice?drill=1" className="button button-secondary">
-            Quick drill
+        <div className="practice-shortcut-grid">
+          <Link href="/stories">
+            <BookOpenText size={17} />
+            <span><strong>Stories</strong><small>Contextual reading</small></span>
           </Link>
-          <Link href="/battles" className="button button-secondary">
-            <Swords size={17} /> Battles
+          <Link href="/missions">
+            <Target size={17} />
+            <span><strong>Missions</strong><small>Goal-based speaking</small></span>
+          </Link>
+          <Link href="/practice?drill=1">
+            <Sparkles size={17} />
+            <span><strong>Quick drill</strong><small>Weak vocabulary</small></span>
+          </Link>
+          <Link href="/battles">
+            <Swords size={17} />
+            <span><strong>Battles</strong><small>Fast vocabulary mode</small></span>
           </Link>
         </div>
       </section>

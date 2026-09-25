@@ -1,7 +1,6 @@
 "use server";
 
 import type { ExerciseType } from "@prisma/client";
-import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/current-user";
 import { applyReviewResult } from "@/lib/review-service";
 import type { ReviewGrade } from "@/lib/fsrs";
@@ -64,20 +63,4 @@ export async function submitReviewMutation(
         error instanceof Error ? error.message : "Could not save this review.",
     };
   }
-}
-
-export async function submitReview(formData: FormData) {
-  await persistReview({
-    userVocabularyId: String(formData.get("userVocabularyId") ?? ""),
-    grade: String(formData.get("grade") ?? "") as ReviewGrade,
-    exerciseType: String(
-      formData.get("exerciseType") ?? "MEANING_RECALL",
-    ) as ExerciseType,
-    prompt: String(
-      formData.get("prompt") ?? "Recall this lexical unit.",
-    ),
-    startedAt: Number(formData.get("startedAt") ?? 0),
-  });
-
-  redirect("/review?start=1");
 }

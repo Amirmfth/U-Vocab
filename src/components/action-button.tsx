@@ -8,11 +8,13 @@ export function ActionButton({
   pendingLabel = "Working…",
   className = "",
   variant = "primary",
+  disabled = false,
 }: {
   children: React.ReactNode;
   pendingLabel?: string;
   className?: string;
   variant?: "primary" | "secondary" | "danger" | "success";
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
 
@@ -20,13 +22,14 @@ export function ActionButton({
     <button
       className={"button button-" + variant + " " + className}
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       aria-busy={pending}
+      aria-disabled={pending || disabled}
     >
       {pending ? (
         <>
           <LoaderCircle className="spinner" size={18} aria-hidden="true" />
-          <span>{pendingLabel}</span>
+          <span aria-live="polite">{pendingLabel}</span>
         </>
       ) : (
         children

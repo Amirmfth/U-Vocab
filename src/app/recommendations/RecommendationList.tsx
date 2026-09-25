@@ -6,6 +6,7 @@ import { AlertCircle, Plus, RotateCcw, X } from "lucide-react";
 import type { TranslationLanguage } from "@prisma/client";
 import type { VocabularyRecommendation } from "@/lib/recommendations";
 import { optimisticRemoveRecommendation } from "@/lib/recommendation-query";
+import { startOperation } from "@/lib/performance";
 import { isTranslationVisible } from "@/lib/translations";
 import {
   addRecommendation,
@@ -57,6 +58,10 @@ export function RecommendationList({
       return result;
     },
     onMutate: (input) => {
+      const perf = startOperation("interaction.recommendation_action", {
+        action: input.action,
+        optimistic: true,
+      });
       const previous = recommendations;
       setRecommendations((current) =>
         optimisticRemoveRecommendation(
@@ -64,10 +69,14 @@ export function RecommendationList({
           input.recommendation.lexemeId,
         ),
       );
-      return { previous };
+      return { previous, perf };
     },
-    onError: (_error, _input, context) => {
+    onError: (error, _input, context) => {
       if (context?.previous) setRecommendations(context.previous);
+      context?.perf.fail(error, { rolledBack: true });
+    },
+    onSuccess: (_result, _input, context) => {
+      context?.perf.success({ rolledBack: false });
     },
   });
 

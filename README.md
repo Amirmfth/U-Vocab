@@ -495,3 +495,18 @@ For local development only, `APP_AUTH_DISABLED=true` explicitly bypasses the gat
 ## Verb conjugation reference
 
 Verb detail pages expose a lazy **Conjugate** action. The first open generates a structured paradigm through the existing AI service, validates it with Zod, and stores it in the versioned `AiGenerationCache`. Reopening uses cached lexical data until source data, prompt version, or schema version changes.
+
+
+# Learning loop
+
+U-Vocab now treats the core vocabulary-learning actions as separate jobs:
+
+1. **Learn / understand** on word detail and Teach.
+2. **Practice** weak skills with short adaptive, deterministic drills.
+3. **Review** already-learned vocabulary when FSRS schedules it for retention.
+
+Quick Practice deliberately avoids open-ended sentence-writing as its default. It selects from meaning recall, reverse recall, article, cloze, stored pattern/preposition and contextual-choice exercises according to mastery, unresolved mistakes, recent formats and available lexical data. Deterministic answers are checked server-side against authoritative lexical data; missed items are reinforced once within the same short session.
+
+Standard Review is an active-recall flashcard flow. Card families include German→meaning, meaning→German, contextual cloze and grammar/pattern recall. The FSRS schedule and Again/Hard/Good/Easy ratings remain authoritative. A failed recall can reappear once later in the same session without creating an unbounded loop.
+
+Focused practice for verbs may reuse the same versioned conjugation cache used by the word-detail Conjugate reference, avoiding a second conjugation data source.

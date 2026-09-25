@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
@@ -38,6 +39,7 @@ export function ReviewSession({
   const queryClient = useQueryClient();
   const reduceMotion = useReducedMotion();
   const queueKey = queryKeys.review.queue(userScope);
+  const repeatCounts = useRef<Record<string, number>>({});
 
   const queue = useQuery({
     queryKey: queueKey,
@@ -66,7 +68,10 @@ export function ReviewSession({
           : current,
       );
 
-      return { previous, perf };
+      const reviewedCard = previous?.cards.find(
+        (card) => card.userVocabularyId === input.userVocabularyId,
+      );
+      return { previous, perf, reviewedCard };
     },
     onError: (error, _input, context) => {
       if (context?.previous) {
@@ -74,9 +79,29 @@ export function ReviewSession({
       }
       context?.perf.fail(error, { rolledBack: true });
     },
-    onSuccess: async (_result, _input, context) => {
+    onSuccess: async (_result, input, context) => {
       context?.perf.success({ rolledBack: false });
-      const current = queryClient.getQueryData<ReviewQueueData>(queueKey);
+      let current = queryClient.getQueryData<ReviewQueueData>(queueKey);
+
+      if (
+        input.grade === "AGAIN" &&
+        context?.reviewedCard &&
+        (repeatCounts.current[input.userVocabularyId] ?? 0) < 1
+      ) {
+        repeatCounts.current[input.userVocabularyId] =
+          (repeatCounts.current[input.userVocabularyId] ?? 0) + 1;
+        queryClient.setQueryData<ReviewQueueData>(queueKey, (value) =>
+          value
+            ? {
+                ...value,
+                dueCount: value.dueCount + 1,
+                cards: [...value.cards, context.reviewedCard!],
+              }
+            : value,
+        );
+        current = queryClient.getQueryData<ReviewQueueData>(queueKey);
+      }
+
       if (!current || shouldRefillReviewQueue(current)) {
         await queryClient.invalidateQueries({ queryKey: queueKey });
       }
@@ -91,8 +116,8 @@ export function ReviewSession({
     review.mutate({
       userVocabularyId: card.userVocabularyId,
       grade,
-      exerciseType: card.exercise.type,
-      prompt: card.exercise.prompt,
+      exerciseType: card.review.exerciseType,
+      prompt: card.review.front.prompt,
       startedAt,
     });
   }

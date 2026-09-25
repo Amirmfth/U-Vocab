@@ -5653,3 +5653,39 @@ body {
     margin-top: 4px;
   }
 }
+
+
+.home-today-activity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 42px;
+  color: var(--text-muted);
+}
+
+.home-today-activity > div {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.home-today-activity strong {
+  color: var(--text-soft);
+  font-family: var(--font-geist-mono), "Geist Mono", monospace;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-today-activity span {
+  font-size: 0.66rem;
+}
+
+@media (max-width: 359px) {
+  .home-today-activity {
+    gap: 10px;
+  }
+
+  .home-today-activity > div {
+    gap: 3px;
+  }
+}

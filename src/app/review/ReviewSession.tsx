@@ -76,7 +76,8 @@ export function ReviewSession({
     },
   });
 
-  const card = queue.data.cards[0];
+  const queueData = queue.data ?? initialData;
+  const card = queueData.cards[0];
 
   function grade(grade: ReviewGrade, startedAt: number) {
     if (!card || review.isPending) return;
@@ -94,7 +95,7 @@ export function ReviewSession({
       <main className="page review-session-shell">
         <header className="review-session-topbar">
           <Link href="/review" className="text-link">Review</Link>
-          <span>{queue.data.dueCount} remaining</span>
+          <span>{queueData.dueCount} remaining</span>
         </header>
         <section className="panel optimistic-next-card" aria-live="polite">
           <div className="skeleton skeleton-kicker" />
@@ -126,7 +127,7 @@ export function ReviewSession({
       <header className="review-session-topbar">
         <Link href="/review" className="text-link">Review</Link>
         <span>
-          {review.isPending ? "Saving previous review…" : queue.data.dueCount + " remaining"}
+          {review.isPending ? "Saving previous review…" : queueData.dueCount + " remaining"}
         </span>
       </header>
 

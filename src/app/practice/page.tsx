@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import type { ExerciseType } from "@prisma/client";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -13,9 +14,10 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
-import { buildExercise } from "@/lib/exercises/build";
+import { buildExercise, eligibleExerciseTypes } from "@/lib/exercises/build";
 import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
+import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 
 function PracticeHub() {
   return (
@@ -91,79 +93,103 @@ export default async function PracticePage({
   searchParams: Promise<{ lexeme?: string; drill?: string }>;
 }) {
   await connection();
-  const params = await searchParams;
+  const params=await searchParams;
+  if(!params.lexeme&&params.drill!=="1") return <PracticeHub/>;
 
-  if (!params.lexeme && params.drill !== "1") {
-    return <PracticeHub />;
-  }
-
-  const user = await getCurrentUser();
-  const item = await db.userVocabulary.findFirst({
-    where: {
-      userId: user.id,
-      ...(params.lexeme ? { lexemeId: params.lexeme } : {}),
-    },
-    include: {
-      lexeme: {
-        include: { patterns: true, translations: true, examples: true },
+  const user=await getCurrentUser();
+  const items=await db.userVocabulary.findMany({
+    where:{ userId:user.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },
+    include:{
+      lexeme:{
+        include:{
+          patterns:true,
+          translations:true,
+          examples:true,
+          mistakes:{
+            where:{ userId:user.id,resolvedAt:null },
+            select:{ type:true },
+          },
+        },
       },
     },
-    orderBy: params.lexeme
-      ? undefined
-      : [
-          { production: "asc" },
-          { contextualUsage: "asc" },
-          { meaningRecall: "asc" },
-          { addedAt: "asc" },
-        ],
+    orderBy:[
+      { production:"asc" },
+      { contextualUsage:"asc" },
+      { meaningRecall:"asc" },
+      { addedAt:"asc" },
+    ],
+    take:params.lexeme?1:8,
   });
 
-  if (!item) {
-    return (
-      <main className="page focus-page">
-        <section className="empty-state compact-empty">
-          <strong>
-            {params.lexeme
-              ? "Word not found in your vocabulary"
-              : "Add a word to start practicing"}
-          </strong>
-          {!params.lexeme ? (
-            <Link href="/vocabulary/new" className="button button-primary">
-              <Plus size={18} />
-              Add word
-            </Link>
-          ) : null}
-          <Link href="/practice" className="text-link">Back to Practice</Link>
-        </section>
-      </main>
-    );
+  if(!items.length){
+    return <main className="page focus-page">
+      <section className="empty-state compact-empty">
+        <strong>{params.lexeme?"Word not found in your vocabulary":"Add a word to start practicing"}</strong>
+        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>Add word</Link>:null}
+        <Link href="/practice" className="text-link">Back to Practice</Link>
+      </section>
+    </main>;
   }
 
-  const mistakes = await db.mistake.findMany({
-    where: { userId: user.id, lexemeId: item.lexemeId, resolvedAt: null },
-    select: { type: true },
-    orderBy: { lastOccurredAt: "desc" },
-  });
-  const exerciseType = selectExerciseType({
-    recognition: item.recognition,
-    meaningRecall: item.meaningRecall,
-    production: item.production,
-    contextualUsage: item.contextualUsage,
-    mistakeTypes: mistakes.map((mistake) => mistake.type),
-  });
-  const exercise = buildExercise(
-    exerciseType,
-    item.lexeme,
-    user.preferredTranslation,
-  );
+  const recent:ExerciseType[]=[];
+  const exercises:Array<{
+    id:string;
+    userVocabularyId:string;
+    lemma:string;
+    exercise:ReturnType<typeof buildExercise>;
+    conjugation?:{ person:string };
+  }>=[];
 
-  return (
-    <main className="page focus-page">
-      <div className="focus-meta">
-        <Link href="/practice">Practice</Link>
-        <span>{item.lexeme.lemma}</span>
-      </div>
-      <PracticeForm userVocabularyId={item.id} exercise={exercise} />
-    </main>
-  );
+  for(const item of items){
+    const snapshot={
+      recognition:item.recognition,
+      meaningRecall:item.meaningRecall,
+      production:item.production,
+      contextualUsage:item.contextualUsage,
+      mistakeTypes:item.lexeme.mistakes.map((mistake)=>mistake.type),
+    };
+    const available=eligibleExerciseTypes(item.lexeme);
+    const count=params.lexeme?Math.min(6,Math.max(3,available.length+1)):1;
+    for(let position=0;position<count;position+=1){
+      const type=selectExerciseType(snapshot,available,recent);
+      recent.push(type);
+      exercises.push({
+        id:item.id+":"+position+":"+type,
+        userVocabularyId:item.id,
+        lemma:item.lexeme.lemma,
+        exercise:buildExercise(type,item.lexeme,user.preferredTranslation),
+      });
+    }
+  }
+
+  if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
+    const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:items[0].lexemeId });
+    if(conjugation.status==="ok"){
+      const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
+      if(form){
+        exercises.push({
+          id:items[0].id+":verb-present-du",
+          userVocabularyId:items[0].id,
+          lemma:items[0].lexeme.lemma,
+          conjugation:{ person:"du" },
+          exercise:{
+            type:"REVERSE_RECALL",
+            prompt:"Conjugate “"+items[0].lexeme.lemma+"” for du in Präsens.",
+            expected:form.form,
+            interaction:"short_text",
+            skill:"production",
+            requiresAI:false,
+          },
+        });
+      }
+    }
+  }
+
+  return <main className="page focus-page">
+    <div className="focus-meta">
+      <Link href="/practice">Practice</Link>
+      <span>{params.lexeme?items[0].lexeme.lemma:"Quick drill"}</span>
+    </div>
+    <PracticeForm exercises={exercises}/>
+  </main>;
 }

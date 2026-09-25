@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
@@ -21,6 +22,13 @@ async function fetchReviewQueue(): Promise<ReviewQueueData> {
     headers: { Accept: "application/json" },
   });
 
+  if (response.status === 401) {
+    window.location.assign(
+      "/login?returnTo=" +
+        encodeURIComponent(window.location.pathname + window.location.search),
+    );
+    throw new Error("Unauthorized");
+  }
   if (!response.ok) {
     throw new Error("Could not refresh the review queue.");
   }
@@ -38,6 +46,8 @@ export function ReviewSession({
   const queryClient = useQueryClient();
   const reduceMotion = useReducedMotion();
   const queueKey = queryKeys.review.queue(userScope);
+  const repeatCounts = useRef<Record<string, number>>({});
+  const [sessionStats, setSessionStats] = useState({ reviewed: 0, again: 0 });
 
   const queue = useQuery({
     queryKey: queueKey,
@@ -49,7 +59,15 @@ export function ReviewSession({
   const review = useMutation({
     mutationFn: async (input: ReviewMutationInput) => {
       const result = await submitReviewMutation(input);
-      if (result.status === "error") throw new Error(result.message);
+      if (result.status === "error") {
+        if (result.message.includes("Unauthorized")) {
+          window.location.assign(
+            "/login?returnTo=" +
+              encodeURIComponent(window.location.pathname + window.location.search),
+          );
+        }
+        throw new Error(result.message);
+      }
       return result;
     },
     onMutate: async (input) => {
@@ -66,7 +84,10 @@ export function ReviewSession({
           : current,
       );
 
-      return { previous, perf };
+      const reviewedCard = previous?.cards.find(
+        (card) => card.userVocabularyId === input.userVocabularyId,
+      );
+      return { previous, perf, reviewedCard };
     },
     onError: (error, _input, context) => {
       if (context?.previous) {
@@ -74,9 +95,33 @@ export function ReviewSession({
       }
       context?.perf.fail(error, { rolledBack: true });
     },
-    onSuccess: async (_result, _input, context) => {
+    onSuccess: async (_result, input, context) => {
       context?.perf.success({ rolledBack: false });
-      const current = queryClient.getQueryData<ReviewQueueData>(queueKey);
+      setSessionStats((value) => ({
+        reviewed: value.reviewed + 1,
+        again: value.again + (input.grade === "AGAIN" ? 1 : 0),
+      }));
+      let current = queryClient.getQueryData<ReviewQueueData>(queueKey);
+
+      if (
+        input.grade === "AGAIN" &&
+        context?.reviewedCard &&
+        (repeatCounts.current[input.userVocabularyId] ?? 0) < 1
+      ) {
+        repeatCounts.current[input.userVocabularyId] =
+          (repeatCounts.current[input.userVocabularyId] ?? 0) + 1;
+        queryClient.setQueryData<ReviewQueueData>(queueKey, (value) =>
+          value
+            ? {
+                ...value,
+                dueCount: value.dueCount + 1,
+                cards: [...value.cards, context.reviewedCard!],
+              }
+            : value,
+        );
+        current = queryClient.getQueryData<ReviewQueueData>(queueKey);
+      }
+
       if (!current || shouldRefillReviewQueue(current)) {
         await queryClient.invalidateQueries({ queryKey: queueKey });
       }
@@ -91,8 +136,8 @@ export function ReviewSession({
     review.mutate({
       userVocabularyId: card.userVocabularyId,
       grade,
-      exerciseType: card.exercise.type,
-      prompt: card.exercise.prompt,
+      exerciseType: card.review.exerciseType,
+      prompt: card.review.front.prompt,
       startedAt,
     });
   }
@@ -119,7 +164,9 @@ export function ReviewSession({
       <main className="page review-session-shell">
         <section className="empty-state compact-empty">
           <strong>Review complete</strong>
-          <span className="muted">Nothing else is due right now.</span>
+          <span className="muted">
+            {sessionStats.reviewed} reviewed · {sessionStats.again} marked Again
+          </span>
           <div className="ia-empty-actions">
             <Link href="/review" className="button button-primary">Back to Review</Link>
             <Link href="/practice" className="button button-secondary">Practice</Link>

@@ -15,7 +15,7 @@ test("strong vocabulary receives a production-heavy review", () => {
   );
 
   assert.ok(
-    ["COLLOCATION", "CASE_PREPOSITION", "FREE_SENTENCE", "PARAPHRASE"].includes(type),
+    ["CLOZE", "CONTEXTUAL_CHOICE", "COLLOCATION", "CASE_PREPOSITION", "REVERSE_RECALL"].includes(type),
   );
 });
 

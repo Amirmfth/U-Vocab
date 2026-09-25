@@ -24,5 +24,5 @@ test("production gap leads to production-oriented exercise", () => {
     mistakeTypes: [],
   });
 
-  assert.ok(["FREE_SENTENCE", "PARAPHRASE", "CASE_PREPOSITION", "COLLOCATION"].includes(type));
+  assert.ok(["REVERSE_RECALL", "CASE_PREPOSITION", "COLLOCATION"].includes(type));
 });

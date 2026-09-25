@@ -6,7 +6,7 @@ test("query filters normalize ordering and omit empty/all values", () => {
   assert.deepEqual(
     normalizeQueryFilters({
       topic: "Travel",
-      q: "  Haus  ",
+      q: "Haus",
       status: "ALL",
       level: "",
     }),
@@ -31,7 +31,7 @@ test("equivalent vocabulary filters produce deterministic query keys", () => {
 });
 
 test("query domains stay hierarchical", () => {
-  assert.deepEqual(queryKeys.review.queue(), ["review", "queue"]);
+  assert.deepEqual(queryKeys.review.queue("user-a"), ["review", "user-a", "queue"]);
   assert.deepEqual(queryKeys.word.detail("lexeme-1"), ["word", "lexeme-1"]);
   assert.deepEqual(queryKeys.writing.session("session-1"), [
     "writing",

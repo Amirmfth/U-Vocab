@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { RelationType } from "@prisma/client";
-import { BookOpen, Plus } from "lucide-react";
+import { BookOpen, GitCompareArrows, Layers3, Network, Plus, Star, Upload } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { currentRetrievability } from "@/lib/fsrs";
@@ -179,6 +179,35 @@ export default async function Vocabulary({
           </Link>
         </div>
       </section>
+
+      <section className="ia-tool-strip" aria-label="Words tools">
+        <Link href="/vocabulary/new" className="ia-tool-link">
+          <Plus size={17} /><span><strong>Add word</strong><small>Create a lexical entry</small></span>
+        </Link>
+        <Link href="/read" className="ia-tool-link">
+          <Upload size={17} /><span><strong>Import from text</strong><small>Discover words in context</small></span>
+        </Link>
+        <Link href="/topic-packs" className="ia-tool-link">
+          <Layers3 size={17} /><span><strong>Packs</strong><small>Topic collections</small></span>
+        </Link>
+        <Link href="/recommendations" className="ia-tool-link">
+          <Star size={17} /><span><strong>Recommendations</strong><small>What to learn next</small></span>
+        </Link>
+        <Link href="/compare" className="ia-tool-link">
+          <GitCompareArrows size={17} /><span><strong>Compare</strong><small>Distinguish similar words</small></span>
+        </Link>
+        <Link href="/universe" className="ia-tool-link">
+          <Network size={17} /><span><strong>Universe</strong><small>Explore your lexical graph</small></span>
+        </Link>
+      </section>
+
+      <nav className="ia-subnav" aria-label="Words views">
+        <Link href="/vocabulary" className={current.status === "ALL" ? "is-active" : ""}>All</Link>
+        <Link href="/vocabulary?status=WEAK" className={current.status === "WEAK" ? "is-active" : ""}>Weak</Link>
+        <Link href="/vocabulary?status=NEW" className={current.status === "NEW" ? "is-active" : ""}>New</Link>
+        <Link href="/vocabulary?status=MASTERED" className={current.status === "MASTERED" ? "is-active" : ""}>Mastered</Link>
+        <Link href="/topic-packs"><Layers3 size={14} /> Packs</Link>
+      </nav>
 
       <VocabularyFilters
         current={current}

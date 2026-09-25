@@ -25,9 +25,9 @@ export default async function RescuePage({
     return (
       <main className="page">
         <section className="page-header compact">
-          <Link href="/progress" className="back-link">
+          <Link href="/review" className="back-link">
             <ArrowLeft size={16} />
-            Progress
+            Review
           </Link>
           <p className="eyebrow">RETENTION</p>
           <h1>Rescue words</h1>
@@ -102,9 +102,9 @@ export default async function RescuePage({
     return (
       <main className="page focus-page">
         <section className="page-header compact">
-          <Link href="/progress" className="back-link">
+          <Link href="/review" className="back-link">
             <ArrowLeft size={16} />
-            Progress
+            Review
           </Link>
           <CheckCircle2 size={28} className="rescue-complete-icon" />
           <h1>Rescue complete</h1>

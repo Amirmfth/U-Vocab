@@ -6,7 +6,15 @@ export function getCachedHomeStats(userId: string) {
   return unstable_cache(
     async () => {
       const now = new Date();
-      const [total, due, weakProduction, mistakes] = await Promise.all([
+      const [
+        total,
+        due,
+        weakProduction,
+        mistakes,
+        activeFocus,
+        activeWriting,
+        activeConversation,
+      ] = await Promise.all([
         db.userVocabulary.count({ where: { userId } }),
         db.userVocabulary.count({
           where: {
@@ -18,9 +26,72 @@ export function getCachedHomeStats(userId: string) {
           where: { userId, production: { lt: 0.4 } },
         }),
         db.mistake.count({ where: { userId, resolvedAt: null } }),
+        db.learningSession.findFirst({
+          where: { userId, status: "ACTIVE" },
+          select: { id: true, lastActiveAt: true, plannedMinutes: true },
+          orderBy: { lastActiveAt: "desc" },
+        }),
+        db.writingSession.findFirst({
+          where: { userId, status: "ACTIVE" },
+          select: { id: true, createdAt: true, taskType: true },
+          orderBy: { createdAt: "desc" },
+        }),
+        db.conversationSession.findFirst({
+          where: { userId, status: "ACTIVE" },
+          select: { id: true, updatedAt: true, kind: true },
+          orderBy: { updatedAt: "desc" },
+        }),
       ]);
 
-      return { total, due, weakProduction, mistakes };
+      const candidates = [
+        activeFocus
+          ? {
+              href: "/focus/" + activeFocus.id,
+              label: "Focus session",
+              detail: activeFocus.plannedMinutes + "-minute plan",
+              at: activeFocus.lastActiveAt,
+            }
+          : null,
+        activeWriting
+          ? {
+              href: "/writing/" + activeWriting.id,
+              label: "Writing",
+              detail: activeWriting.taskType,
+              at: activeWriting.createdAt,
+            }
+          : null,
+        activeConversation
+          ? {
+              href: "/conversation/" + activeConversation.id,
+              label:
+                activeConversation.kind === "MISSION"
+                  ? "Speaking mission"
+                  : "Conversation",
+              detail: "Continue speaking practice",
+              at: activeConversation.updatedAt,
+            }
+          : null,
+      ].filter(
+        (
+          item,
+        ): item is {
+          href: string;
+          label: string;
+          detail: string;
+          at: Date;
+        } => Boolean(item),
+      );
+
+      candidates.sort((a, b) => b.at.getTime() - a.at.getTime());
+      const recent = candidates[0]
+        ? {
+            href: candidates[0].href,
+            label: candidates[0].label,
+            detail: candidates[0].detail,
+          }
+        : null;
+
+      return { total, due, weakProduction, mistakes, recent };
     },
     ["home-stats", userId],
     {
@@ -29,6 +100,8 @@ export function getCachedHomeStats(userId: string) {
         cacheTags.vocabulary(userId),
         cacheTags.review(userId),
         cacheTags.mistakes(userId),
+        cacheTags.writing(userId),
+        cacheTags.conversation(userId),
       ],
       revalidate: 60,
     },

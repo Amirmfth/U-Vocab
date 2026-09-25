@@ -89,7 +89,7 @@ export function ReviewCard(props: Props) {
                 <input type="hidden" name="startedAt" value={startedAt.current} />
                 <ActionButton
                   variant={grade === "AGAIN" ? "danger" : grade === "EASY" ? "success" : "secondary"}
-                  pendingLabel="Saving…"
+                  pendingLabel="Saving review…"
                 >
                   {grade.charAt(0) + grade.slice(1).toLowerCase()}
                 </ActionButton>

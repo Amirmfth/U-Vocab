@@ -18,6 +18,7 @@ export const AI_PROMPT_VERSIONS: Record<string, string> = {
   conversation_tutor: "v2",
   conversation_final_evaluation: "v2",
   word_comparison: "v2",
+  verb_conjugation: "v1",
   lexeme_embedding: "v1",
   mistake_embedding: "v1",
   semantic_query_embedding: "v1",

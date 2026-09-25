@@ -38,3 +38,19 @@ export function applyMasteryDelta(
     contextualUsage:delta.contextualUsage===undefined?current.contextualUsage:clamp(current.contextualUsage+delta.contextualUsage),
   };
 }
+
+
+export type ReviewGradeLike="AGAIN"|"HARD"|"GOOD"|"EASY";
+
+export function reviewMasteryDelta(type:ExerciseType,grade:ReviewGradeLike):MasteryDelta {
+  const recall=grade==="AGAIN"?-0.03:grade==="HARD"?0.03:grade==="GOOD"?0.06:0.09;
+  const delta:MasteryDelta={ meaningRecall:recall };
+  if(["REVERSE_RECALL","ARTICLE","COLLOCATION","CASE_PREPOSITION"].includes(type)){
+    delta.production=recall/2;
+  }
+  if(["CLOZE","CONTEXTUAL_CHOICE","CASE_PREPOSITION","COLLOCATION"].includes(type)){
+    delta.contextualUsage=recall/2;
+  }
+  if(type==="MEANING_RECALL") delta.recognition=recall/3;
+  return delta;
+}

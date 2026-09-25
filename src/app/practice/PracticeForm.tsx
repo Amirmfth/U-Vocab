@@ -28,12 +28,21 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   function submit(value:string){
     if(!current||pending||result?.status==="success") return;
     startTransition(async()=>{
-      const response=await submitPracticeAnswer({
-        userVocabularyId:current.userVocabularyId,
-        exerciseType:current.exercise.type,
-        answer:value,
-        startedAt:startedAt.current,
-      });
+      let response:PracticeAnswerResult;
+      try {
+        response=await submitPracticeAnswer({
+          userVocabularyId:current.userVocabularyId,
+          exerciseType:current.exercise.type,
+          answer:value,
+          startedAt:startedAt.current,
+        });
+      } catch (error) {
+        if(error instanceof Error&&error.message.includes("Unauthorized")){
+          window.location.assign("/login?returnTo="+encodeURIComponent(window.location.pathname+window.location.search));
+          return;
+        }
+        response={ status:"error",message:"Could not save this practice attempt." };
+      }
       setResult(response);
       if(response.status==="success"){
         setHistory((items)=>[...items,{ correct:response.correct,skill:current.exercise.skill }]);

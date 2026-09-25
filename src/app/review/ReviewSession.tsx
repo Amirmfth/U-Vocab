@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
-import { optimisticReviewAdvance, REVIEW_QUEUE_QUERY_POLICY } from "@/lib/review-query";
+import { optimisticReviewAdvance, REVIEW_QUEUE_QUERY_POLICY, shouldRefillReviewQueue } from "@/lib/review-query";
 import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueData } from "@/lib/review-queue";
 import {
@@ -70,7 +70,7 @@ export function ReviewSession({
     },
     onSuccess: async () => {
       const current = queryClient.getQueryData<ReviewQueueData>(queueKey);
-      if (!current || current.cards.length <= 2) {
+      if (!current || shouldRefillReviewQueue(current)) {
         await queryClient.invalidateQueries({ queryKey: queueKey });
       }
     },

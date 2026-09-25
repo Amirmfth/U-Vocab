@@ -13,6 +13,7 @@ export type PracticeSessionExercise={
   lemma:string;
   retry?:boolean;
   exercise:ExerciseDefinition;
+  conjugation?:{ person:string };
 };
 
 export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[] }){
@@ -35,6 +36,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           exerciseType:current.exercise.type,
           answer:value,
           startedAt:startedAt.current,
+          conjugation:current.conjugation,
         });
       } catch (error) {
         if(error instanceof Error&&error.message.includes("Unauthorized")){

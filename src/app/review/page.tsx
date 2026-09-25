@@ -70,8 +70,7 @@ export default async function ReviewPage({
     }),
   ]);
 
-  {
-    return (
+  return (
       <main className="page review-landing">
         <section className="review-hero">
           <div>
@@ -104,8 +103,5 @@ export default async function ReviewPage({
 
         <ReviewModes mistakes={mistakeCount} weak={weakCount} />
       </main>
-    );
-  }
-
-  }
+  );
 }

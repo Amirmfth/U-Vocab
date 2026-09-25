@@ -117,7 +117,7 @@ export function WritingStartForm({
         <StatusNotice tone="error">{state.message}</StatusNotice>
       ) : null}
 
-      <ActionButton pendingLabel="Generating writing task…">
+      <ActionButton pendingLabel="Preparing your writing task…">
         <PenLine size={17} />
         Create writing task
       </ActionButton>

@@ -11,6 +11,10 @@ type ResponseShape={ status:"ok"; cache:"hit"|"miss"; data:VerbConjugationData }
 async function fetchConjugation(lexemeId:string):Promise<ResponseShape>{
   const response=await fetch("/api/vocabulary/"+lexemeId+"/conjugation",{ headers:{ Accept:"application/json" },cache:"no-store" });
   const payload=await response.json();
+  if(response.status===401){
+    window.location.assign("/login?returnTo="+encodeURIComponent(window.location.pathname+window.location.search));
+    throw new Error("Unauthorized");
+  }
   if(!response.ok) throw new Error(payload.error??"Could not load conjugation.");
   return payload as ResponseShape;
 }

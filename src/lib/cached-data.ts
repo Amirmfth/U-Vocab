@@ -338,7 +338,7 @@ export function getCachedWritingIndex(userId: string) {
           take: 50,
         }),
         db.writingSession.findMany({
-          where: { userId },
+          where: { userId, parentId: null },
           orderBy: { createdAt: "desc" },
           take: 12,
         }),

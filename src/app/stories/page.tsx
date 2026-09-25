@@ -9,7 +9,7 @@ import { StoryForm } from "./StoryForm";
 export default async function StoriesPage() {
   await connection();
   const user = await getCurrentUser();
-  const [stories, vocabulary] = await Promise.all([
+  const [stories, vocabulary, topicPacks] = await Promise.all([
     db.story.findMany({
       where: { userId: user.id },
       include: { _count: { select: { targets: true } } },
@@ -18,7 +18,13 @@ export default async function StoriesPage() {
     db.userVocabulary.findMany({
       where: { userId: user.id }, include: { lexeme: true },
       orderBy: [{ production: "asc" }, { contextualUsage: "asc" }, { addedAt: "desc" }],
-      take: 20,
+      take: 250,
+    }),
+    db.topicPack.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+      include: { items: { orderBy: { position: "asc" }, include: { lexeme: true } } },
     }),
   ]);
 
@@ -32,6 +38,14 @@ export default async function StoriesPage() {
           lexemeId: item.lexemeId,
           label: item.lexeme.article ? item.lexeme.article + " " + item.lexeme.lemma : item.lexeme.lemma,
           state: item.state,
+        }))}
+        topicPacks={topicPacks.map((pack) => ({
+          id: pack.id,
+          title: pack.title,
+          items: pack.items.map((item) => ({
+            lexemeId: item.lexemeId,
+            label: item.lexeme.article ? item.lexeme.article + " " + item.lexeme.lemma : item.lexeme.lemma,
+          })),
         }))}
       />
 

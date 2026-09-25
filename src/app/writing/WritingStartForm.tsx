@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PenLine } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
@@ -17,6 +17,7 @@ export function WritingStartForm({
 }) {
   const router = useRouter();
   const [state, action] = useActionState(createWritingSessionAction, initialState);
+  const [targetLength, setTargetLength] = useState("120");
 
   useEffect(() => {
     if (state.status === "success" && state.sessionId) {
@@ -26,74 +27,81 @@ export function WritingStartForm({
 
   return (
     <form action={action} className="panel writing-start-form">
-      <div className="field">
-        <label htmlFor="writing-mode-trigger">Mode</label>
-        <ActivitySelect
-          id="writing-mode"
-          name="mode"
-          defaultValue="GUIDED"
-          options={[
-            { value: "GUIDED", label: "Guided vocabulary" },
-            { value: "OPEN", label: "Open writing" },
-          ]}
-        />
+      <div className="writing-settings-row">
+        <div className="field">
+          <label htmlFor="writing-mode-trigger">Mode</label>
+          <ActivitySelect
+            id="writing-mode"
+            name="mode"
+            defaultValue="GUIDED"
+            options={[
+              { value: "GUIDED", label: "Guided vocabulary" },
+              { value: "OPEN", label: "Open writing" },
+            ]}
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="writing-level-trigger">Level</label>
+          <ActivitySelect
+            id="writing-level"
+            name="level"
+            defaultValue="B2"
+            options={["A1","A2","B1","B2","C1","C2"].map((value) => ({
+              value,
+              label: value,
+            }))}
+          />
+        </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="writing-level-trigger">Level</label>
-        <ActivitySelect
-          id="writing-level"
-          name="level"
-          defaultValue="B2"
-          options={["A1","A2","B1","B2","C1","C2"].map((value) => ({
-            value,
-            label: value,
-          }))}
-        />
+      <div className="writing-settings-row">
+        <div className="field">
+          <label htmlFor="writing-type-trigger">Writing type</label>
+          <ActivitySelect
+            id="writing-type"
+            name="taskType"
+            defaultValue="formal_email"
+            options={[
+              { value: "formal_email", label: "Formal email" },
+              { value: "informal_email", label: "Informal email" },
+              { value: "opinion", label: "Opinion text" },
+              { value: "essay", label: "Essay" },
+              { value: "complaint", label: "Complaint / request" },
+              { value: "report", label: "Short report" },
+            ]}
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="writing-length-trigger">Target length</label>
+          <ActivitySelect
+            id="writing-length"
+            name="targetWords"
+            defaultValue="120"
+            onValueChange={setTargetLength}
+            options={[
+              { value: "120", label: "~120 words" },
+              { value: "180", label: "~180 words" },
+              { value: "CUSTOM", label: "Custom length" },
+            ]}
+          />
+        </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="writing-type-trigger">Writing type</label>
-        <ActivitySelect
-          id="writing-type"
-          name="taskType"
-          defaultValue="formal_email"
-          options={[
-            { value: "formal_email", label: "Formal email" },
-            { value: "informal_email", label: "Informal email" },
-            { value: "opinion", label: "Opinion text" },
-            { value: "essay", label: "Essay" },
-            { value: "complaint", label: "Complaint / request" },
-            { value: "report", label: "Short report" },
-          ]}
-        />
-      </div>
-
-      <div className="field">
-        <label htmlFor="writing-length-trigger">Target length</label>
-        <ActivitySelect
-          id="writing-length"
-          name="targetWords"
-          defaultValue="120"
-          options={[
-            { value: "120", label: "~120 words" },
-            { value: "180", label: "~180 words" },
-            { value: "CUSTOM", label: "Custom length" },
-          ]}
-        />
-      </div>
-
-      <div className="field">
-        <label htmlFor="writing-custom-words">Custom word target</label>
-        <input
-          id="writing-custom-words"
-          name="customWords"
-          type="number"
-          min="60"
-          max="500"
-          defaultValue="150"
-        />
-      </div>
+      {targetLength === "CUSTOM" ? (
+        <div className="field">
+          <label htmlFor="writing-custom-words">Custom word target</label>
+          <input
+            id="writing-custom-words"
+            name="customWords"
+            type="number"
+            min="60"
+            max="500"
+            defaultValue="150"
+          />
+        </div>
+      ) : null}
 
       <div className="field writing-topic-field">
         <label htmlFor="writing-topic">Topic</label>

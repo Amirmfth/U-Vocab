@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono";
 import { AppNavigation } from "@/components/app-navigation";
 import { PageTransition } from "@/components/page-transition";
 import { WebVitals } from "@/components/web-vitals";
+import { getCurrentUser } from "@/lib/current-user";
 
 export const metadata = {
   title: {
@@ -14,7 +15,8 @@ export const metadata = {
   description: "Your personal German lexical knowledge system",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
   return (
     <html
       lang="en"
@@ -22,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body>
         <WebVitals />
-        <AppNavigation />
+        <AppNavigation translationPreference={user.preferredTranslation} />
         <div className="app-shell">
           <PageTransition>{children}</PageTransition>
         </div>

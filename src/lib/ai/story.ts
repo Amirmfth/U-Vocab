@@ -11,13 +11,16 @@ export const storySchema = z.object({
   englishSummary: z.string(),
   persianSummary: z.string(),
   usedTargets: z.array(z.string()),
-  questions: z.array(
-    z.object({
-      type: z.enum(["COMPREHENSION", "VOCABULARY"]),
-      question: z.string(),
-      answer: z.string(),
-    }),
-  ).min(4).max(10),
+  questions: z
+    .array(
+      z.object({
+        type: z.enum(["COMPREHENSION", "VOCABULARY"]),
+        question: z.string(),
+        answer: z.string(),
+      }),
+    )
+    .min(4)
+    .max(10),
 });
 
 export async function generateStory(input: {
@@ -33,25 +36,32 @@ export async function generateStory(input: {
     userId: input.userId,
     operation: "story_generation",
     model: route.model,
-    metadata: { level: input.level, length: input.length, targetCount: input.targets.length, hasTopic: Boolean(input.topic) },
+    metadata: {
+      level: input.level,
+      length: input.length,
+      targetCount: input.targets.length,
+      hasTopic: Boolean(input.topic),
+    },
   });
   try {
-    const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: route.model,
-      max_output_tokens: route.maxOutputTokens,
-      input: [
-        {
-          role: "system",
-          content:
-            "Write compelling, natural German reading material for a vocabulary learner. Use the target lexical units naturally and avoid keyword stuffing. Match the requested CEFR level and length. Include comprehension and vocabulary questions. Return exact target lemmas that actually appear in the story.",
-        },
-        {
-          role: "user",
-          content: JSON.stringify({ ...input, userId: undefined }),
-        },
-      ],
-      text: { format: zodTextFormat(storySchema, "vocabulary_story") },
-    }));
+    const response = await perf.span("provider", () =>
+      getOpenAI().responses.parse({
+        model: route.model,
+        max_output_tokens: route.maxOutputTokens,
+        input: [
+          {
+            role: "system",
+            content:
+              "Write compelling, natural German reading material for a vocabulary learner. Use the target lexical units naturally and avoid keyword stuffing. Match the requested CEFR level and length. Include comprehension and vocabulary questions. Return exact target lemmas that actually appear in the story.",
+          },
+          {
+            role: "user",
+            content: JSON.stringify({ ...input, userId: undefined }),
+          },
+        ],
+        text: { format: zodTextFormat(storySchema, "vocabulary_story") },
+      }),
+    );
 
     if (!response.output_parsed) {
       const parseError = new Error("OpenAI did not return a valid story.");
@@ -70,7 +80,12 @@ export async function generateStory(input: {
     return response.output_parsed;
   } catch (error) {
     perf.fail(error);
-    if (!(error instanceof Error && error.message === "OpenAI did not return a valid story.")) {
+    if (
+      !(
+        error instanceof Error &&
+        error.message === "OpenAI did not return a valid story."
+      )
+    ) {
       await usageRecorder.failure(error);
     }
     throw error;

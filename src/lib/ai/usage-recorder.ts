@@ -20,9 +20,10 @@ function errorStatus(error: unknown) {
 
 function errorRequestId(error: unknown) {
   if (!error || typeof error !== "object") return null;
+  const values = error as Record<string, unknown>;
   for (const key of ["request_id", "requestId", "_request_id"] as const) {
-    if (key in error) {
-      const value = error[key];
+    if (key in values) {
+      const value = values[key];
       if (typeof value === "string") return value;
     }
   }

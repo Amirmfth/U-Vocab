@@ -28,38 +28,43 @@ export async function createStory(
   formData: FormData,
 ): Promise<StoryState> {
   const level = String(formData.get("level") ?? "");
-  const length = String(formData.get("length") ?? "MEDIUM") as "SHORT" | "MEDIUM" | "LONG";
+  const length = String(formData.get("length") ?? "MEDIUM") as
+    | "SHORT"
+    | "MEDIUM"
+    | "LONG";
   const topic = String(formData.get("topic") ?? "").trim() || null;
   const selectedIds = formData.getAll("targetIds").map(String);
 
-  if (!["A1","A2","B1","B2","C1","C2"].includes(level)) {
+  if (!["A1", "A2", "B1", "B2", "C1", "C2"].includes(level)) {
     return { status: "error", message: "Choose a valid CEFR level." };
   }
-  if (!["SHORT","MEDIUM","LONG"].includes(length)) {
+  if (!["SHORT", "MEDIUM", "LONG"].includes(length)) {
     return { status: "error", message: "Choose a valid story length." };
   }
 
   try {
     const user = await getCurrentUser();
 
-    const targets = selectedIds.length
-      ? await db.userVocabulary.findMany({
-          where: { userId: user.id, lexemeId: { in: selectedIds } },
+    const targetRows = selectedIds.length
+      ? await db.lexeme.findMany({
+          where: {
+            id: { in: selectedIds },
+            OR: [
+              { userStates: { some: { userId: user.id } } },
+              { topicPackItems: { some: { topicPack: { userId: user.id } } } },
+            ],
+          },
           select: {
-            lexemeId: true,
-            lexeme: {
-              select: {
-                lemma: true,
-                patterns: { select: { pattern: true } },
-              },
-            },
+            id: true,
+            lemma: true,
+            patterns: { select: { pattern: true } },
           },
           take: 10,
         })
       : await db.userVocabulary.findMany({
           where: {
             userId: user.id,
-            state: { in: ["NEW","LEARNING","FAMILIAR","ACTIVE"] },
+            state: { in: ["NEW", "LEARNING", "FAMILIAR", "ACTIVE"] },
           },
           select: {
             lexemeId: true,
@@ -78,6 +83,20 @@ export async function createStory(
           take: 6,
         });
 
+    const targets = targetRows.map((item) =>
+      "lexeme" in item
+        ? {
+            lexemeId: item.lexemeId,
+            lemma: item.lexeme.lemma,
+            patterns: item.lexeme.patterns,
+          }
+        : {
+            lexemeId: item.id,
+            lemma: item.lemma,
+            patterns: item.patterns,
+          },
+    );
+
     if (!targets.length) {
       return {
         status: "error",
@@ -91,19 +110,23 @@ export async function createStory(
       length,
       topic,
       targets: targets.map((item) => ({
-        lemma: item.lexeme.lemma,
-        pattern: item.lexeme.patterns[0]?.pattern ?? null,
+        lemma: item.lemma,
+        pattern: item.patterns[0]?.pattern ?? null,
       })),
     });
 
     const normalizedUsed = new Set(
-      generated.usedTargets.map((lemma) => lemma.toLocaleLowerCase("de-DE").trim()),
+      generated.usedTargets.map((lemma) =>
+        lemma.toLocaleLowerCase("de-DE").trim(),
+      ),
     );
 
     const usedTargets = targets.filter((item) => {
-      const normalizedLemma = item.lexeme.lemma.toLocaleLowerCase("de-DE").trim();
-      return normalizedUsed.has(normalizedLemma) &&
-        storyContainsLemma(generated.content, item.lexeme.lemma);
+      const normalizedLemma = item.lemma.toLocaleLowerCase("de-DE").trim();
+      return (
+        normalizedUsed.has(normalizedLemma) &&
+        storyContainsLemma(generated.content, item.lemma)
+      );
     });
 
     const story = await db.story.create({
@@ -136,7 +159,10 @@ export async function createStory(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not generate this story.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Could not generate this story.",
     };
   }
 }
@@ -187,7 +213,10 @@ export async function markStoryRead(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not record this reading.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Could not record this reading.",
     };
   }
 }

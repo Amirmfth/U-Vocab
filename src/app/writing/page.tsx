@@ -16,10 +16,6 @@ export default async function WritingPage() {
       <section className="page-header compact">
         <p className="eyebrow">WRITING PRACTICE</p>
         <h1>German writing exam</h1>
-        <p className="page-description">
-          Practice exam-style German writing with vocabulary-focused AI evaluation.
-          Scores are learning signals, not official CEFR certification.
-        </p>
       </section>
 
       <WritingStartForm

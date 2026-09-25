@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -18,6 +20,11 @@ import {
   sectionForPath,
   type LearningSection,
 } from "@/lib/navigation";
+
+const MobileAddVocabularySheet = dynamic(
+  () => import("@/components/mobile-add-vocabulary-sheet").then((module) => module.MobileAddVocabularySheet),
+  { ssr: false },
+);
 
 const primary: Array<{
   section: LearningSection;
@@ -62,8 +69,14 @@ function NavLink({
   );
 }
 
-export function AppNavigation() {
+export function AppNavigation({
+  translationPreference,
+}: {
+  translationPreference: "ENGLISH" | "PERSIAN" | "BOTH";
+}) {
   const pathname = usePathname();
+  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+  const [hasOpenedAddSheet, setHasOpenedAddSheet] = useState(false);
   const owner = routeOwner(pathname);
   const isPrimary =
     pathname === "/" ||
@@ -79,13 +92,19 @@ export function AppNavigation() {
           <span>U-Vocab</span>
         </Link>
         <div className="mobile-header-actions">
-          <Link
-            href="/vocabulary/new"
+          <button
+            type="button"
             className="icon-button"
             aria-label="Add word"
+            aria-expanded={isAddSheetOpen}
+            aria-controls="mobile-add-sheet"
+            onClick={() => {
+              setHasOpenedAddSheet(true);
+              setIsAddSheetOpen(true);
+            }}
           >
             <Plus size={20} />
-          </Link>
+          </button>
           <Link href="/settings" className="icon-button" aria-label="Settings">
             <Settings size={19} />
           </Link>
@@ -170,6 +189,11 @@ export function AppNavigation() {
           );
         })}
       </nav>
+      {hasOpenedAddSheet ? <MobileAddVocabularySheet
+        isOpen={isAddSheetOpen}
+        onClose={() => setIsAddSheetOpen(false)}
+        translationPreference={translationPreference}
+      /> : null}
     </>
   );
 }

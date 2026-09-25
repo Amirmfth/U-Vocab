@@ -45,6 +45,20 @@ export default async function WritingSessionPage({
   const parentEvaluation = parent?.evaluation
     ? writingEvaluationSchema.safeParse(parent.evaluation)
     : null;
+  const rewrites = !session.parentId
+    ? await db.writingSession.findMany({
+        where: { userId: user.id, parentId: session.id },
+        select: {
+          id: true,
+          status: true,
+          draft: true,
+          wordCount: true,
+          evaluation: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "asc" },
+      })
+    : [];
 
   return (
     <main className="page">
@@ -85,6 +99,16 @@ export default async function WritingSessionPage({
               <p className="muted">
                 Improve your previous attempt using its feedback. The task remains the same.
               </p>
+              {parentEvaluation?.success ? (
+                <>
+                  <p className="rewrite-score">Previous overall: {percent(parentEvaluation.data.overall)}%</p>
+                  <ul>
+                    {parentEvaluation.data.improvements.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
             </section>
           ) : null}
           <WritingEditor
@@ -248,6 +272,31 @@ export default async function WritingSessionPage({
           ) : null}
 
           <RewriteButton sessionId={session.id} />
+
+          {rewrites.length ? (
+            <section className="page-section rewrite-history">
+              <h2 className="section-title">Rewrite history</h2>
+              <div className="collection-list">
+                {rewrites.map((rewrite, index) => {
+                  const rewriteEvaluation = rewrite.evaluation
+                    ? writingEvaluationSchema.safeParse(rewrite.evaluation)
+                    : null;
+                  return (
+                    <Link className="collection-row" href={"/writing/" + rewrite.id} key={rewrite.id}>
+                      <div>
+                        <strong>Rewrite {index + 1}</strong>
+                        <span>
+                          {rewrite.status.toLowerCase()} · {rewrite.wordCount} words
+                          {rewriteEvaluation?.success ? ` · ${percent(rewriteEvaluation.data.overall)}% overall` : ""}
+                        </span>
+                      </div>
+                      <ArrowLeft className="rewrite-history-arrow" size={16} />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
         </>
       ) : (
         <div className="empty-state">

@@ -43,7 +43,7 @@ export async function resolveMistake(
     revalidateUserDomains(
       user.id,
       ["home", "mistakes", "progress", "review"],
-      [mistake.lexemeId],
+      mistake.lexemeId ? [mistake.lexemeId] : [],
     );
     revalidatePath("/mistakes");
     return { status: "success", message: "Marked resolved." };

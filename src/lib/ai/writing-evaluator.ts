@@ -71,6 +71,17 @@ export const writingEvaluationSchema = z.object({
 
 export type WritingEvaluation = z.infer<typeof writingEvaluationSchema>;
 
+export function calculateWritingOverall(evaluation: Omit<WritingEvaluation, "overall">) {
+  const weighted =
+    evaluation.taskCompletion * 0.2 +
+    evaluation.organization * 0.15 +
+    evaluation.grammar * 0.25 +
+    evaluation.vocabularyRange * 0.15 +
+    evaluation.vocabularyAccuracy * 0.15 +
+    evaluation.naturalness * 0.1;
+  return Math.round(Math.max(0, Math.min(1, weighted)) * 100) / 100;
+}
+
 export async function evaluateWriting(input: {
   userId: string;
   level: string;
@@ -81,19 +92,25 @@ export async function evaluateWriting(input: {
   draft: string;
   precomputedWordCount: number;
   repeatedWords: Array<{ word: string; count: number }>;
-  targets: Array<{
+  requiredTargets: Array<{
     lexemeId: string;
     lemma: string;
     patterns: string[];
   }>;
+  observedVocabulary: Array<{ lemma: string; patterns: string[] }>;
+  rewriteContext?: {
+    previousDraft: string;
+    previousWordCount: number;
+    previousEvaluation?: Pick<WritingEvaluation, "overall" | "summary" | "improvements" | "corrections">;
+  };
 }) {
   const route = aiRoute("writing_evaluation");
-  const perf = startOperation("ai.writing_evaluation", { model: route.model, draftChars: input.draft.length, targetCount: input.targets.length, level: input.level });
+  const perf = startOperation("ai.writing_evaluation", { model: route.model, draftChars: input.draft.length, targetCount: input.requiredTargets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "writing_evaluation",
     model: route.model,
-    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.targets.length },
+    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.requiredTargets.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -103,7 +120,7 @@ export async function evaluateWriting(input: {
         {
           role: "system",
           content:
-            "Evaluate this German writing practice. Scores are internal learning signals only. Word count and repeated-word counts are precomputed; use them instead of recounting. Judge grammar, organization, lexical accuracy/naturalness, collocations, and supplied targets. targetUsage must use only supplied lexeme IDs. Keep feedback prioritized and concise: at most four strengths, five improvements, five collocation notes, twelve lexical mistakes, eight corrections, and a concise improved version preserving the learner intent.",
+            "Evaluate this German writing practice. Word count and repeated-word counts are precomputed; use them instead of recounting. Score each category from 0 to 1 using this rubric: 0.9-1.0 = consistently strong for the requested level, 0.75-0.89 = solid with minor issues, 0.55-0.74 = partly successful with clear weaknesses, 0.30-0.54 = limited control, below 0.30 = largely unsuccessful. Task completion measures fulfillment of the actual task, including an appropriate response to the target length. Organization measures structure and cohesion. Grammar measures accuracy and control. Vocabulary range measures variety appropriate to the level. Vocabulary accuracy measures correct word choice, forms, and collocations. Naturalness measures idiomatic, context-appropriate German. Evaluate requiredTargets separately: targetUsage must contain only requiredTargets' lexeme IDs, including unused required targets. observedVocabulary is context only and must never appear in targetUsage. If rewriteContext is present, explicitly assess whether the new draft addressed its prior feedback, but score the new draft on its own merits. The server computes overall from the category scores, so make each category score independently defensible. Keep feedback prioritized and concise: at most four strengths, five improvements, five collocation notes, twelve lexical mistakes, eight corrections, and an improved version preserving the learner intent.",
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],
@@ -126,7 +143,24 @@ export async function evaluateWriting(input: {
       outputTokens: response.usage?.output_tokens ?? 0,
     });
 
-    return response.output_parsed;
+    const targetUsageById = new Map(
+      response.output_parsed.targetUsage.map((usage) => [usage.lexemeId, usage]),
+    );
+    const targetUsage = input.requiredTargets.map((target) =>
+      targetUsageById.get(target.lexemeId) ?? {
+        lexemeId: target.lexemeId,
+        used: false,
+        correct: false,
+        naturalness: 0,
+        note: "Not used in this draft.",
+      },
+    );
+
+    return {
+      ...response.output_parsed,
+      targetUsage,
+      overall: calculateWritingOverall(response.output_parsed),
+    };
   } catch (error) {
     perf.fail(error);
     await usageRecorder.failure(error);

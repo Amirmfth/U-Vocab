@@ -1,8 +1,9 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { cacheTags } from "@/lib/cache-tags";
+import { localDateKey } from "@/lib/progress";
 
-export function getCachedHomeStats(userId: string) {
+export function getCachedHomeStats(userId: string, timeZone: string) {
   return unstable_cache(
     async () => {
       const now = new Date();
@@ -14,6 +15,9 @@ export function getCachedHomeStats(userId: string) {
         activeFocus,
         activeWriting,
         activeConversation,
+        recentAttempts,
+        recentReviews,
+        recentAdded,
       ] = await Promise.all([
         db.userVocabulary.count({ where: { userId } }),
         db.userVocabulary.count({
@@ -40,6 +44,27 @@ export function getCachedHomeStats(userId: string) {
           where: { userId, status: "ACTIVE" },
           select: { id: true, updatedAt: true, kind: true },
           orderBy: { updatedAt: "desc" },
+        }),
+        db.attempt.findMany({
+          where: {
+            userId,
+            createdAt: { gte: new Date(now.getTime() - 36 * 60 * 60 * 1000) },
+          },
+          select: { createdAt: true, durationMs: true },
+        }),
+        db.review.findMany({
+          where: {
+            userVocabulary: { userId },
+            reviewedAt: { gte: new Date(now.getTime() - 36 * 60 * 60 * 1000) },
+          },
+          select: { reviewedAt: true },
+        }),
+        db.userVocabulary.findMany({
+          where: {
+            userId,
+            addedAt: { gte: new Date(now.getTime() - 36 * 60 * 60 * 1000) },
+          },
+          select: { addedAt: true },
         }),
       ]);
 
@@ -91,9 +116,37 @@ export function getCachedHomeStats(userId: string) {
           }
         : null;
 
-      return { total, due, weakProduction, mistakes, recent };
+      const todayKey = localDateKey(now, timeZone);
+      const todayAttempts = recentAttempts.filter(
+        (item) => localDateKey(item.createdAt, timeZone) === todayKey,
+      );
+      const todayReviews = recentReviews.filter(
+        (item) => localDateKey(item.reviewedAt, timeZone) === todayKey,
+      ).length;
+      const todayAdded = recentAdded.filter(
+        (item) => localDateKey(item.addedAt, timeZone) === todayKey,
+      ).length;
+      const todayMinutes = Math.round(
+        todayAttempts.reduce(
+          (sum, item) => sum + (item.durationMs ?? 0),
+          0,
+        ) / 60000,
+      );
+
+      return {
+        total,
+        due,
+        weakProduction,
+        mistakes,
+        recent,
+        today: {
+          minutes: todayMinutes,
+          reviews: todayReviews,
+          added: todayAdded,
+        },
+      };
     },
-    ["home-stats", userId],
+    ["home-stats", userId, timeZone],
     {
       tags: [
         cacheTags.home(userId),
@@ -102,6 +155,7 @@ export function getCachedHomeStats(userId: string) {
         cacheTags.mistakes(userId),
         cacheTags.writing(userId),
         cacheTags.conversation(userId),
+        cacheTags.progress(userId),
       ],
       revalidate: 60,
     },
@@ -284,7 +338,7 @@ export function getCachedWritingIndex(userId: string) {
           take: 50,
         }),
         db.writingSession.findMany({
-          where: { userId },
+          where: { userId, parentId: null },
           orderBy: { createdAt: "desc" },
           take: 12,
         }),

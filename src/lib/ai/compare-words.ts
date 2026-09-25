@@ -48,11 +48,13 @@ const legacyComparisonSchema = comparisonBaseSchema.extend({
   ).length(2),
 });
 
-export const comparisonSchema = z.union([
-  comparisonBaseSchema,
-  legacyComparisonSchema,
-]).transform((value) => {
-  if (!Array.isArray(value.production)) return value;
+export type ComparisonContent = z.infer<typeof comparisonBaseSchema>;
+type LegacyComparisonContent = z.infer<typeof legacyComparisonSchema>;
+
+function normalizeComparisonContent(
+  value: ComparisonContent | LegacyComparisonContent,
+): ComparisonContent {
+  if (!Array.isArray(value.production)) return value as ComparisonContent;
 
   return {
     ...value,
@@ -65,9 +67,12 @@ export const comparisonSchema = z.union([
         "Use the second word naturally in a German sentence.",
     },
   };
-});
+}
 
-export type ComparisonContent = z.infer<typeof comparisonSchema>;
+export const comparisonSchema = z.union([
+  comparisonBaseSchema,
+  legacyComparisonSchema,
+]).transform(normalizeComparisonContent);
 
 export async function generateWordComparison(input: {
   userId: string;

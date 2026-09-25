@@ -1,12 +1,17 @@
 "use server";
 
+import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateWritingTask } from "@/lib/ai/writing-task";
 import { evaluateWriting } from "@/lib/ai/writing-evaluator";
+import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
 import { recordMistakesBatch } from "@/lib/mistakes-batch";
-import { updateVocabularyMasteryBatch } from "@/lib/vocabulary-batch";
+import {
+  updateVocabularyMasteryBatch,
+  type VocabularyMasteryUpdate,
+} from "@/lib/vocabulary-batch";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { detectLexemePresence, detectRepeatedWords } from "@/lib/ai/preprocess";
@@ -105,7 +110,13 @@ export async function createWritingSessionAction(
 
   return instrumentOperation(
     "writing.create",
-    { mode, level, taskType, targetWords, hasCollection: Boolean(collectionId) },
+    {
+      mode,
+      level,
+      taskType,
+      targetWords,
+      hasCollection: Boolean(collectionId),
+    },
     async (perf) => {
       try {
         const user = await perf.span("auth", () => getCurrentUser());
@@ -214,27 +225,31 @@ async function detectKnownLexemes(userId: string, draft: string) {
 
   if (!selected.length) return [];
 
-  return db.userVocabulary.findMany({
-    where: {
-      userId,
-      lexemeId: { in: selected.map((item) => item.lexemeId) },
-    },
-    select: {
-      lexemeId: true,
-      lexeme: {
-        select: {
-          lemma: true,
-          patterns: { select: { pattern: true } },
+  return db.userVocabulary
+    .findMany({
+      where: {
+        userId,
+        lexemeId: { in: selected.map((item) => item.lexemeId) },
+      },
+      select: {
+        lexemeId: true,
+        lexeme: {
+          select: {
+            lemma: true,
+            patterns: { select: { pattern: true } },
+          },
         },
       },
-    },
-  }).then((items) =>
-    items.map((item) => ({
-      id: item.lexemeId,
-      lemma: item.lexeme.lemma,
-      patterns: item.lexeme.patterns.map((pattern) => pattern.pattern).slice(0, 3),
-    })),
-  );
+    })
+    .then((items) =>
+      items.map((item) => ({
+        id: item.lexemeId,
+        lemma: item.lexeme.lemma,
+        patterns: item.lexeme.patterns
+          .map((pattern) => pattern.pattern)
+          .slice(0, 3),
+      })),
+    );
 }
 
 export async function evaluateWritingAction(
@@ -266,6 +281,7 @@ export async function evaluateWritingAction(
             where: { id: sessionId, userId: user.id },
             select: {
               id: true,
+              parentId: true,
               level: true,
               mode: true,
               taskType: true,
@@ -293,21 +309,26 @@ export async function evaluateWritingAction(
         const observed = await perf.span("dbRead", () =>
           detectKnownLexemes(user.id, draft),
         );
-        const lexical = new Map(
-          session.targets.map((target) => [
-            target.lexemeId,
-            {
-              id: target.lexemeId,
-              lemma: target.lexeme.lemma,
-              patterns: target.lexeme.patterns.map(
-                (pattern) => pattern.pattern,
-              ),
-            },
-          ]),
-        );
-        for (const item of observed) lexical.set(item.id, item);
-        const lexicalContext = Array.from(lexical.values()).slice(0, 18);
+        const requiredTargets = session.targets.map((target) => ({
+          id: target.lexemeId,
+          lemma: target.lexeme.lemma,
+          patterns: target.lexeme.patterns.map((pattern) => pattern.pattern),
+        }));
+        const requiredIds = new Set(requiredTargets.map((target) => target.id));
+        const observedVocabulary = observed.filter((item) => !requiredIds.has(item.id));
         const repetitions = detectRepeatedWords(draft);
+        const parentId = session.parentId;
+        const parent = parentId
+          ? await perf.span("dbRead", () =>
+              db.writingSession.findFirst({
+                where: { id: parentId, userId: user.id },
+                select: { draft: true, wordCount: true, evaluation: true },
+              }),
+            )
+          : null;
+        const parentEvaluation = parent?.evaluation
+          ? writingEvaluationSchema.safeParse(parent.evaluation)
+          : null;
 
         const evaluation = await perf.span("ai", () =>
           evaluateWriting({
@@ -320,22 +341,40 @@ export async function evaluateWritingAction(
             draft,
             precomputedWordCount: countWords(draft),
             repeatedWords: repetitions,
-            targets: lexicalContext.map((item) => ({
+            requiredTargets: requiredTargets.map((item) => ({
               lexemeId: item.id,
               lemma: item.lemma,
               patterns: item.patterns,
             })),
+            observedVocabulary: observedVocabulary.slice(0, 12).map((item) => ({
+              lemma: item.lemma,
+              patterns: item.patterns,
+            })),
+            rewriteContext: parent
+              ? {
+                  previousDraft: parent.draft,
+                  previousWordCount: parent.wordCount,
+                  previousEvaluation: parentEvaluation?.success
+                    ? {
+                        overall: parentEvaluation.data.overall,
+                        summary: parentEvaluation.data.summary,
+                        improvements: parentEvaluation.data.improvements,
+                        corrections: parentEvaluation.data.corrections,
+                      }
+                    : undefined,
+                }
+              : undefined,
           }),
         );
 
-        const validIds = new Set(lexicalContext.map((item) => item.id));
+        const validIds = requiredIds;
         const usageById = new Map(
           evaluation.targetUsage
             .filter((item) => validIds.has(item.lexemeId))
             .map((item) => [item.lexemeId, item]),
         );
 
-        const usedLexemeIds = lexicalContext
+        const usedLexemeIds = requiredTargets
           .filter((item) => usageById.get(item.id)?.used)
           .map((item) => item.id);
 
@@ -360,10 +399,10 @@ export async function evaluateWritingAction(
           vocabularyRows.map((item) => [item.lexemeId, item]),
         );
 
-        const attempts = [];
-        const masteryUpdates = [];
+        const attempts: Prisma.AttemptCreateManyInput[] = [];
+        const masteryUpdates: VocabularyMasteryUpdate[] = [];
 
-        for (const item of lexicalContext) {
+        for (const item of requiredTargets) {
           const usage = usageById.get(item.id);
           if (!usage?.used) continue;
 
@@ -394,7 +433,8 @@ export async function evaluateWritingAction(
                 0,
                 Math.min(
                   1,
-                  userVocabulary.contextualUsage + (usage.correct ? 0.08 : -0.015),
+                  userVocabulary.contextualUsage +
+                    (usage.correct ? 0.08 : -0.015),
                 ),
               ),
             });
@@ -449,7 +489,7 @@ export async function evaluateWritingAction(
           revalidateUserDomains(
             user.id,
             ["home", "vocabulary", "progress", "mistakes", "writing"],
-            lexicalContext.map((item) => item.id),
+            [...requiredIds],
           );
           revalidatePath("/writing/" + session.id);
           revalidatePath("/writing");
@@ -507,7 +547,7 @@ export async function createRewriteAction(
           db.writingSession.create({
             data: {
               userId: user.id,
-              parentId: source.id,
+              parentId: source.parentId ?? source.id,
               mode: source.mode,
               level: source.level,
               taskType: source.taskType,

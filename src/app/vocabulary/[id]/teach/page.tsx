@@ -200,7 +200,6 @@ export default async function TeachWordPage({
         </div>
         <PracticeForm
           userVocabularyId={item.id}
-          lemma={word.lemma}
           exercise={productionExercise}
         />
       </section>

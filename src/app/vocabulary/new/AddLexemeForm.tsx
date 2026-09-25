@@ -19,34 +19,38 @@ export function AddLexemeForm({
 }: {
   translationPreference: "ENGLISH" | "PERSIAN" | "BOTH";
 }) {
-  const [preview, previewAction] = useActionState(previewVocabularyText, previewInitial);
-  const [commit, commitAction] = useActionState(addSelectedVocabulary, commitInitial);
-  const payload = useMemo(() => JSON.stringify(preview.candidates ?? []), [preview.candidates]);
+  const [preview, previewAction] = useActionState(
+    previewVocabularyText,
+    previewInitial,
+  );
+  const [commit, commitAction] = useActionState(
+    addSelectedVocabulary,
+    commitInitial,
+  );
+  const payload = useMemo(
+    () => JSON.stringify(preview.candidates ?? []),
+    [preview.candidates],
+  );
 
   return (
     <div className="import-workspace">
-      <form action={previewAction} className="panel form-panel">
-        <div className="field">
-          <label htmlFor="text">German word, phrase, or pasted text</label>
-          <textarea
-            id="text"
-            name="text"
-            placeholder="Paste a word, phrase, email, article, or transcript in German…"
-            rows={8}
-            required
-          />
-        </div>
+      <form action={previewAction} className="form-panel">
+        <textarea
+          id="text"
+          name="text"
+          placeholder="Paste a word, phrase, email, article, or transcript in German…"
+          rows={8}
+          required
+        />
 
-        {preview.status === "error" ? <StatusNotice tone="error">{preview.message}</StatusNotice> : null}
+        {preview.status === "error" ? (
+          <StatusNotice tone="error">{preview.message}</StatusNotice>
+        ) : null}
 
         <ActionButton pendingLabel="Analyzing text…">
           <ScanText size={18} />
           Analyze text
         </ActionButton>
-
-        <p className="form-help">
-          A single word or phrase creates one suggestion. Longer text produces a deduplicated list of useful lexical units for you to review.
-        </p>
       </form>
 
       {preview.status === "success" && preview.candidates?.length ? (
@@ -72,7 +76,10 @@ export function AddLexemeForm({
                 />
                 <div className="import-row-copy">
                   <div className="word-meta">
-                    <strong>{candidate.article ? candidate.article + " " : ""}{candidate.lemma}</strong>
+                    <strong>
+                      {candidate.article ? candidate.article + " " : ""}
+                      {candidate.lemma}
+                    </strong>
                     <span className="badge">{candidate.partOfSpeech}</span>
                     <span className="badge">
                       {candidate.userVocabularyId
@@ -82,18 +89,29 @@ export function AddLexemeForm({
                           : "new"}
                     </span>
                   </div>
-                  {translationPreference !== "PERSIAN" ? <span>{candidate.englishMeaning}</span> : null}
-                  {translationPreference !== "ENGLISH" ? <span className="rtl">{candidate.persianMeaning}</span> : null}
-                  {candidate.pattern ? <small>{candidate.pattern}</small> : null}
+                  {translationPreference !== "PERSIAN" ? (
+                    <span>{candidate.englishMeaning}</span>
+                  ) : null}
+                  {translationPreference !== "ENGLISH" ? (
+                    <span className="rtl">{candidate.persianMeaning}</span>
+                  ) : null}
+                  {candidate.pattern ? (
+                    <small>{candidate.pattern}</small>
+                  ) : null}
                 </div>
               </label>
             ))}
           </div>
 
           {commit.status === "success" ? (
-            <StatusNotice tone="success"><Check size={17} />{commit.message}</StatusNotice>
+            <StatusNotice tone="success">
+              <Check size={17} />
+              {commit.message}
+            </StatusNotice>
           ) : null}
-          {commit.status === "error" ? <StatusNotice tone="error">{commit.message}</StatusNotice> : null}
+          {commit.status === "error" ? (
+            <StatusNotice tone="error">{commit.message}</StatusNotice>
+          ) : null}
 
           <ActionButton pendingLabel="Adding selected vocabulary…">
             <Check size={18} />

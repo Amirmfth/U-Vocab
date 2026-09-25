@@ -48,7 +48,7 @@ export function ReadingForm() {
         </StatusNotice>
       ) : null}
 
-      <ActionButton pendingLabel="Analyzing lexical units…">
+      <ActionButton pendingLabel="Analyzing vocabulary in this text…">
         <ScanText size={18} />
         Analyze text
       </ActionButton>

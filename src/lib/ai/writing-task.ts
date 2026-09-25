@@ -21,30 +21,48 @@ export async function generateWritingTask(input: {
   targets: Array<{ lemma: string; patterns: string[] }>;
 }) {
   const route = aiRoute("writing_task");
-  const perf = startOperation("ai.writing_task", { model: route.model, mode: input.mode, level: input.level, targetCount: input.targets.length });
+  const perf = startOperation("ai.writing_task", {
+    model: route.model,
+    mode: input.mode,
+    level: input.level,
+    targetCount: input.targets.length,
+  });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "writing_task",
     model: route.model,
-    metadata: { level: input.level, mode: input.mode, taskType: input.taskType, targetWords: input.targetWords, targetCount: input.targets.length },
+    metadata: {
+      level: input.level,
+      mode: input.mode,
+      taskType: input.taskType,
+      targetWords: input.targetWords,
+      targetCount: input.targets.length,
+    },
   });
   try {
-    const response = await perf.span("provider", () => getOpenAI().responses.parse({
-      model: route.model,
-      max_output_tokens: route.maxOutputTokens,
-      input: [
-        {
-          role: "system",
-          content:
-            "Create a realistic German writing-practice task. Match the requested CEFR level, writing type, topic, and approximate word count. Do not claim this is an official exam or official CEFR certification. In GUIDED mode, make the supplied target lexical units naturally useful without requiring awkward use of every item. In OPEN mode, do not prescribe vocabulary. Return a concise title, the task instructions, and a short content checklist.",
-        },
-        { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
-      ],
-      text: { format: zodTextFormat(writingTaskSchema, "writing_task") },
-    }));
+    const response = await perf.span("provider", () =>
+      getOpenAI().responses.parse({
+        model: route.model,
+        max_output_tokens: route.maxOutputTokens,
+        input: [
+          {
+            role: "system",
+            content:
+              "Create a realistic German writing-practice task. Match the requested CEFR level, writing type, topic, and approximate word count. Do not claim this is an official exam or official CEFR certification. In GUIDED mode, make the supplied target lexical units naturally useful without requiring awkward use of every item. In OPEN mode, do not prescribe vocabulary. Return a concise title, the task instructions, and a short content checklist.",
+          },
+          {
+            role: "user",
+            content: JSON.stringify({ ...input, userId: undefined }),
+          },
+        ],
+        text: { format: zodTextFormat(writingTaskSchema, "writing_task") },
+      }),
+    );
 
     if (!response.output_parsed) {
-      const parseError = new Error("OpenAI did not return a valid writing task.");
+      const parseError = new Error(
+        "OpenAI did not return a valid writing task.",
+      );
       await usageRecorder.failure(parseError, response);
       throw parseError;
     }

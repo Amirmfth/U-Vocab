@@ -49,7 +49,7 @@ export function ActivityHeatmap({
         {keys.map((date) => {
           const day = lookup.get(date);
           const count = day
-            ? day.reviewed + day.learned + day.produced + day.encounters + day.mistakesCorrected
+            ? day.reviewed + day.learned + day.produced + day.readingEncounters + day.mistakesCorrected
             : 0;
 
           return (

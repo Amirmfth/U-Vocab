@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { analyzeGermanLexeme } from "@/lib/ai/analyze-word";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { buildReadingExcerpt, rankReadingCandidates } from "@/lib/ai/preprocess";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import {
@@ -69,9 +70,20 @@ export async function previewVocabularyText(
       const analysis = await analyzeGermanLexeme(text, user.id);
       candidates = [candidateFromLexicalAnalysis(analysis)];
     } else {
+      const knownVocabulary = await db.userVocabulary.findMany({
+        where: { userId: user.id },
+        select: { lexeme: { select: { normalized: true } } },
+      });
+      const knownLemmas = new Set(
+        knownVocabulary.map((item) => item.lexeme.normalized),
+      );
+      const readingCandidates = rankReadingCandidates(text, knownLemmas, 30);
+      const excerpt = buildReadingExcerpt(text, readingCandidates, 12_000);
       const analysis = await analyzeReadingText({
         userId: user.id,
-        text,
+        text: excerpt,
+        originalTextChars: text.length,
+        candidates: readingCandidates,
         targetLevel: user.targetLevel,
       });
 

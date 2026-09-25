@@ -32,7 +32,7 @@ export function PracticeForm(props: {
             rows={props.exercise.type === "FREE_SENTENCE" || props.exercise.type === "PARAPHRASE" ? 5 : 3}
             required autoFocus />
         </div>
-        <ActionButton pendingLabel="Checking…"><Check size={18} />Check answer</ActionButton>
+        <ActionButton pendingLabel="Checking answer…"><Check size={18} />Check answer</ActionButton>
       </form>
       {state.status === "error" ? <StatusNotice tone="error">{state.feedback ?? "Could not check this answer."}</StatusNotice> : null}
       {state.status === "success" ? (

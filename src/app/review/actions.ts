@@ -43,5 +43,5 @@ export async function submitReview(formData: FormData) {
     [result.item.lexemeId],
   );
 
-  redirect("/review");
+  redirect("/review?start=1");
 }

@@ -1,9 +1,11 @@
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { evaluateConversationTurn } from "@/lib/ai/conversation-turn-evaluator";
 import { recordMistakesBatch, type MistakeInput } from "@/lib/mistakes-batch";
 import {
   updateConversationTargetsBatch,
   updateVocabularyMasteryBatch,
+  type VocabularyMasteryUpdate,
 } from "@/lib/vocabulary-batch";
 
 export async function processConversationTurn(input: {
@@ -65,8 +67,8 @@ export async function processConversationTurn(input: {
     vocabularyRows.map((item) => [item.lexemeId, item]),
   );
 
-  const attempts = [];
-  const masteryUpdates = [];
+  const attempts: Prisma.AttemptCreateManyInput[] = [];
+  const masteryUpdates: VocabularyMasteryUpdate[] = [];
   const mistakes: MistakeInput[] = [];
   const now = new Date();
 

@@ -42,7 +42,7 @@ export function ReviewCard({
   return <section className="panel learning-card review-flashcard">
     <div className="learning-card-head">
       <span className="badge">{card.review.family.replaceAll("_"," ").toLowerCase()}</span>
-      <span className="muted">{card.lemma}</span>
+      <span className="muted">active recall</span>
     </div>
 
     <div className="review-card-front">

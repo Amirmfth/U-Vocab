@@ -12,7 +12,8 @@ export type AIOperation =
   | "word_expansion"
   | "lexical_insight"
   | "story_generation"
-  | "topic_pack_generation";
+  | "topic_pack_generation"
+  | "verb_conjugation";
 
 type Route = {
   model: string;
@@ -37,6 +38,7 @@ const ROUTES: Record<AIOperation, Route> = {
   lexical_insight: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 2200 },
   story_generation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 3600 },
   topic_pack_generation: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 2600 },
+  verb_conjugation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 5200 },
 };
 
 function envKey(operation: AIOperation) {

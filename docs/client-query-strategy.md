@@ -333,9 +333,15 @@ Use browser Network/Performance tools plus the existing #48/#51 instrumentation.
 Review:
 
 - rating tap → next-card paint latency
-- server mutation duration
+- `interaction.review_rating` mutation duration
 - number of queue GET requests per N reviews
 - failure/rollback behavior
+
+Recommendations:
+
+- `interaction.recommendation_action` mutation duration
+- optimistic removal latency
+- rollback rate/errors
 
 Words:
 
@@ -343,10 +349,6 @@ Words:
 - scroll restoration correctness
 - duplicate data requests
 
-Recommendations:
-
-- tap → row removal latency
-- server mutation duration
-- rollback behavior
+The client interaction events include only safe operational metadata such as action/grade and whether rollback occurred; they do not include answer or recommendation content.
 
 The intended outcome is fewer avoidable navigation/data fetches and immediate safe UI feedback, without increasing background traffic or creating a second client-side domain model.

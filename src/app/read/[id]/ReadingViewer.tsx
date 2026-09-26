@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BookOpenCheck, Plus, X } from "lucide-react";
 import { AddReadingLexemeForm } from "./AddReadingLexemeForm";
@@ -133,21 +133,48 @@ export function ReadingViewer({
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const reduceMotion = useReducedMotion();
+  const sheetRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const selected = items.find((item) => item.id === selectedId) ?? items[0];
 
   useEffect(() => {
     if (!mobileOpen) return;
 
     const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMobileOpen(false);
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !sheetRef.current) return;
+      const focusable = Array.from(
+        sheetRef.current.querySelectorAll<HTMLElement>(focusableSelector),
+      );
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("keydown", handleKeyDown);
+    requestAnimationFrame(() => closeButtonRef.current?.focus());
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("keydown", handleKeyDown);
+      triggerRef.current?.focus();
     };
   }, [mobileOpen]);
 
@@ -184,9 +211,10 @@ export function ReadingViewer({
         <button
           className={classForState(item.state)}
           key={index}
-          onClick={() => {
+          onClick={(event) => {
             setSelectedId(item.id);
             if (window.matchMedia("(max-width: 759px)").matches) {
+              triggerRef.current = event.currentTarget;
               setMobileOpen(true);
             }
           }}
@@ -196,7 +224,7 @@ export function ReadingViewer({
         </button>
       );
     });
-  }, [content, items, reduceMotion]);
+  }, [content, items]);
 
   return (
     <div className="reading-layout">
@@ -238,6 +266,8 @@ export function ReadingViewer({
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
+              ref={sheetRef}
+              tabIndex={-1}
               animate={{ opacity: 1, y: 0 }}
               aria-label={`Details for ${selected.lemma}`}
               aria-modal="true"
@@ -252,6 +282,7 @@ export function ReadingViewer({
               <div className="reading-sheet-header">
                 <span>Word details</span>
                 <button
+                  ref={closeButtonRef}
                   aria-label="Close word details"
                   className="icon-button"
                   type="button"

@@ -19,7 +19,6 @@ import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
 import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
-import { isTranslationVisible } from "@/lib/translations";
 
 function PracticeHub() {
   return (
@@ -145,10 +144,11 @@ export default async function PracticePage({
     </main>;
   }
 
+  const optionLanguage=user.preferredTranslation==="PERSIAN"?"fa":"en";
   const optionPools={
     meanings:distractorItems.flatMap((item)=>
       item.lexeme.translations
-        .filter((translation)=>isTranslationVisible(user.preferredTranslation,translation.language))
+        .filter((translation)=>translation.language===optionLanguage)
         .map((translation)=>translation.text),
     ),
     lemmas:distractorItems.map((item)=>formatLexemeLabel(item.lexeme)),

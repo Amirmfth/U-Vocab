@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, CheckCircle2, RotateCcw, XCircle } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
+import { checkDeterministicAnswer } from "@/lib/exercises/check";
 import { StatusNotice } from "@/components/status-notice";
 import { submitPracticeAnswer, type PracticeAnswerResult } from "./actions";
 
@@ -24,7 +25,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   const [selected,setSelected]=useState<string|null>(null);
   const [result,setResult]=useState<PracticeAnswerResult|null>(null);
   const [history,setHistory]=useState<Array<{ correct:boolean;skill:string }>>([]);
-  const [pending,startTransition]=useTransition();
+  const [saveError,setSaveError]=useState<string|null>(null);
   const reduceMotion=useReducedMotion();
   const startedAt=useRef(Date.now());
   const current=queue[index];
@@ -37,39 +38,43 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
       setAnswer("");
       setSelected(null);
       setResult(null);
+      setSaveError(null);
       startedAt.current=Date.now();
     },delay);
     return ()=>window.clearTimeout(timer);
   },[result]);
 
   function submit(value:string){
-    if(!current||pending||result?.status==="success") return;
+    if(!current||result?.status==="success") return;
     setSelected(value);
-    startTransition(async()=>{
-      let response:PracticeAnswerResult;
-      try {
-        response=await submitPracticeAnswer({
-          userVocabularyId:current.userVocabularyId,
-          exerciseType:current.exercise.type,
-          answer:value,
-          startedAt:startedAt.current,
-          conjugation:current.conjugation,
-          interaction:current.exercise.interaction,
-        });
-      } catch (error) {
+    const evaluation=checkDeterministicAnswer(value,current.exercise.expected);
+    const response:PracticeAnswerResult={
+      status:"success",
+      correct:evaluation.correct,
+      feedback:evaluation.feedback,
+      expected:current.exercise.expected,
+    };
+    setResult(response);
+    setHistory((items)=>[...items,{ correct:response.correct,skill:current.exercise.skill }]);
+    if(!response.correct&&!current.retry){
+      setQueue((items)=>[...items,{ ...current,id:current.id+"-retry",retry:true }]);
+    }
+
+    // Feedback uses the answer delivered with this question. The server still
+    // rebuilds and independently validates the exercise before saving it.
+    void submitPracticeAnswer({
+      userVocabularyId:current.userVocabularyId,
+      exerciseType:current.exercise.type,
+      answer:value,
+      startedAt:startedAt.current,
+      conjugation:current.conjugation,
+      interaction:current.exercise.interaction,
+    }).catch((error)=>{
         if(error instanceof Error&&error.message.includes("Unauthorized")){
           window.location.assign("/login?returnTo="+encodeURIComponent(window.location.pathname+window.location.search));
           return;
         }
-        response={ status:"error",message:"Could not save this practice attempt." };
-      }
-      setResult(response);
-      if(response.status==="success"){
-        setHistory((items)=>[...items,{ correct:response.correct,skill:current.exercise.skill }]);
-        if(!response.correct&&!current.retry){
-          setQueue((items)=>[...items,{ ...current,id:current.id+"-retry",retry:true }]);
-        }
-      }
+        setSaveError("Your feedback was shown, but this attempt could not be saved.");
     });
   }
 
@@ -128,7 +133,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
                   isWrong?"is-wrong":"",
                   isSelected?"is-selected":"",
                 ].filter(Boolean).join(" ")}
-                disabled={pending||success}
+                disabled={success}
                 onClick={()=>submit(option)}
               >
                 <span>{option}</span>
@@ -140,15 +145,15 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           <form onSubmit={(event)=>{ event.preventDefault();submit(answer); }}>
             <div className="field">
               <label htmlFor="practice-answer">Your answer</label>
-              <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={pending||success} autoFocus autoComplete="off"/>
+              <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={success} autoFocus autoComplete="off"/>
             </div>
-            <button className="button button-primary" type="submit" disabled={pending||success||!answer.trim()}>
-              <Check size={18}/>{pending?"Checking…":"Check answer"}
+            <button className="button button-primary" type="submit" disabled={success||!answer.trim()}>
+              <Check size={18}/>Check answer
             </button>
           </form>
         )}
 
-        {pending&&!success?<div className="practice-instant-feedback" role="status">Checking…</div>:null}
+        {saveError?<StatusNotice tone="error">{saveError}</StatusNotice>:null}
         {result?.status==="error"?<StatusNotice tone="error">{result.message}</StatusNotice>:null}
         {result?.status==="success"?(
           <div className={"practice-instant-feedback "+(result.correct?"is-correct":"is-wrong")} role="status">

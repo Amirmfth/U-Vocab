@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Clock3, XCircle } from "lucide-react";
@@ -54,8 +54,18 @@ export function BattleRunner({
     return Math.max(0, durationSec - elapsed);
   });
   const [pending, startTransition] = useTransition();
+  const [saveError, setSaveError] = useState<string | null>(null);
   const questionStartedAt = useRef(Date.now());
+  const pendingSaves = useRef(new Set<Promise<unknown>>());
   const current = questions[index];
+
+  const finishBattle = useCallback(async () => {
+    // A locally graded final answer may still be on its way to the server.
+    // Finish only after those writes have settled so it is included in results.
+    await Promise.allSettled([...pendingSaves.current]);
+    await completeBattle(sessionId);
+    router.refresh();
+  }, [router, sessionId]);
 
   useEffect(() => {
     if (mode !== "TIMED" || !durationSec || index >= questions.length) return;
@@ -65,8 +75,7 @@ export function BattleRunner({
         if (value <= 1) {
           window.clearInterval(timer);
           startTransition(async () => {
-            await completeBattle(sessionId);
-            router.refresh();
+            await finishBattle();
           });
           return 0;
         }
@@ -75,15 +84,14 @@ export function BattleRunner({
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [durationSec, index, mode, questions.length, router, sessionId]);
+  }, [durationSec, finishBattle, index, mode, questions.length]);
 
   useEffect(() => {
     if (!result) return;
     const timer = window.setTimeout(() => {
       if (index + 1 >= questions.length) {
         startTransition(async () => {
-          await completeBattle(sessionId);
-          router.refresh();
+          await finishBattle();
         });
         return;
       }
@@ -93,7 +101,7 @@ export function BattleRunner({
       questionStartedAt.current = Date.now();
     }, result.correct ? 800 : 1100);
     return () => window.clearTimeout(timer);
-  }, [index, questions.length, result, router, sessionId]);
+  }, [finishBattle, index, questions.length, result]);
 
   if (!current || (mode === "TIMED" && remaining <= 0)) {
     return (
@@ -109,8 +117,7 @@ export function BattleRunner({
           disabled={pending}
           onClick={() =>
             startTransition(async () => {
-              await completeBattle(sessionId);
-              router.refresh();
+              await finishBattle();
             })
           }
         >
@@ -120,21 +127,39 @@ export function BattleRunner({
     );
   }
 
-  async function choose(answer: string) {
+  function choose(answer: string) {
     if (pending || result) return;
     setSelected(answer);
     const responseMs = Date.now() - questionStartedAt.current;
 
-    startTransition(async () => {
-      const response = await answerBattleQuestion({
+    const correct =
+      current.expected.trim().toLocaleLowerCase("de-DE") ===
+      answer.trim().toLocaleLowerCase("de-DE");
+    const points = correct
+      ? 100 + (mode === "TIMED" ? Math.max(0, 50 - Math.floor(responseMs / 200)) : 0)
+      : 0;
+    setScore((value) => value + points);
+    setAnswered((value) => value + 1);
+    setResult({
+      correct,
+      expected: current.expected,
+      explanation: current.explanation,
+      points,
+    });
+
+    // The question's expected answer is loaded with the question, so feedback
+    // can be shown immediately. The server recomputes it before persistence.
+    startTransition(() => {
+      const save = answerBattleQuestion({
         sessionId,
         questionId: current.id,
         answer,
         responseMs,
+      }).catch(() => {
+        setSaveError("Your feedback was shown, but this answer could not be saved.");
       });
-      setScore((value) => value + response.points);
-      setAnswered((value) => value + 1);
-      setResult(response);
+      pendingSaves.current.add(save);
+      void save.finally(() => pendingSaves.current.delete(save));
     });
   }
 
@@ -175,7 +200,7 @@ export function BattleRunner({
                     isWrong ? "is-wrong" : "",
                   ].filter(Boolean).join(" ")}
                   key={option}
-                  disabled={pending || Boolean(result)}
+                  disabled={Boolean(result)}
                   onClick={() => choose(option)}
                 >
                   <span>{option}</span>
@@ -185,11 +210,7 @@ export function BattleRunner({
             })}
           </div>
 
-          {pending && !result ? (
-            <div className="battle-feedback is-pending" role="status">
-              <span>Checking…</span>
-            </div>
-          ) : null}
+          {saveError ? <div className="battle-feedback is-wrong" role="status">{saveError}</div> : null}
 
           {result ? (
             <div className={"battle-feedback " + (result.correct ? "is-correct" : "is-wrong")} role="status">

@@ -319,9 +319,11 @@ export default async function Word({
     { label: "context", value: state.contextualUsage },
   ];
   const overallMastery = Math.round(
-    (masteryScores.reduce((sum, item) => sum + item.value, 0) / masteryScores.length) * 100,
+    (masteryScores.reduce((sum, item) => sum + Number(item.value), 0) / masteryScores.length) * 100,
   );
-  const weakestSkill = [...masteryScores].sort((a, b) => a.value - b.value)[0];
+  const weakestSkill = [...masteryScores].sort(
+    (a, b) => Number(a.value) - Number(b.value),
+  )[0];
 
   perf.success({
     found: true,

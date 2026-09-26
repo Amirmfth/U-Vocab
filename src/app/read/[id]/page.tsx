@@ -87,8 +87,8 @@ export default async function ReadingDocumentPage({
   };
 
   return (
-    <main className="page">
-      <section className="page-header compact">
+    <main className="page reading-document-page">
+      <section className="page-header compact reading-document-header">
         <Link href="/read" className="back-link">
           <ArrowLeft size={16} />
           Reading mode

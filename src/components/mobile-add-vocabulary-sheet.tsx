@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { AddLexemeForm } from "@/app/vocabulary/new/AddLexemeForm";
@@ -17,20 +17,55 @@ export function MobileAddVocabularySheet({
   translationPreference: TranslationPreference;
 }) {
   const reduceMotion = useReducedMotion();
+  const panelRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (event.key !== "Tab" || !panelRef.current) return;
+
+      const focusable = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(focusableSelector),
+      ).filter((element) => !element.hasAttribute("hidden"));
+
+      if (!focusable.length) {
+        event.preventDefault();
+        panelRef.current.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("keydown", handleKeyDown);
+    requestAnimationFrame(() => closeButtonRef.current?.focus());
+
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
     };
   }, [isOpen, onClose]);
 
@@ -49,6 +84,8 @@ export function MobileAddVocabularySheet({
             onClick={onClose}
           />
           <motion.section
+            ref={panelRef}
+            tabIndex={-1}
             key="mobile-add-sheet-panel"
             className="mobile-add-sheet-panel"
             initial={reduceMotion ? false : { opacity: 0, y: 44 }}
@@ -61,7 +98,7 @@ export function MobileAddVocabularySheet({
               <div>
                 <h2 id="mobile-add-sheet-title">Add vocabulary</h2>
               </div>
-              <button className="icon-button" type="button" onClick={onClose} aria-label="Close">
+              <button ref={closeButtonRef} className="icon-button" type="button" onClick={onClose} aria-label="Close">
                 <X size={20} />
               </button>
             </header>

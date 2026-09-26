@@ -12,10 +12,13 @@ export default async function ReadPage() {
   const documents = await getCachedReadingIndex(user.id);
 
   return (
-    <main className="page">
-      <section className="page-header compact">
-        <p className="eyebrow">READ</p>
-        <h1>Reading mode</h1>
+    <main className="page reading-hub">
+      <section className="page-header compact practice-workbench-header">
+        <p className="eyebrow">READING PRACTICE</p>
+        <h1>Reading workspace</h1>
+        <p className="page-description">
+          Paste real German, inspect vocabulary in context, and save useful words without leaving the text.
+        </p>
       </section>
 
       <ReadingForm />

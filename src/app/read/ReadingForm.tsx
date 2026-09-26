@@ -19,7 +19,7 @@ export function ReadingForm() {
     <form action={action} className="panel reading-form">
       <div className="field">
         <label htmlFor="title">Title <span className="muted">(optional)</span></label>
-        <input id="title" name="title" placeholder="Article, email, transcript…" />
+        <input id="title" name="title" placeholder="Article, email, transcript…" autoComplete="off" />
       </div>
 
       <div className="field">
@@ -29,6 +29,7 @@ export function ReadingForm() {
           name="content"
           rows={12}
           placeholder="Paste German text here…"
+          autoComplete="off"
           required
         />
       </div>

@@ -312,6 +312,18 @@ export default async function Word({
       translation.language,
     ),
   );
+  const masteryScores = [
+    { label: "recognition", value: state.recognition },
+    { label: "meaning recall", value: state.meaningRecall },
+    { label: "production", value: state.production },
+    { label: "context", value: state.contextualUsage },
+  ];
+  const overallMastery = Math.round(
+    (masteryScores.reduce((sum, item) => sum + Number(item.value), 0) / masteryScores.length) * 100,
+  );
+  const weakestSkill = [...masteryScores].sort(
+    (a, b) => Number(a.value) - Number(b.value),
+  )[0];
 
   perf.success({
     found: true,
@@ -319,8 +331,8 @@ export default async function Word({
   });
 
   return (
-    <main className="page">
-      <section className="page-header">
+    <main className="page word-detail-page">
+      <section className="page-header word-identity-hero">
         <div className="word-detail-topline">
           <div className="word-meta">
             <span className="badge">{word.partOfSpeech}</span>
@@ -335,6 +347,16 @@ export default async function Word({
         {word.plural ? (
           <p className="page-description">Plural: {word.plural}</p>
         ) : null}
+
+        <div className="word-identity-mastery" aria-label={"Overall mastery " + overallMastery + "%"}>
+          <div>
+            <span><strong>{overallMastery}%</strong> overall mastery</span>
+            <small>Next focus: {weakestSkill.label}</small>
+          </div>
+          <div className="metric-bar" aria-hidden="true">
+            <span style={{ width: overallMastery + "%" }} />
+          </div>
+        </div>
 
         <div className="word-primary-actions">
           <Link

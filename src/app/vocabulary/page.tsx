@@ -156,13 +156,17 @@ export default async function Vocabulary({
     }));
 
   return (
-    <main className="page">
+    <main className="page vocabulary-page">
       <VocabularyScrollRestoration />
       <section className="page-header compact library-header">
-        <div>
+        <div className="library-header-copy">
+          <p className="eyebrow">YOUR LEXICON</p>
           <h1>Vocabulary</h1>
-          <p className="muted">
-            {filtered.length} shown · {items.length} total
+          <p className="library-header-description">
+            Find the word you need, see what is weak, and move directly into learning.
+          </p>
+          <p className="library-count">
+            <strong>{filtered.length}</strong> shown <span aria-hidden="true">·</span> {items.length} total
           </p>
         </div>
         <div className="library-header-actions">

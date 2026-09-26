@@ -71,10 +71,10 @@ export default async function ReviewPage({
   ]);
 
   return (
-      <main className="page review-landing">
+      <main className="page review-landing review-page">
         <section className="review-hero">
           <div>
-            <p className="eyebrow">REVIEW</p>
+            <p className="eyebrow">MEMORY MAINTENANCE</p>
             <h1>{dueCount ? dueCount + " due now" : "You're caught up"}</h1>
             <p>
               {dueCount

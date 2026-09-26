@@ -155,7 +155,10 @@ export async function evaluateWriting(input: {
         used: false,
         correct: false,
         naturalness: 0,
-        note: "Not used in this draft.",
+        note:
+          input.evaluationLocale === "fa"
+            ? "این واژهٔ هدف در این متن استفاده نشد."
+            : "Not used in this draft.",
       },
     );
 

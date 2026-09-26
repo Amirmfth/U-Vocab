@@ -34,17 +34,24 @@ export function WritingEditor({
   return (
     <form action={action} className="writing-editor">
       <input type="hidden" name="sessionId" value={sessionId} />
+      <div className="writing-editor-heading">
+        <label htmlFor="writing-draft">Your response</label>
+        <span>Write in German. You can revise freely before submitting.</span>
+      </div>
       <textarea
+        id="writing-draft"
         name="draft"
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         rows={18}
         placeholder="Schreibe deinen Text auf Deutsch…"
+        autoComplete="off"
+        aria-describedby="writing-word-count"
       />
 
       <div className="writing-editor-footer">
-        <span className={words < targetWords * 0.7 ? "is-under" : ""}>
-          {words} / ~{targetWords} words
+        <span id="writing-word-count" className={words < targetWords * 0.7 ? "is-under" : ""}>
+          {words} of about {targetWords} words
         </span>
 
         <ActionButton pendingLabel="Evaluating writing…" disabled={words < 20}>

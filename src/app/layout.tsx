@@ -3,6 +3,7 @@ import "./core-experience.css";
 import "./core-learning-polish.css";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import type { Viewport } from "next";
 import { AppNavigation } from "@/components/app-navigation";
 import { PageTransition } from "@/components/page-transition";
 import { WebVitals } from "@/components/web-vitals";
@@ -15,7 +16,7 @@ export const metadata = {
   description: "Your personal German lexical knowledge system",
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   themeColor: "#09090b",
   colorScheme: "dark",
 };

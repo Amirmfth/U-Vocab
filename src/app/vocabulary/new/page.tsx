@@ -1,7 +1,9 @@
+import { connection } from "next/server";
 import { AddLexemeForm } from "./AddLexemeForm";
 import { getCurrentUser } from "@/lib/current-user";
 
 export default async function NewWord() {
+  await connection();
   const user = await getCurrentUser();
 
   return (

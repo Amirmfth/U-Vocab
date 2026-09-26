@@ -15,13 +15,11 @@ const queue: ReviewQueueData = {
       lexemeId: "lex-1",
       lemma: "Haus",
       article: "das",
-      patterns: [],
-      translations: [{ language: "en", text: "house" }],
-      exercise: {
-        type: "MEANING_RECALL",
-        prompt: "Meaning?",
-        expected: "house",
-        requiresAI: false,
+      review: {
+        family: "GERMAN_MEANING",
+        exerciseType: "MEANING_RECALL",
+        front: { prompt: "Haus" },
+        back: { answer: "house", details: [] },
       },
     },
     {
@@ -29,13 +27,11 @@ const queue: ReviewQueueData = {
       lexemeId: "lex-2",
       lemma: "gehen",
       article: null,
-      patterns: [],
-      translations: [{ language: "en", text: "go" }],
-      exercise: {
-        type: "MEANING_RECALL",
-        prompt: "Meaning?",
-        expected: "go",
-        requiresAI: false,
+      review: {
+        family: "GERMAN_MEANING",
+        exerciseType: "MEANING_RECALL",
+        front: { prompt: "gehen" },
+        back: { answer: "go", details: [] },
       },
     },
   ],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Eye, RotateCcw } from "lucide-react";
 import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueCard } from "@/lib/review-queue";
@@ -21,6 +22,7 @@ export function ReviewCard({
 }){
   const [revealed,setRevealed]=useState(false);
   const startedAt=useRef(Date.now());
+  const reduceMotion = useReducedMotion();
 
   useEffect(()=>{
     function keydown(event:KeyboardEvent){
@@ -45,20 +47,27 @@ export function ReviewCard({
       <span className="muted">active recall</span>
     </div>
 
-    <div className="review-card-front">
-      <p className="eyebrow">RECALL</p>
-      <h2 className="learning-prompt">{card.review.front.prompt}</h2>
-      {card.review.front.hint?<p className="muted">{card.review.front.hint}</p>:null}
-    </div>
-
-    {!revealed?<button className="button button-primary review-reveal" type="button" onClick={()=>setRevealed(true)}>
-      <Eye size={18}/>Reveal answer
-    </button>:<>
-      <div className="answer-panel review-card-back">
+    <motion.div
+      animate={{ rotateY: revealed ? 180 : 0 }}
+      className="review-card-flip"
+      style={{ transformStyle: "preserve-3d" }}
+      transition={{ duration: reduceMotion ? 0 : 0.42, ease: "easeInOut" }}
+    >
+      <div aria-hidden={revealed} className="review-card-face review-card-front">
+        <p className="eyebrow">RECALL</p>
+        <h2 className="learning-prompt">{card.review.front.prompt}</h2>
+        {card.review.front.hint?<p className="muted">{card.review.front.hint}</p>:null}
+      </div>
+      <div aria-hidden={!revealed} className="answer-panel review-card-face review-card-back">
         <p className="eyebrow">CHECK</p>
         <strong>{card.review.back.answer}</strong>
         {card.review.back.details.map((detail)=><p key={detail}>{detail}</p>)}
       </div>
+    </motion.div>
+
+    {!revealed?<button className="button button-primary review-reveal" type="button" onClick={()=>setRevealed(true)}>
+      <Eye size={18}/>Reveal answer
+    </button>:<>
       <div className="learning-card-head">
         <p className="muted">Rate retrieval difficulty. Keys 1–4 also work.</p>
         <button className="text-button" type="button" onClick={()=>setRevealed(false)} disabled={isSubmitting}>

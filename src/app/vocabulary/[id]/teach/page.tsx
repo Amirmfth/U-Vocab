@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { buildExercise } from "@/lib/exercises/build";
 import { PracticeForm } from "@/app/practice/PracticeForm";
 import { LexicalInsightPanel } from "../LexicalInsightPanel";
 import { ScheduleReviewForm } from "./ScheduleReviewForm";
@@ -51,12 +52,11 @@ export default async function TeachWordPage({
     isTranslationVisible(user.preferredTranslation, translation.language),
   );
 
-  const productionExercise = {
-    type: "FREE_SENTENCE" as const,
-    prompt: `Write a natural German sentence using “${word.lemma}”.`,
-    hint: word.patterns[0]?.pattern,
-    requiresAI: true,
-  };
+  const productionExercise = buildExercise(
+    "REVERSE_RECALL",
+    word,
+    user.preferredTranslation,
+  );
 
   return (
     <main className="page">
@@ -199,10 +199,12 @@ export default async function TeachWordPage({
           </div>
           <Brain size={20} />
         </div>
-        <PracticeForm
-          userVocabularyId={item.id}
-          exercise={productionExercise}
-        />
+        <PracticeForm exercises={[{
+          id: `${item.id}:production`,
+          userVocabularyId: item.id,
+          lemma: word.lemma,
+          exercise: productionExercise,
+        }]} />
       </section>
 
       <section className="panel lesson-footer-actions">

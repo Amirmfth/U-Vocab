@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSessionToken, credentialsMatch, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/auth-session";
 
@@ -10,6 +10,19 @@ function safeReturnTo(value: FormDataEntryValue | null) {
   const target = typeof value === "string" ? value : "/";
   if (!target.startsWith("/") || target.startsWith("//") || target.startsWith("/login")) return "/";
   return target;
+}
+
+async function shouldUseSecureSessionCookie() {
+  const requestHeaders = await headers();
+  const forwardedProtocol = requestHeaders
+    .get("x-forwarded-proto")
+    ?.split(",")[0]
+    ?.trim();
+  if (forwardedProtocol) return forwardedProtocol === "https";
+
+  const host = requestHeaders.get("host") ?? "";
+  const isLocalhost = /^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(host);
+  return process.env.NODE_ENV === "production" && !isLocalhost;
 }
 
 export async function login(_state: LoginState, formData: FormData): Promise<LoginState> {
@@ -23,10 +36,13 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
 
   if (!valid) return { status: "error", message: "Invalid username or password." };
 
-  const store = await cookies();
+  const [store, secure] = await Promise.all([
+    cookies(),
+    shouldUseSecureSessionCookie(),
+  ]);
   store.set(SESSION_COOKIE_NAME, await createSessionToken(), {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_MAX_AGE_SECONDS,

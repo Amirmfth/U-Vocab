@@ -187,6 +187,7 @@ export function VocabularyFilters({
               <div className="filter-menu-list" role="listbox" aria-label="Filter types">
                 {filters.map((filter) => (
                   <button
+                    aria-selected={current[filter.key] !== "ALL"}
                     className="filter-menu-option"
                     key={filter.key}
                     onClick={() => setMenu(filter.key)}

@@ -26,7 +26,7 @@ export default async function SettingsPage() {
       <section className="panel account-links">
         <div>
           <strong>Private session</strong>
-          <span className="muted">Clear this browser's signed U-Vocab session.</span>
+          <span className="muted">Clear this browser&apos;s signed U-Vocab session.</span>
         </div>
         <form action={logout}>
           <button className="button button-secondary" type="submit"><LogOut size={17} /> Sign out</button>

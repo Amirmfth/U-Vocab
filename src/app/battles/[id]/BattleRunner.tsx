@@ -76,7 +76,7 @@ export function BattleRunner({
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [durationSec, index, mode, router, sessionId]);
+  }, [durationSec, index, mode, questions.length, router, sessionId]);
 
   if (!current || (mode === "TIMED" && remaining <= 0)) {
     return (

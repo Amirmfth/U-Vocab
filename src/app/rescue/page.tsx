@@ -146,16 +146,11 @@ export default async function RescuePage({
   );
 
   return (
-    <main className="page focus-page">
-      <section className="focus-meta">
-        <Link href="/rescue" className="back-link">
-          <ArrowLeft size={16} />
-          Rescue words
-        </Link>
-        <span>
-          {step + 1} / {stableIds.length}
-        </span>
-      </section>
+    <main className="page focus-page review-session-shell">
+      <header className="review-session-topbar">
+        <Link href="/rescue" className="text-link">Rescue words</Link>
+        <span>{step + 1} / {stableIds.length}</span>
+      </header>
 
       <RescueCard
         userVocabularyId={current.id}

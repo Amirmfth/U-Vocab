@@ -39,12 +39,12 @@ export function AddLexemeForm({
         <div className="field">
           <label htmlFor="text">German vocabulary or text</label>
           <textarea
-          id="text"
-          name="text"
-          placeholder="Paste a word, phrase, email, article, or transcript in German…"
-          rows={8}
-          autoComplete="off"
-          required
+            id="text"
+            name="text"
+            placeholder="Paste a word, phrase, email, article, or transcript in German…"
+            rows={8}
+            autoComplete="off"
+            required
           />
           <p className="form-help">Paste one word for a focused lookup, or a longer text to extract useful vocabulary.</p>
         </div>

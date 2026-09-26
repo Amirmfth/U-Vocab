@@ -72,6 +72,36 @@ export function ConversationStartForm({
         />
       </div>
 
+      <div className="field">
+        <label htmlFor={kind + "-tone-trigger"}>Conversation tone</label>
+        <ActivitySelect
+          id={kind + "-tone"}
+          name="tone"
+          defaultValue="FRIENDLY"
+          options={[
+            { value: "FRIENDLY", label: "Friendly", description: "Warm and natural" },
+            { value: "PROFESSIONAL", label: "Professional", description: "Workplace-ready and composed" },
+            { value: "PLAYFUL", label: "Playful", description: "Lighter and more expressive" },
+            { value: "DIRECT", label: "Direct", description: "Concise and straightforward" },
+            { value: "SUPPORTIVE", label: "Supportive", description: "Patient and encouraging" },
+          ]}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor={kind + "-formality-trigger"}>Formality</label>
+        <ActivitySelect
+          id={kind + "-formality"}
+          name="formality"
+          defaultValue="NEUTRAL"
+          options={[
+            { value: "CASUAL", label: "Casual · du", description: "Informal everyday German" },
+            { value: "NEUTRAL", label: "Contextual", description: "Use what naturally fits the situation" },
+            { value: "FORMAL", label: "Formal · Sie", description: "Polite and socially formal German" },
+          ]}
+        />
+      </div>
+
       {kind === "MISSION" ? (
         <label className="conversation-toggle">
           <input type="checkbox" name="revealTargets" />

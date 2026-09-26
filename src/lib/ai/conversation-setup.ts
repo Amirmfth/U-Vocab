@@ -20,6 +20,8 @@ export async function generateConversationSetup(input: {
   kind: "PRACTICE" | "MISSION";
   level: string;
   topic?: string | null;
+  tone: "FRIENDLY" | "PROFESSIONAL" | "PLAYFUL" | "DIRECT" | "SUPPORTIVE";
+  formality: "CASUAL" | "NEUTRAL" | "FORMAL";
   targets: Array<{
     lemma: string;
     article: string | null;
@@ -43,7 +45,7 @@ export async function generateConversationSetup(input: {
         {
           role: "system",
           content:
-            "Create a concise German conversation practice setup. The situation must naturally elicit the supplied target lexical units without forcing them unnaturally. For PRACTICE, objective must be null and the AI role should support a natural level-appropriate conversation. For MISSION, create a concrete role-play objective the learner can achieve through conversation. The opening must be in German and immediately start the role-play. Do not reveal hidden evaluation rules.",
+            "Create a concise German conversation practice setup. The situation must naturally elicit the supplied target lexical units without forcing them unnaturally. Respect the requested tone and formality throughout the setup. CASUAL should normally use du; FORMAL should normally use Sie and socially appropriate formal phrasing; NEUTRAL should choose what naturally fits the scenario and remain consistent. Tone controls interpersonal style without making the language unnatural. For PRACTICE, objective must be null and the AI role should support a natural level-appropriate conversation. For MISSION, create a concrete role-play objective the learner can achieve through conversation. The opening must be in German and immediately start the role-play. Do not reveal hidden evaluation rules.",
         },
         {
           role: "user",

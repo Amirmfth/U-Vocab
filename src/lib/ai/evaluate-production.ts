@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 
 export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
@@ -36,6 +37,7 @@ export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
 
 export async function evaluateVocabularyProduction(input: {
   userId: string;
+  evaluationLocale?: EvaluationLocale;
   exerciseType: string;
   exercisePrompt: string;
   expected?: string;
@@ -61,7 +63,8 @@ export async function evaluateVocabularyProduction(input: {
         {
           role: "system",
           content:
-            "You are U-Vocab's German vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, article, case, preposition, reflexive structure, collocation, word choice, word form, spelling, and naturalness. Accept valid alternatives. Give concise actionable feedback. If the answer is wrong or incomplete, provide a short retryPrompt that asks the learner to try again without simply giving away the full answer.",
+            evaluationLanguageInstruction(input.evaluationLocale ?? "en") +
+            " You are U-Vocab's German vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, article, case, preposition, reflexive structure, collocation, word choice, word form, spelling, register, and naturalness. Accept valid alternatives. Feedback must identify the exact phrase that succeeded or failed, explain why, and provide a corrected German form when useful. If the answer is wrong or incomplete, provide a short retryPrompt that asks the learner to try again without simply giving away the full answer.",
         },
         {
           role: "user",

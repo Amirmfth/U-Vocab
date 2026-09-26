@@ -4,7 +4,7 @@ import { ChevronLeft, Filter, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-type FilterKey = "status" | "pos" | "level" | "topic" | "relation";
+type FilterKey = "status" | "pos" | "level" | "topic" | "relation" | "sort";
 
 type FilterOption = {
   label: string;
@@ -19,6 +19,10 @@ type FilterDefinition = {
 
 function withAll(label: string, values: FilterOption[]) {
   return [{ value: "ALL", label }, ...values];
+}
+
+function isDefaultValue(key: FilterKey, value: string) {
+  return value === "ALL" || (key === "sort" && value === "RECENTLY_ADDED");
 }
 
 export function VocabularyFilters({
@@ -58,6 +62,19 @@ export function VocabularyFilters({
     { key: "level", label: "CEFR level", options: withAll("Any CEFR level", levelOptions) },
     { key: "topic", label: "Topic", options: withAll("Any topic", topicOptions) },
     {
+      key: "sort",
+      label: "Sort",
+      options: [
+        { value: "RECENTLY_ADDED", label: "Recently added" },
+        { value: "ALPHABETICAL", label: "Alphabetical A–Z" },
+        { value: "CEFR_ASC", label: "CEFR A1 → C2" },
+        { value: "CEFR_DESC", label: "CEFR C2 → A1" },
+        { value: "MASTERY_ASC", label: "Lowest mastery first" },
+        { value: "MASTERY_DESC", label: "Highest mastery first" },
+        { value: "NEXT_REVIEW", label: "Next review first" },
+      ],
+    },
+    {
       key: "relation",
       label: "Relationship",
       options: [
@@ -83,7 +100,8 @@ export function VocabularyFilters({
 
   function setParam(key: FilterKey, value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    if (!value || value === "ALL") params.delete(key);
+    const isDefault = isDefaultValue(key, value);
+    if (!value || isDefault) params.delete(key);
     else params.set(key, value);
     router.push("/vocabulary" + (params.toString() ? "?" + params.toString() : ""));
     setMenu(null);
@@ -102,7 +120,9 @@ export function VocabularyFilters({
   }
 
   const activeFilters = filters.flatMap((filter) => {
-    if (current[filter.key] === "ALL") return [];
+    if (
+      isDefaultValue(filter.key, current[filter.key])
+    ) return [];
     const option = filter.options.find((item) => item.value === current[filter.key]);
     return option ? [{ ...filter, valueLabel: option.label }] : [];
   });
@@ -121,9 +141,13 @@ export function VocabularyFilters({
           placeholder="Search German, English, or Persian…"
           aria-label="Search vocabulary"
         />
-        {filters.map((filter) => current[filter.key] !== "ALL" ? (
-          <input key={filter.key} type="hidden" name={filter.key} value={current[filter.key]} />
-        ) : null)}
+        {filters.map((filter) => {
+          const value = current[filter.key];
+          const isDefault = isDefaultValue(filter.key, value);
+          return !isDefault ? (
+            <input key={filter.key} type="hidden" name={filter.key} value={value} />
+          ) : null;
+        })}
         <button type="submit" className="icon-button" aria-label="Search">
           <Search size={17} />
         </button>
@@ -187,7 +211,7 @@ export function VocabularyFilters({
               <div className="filter-menu-list" role="listbox" aria-label="Filter types">
                 {filters.map((filter) => (
                   <button
-                    aria-selected={current[filter.key] !== "ALL"}
+                    aria-selected={!isDefaultValue(filter.key, current[filter.key])}
                     className="filter-menu-option"
                     key={filter.key}
                     onClick={() => setMenu(filter.key)}
@@ -195,7 +219,7 @@ export function VocabularyFilters({
                     type="button"
                   >
                     {filter.label}
-                    {current[filter.key] !== "ALL" ? <span>Active</span> : null}
+                    {!isDefaultValue(filter.key, current[filter.key]) ? <span>Active</span> : null}
                   </button>
                 ))}
               </div>

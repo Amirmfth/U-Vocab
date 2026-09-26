@@ -95,6 +95,20 @@ enum ConversationStatus {
   COMPLETED
 }
 
+enum ConversationTone {
+  FRIENDLY
+  PROFESSIONAL
+  PLAYFUL
+  DIRECT
+  SUPPORTIVE
+}
+
+enum ConversationFormality {
+  CASUAL
+  NEUTRAL
+  FORMAL
+}
+
 enum BattleGame {
   RAPID_RECALL
   ARTICLE
@@ -612,6 +626,8 @@ model ConversationSession {
   aiRole        String
   objective     String?
   revealTargets Boolean            @default(true)
+  tone          ConversationTone    @default(FRIENDLY)
+  formality     ConversationFormality @default(NEUTRAL)
   summary       Json?
   turnInFlight  Boolean            @default(false)
   startedAt     DateTime            @default(now())

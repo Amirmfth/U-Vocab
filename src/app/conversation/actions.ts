@@ -6,6 +6,7 @@ import { evaluateConversationSession } from "@/lib/ai/conversation-final-evaluat
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { selectConversationTargets } from "@/lib/conversation/targets";
+import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 
 export type ConversationActionState = {
   status: "idle" | "success" | "error";
@@ -25,6 +26,14 @@ export async function createConversationSessionAction(
   const collectionId =
     collectionRaw && collectionRaw !== "NONE" ? collectionRaw : null;
   const topic = String(formData.get("topic") ?? "").trim() || null;
+  const toneRaw = String(formData.get("tone") ?? "FRIENDLY");
+  const tone = ["FRIENDLY","PROFESSIONAL","PLAYFUL","DIRECT","SUPPORTIVE"].includes(toneRaw)
+    ? toneRaw as "FRIENDLY"|"PROFESSIONAL"|"PLAYFUL"|"DIRECT"|"SUPPORTIVE"
+    : "FRIENDLY";
+  const formalityRaw = String(formData.get("formality") ?? "NEUTRAL");
+  const formality = ["CASUAL","NEUTRAL","FORMAL"].includes(formalityRaw)
+    ? formalityRaw as "CASUAL"|"NEUTRAL"|"FORMAL"
+    : "NEUTRAL";
   const revealTargets = String(formData.get("revealTargets") ?? "") === "on";
   const targetCount = Math.max(
     3,
@@ -51,6 +60,8 @@ export async function createConversationSessionAction(
       kind,
       level: user.targetLevel,
       topic,
+      tone,
+      formality,
       targets,
     });
 
@@ -64,6 +75,8 @@ export async function createConversationSessionAction(
         aiRole: setup.aiRole,
         objective: kind === "MISSION" ? setup.objective : null,
         revealTargets: kind === "PRACTICE" ? true : revealTargets,
+        tone,
+        formality,
         targets: {
           create: targets.map((target, position) => ({
             lexemeId: target.id,
@@ -148,6 +161,7 @@ export async function completeConversationAction(
 
     const evaluation = await evaluateConversationSession({
       userId: user.id,
+      evaluationLocale: evaluationLocaleForPreference(user.preferredTranslation),
       kind: session.kind,
       level: session.level,
       scenario: session.scenario,
@@ -165,6 +179,7 @@ export async function completeConversationAction(
       })),
     });
 
+    const evaluationLocale = evaluationLocaleForPreference(user.preferredTranslation);
     const targetEvaluation = new Map(
       evaluation.targetResults.map((result) => [result.lexemeId, result]),
     );
@@ -179,9 +194,13 @@ export async function completeConversationAction(
           naturalness:
             target.uses > 0 ? target.successfulUses / target.uses : 0,
           note:
-            target.uses > 0
-              ? "Usage was tracked during the conversation."
-              : "This target was not used.",
+            evaluationLocale === "fa"
+              ? target.uses > 0
+                ? "استفاده از این واژه در طول مکالمه ثبت شد."
+                : "این واژهٔ هدف در مکالمه استفاده نشد."
+              : target.uses > 0
+                ? "Usage was tracked during the conversation."
+                : "This target was not used.",
         };
       }),
     };
@@ -263,6 +282,8 @@ export async function replayConversationAction(
         aiRole: source.aiRole,
         objective: source.objective,
         revealTargets: source.revealTargets,
+        tone: source.tone,
+        formality: source.formality,
         targets: {
           create: source.targets.map((target) => ({
             lexemeId: target.lexemeId,

@@ -95,6 +95,8 @@ export async function buildConversationContext(input: {
       aiRole: session.aiRole,
       objective: session.objective,
       revealTargets: session.revealTargets,
+      tone: session.tone,
+      formality: session.formality,
     },
     learner: {
       level: session.user.targetLevel,

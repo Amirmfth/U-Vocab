@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 
 export const conversationTurnEvaluationSchema = z.object({
   targetUsage: z.array(
@@ -42,6 +43,7 @@ export type ConversationTurnEvaluation = z.infer<
 
 export async function evaluateConversationTurn(input: {
   userId: string;
+  evaluationLocale: EvaluationLocale;
   level: string;
   message: string;
   targets: Array<{
@@ -66,7 +68,8 @@ export async function evaluateConversationTurn(input: {
         {
           role: "system",
           content:
-            "Evaluate only the learner's use of the supplied German target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, case/preposition, form, spelling, and naturalness. Do not penalize unrelated grammar. relevantCorrection should be a very short conversational correction only when useful; otherwise null.",
+            evaluationLanguageInstruction(input.evaluationLocale) +
+            " Evaluate only the learner's use of the supplied German target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, case/preposition, form, spelling, register, and naturalness. Do not penalize unrelated grammar. Feedback and mistake explanations must quote or name the exact attempted phrase and give the exact corrected German form when there is an error. Avoid generic praise or generic criticism. relevantCorrection should be a very short actionable correction only when useful; otherwise null.",
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],

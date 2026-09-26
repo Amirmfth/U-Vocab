@@ -16,6 +16,13 @@ export function buildTutorInstructions(
     "Learner level: " + context.learner.level + ".",
     "Scenario: " + context.session.scenario,
     "Your role: " + context.session.aiRole,
+    "Conversation tone: " + context.session.tone.toLowerCase() + ".",
+    "Formality: " + context.session.formality.toLowerCase() + ".",
+    context.session.formality === "CASUAL"
+      ? "Use du consistently unless the scenario explicitly requires otherwise."
+      : context.session.formality === "FORMAL"
+        ? "Use Sie consistently and model socially appropriate formal German."
+        : "Use the form of address that naturally fits the scenario and keep it consistent.",
     context.session.objective
       ? "Conversation objective: " + context.session.objective
       : null,

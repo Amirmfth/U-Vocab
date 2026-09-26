@@ -14,6 +14,10 @@ import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
+function dateTime(value: Date | string): number {
+  return value instanceof Date ? value.getTime() : Date.parse(value);
+}
+
 export default async function Vocabulary({
   searchParams,
 }: {
@@ -32,6 +36,8 @@ export default async function Vocabulary({
   const now = new Date();
   const recentCutoff = new Date(now);
   recentCutoff.setDate(recentCutoff.getDate() - 30);
+  const nowTime = now.getTime();
+  const recentCutoffTime = recentCutoff.getTime();
 
   const current = {
     q: (query.q ?? "").trim(),
@@ -133,10 +139,10 @@ export default async function Vocabulary({
       case "MASTERED":
         return ["MASTERED", "MAINTENANCE"].includes(item.state);
       case "DUE":
-        return !item.nextReviewAt || item.nextReviewAt <= now;
+        return !item.nextReviewAt || dateTime(item.nextReviewAt) <= nowTime;
       case "RECENT":
         return Boolean(
-          word.encounters[0] && word.encounters[0].createdAt >= recentCutoff,
+          word.encounters[0] && dateTime(word.encounters[0].createdAt) >= recentCutoffTime,
         );
       case "DIFFICULT": {
         const retrievability = item.fsrsCard
@@ -168,9 +174,10 @@ export default async function Vocabulary({
       case "MASTERY_DESC":
         return masteryOf(b) - masteryOf(a);
       case "NEXT_REVIEW":
-        return (a.nextReviewAt?.getTime() ?? 0) - (b.nextReviewAt?.getTime() ?? 0);
+        return (a.nextReviewAt ? dateTime(a.nextReviewAt) : 0) -
+          (b.nextReviewAt ? dateTime(b.nextReviewAt) : 0);
       default:
-        return b.addedAt.getTime() - a.addedAt.getTime();
+        return dateTime(b.addedAt) - dateTime(a.addedAt);
     }
   });
 
@@ -271,7 +278,7 @@ export default async function Vocabulary({
                 4) *
                 100,
             );
-            const isDue = !item.nextReviewAt || item.nextReviewAt <= now;
+            const isDue = !item.nextReviewAt || dateTime(item.nextReviewAt) <= nowTime;
             const isWeak = mastery < 45;
 
             return (

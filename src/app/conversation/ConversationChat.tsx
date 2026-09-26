@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Send } from "lucide-react";
+import { Bot, Send, UserRound } from "lucide-react";
 
 type ChatMessage = {
   id: string;
@@ -13,20 +13,28 @@ type ChatMessage = {
 export function ConversationChat({
   sessionId,
   initialMessages,
+  tutorLabel,
 }: {
   sessionId: string;
   initialMessages: ChatMessage[];
+  tutorLabel: string;
 }) {
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const temporaryId = useRef(0);
+  const endRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!streaming) setMessages(initialMessages);
   }, [initialMessages, streaming]);
-  const [error, setError] = useState<string | null>(null);
-  const temporaryId = useRef(0);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: streaming ? "auto" : "smooth", block: "end" });
+  }, [messages, streaming]);
 
   const canSend = useMemo(
     () => draft.trim().length > 0 && !streaming,
@@ -80,6 +88,7 @@ export function ConversationChat({
       }
 
       router.refresh();
+      requestAnimationFrame(() => textareaRef.current?.focus());
     } catch (actionError) {
       setMessages((current) =>
         current.filter((item) => item.id !== assistantId),
@@ -97,29 +106,37 @@ export function ConversationChat({
   return (
     <section className="conversation-chat">
       <div className="conversation-messages" aria-live="polite">
-        {messages.map((message) => (
-          <article
-            className={
-              "conversation-message " +
-              (message.role === "USER" ? "is-user" : "is-assistant")
-            }
-            key={message.id}
-          >
-            <span>{message.role === "USER" ? "You" : "Tutor"}</span>
-            <p>
-              {message.content ||
-                (streaming && message.role === "ASSISTANT" ? "…" : "")}
-            </p>
-          </article>
-        ))}
+        {messages.map((message) => {
+          const isUser = message.role === "USER";
+          return (
+            <article
+              className={"conversation-message " + (isUser ? "is-user" : "is-assistant")}
+              key={message.id}
+            >
+              <div className="conversation-avatar" aria-hidden="true">
+                {isUser ? <UserRound size={17} /> : <Bot size={17} />}
+              </div>
+              <div className="conversation-bubble">
+                <span>{isUser ? "You" : tutorLabel}</span>
+                <p>
+                  {message.content ||
+                    (streaming && !isUser ? "…" : "")}
+                </p>
+              </div>
+            </article>
+          );
+        })}
+        <div ref={endRef} />
       </div>
 
       <form className="conversation-composer" onSubmit={submit}>
         <textarea
-          rows={3}
+          ref={textareaRef}
+          rows={2}
           value={draft}
           disabled={streaming}
           placeholder="Antworte auf Deutsch…"
+          aria-label="Your German reply"
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
             if (
@@ -134,13 +151,17 @@ export function ConversationChat({
         />
         <button
           type="submit"
-          className="button button-primary"
+          className="conversation-send-button"
           disabled={!canSend}
           aria-busy={streaming}
+          aria-label={streaming ? "Tutor is replying" : "Send message"}
+          title={streaming ? "Tutor is replying…" : "Send · Enter"}
         >
-          <Send size={17} />
-          {streaming ? "Tutor is replying…" : "Send"}
+          <Send size={18} />
         </button>
+        <span className="conversation-composer-hint">
+          Enter to send · Shift + Enter for a new line
+        </span>
       </form>
 
       {error ? (

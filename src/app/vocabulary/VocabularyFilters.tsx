@@ -4,7 +4,7 @@ import { ChevronLeft, Filter, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-type FilterKey = "status" | "pos" | "level" | "topic" | "relation";
+type FilterKey = "status" | "pos" | "level" | "topic" | "relation" | "sort";
 
 type FilterOption = {
   label: string;
@@ -58,6 +58,19 @@ export function VocabularyFilters({
     { key: "level", label: "CEFR level", options: withAll("Any CEFR level", levelOptions) },
     { key: "topic", label: "Topic", options: withAll("Any topic", topicOptions) },
     {
+      key: "sort",
+      label: "Sort",
+      options: [
+        { value: "RECENTLY_ADDED", label: "Recently added" },
+        { value: "ALPHABETICAL", label: "Alphabetical A–Z" },
+        { value: "CEFR_ASC", label: "CEFR A1 → C2" },
+        { value: "CEFR_DESC", label: "CEFR C2 → A1" },
+        { value: "MASTERY_ASC", label: "Lowest mastery first" },
+        { value: "MASTERY_DESC", label: "Highest mastery first" },
+        { value: "NEXT_REVIEW", label: "Next review first" },
+      ],
+    },
+    {
       key: "relation",
       label: "Relationship",
       options: [
@@ -83,7 +96,8 @@ export function VocabularyFilters({
 
   function setParam(key: FilterKey, value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    if (!value || value === "ALL") params.delete(key);
+    const isDefault = value === "ALL" || (key === "sort" && value === "RECENTLY_ADDED");
+    if (!value || isDefault) params.delete(key);
     else params.set(key, value);
     router.push("/vocabulary" + (params.toString() ? "?" + params.toString() : ""));
     setMenu(null);
@@ -102,7 +116,10 @@ export function VocabularyFilters({
   }
 
   const activeFilters = filters.flatMap((filter) => {
-    if (current[filter.key] === "ALL") return [];
+    if (
+      current[filter.key] === "ALL" ||
+      (filter.key === "sort" && current.sort === "RECENTLY_ADDED")
+    ) return [];
     const option = filter.options.find((item) => item.value === current[filter.key]);
     return option ? [{ ...filter, valueLabel: option.label }] : [];
   });
@@ -121,9 +138,13 @@ export function VocabularyFilters({
           placeholder="Search German, English, or Persian…"
           aria-label="Search vocabulary"
         />
-        {filters.map((filter) => current[filter.key] !== "ALL" ? (
-          <input key={filter.key} type="hidden" name={filter.key} value={current[filter.key]} />
-        ) : null)}
+        {filters.map((filter) => {
+          const value = current[filter.key];
+          const isDefault = value === "ALL" || (filter.key === "sort" && value === "RECENTLY_ADDED");
+          return !isDefault ? (
+            <input key={filter.key} type="hidden" name={filter.key} value={value} />
+          ) : null;
+        })}
         <button type="submit" className="icon-button" aria-label="Search">
           <Search size={17} />
         </button>

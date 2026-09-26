@@ -11,6 +11,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { formatRelativeReviewTime } from "@/lib/relative-time";
 import { startOperation } from "@/lib/performance";
 import {
   getCachedWordPrimary,
@@ -430,8 +431,8 @@ export default async function Word({
           })}
 
           {state.nextReviewAt ? (
-            <p className="muted">
-              Next review: {state.nextReviewAt.toLocaleString()}
+            <p className="muted" title={state.nextReviewAt.toLocaleString()}>
+              Next review: {formatRelativeReviewTime(state.nextReviewAt)}
             </p>
           ) : null}
         </article>

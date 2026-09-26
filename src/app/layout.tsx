@@ -1,5 +1,6 @@
 import "./globals.css";
 import "./core-experience.css";
+import "./core-learning-polish.css";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { AppNavigation } from "@/components/app-navigation";
@@ -14,6 +15,11 @@ export const metadata = {
   description: "Your personal German lexical knowledge system",
 };
 
+export const viewport = {
+  themeColor: "#09090b",
+  colorScheme: "dark",
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const authenticated = await isAppAuthenticated();
   const user = authenticated ? await getCurrentUser() : null;
@@ -21,10 +27,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
         {authenticated ? <WebVitals /> : null}
         {user ? <AppNavigation translationPreference={user.preferredTranslation} /> : null}
         <QueryProvider>
-          <div className={authenticated ? "app-shell" : "auth-shell"}>
+          <div
+            id="main-content"
+            tabIndex={-1}
+            className={authenticated ? "app-shell" : "auth-shell"}
+          >
             <PageTransition>{children}</PageTransition>
           </div>
         </QueryProvider>

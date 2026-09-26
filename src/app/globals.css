@@ -4863,3 +4863,109 @@ summary {
   }
 }
 @media (max-width:619px) { .conjugation-overlay { align-items: flex-end; padding: 0; } .conjugation-panel { width: 100%; max-height: min(88dvh, 760px); border-bottom: 0; border-radius: 26px 26px 0 0; } .conjugation-sheet-handle { display: block; width: 38px; height: 4px; margin: 10px auto 0; border-radius: 999px; background: var(--border-strong); } .conjugation-shell { min-height: 0; max-height: min(88dvh, 760px); padding-bottom: env(safe-area-inset-bottom); } .conjugation-table th, .conjugation-table td { padding: 12px 6px; } }
+
+
+/* Fast multiple-choice learning interactions */
+.practice-session-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.practice-choice-grid,
+.battle-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.practice-option,
+.battle-option {
+  min-height: 58px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    opacity 140ms ease;
+}
+.practice-option:hover:not(:disabled),
+.practice-option:focus-visible:not(:disabled),
+.battle-option:hover:not(:disabled),
+.battle-option:focus-visible:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+  transform: translateY(-1px);
+}
+.practice-option:disabled,
+.battle-option:disabled {
+  cursor: default;
+}
+.practice-option.is-selected,
+.battle-option.is-selected {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+}
+.practice-option.is-correct,
+.battle-option.is-correct {
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+.practice-option.is-wrong,
+.battle-option.is-wrong {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+.practice-option.is-correct > svg,
+.battle-option.is-correct > svg {
+  color: var(--success);
+}
+.practice-option.is-wrong > svg,
+.battle-option.is-wrong > svg {
+  color: var(--danger);
+}
+.practice-instant-feedback {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+}
+.practice-instant-feedback.is-correct {
+  color: var(--success);
+  background: var(--success-soft);
+}
+.practice-instant-feedback.is-wrong {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+.practice-instant-feedback > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.practice-instant-feedback small {
+  color: var(--text-muted);
+}
+.battle-feedback.is-pending {
+  color: var(--text-muted);
+  background: var(--surface-raised);
+}
+@media (min-width: 620px) {
+  .practice-choice-grid,
+  .battle-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

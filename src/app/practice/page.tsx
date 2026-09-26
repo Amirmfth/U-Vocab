@@ -18,6 +18,8 @@ import { buildExercise, eligibleExerciseTypes } from "@/lib/exercises/build";
 import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
 import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
+import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { isTranslationVisible } from "@/lib/translations";
 
 function PracticeHub() {
   return (
@@ -97,7 +99,8 @@ export default async function PracticePage({
   if(!params.lexeme&&params.drill!=="1") return <PracticeHub/>;
 
   const user=await getCurrentUser();
-  const items=await db.userVocabulary.findMany({
+  const [items,distractorItems]=await Promise.all([
+    db.userVocabulary.findMany({
     where:{ userId:user.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },
     include:{
       lexeme:{
@@ -119,7 +122,18 @@ export default async function PracticePage({
       { addedAt:"asc" },
     ],
     take:params.lexeme?1:8,
-  });
+  }),
+    db.userVocabulary.findMany({
+      where:{ userId:user.id },
+      include:{
+        lexeme:{
+          include:{ patterns:true,translations:true,examples:true },
+        },
+      },
+      orderBy:{ addedAt:"desc" },
+      take:60,
+    }),
+  ]);
 
   if(!items.length){
     return <main className="page focus-page">
@@ -130,6 +144,17 @@ export default async function PracticePage({
       </section>
     </main>;
   }
+
+  const optionPools={
+    meanings:distractorItems.flatMap((item)=>
+      item.lexeme.translations
+        .filter((translation)=>isTranslationVisible(user.preferredTranslation,translation.language))
+        .map((translation)=>translation.text),
+    ),
+    lemmas:distractorItems.map((item)=>formatLexemeLabel(item.lexeme)),
+    patterns:distractorItems.flatMap((item)=>item.lexeme.patterns.map((pattern)=>pattern.pattern)),
+    examples:distractorItems.flatMap((item)=>item.lexeme.examples.map((example)=>example.german)),
+  };
 
   const recent:ExerciseType[]=[];
   const exercises:Array<{
@@ -157,7 +182,7 @@ export default async function PracticePage({
         id:item.id+":"+position+":"+type,
         userVocabularyId:item.id,
         lemma:item.lexeme.lemma,
-        exercise:buildExercise(type,item.lexeme,user.preferredTranslation),
+        exercise:buildExercise(type,item.lexeme,user.preferredTranslation,optionPools),
       });
     }
   }
@@ -167,6 +192,10 @@ export default async function PracticePage({
     if(conjugation.status==="ok"){
       const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
       if(form){
+        const verbOptions=Array.from(new Set([
+          form.form,
+          ...conjugation.data.indicative.present.forms.map((row)=>row.form),
+        ])).slice(0,4);
         exercises.push({
           id:items[0].id+":verb-present-du",
           userVocabularyId:items[0].id,
@@ -174,9 +203,10 @@ export default async function PracticePage({
           conjugation:{ person:"du" },
           exercise:{
             type:"REVERSE_RECALL",
-            prompt:"Conjugate “"+items[0].lexeme.lemma+"” for du in Präsens.",
+            prompt:"Which form is correct for du in Präsens?",
             expected:form.form,
-            interaction:"short_text",
+            interaction:verbOptions.length>=3?"choice":"short_text",
+            options:verbOptions.length>=3?verbOptions:undefined,
             skill:"production",
             requiresAI:false,
           },

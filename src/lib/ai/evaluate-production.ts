@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 
 export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
@@ -36,6 +37,7 @@ export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
 
 export async function evaluateVocabularyProduction(input: {
   userId: string;
+  evaluationLocale?: EvaluationLocale;
   exerciseType: string;
   exercisePrompt: string;
   expected?: string;

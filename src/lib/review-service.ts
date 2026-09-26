@@ -4,7 +4,11 @@ import {
   VocabularyState,
 } from "@prisma/client";
 import { db } from "@/lib/db";
-import { scheduleReview, type ReviewGrade } from "@/lib/fsrs";
+import {
+  isReviewDue,
+  scheduleReview,
+  type ReviewGrade,
+} from "@/lib/fsrs";
 import { applyMasteryDelta, reviewMasteryDelta } from "@/lib/exercises/mastery";
 
 function nextVocabularyState(stability: number): VocabularyState {
@@ -22,21 +26,34 @@ export async function applyReviewResult(input: {
   prompt: string;
   durationMs?: number | null;
 }) {
-  const item = await db.userVocabulary.findFirst({
-    where: { id: input.userVocabularyId, userId: input.userId },
-  });
-  if (!item) throw new Error("Vocabulary item not found.");
+  const now = new Date();
 
-  const scheduled = scheduleReview(item.fsrsCard, input.grade);
-  const state = nextVocabularyState(scheduled.stability);
-  const mastery = applyMasteryDelta(item, reviewMasteryDelta(input.exerciseType, input.grade));
+  return db.$transaction(async (tx) => {
+    const item = await tx.userVocabulary.findFirst({
+      where: { id: input.userVocabularyId, userId: input.userId },
+    });
+    if (!item) throw new Error("Vocabulary item not found.");
 
-  const masteredAt =
-    state === "MASTERED" && !item.masteredAt ? new Date() : item.masteredAt;
+    if (!isReviewDue(item.nextReviewAt, now)) {
+      throw new Error("This vocabulary item is not due for review yet.");
+    }
 
-  await db.$transaction([
-    db.userVocabulary.update({
-      where: { id: item.id },
+    const scheduled = scheduleReview(item.fsrsCard, input.grade, now);
+    const state = nextVocabularyState(scheduled.stability);
+    const mastery = applyMasteryDelta(
+      item,
+      reviewMasteryDelta(input.exerciseType, input.grade),
+    );
+
+    const masteredAt =
+      state === "MASTERED" && !item.masteredAt ? new Date() : item.masteredAt;
+
+    const claimed = await tx.userVocabulary.updateMany({
+      where: {
+        id: item.id,
+        userId: input.userId,
+        OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
+      },
       data: {
         fsrsCard: scheduled.nextCard,
         stability: scheduled.stability,
@@ -50,16 +67,22 @@ export async function applyReviewResult(input: {
         production: mastery.production,
         contextualUsage: mastery.contextualUsage,
       },
-    }),
-    db.review.create({
+    });
+
+    if (claimed.count !== 1) {
+      throw new Error("This vocabulary item is no longer due for review.");
+    }
+
+    await tx.review.create({
       data: {
         userVocabularyId: item.id,
         rating: input.grade as ReviewRating,
         previousCard: scheduled.previousCard,
         nextCard: scheduled.nextCard,
       },
-    }),
-    db.attempt.create({
+    });
+
+    await tx.attempt.create({
       data: {
         userId: input.userId,
         userVocabularyId: item.id,
@@ -77,8 +100,8 @@ export async function applyReviewResult(input: {
                 : 1,
         durationMs: input.durationMs ?? null,
       },
-    }),
-  ]);
+    });
 
-  return { item, scheduled, state };
+    return { item, scheduled, state };
+  });
 }

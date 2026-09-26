@@ -9,9 +9,17 @@ import type {
 } from "./types";
 
 function preferredMeaning(lexeme: ExerciseLexeme, preference: TranslationLanguage) {
-  return lexeme.translations.find((translation) =>
-    isTranslationVisible(preference, translation.language),
-  )?.text ?? lexeme.translations[0]?.text ?? "";
+  const preferredLanguage = preference === "PERSIAN" ? "fa" : "en";
+  return (
+    lexeme.translations.find(
+      (translation) => translation.language === preferredLanguage,
+    )?.text ??
+    lexeme.translations.find((translation) =>
+      isTranslationVisible(preference, translation.language),
+    )?.text ??
+    lexeme.translations[0]?.text ??
+    ""
+  );
 }
 
 function cleanToken(value: string) {

@@ -62,8 +62,8 @@ export default async function WritingSessionPage({
     : [];
 
   return (
-    <main className="page">
-      <section className="page-header compact">
+    <main className="page writing-session-page">
+      <section className="page-header compact writing-session-header">
         <Link href="/writing" className="back-link">
           <ArrowLeft size={16} />
           Writing

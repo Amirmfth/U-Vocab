@@ -1,6 +1,7 @@
 import type { ExerciseType, TranslationLanguage } from "@prisma/client";
 import { db } from "@/lib/db";
 import { buildReviewCard, type ReviewCardDefinition } from "@/lib/review-card";
+import { repairImpossibleEasySchedules } from "@/lib/review-schedule-repair";
 
 export type ReviewQueueCard={
   userVocabularyId:string;
@@ -21,6 +22,7 @@ export async function getReviewQueueData(input:{
   limit?:number;
 }):Promise<ReviewQueueData>{
   const now=new Date();
+  await repairImpossibleEasySchedules(input.userId,now);
   const where={
     userId:input.userId,
     OR:[{ nextReviewAt:null },{ nextReviewAt:{ lte:now } }],

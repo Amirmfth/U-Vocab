@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 
 const lexicalMistakeSchema = z.object({
   type: z.enum([
@@ -84,6 +85,7 @@ export function calculateWritingOverall(evaluation: Omit<WritingEvaluation, "ove
 
 export async function evaluateWriting(input: {
   userId: string;
+  evaluationLocale: EvaluationLocale;
   level: string;
   mode: "GUIDED" | "OPEN";
   taskType: string;

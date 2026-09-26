@@ -21,6 +21,10 @@ function withAll(label: string, values: FilterOption[]) {
   return [{ value: "ALL", label }, ...values];
 }
 
+function isDefaultValue(key: FilterKey, value: string) {
+  return value === "ALL" || (key === "sort" && value === "RECENTLY_ADDED");
+}
+
 export function VocabularyFilters({
   current,
   partOfSpeechOptions,
@@ -96,7 +100,7 @@ export function VocabularyFilters({
 
   function setParam(key: FilterKey, value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    const isDefault = value === "ALL" || (key === "sort" && value === "RECENTLY_ADDED");
+    const isDefault = isDefaultValue(key, value);
     if (!value || isDefault) params.delete(key);
     else params.set(key, value);
     router.push("/vocabulary" + (params.toString() ? "?" + params.toString() : ""));
@@ -117,8 +121,7 @@ export function VocabularyFilters({
 
   const activeFilters = filters.flatMap((filter) => {
     if (
-      current[filter.key] === "ALL" ||
-      (filter.key === "sort" && current.sort === "RECENTLY_ADDED")
+      isDefaultValue(filter.key, current[filter.key])
     ) return [];
     const option = filter.options.find((item) => item.value === current[filter.key]);
     return option ? [{ ...filter, valueLabel: option.label }] : [];
@@ -140,7 +143,7 @@ export function VocabularyFilters({
         />
         {filters.map((filter) => {
           const value = current[filter.key];
-          const isDefault = value === "ALL" || (filter.key === "sort" && value === "RECENTLY_ADDED");
+          const isDefault = isDefaultValue(filter.key, value);
           return !isDefault ? (
             <input key={filter.key} type="hidden" name={filter.key} value={value} />
           ) : null;
@@ -208,7 +211,7 @@ export function VocabularyFilters({
               <div className="filter-menu-list" role="listbox" aria-label="Filter types">
                 {filters.map((filter) => (
                   <button
-                    aria-selected={current[filter.key] !== "ALL"}
+                    aria-selected={!isDefaultValue(filter.key, current[filter.key])}
                     className="filter-menu-option"
                     key={filter.key}
                     onClick={() => setMenu(filter.key)}
@@ -216,7 +219,7 @@ export function VocabularyFilters({
                     type="button"
                   >
                     {filter.label}
-                    {current[filter.key] !== "ALL" ? <span>Active</span> : null}
+                    {!isDefaultValue(filter.key, current[filter.key]) ? <span>Active</span> : null}
                   </button>
                 ))}
               </div>

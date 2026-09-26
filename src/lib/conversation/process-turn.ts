@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { evaluateConversationTurn } from "@/lib/ai/conversation-turn-evaluator";
 import { recordMistakesBatch, type MistakeInput } from "@/lib/mistakes-batch";
+import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 import {
   updateConversationTargetsBatch,
   updateVocabularyMasteryBatch,
@@ -20,6 +21,7 @@ export async function processConversationTurn(input: {
       status: "ACTIVE",
     },
     include: {
+      user: { select: { preferredTranslation: true } },
       targets: {
         include: {
           lexeme: { include: { patterns: true } },
@@ -32,6 +34,7 @@ export async function processConversationTurn(input: {
 
   const evaluation = await evaluateConversationTurn({
     userId: input.userId,
+    evaluationLocale: evaluationLocaleForPreference(session.user.preferredTranslation),
     level: session.level,
     message: input.message,
     targets: session.targets.map((target) => ({

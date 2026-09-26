@@ -54,6 +54,14 @@ export default async function ConversationSessionPage({
           <span className="badge">{session.kind.toLowerCase()}</span>
           <span className="badge">{session.level}</span>
           <span className="badge">{session.status.toLowerCase()}</span>
+          <span className="badge">{session.tone.toLowerCase()}</span>
+          <span className="badge">
+            {session.formality === "CASUAL"
+              ? "casual · du"
+              : session.formality === "FORMAL"
+                ? "formal · Sie"
+                : "contextual formality"}
+          </span>
         </div>
 
         <h1>{session.title}</h1>
@@ -104,6 +112,7 @@ export default async function ConversationSessionPage({
               role: message.role,
               content: message.content,
             }))}
+            tutorLabel={session.aiRole}
           />
           <ConversationFinish sessionId={session.id} />
         </>

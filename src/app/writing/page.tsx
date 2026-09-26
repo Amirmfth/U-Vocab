@@ -12,10 +12,13 @@ export default async function WritingPage() {
   const [collections, sessions] = await getCachedWritingIndex(user.id);
 
   return (
-    <main className="page">
-      <section className="page-header compact">
+    <main className="page writing-hub">
+      <section className="page-header compact practice-workbench-header">
         <p className="eyebrow">WRITING PRACTICE</p>
-        <h1>German writing exam</h1>
+        <h1>Writing studio</h1>
+        <p className="page-description">
+          Build a focused German task around your level and vocabulary, then get actionable feedback on the result.
+        </p>
       </section>
 
       <WritingStartForm

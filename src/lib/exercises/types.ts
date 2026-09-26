@@ -23,6 +23,13 @@ export type ExerciseLexeme = {
   examples: { german: string }[];
 };
 
+export type ExerciseOptionPools = {
+  meanings?: string[];
+  lemmas?: string[];
+  patterns?: string[];
+  examples?: string[];
+};
+
 export type LearnerSnapshot = {
   recognition: number;
   meaningRecall: number;

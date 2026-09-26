@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Clock3, XCircle } from "lucide-react";
 import { answerBattleQuestion, completeBattle } from "../actions";
@@ -31,11 +32,14 @@ export function BattleRunner({
   questions: Question[];
 }) {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const firstUnanswered = questions.findIndex((question) => !question.answer);
   const [index, setIndex] = useState(
     firstUnanswered === -1 ? questions.length : firstUnanswered,
   );
   const [score, setScore] = useState(initialScore);
+  const [answered, setAnswered] = useState(() => questions.filter((question) => question.answer).length);
+  const [selected, setSelected] = useState<string | null>(null);
   const [result, setResult] = useState<{
     correct: boolean;
     expected: string;
@@ -52,11 +56,6 @@ export function BattleRunner({
   const [pending, startTransition] = useTransition();
   const questionStartedAt = useRef(Date.now());
   const current = questions[index];
-
-  const answered = useMemo(
-    () => questions.filter((question) => question.answer).length + (result ? 1 : 0),
-    [questions, result],
-  );
 
   useEffect(() => {
     if (mode !== "TIMED" || !durationSec || index >= questions.length) return;
@@ -77,6 +76,24 @@ export function BattleRunner({
 
     return () => window.clearInterval(timer);
   }, [durationSec, index, mode, questions.length, router, sessionId]);
+
+  useEffect(() => {
+    if (!result) return;
+    const timer = window.setTimeout(() => {
+      if (index + 1 >= questions.length) {
+        startTransition(async () => {
+          await completeBattle(sessionId);
+          router.refresh();
+        });
+        return;
+      }
+      setResult(null);
+      setSelected(null);
+      setIndex((value) => value + 1);
+      questionStartedAt.current = Date.now();
+    }, result.correct ? 800 : 1100);
+    return () => window.clearTimeout(timer);
+  }, [index, questions.length, result, router, sessionId]);
 
   if (!current || (mode === "TIMED" && remaining <= 0)) {
     return (
@@ -105,6 +122,7 @@ export function BattleRunner({
 
   async function choose(answer: string) {
     if (pending || result) return;
+    setSelected(answer);
     const responseMs = Date.now() - questionStartedAt.current;
 
     startTransition(async () => {
@@ -115,14 +133,9 @@ export function BattleRunner({
         responseMs,
       });
       setScore((value) => value + response.points);
+      setAnswered((value) => value + 1);
       setResult(response);
     });
-  }
-
-  function next() {
-    setResult(null);
-    setIndex((value) => value + 1);
-    questionStartedAt.current = Date.now();
   }
 
   return (
@@ -137,43 +150,64 @@ export function BattleRunner({
         )}
       </div>
 
-      <article className="panel battle-question-card">
-        <h2>{current.prompt}</h2>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.article
+          key={current.id}
+          className="panel battle-question-card"
+          initial={reduceMotion ? false : { opacity: 0, x: 30, scale: 0.99 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -36, scale: 0.985 }}
+          transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
+        >
+          <h2>{current.prompt}</h2>
 
-        <div className="battle-options">
-          {current.options.map((option) => (
-            <button
-              type="button"
-              className="battle-option"
-              key={option}
-              disabled={pending || Boolean(result)}
-              onClick={() => choose(option)}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        {result ? (
-          <div className={"battle-feedback " + (result.correct ? "is-correct" : "is-wrong")}>
-            {result.correct ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
-            <div>
-              <strong>
-                {result.correct
-                  ? "+" + result.points + " points"
-                  : "Expected: " + result.expected}
-              </strong>
-              {result.explanation ? <span>{result.explanation}</span> : null}
-            </div>
+          <div className="battle-options">
+            {current.options.map((option) => {
+              const isCorrect = Boolean(result) && option === result?.expected;
+              const isWrong = Boolean(result) && selected === option && !result?.correct;
+              return (
+                <button
+                  type="button"
+                  className={[
+                    "battle-option",
+                    selected === option ? "is-selected" : "",
+                    isCorrect ? "is-correct" : "",
+                    isWrong ? "is-wrong" : "",
+                  ].filter(Boolean).join(" ")}
+                  key={option}
+                  disabled={pending || Boolean(result)}
+                  onClick={() => choose(option)}
+                >
+                  <span>{option}</span>
+                  {isCorrect ? <CheckCircle2 size={18} /> : isWrong ? <XCircle size={18} /> : null}
+                </button>
+              );
+            })}
           </div>
-        ) : null}
 
-        {result ? (
-          <button type="button" className="button button-primary" onClick={next}>
-            {index + 1 >= questions.length ? "Finish" : "Next"}
-          </button>
-        ) : null}
-      </article>
+          {pending && !result ? (
+            <div className="battle-feedback is-pending" role="status">
+              <span>Checking…</span>
+            </div>
+          ) : null}
+
+          {result ? (
+            <div className={"battle-feedback " + (result.correct ? "is-correct" : "is-wrong")} role="status">
+              {result.correct ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+              <div>
+                <strong>
+                  {result.correct
+                    ? "+" + result.points + " points"
+                    : "Correct: " + result.expected}
+                </strong>
+                <span>
+                  {result.explanation ?? "Next question…"}
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </motion.article>
+      </AnimatePresence>
     </section>
   );
 }

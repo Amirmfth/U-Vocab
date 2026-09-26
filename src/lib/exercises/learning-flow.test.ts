@@ -50,3 +50,13 @@ test("choice evidence weighs mastery less than typed production",()=>{
   );
   assert.equal(updated.production,1);
 });
+
+
+test("meaning recall becomes multi-option when vocabulary distractors exist",()=>{
+  const exercise=buildExercise("MEANING_RECALL",noun,"ENGLISH",{
+    meanings:["chair","window","door","book"],
+  });
+  assert.equal(exercise.interaction,"choice");
+  assert.equal(exercise.options?.length,4);
+  assert.ok(exercise.options?.includes("table"));
+});

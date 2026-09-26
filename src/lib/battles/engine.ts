@@ -1,6 +1,7 @@
 import type { BattleGame } from "@prisma/client";
 import { db } from "@/lib/db";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { deterministicChoiceOptions } from "@/lib/exercises/options";
 
 type BattleQuestionDraft = {
   lexemeId: string | null;
@@ -14,15 +15,6 @@ function unique(values: Array<string | null | undefined>) {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value))));
 }
 
-function deterministicOptions(expected: string, pool: string[], limit = 4) {
-  const values = unique([expected, ...pool.filter((item) => item !== expected)]).slice(0, limit);
-  if (values.length < 2) return values;
-  const offset =
-    Array.from(expected).reduce((sum, character) => sum + character.codePointAt(0)!, 0) %
-    values.length;
-  return [...values.slice(offset), ...values.slice(0, offset)];
-}
-
 function prepositionFrom(pattern: string) {
   const match = pattern.match(/\b(an|auf|aus|bei|für|gegen|in|mit|nach|über|um|von|vor|zu)\b/i);
   return match?.[1]?.toLowerCase() ?? null;
@@ -34,7 +26,12 @@ export async function buildBattleQuestions(input: {
   count?: number;
 }) {
   const count = input.count ?? 8;
-  const vocabulary = await db.userVocabulary.findMany({
+  const [user, vocabulary] = await Promise.all([
+    db.user.findUnique({
+      where: { id: input.userId },
+      select: { preferredTranslation: true },
+    }),
+    db.userVocabulary.findMany({
     where: { userId: input.userId },
     include: {
       lexeme: {
@@ -54,13 +51,16 @@ export async function buildBattleQuestions(input: {
       { meaningRecall: "asc" },
     ],
     take: 100,
-  });
+  }),
+  ]);
 
+  const preferredLanguage =
+    user?.preferredTranslation === "PERSIAN" ? "fa" : "en";
   const drafts: BattleQuestionDraft[] = [];
-  const englishPool = unique(
+  const meaningPool = unique(
     vocabulary.flatMap((item) =>
       item.lexeme.translations
-        .filter((translation) => translation.language === "en")
+        .filter((translation) => translation.language === preferredLanguage)
         .map((translation) => translation.text),
     ),
   );
@@ -77,13 +77,13 @@ export async function buildBattleQuestions(input: {
 
     if (input.game === "RAPID_RECALL") {
       const meaning = lexeme.translations.find(
-        (translation) => translation.language === "en",
+        (translation) => translation.language === preferredLanguage,
       )?.text;
       if (!meaning) continue;
       drafts.push({
         lexemeId: lexeme.id,
         prompt: "What does “" + lexeme.lemma + "” mean?",
-        options: deterministicOptions(meaning, englishPool),
+        options: deterministicChoiceOptions(meaning, meaningPool),
         expected: meaning,
         explanation: null,
       });
@@ -108,7 +108,7 @@ export async function buildBattleQuestions(input: {
       drafts.push({
         lexemeId: lexeme.id,
         prompt: "Which pattern belongs to “" + lexeme.lemma + "”?",
-        options: deterministicOptions(pattern, patternPool),
+        options: deterministicChoiceOptions(pattern, patternPool),
         expected: pattern,
         explanation: pattern,
       });
@@ -120,7 +120,7 @@ export async function buildBattleQuestions(input: {
       drafts.push({
         lexemeId: lexeme.id,
         prompt: "Which word is closest in meaning to “" + lexeme.lemma + "”?",
-        options: deterministicOptions(relation.target.lemma, lemmaPool),
+        options: deterministicChoiceOptions(relation.target.lemma, lemmaPool),
         expected: relation.target.lemma,
         explanation:
           lexeme.lemma + " ↔ " + relation.target.lemma +
@@ -137,7 +137,7 @@ export async function buildBattleQuestions(input: {
       drafts.push({
         lexemeId: lexeme.id,
         prompt: "Which preposition completes the pattern for “" + lexeme.lemma + "”?",
-        options: deterministicOptions(preposition, prepPool),
+        options: deterministicChoiceOptions(preposition, prepPool),
         expected: preposition,
         explanation: pattern.pattern,
       });
@@ -159,7 +159,7 @@ export async function buildBattleQuestions(input: {
         (item) => item.lexeme.partOfSpeech !== group[0].lexeme.partOfSpeech,
       );
       if (!odd) continue;
-      const options = deterministicOptions(
+      const options = deterministicChoiceOptions(
         odd.lexeme.lemma,
         group.slice(0, 3).map((item) => item.lexeme.lemma),
       );

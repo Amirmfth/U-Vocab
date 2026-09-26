@@ -14,6 +14,8 @@ const scheduler = fsrs({
   maximum_interval: 36500,
   enable_fuzz: true,
   enable_short_term: true,
+  learning_steps: ["1m", "10m"],
+  relearning_steps: ["10m"],
 });
 
 const ratingMap: Record<ReviewGrade, Grade> = {
@@ -47,8 +49,17 @@ export function scheduleReview(
   grade: ReviewGrade,
   now = new Date(),
 ) {
-  const previous = hydrateCard(savedCard, now);
-  const result = scheduler.next(previous, now, ratingMap[grade]);
+  let previous = hydrateCard(savedCard, now);
+  let result = scheduler.next(previous, now, ratingMap[grade]);
+
+  if (
+    grade === "EASY" &&
+    result.card.due.getTime() - now.getTime() < 24 * 60 * 60 * 1000
+  ) {
+    previous = createEmptyCard(now);
+    result = scheduler.next(previous, now, ratingMap[grade]);
+  }
+
   const retrievability = scheduler.get_retrievability(result.card, now, false);
 
   return {

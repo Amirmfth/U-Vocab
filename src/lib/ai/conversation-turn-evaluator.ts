@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 
 export const conversationTurnEvaluationSchema = z.object({
   targetUsage: z.array(
@@ -42,6 +43,7 @@ export type ConversationTurnEvaluation = z.infer<
 
 export async function evaluateConversationTurn(input: {
   userId: string;
+  evaluationLocale: EvaluationLocale;
   level: string;
   message: string;
   targets: Array<{

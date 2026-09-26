@@ -19,7 +19,7 @@ export function LoginForm({ returnTo }: { returnTo: string }) {
         <h1>Sign in to U-Vocab</h1>
         <p className="muted">Use the shared credentials configured for this deployment.</p>
       </div>
-      <label className="field"><span>Username</span><input name="username" autoComplete="username" required autoFocus /></label>
+      <label className="field"><span>Username</span><input name="username" autoComplete="username" required /></label>
       <label className="field"><span>Password</span><input name="password" type="password" autoComplete="current-password" required /></label>
       {state.status === "error" ? <StatusNotice tone="error">{state.message}</StatusNotice> : null}
       <ActionButton pendingLabel="Signing in…">Sign in</ActionButton>

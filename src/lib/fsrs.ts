@@ -60,3 +60,8 @@ export function scheduleReview(
     retrievability,
   };
 }
+
+
+export function isReviewDue(nextReviewAt: Date | null | undefined, now = new Date()) {
+  return !nextReviewAt || nextReviewAt.getTime() <= now.getTime();
+}

@@ -12,6 +12,9 @@ export function optimisticReviewAdvance(
   queue: ReviewQueueData,
   userVocabularyId: string,
 ): ReviewQueueData {
+  if (!queue.cards.some((card) => card.userVocabularyId === userVocabularyId)) {
+    return queue;
+  }
   return {
     dueCount: Math.max(0, queue.dueCount - 1),
     cards: queue.cards.filter(

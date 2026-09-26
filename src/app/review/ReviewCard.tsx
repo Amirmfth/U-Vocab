@@ -14,11 +14,10 @@ const ratings:Array<{ grade:ReviewGrade;label:string;hint:string }>=[
 ];
 
 export function ReviewCard({
-  card,onGrade,isSubmitting,
+  card,onGrade,
 }:{
   card:ReviewQueueCard;
   onGrade:(grade:ReviewGrade,startedAt:number)=>void;
-  isSubmitting:boolean;
 }){
   const [revealed,setRevealed]=useState(false);
   const startedAt=useRef(Date.now());
@@ -26,7 +25,6 @@ export function ReviewCard({
 
   useEffect(()=>{
     function keydown(event:KeyboardEvent){
-      if(isSubmitting) return;
       if(!revealed&&(event.key===" "||event.key==="Enter")){
         event.preventDefault();
         setRevealed(true);
@@ -39,7 +37,7 @@ export function ReviewCard({
     }
     window.addEventListener("keydown",keydown);
     return ()=>window.removeEventListener("keydown",keydown);
-  },[isSubmitting,onGrade,revealed]);
+  },[onGrade,revealed]);
 
   return <section className="panel learning-card review-flashcard">
     <div className="learning-card-head">
@@ -70,14 +68,13 @@ export function ReviewCard({
     </button>:<>
       <div className="learning-card-head">
         <p className="muted">Rate retrieval difficulty. FSRS uses this to schedule the next review. Keys 1–4 also work.</p>
-        <button className="text-button" type="button" onClick={()=>setRevealed(false)} disabled={isSubmitting}>
+        <button className="text-button" type="button" onClick={()=>setRevealed(false)}>
           <RotateCcw size={15}/>Hide
         </button>
       </div>
-      <div className="grade-grid review-grade-grid" aria-busy={isSubmitting}>
+      <div className="grade-grid review-grade-grid">
         {ratings.map((rating,index)=><button
           className={"button "+(rating.grade==="AGAIN"?"button-danger":rating.grade==="EASY"?"button-success":"button-secondary")}
-          disabled={isSubmitting}
           key={rating.grade}
           onClick={()=>onGrade(rating.grade,startedAt.current)}
           type="button"

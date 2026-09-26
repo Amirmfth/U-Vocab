@@ -20,11 +20,13 @@ export async function getReviewQueueData(input:{
   userId:string;
   preferredTranslation:TranslationLanguage;
   limit?:number;
+  excludeIds?:string[];
 }):Promise<ReviewQueueData>{
   const now=new Date();
   await repairImpossibleEasySchedules(input.userId,now);
   const where={
     userId:input.userId,
+    id:{ notIn:input.excludeIds??[] },
     OR:[{ nextReviewAt:null },{ nextReviewAt:{ lte:now } }],
   };
 

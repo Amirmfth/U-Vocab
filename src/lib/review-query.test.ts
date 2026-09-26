@@ -46,18 +46,15 @@ test("optimistic review advance removes only the rated card", () => {
   );
 });
 
-test("rollback can restore the exact previous queue snapshot", () => {
-  const previous = structuredClone(queue);
-  const optimistic = optimisticReviewAdvance(previous, "uv-1");
+test("overlapping reviews advance once per card and retries do not change the count", () => {
+  const first = optimisticReviewAdvance(queue, "uv-1");
+  const second = optimisticReviewAdvance(first, "uv-2");
+  const retry = optimisticReviewAdvance(second, "uv-1");
 
-  assert.notDeepEqual(optimistic, previous);
-  const rolledBack = previous;
-
-  assert.deepEqual(rolledBack, queue);
-  assert.deepEqual(
-    rolledBack.cards.map((card) => card.userVocabularyId),
-    ["uv-1", "uv-2"],
-  );
+  assert.equal(first.dueCount, 7);
+  assert.equal(second.dueCount, 6);
+  assert.deepEqual(second.cards, []);
+  assert.equal(retry, second);
 });
 
 test("hydrated review data does not refetch immediately on mount", () => {

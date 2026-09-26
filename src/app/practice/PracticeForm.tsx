@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
-import { ArrowRight, Check, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Check, CheckCircle2, RotateCcw, XCircle } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { StatusNotice } from "@/components/status-notice";
 import { submitPracticeAnswer, type PracticeAnswerResult } from "./actions";
@@ -20,14 +21,30 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   const [queue,setQueue]=useState(exercises);
   const [index,setIndex]=useState(0);
   const [answer,setAnswer]=useState("");
+  const [selected,setSelected]=useState<string|null>(null);
   const [result,setResult]=useState<PracticeAnswerResult|null>(null);
   const [history,setHistory]=useState<Array<{ correct:boolean;skill:string }>>([]);
   const [pending,startTransition]=useTransition();
+  const reduceMotion=useReducedMotion();
   const startedAt=useRef(Date.now());
   const current=queue[index];
 
+  useEffect(()=>{
+    if(result?.status!=="success") return;
+    const delay=result.correct?850:1150;
+    const timer=window.setTimeout(()=>{
+      setIndex((value)=>value+1);
+      setAnswer("");
+      setSelected(null);
+      setResult(null);
+      startedAt.current=Date.now();
+    },delay);
+    return ()=>window.clearTimeout(timer);
+  },[result]);
+
   function submit(value:string){
     if(!current||pending||result?.status==="success") return;
+    setSelected(value);
     startTransition(async()=>{
       let response:PracticeAnswerResult;
       try {
@@ -37,6 +54,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           answer:value,
           startedAt:startedAt.current,
           conjugation:current.conjugation,
+          interaction:current.exercise.interaction,
         });
       } catch (error) {
         if(error instanceof Error&&error.message.includes("Unauthorized")){
@@ -53,13 +71,6 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
         }
       }
     });
-  }
-
-  function next(){
-    setIndex((value)=>value+1);
-    setAnswer("");
-    setResult(null);
-    startedAt.current=Date.now();
   }
 
   if(!current){
@@ -80,45 +91,75 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   const progress=Math.min(100,Math.round((index/Math.max(queue.length,1))*100));
   const success=result?.status==="success";
 
-  return <section className="panel learning-card practice-session-card">
+  return <div className="practice-session-stage">
     <div className="practice-progress">
       <span>{Math.min(index+1,queue.length)} / {queue.length}</span>
       <div className="metric-bar"><span style={{ width:progress+"%" }}/></div>
     </div>
-    <div className="learning-card-head">
-      <span className="exercise-type">{current.exercise.type.replaceAll("_"," ").toLowerCase()}</span>
-      <span className="muted">{current.lemma}{current.retry?" · retry":""}</span>
-    </div>
-    <h1 className="learning-prompt">{current.exercise.prompt}</h1>
-    {current.exercise.hint?<details><summary>Hint</summary><p className="muted">{current.exercise.hint}</p></details>:null}
 
-    {current.exercise.interaction==="choice"?<div className="practice-choice-grid">
-      {current.exercise.options?.map((option)=><button
-        key={option}
-        type="button"
-        className="battle-option"
-        disabled={pending||success}
-        onClick={()=>{ setAnswer(option);submit(option); }}
-      >{option}</button>)}
-    </div>:<form onSubmit={(event)=>{ event.preventDefault();submit(answer); }}>
-      <div className="field">
-        <label htmlFor="practice-answer">Your answer</label>
-        <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={pending||success} autoFocus autoComplete="off"/>
-      </div>
-      <button className="button button-primary" type="submit" disabled={pending||success||!answer.trim()}>
-        <Check size={18}/>{pending?"Checking…":"Check answer"}
-      </button>
-    </form>}
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.section
+        key={current.id}
+        className="panel learning-card practice-session-card"
+        initial={reduceMotion?false:{ opacity:0,x:28,scale:.99 }}
+        animate={{ opacity:1,x:0,scale:1 }}
+        exit={reduceMotion?{ opacity:0 }:{ opacity:0,x:-34,scale:.985 }}
+        transition={{ duration:reduceMotion?0:.2,ease:"easeOut" }}
+      >
+        <div className="learning-card-head">
+          <span className="exercise-type">{current.exercise.type.replaceAll("_"," ").toLowerCase()}</span>
+          <span className="muted">{current.lemma}{current.retry?" · retry":""}</span>
+        </div>
 
-    {result?.status==="error"?<StatusNotice tone="error">{result.message}</StatusNotice>:null}
-    {result?.status==="success"?<div className="practice-feedback">
-      <StatusNotice tone={result.correct?"success":"info"}>
-        <strong>{result.correct?"Correct":"Not quite"}</strong><br/>{result.feedback}
-      </StatusNotice>
-      {!result.correct?<div className="answer-panel"><b>Expected:</b> {result.expected}</div>:null}
-      <button className="button button-primary" type="button" onClick={next}>
-        {index+1>=queue.length?"Finish":"Next"}<ArrowRight size={17}/>
-      </button>
-    </div>:null}
-  </section>;
+        <h1 className="learning-prompt">{current.exercise.prompt}</h1>
+
+        {current.exercise.interaction==="choice"?(
+          <div className="practice-choice-grid" role="group" aria-label="Answer choices">
+            {current.exercise.options?.map((option)=>{
+              const isExpected=success&&option===current.exercise.expected;
+              const isSelected=selected===option;
+              const isWrong=success&&isSelected&&!result.correct;
+              return <button
+                key={option}
+                type="button"
+                className={[
+                  "practice-option",
+                  isExpected?"is-correct":"",
+                  isWrong?"is-wrong":"",
+                  isSelected?"is-selected":"",
+                ].filter(Boolean).join(" ")}
+                disabled={pending||success}
+                onClick={()=>submit(option)}
+              >
+                <span>{option}</span>
+                {isExpected?<CheckCircle2 size={18}/>:isWrong?<XCircle size={18}/>:null}
+              </button>;
+            })}
+          </div>
+        ):(
+          <form onSubmit={(event)=>{ event.preventDefault();submit(answer); }}>
+            <div className="field">
+              <label htmlFor="practice-answer">Your answer</label>
+              <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={pending||success} autoFocus autoComplete="off"/>
+            </div>
+            <button className="button button-primary" type="submit" disabled={pending||success||!answer.trim()}>
+              <Check size={18}/>{pending?"Checking…":"Check answer"}
+            </button>
+          </form>
+        )}
+
+        {pending&&!success?<div className="practice-instant-feedback" role="status">Checking…</div>:null}
+        {result?.status==="error"?<StatusNotice tone="error">{result.message}</StatusNotice>:null}
+        {result?.status==="success"?(
+          <div className={"practice-instant-feedback "+(result.correct?"is-correct":"is-wrong")} role="status">
+            {result.correct?<CheckCircle2 size={18}/>:<XCircle size={18}/>}
+            <span>
+              <strong>{result.correct?"Correct":"Not quite"}</strong>
+              {!result.correct?<small>Correct answer: {result.expected}</small>:<small>Next question…</small>}
+            </span>
+          </div>
+        ):null}
+      </motion.section>
+    </AnimatePresence>
+  </div>;
 }

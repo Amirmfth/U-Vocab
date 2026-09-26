@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { BookOpenCheck, Plus } from "lucide-react";
+import { BookOpenCheck, Plus, X } from "lucide-react";
 import { AddReadingLexemeForm } from "./AddReadingLexemeForm";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 
@@ -34,27 +34,6 @@ function classForState(state: ReadingLexeme["state"]) {
   if (state === "KNOWN") return "reading-token known";
   if (state === "LEARNING") return "reading-token learning";
   return "reading-token unknown";
-}
-
-function afterScrollSettles(element: HTMLElement, callback: () => void) {
-  let previousTop = element.getBoundingClientRect().top;
-  let stableFrames = 0;
-  const startedAt = performance.now();
-
-  function check() {
-    const top = element.getBoundingClientRect().top;
-    stableFrames = Math.abs(top - previousTop) < 0.5 ? stableFrames + 1 : 0;
-    previousTop = top;
-
-    if (stableFrames >= 3 || performance.now() - startedAt > 900) {
-      callback();
-      return;
-    }
-
-    requestAnimationFrame(check);
-  }
-
-  requestAnimationFrame(check);
 }
 
 function ReadingDetail({
@@ -152,32 +131,25 @@ export function ReadingViewer({
   translationPreference: "ENGLISH" | "PERSIAN" | "BOTH";
 }) {
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
-  const [mobileAnchor, setMobileAnchor] = useState<{ left: number; top: number } | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const reduceMotion = useReducedMotion();
   const selected = items.find((item) => item.id === selectedId) ?? items[0];
 
   useEffect(() => {
-    function closeMobileDetail(event: PointerEvent) {
-      const target = event.target;
-      if (
-        !(target instanceof Element) ||
-        (!target.closest(".reading-detail-mobile") && !target.closest(".reading-token"))
-      ) {
-        setMobileAnchor(null);
-      }
-    }
+    if (!mobileOpen) return;
 
-    function closeOnScroll() {
-      setMobileAnchor(null);
-    }
-
-    document.addEventListener("pointerdown", closeMobileDetail);
-    window.addEventListener("scroll", closeOnScroll, true);
-    return () => {
-      document.removeEventListener("pointerdown", closeMobileDetail);
-      window.removeEventListener("scroll", closeOnScroll, true);
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
     };
-  }, []);
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileOpen]);
 
   const rendered = useMemo(() => {
     const pairs = items.flatMap((item) =>
@@ -212,36 +184,10 @@ export function ReadingViewer({
         <button
           className={classForState(item.state)}
           key={index}
-          onClick={(event) => {
-            const trigger = event.currentTarget;
-            const panelHeight = Math.min(520, window.innerHeight - 32);
-            const token = trigger.getBoundingClientRect();
-            const overflow = token.bottom + 8 + panelHeight - (window.innerHeight - 16);
-
-            const positionDetail = () => {
-              const nextToken = trigger.getBoundingClientRect();
-              const panelWidth = Math.min(360, window.innerWidth - 32);
-              const below = nextToken.bottom + 8;
-              const reachedPageEnd =
-                window.scrollY + window.innerHeight >=
-                document.documentElement.scrollHeight - 2;
-              const top =
-                reachedPageEnd && below + panelHeight > window.innerHeight - 16
-                  ? Math.max(16, nextToken.top - panelHeight - 8)
-                  : below;
-
-              setSelectedId(item.id);
-              setMobileAnchor({
-                left: Math.min(Math.max(nextToken.left, 16), window.innerWidth - panelWidth - 16),
-                top,
-              });
-            };
-
-            if (overflow > 0) {
-              window.scrollBy({ top: overflow, behavior: reduceMotion ? "auto" : "smooth" });
-              afterScrollSettles(trigger, positionDetail);
-            } else {
-              positionDetail();
+          onClick={() => {
+            setSelectedId(item.id);
+            if (window.matchMedia("(max-width: 759px)").matches) {
+              setMobileOpen(true);
             }
           }}
           type="button"
@@ -279,23 +225,48 @@ export function ReadingViewer({
       )}
 
       <AnimatePresence>
-        {selected && mobileAnchor ? (
-          <motion.aside
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            aria-label={`Details for ${selected.lemma}`}
-            className="panel reading-detail reading-detail-mobile"
-            exit={{ opacity: 0, scale: 0.98, y: -4 }}
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.98, y: -4 }}
-            key="reading-mobile-detail"
-            style={{ left: mobileAnchor.left, top: mobileAnchor.top }}
-            transition={{ duration: reduceMotion ? 0 : 0.18, ease: "easeOut" }}
-          >
-            <ReadingDetail
-              documentId={documentId}
-              selected={selected}
-              translationPreference={translationPreference}
+        {selected && mobileOpen ? (
+          <>
+            <motion.button
+              aria-label="Close word details"
+              className="reading-detail-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.16 }}
+              type="button"
+              onClick={() => setMobileOpen(false)}
             />
-          </motion.aside>
+            <motion.aside
+              animate={{ opacity: 1, y: 0 }}
+              aria-label={`Details for ${selected.lemma}`}
+              aria-modal="true"
+              className="panel reading-detail reading-detail-mobile"
+              exit={{ opacity: 0, y: 28 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+              key="reading-mobile-detail"
+              role="dialog"
+              transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
+            >
+              <div className="reading-sheet-handle" aria-hidden="true" />
+              <div className="reading-sheet-header">
+                <span>Word details</span>
+                <button
+                  aria-label="Close word details"
+                  className="icon-button"
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <ReadingDetail
+                documentId={documentId}
+                selected={selected}
+                translationPreference={translationPreference}
+              />
+            </motion.aside>
+          </>
         ) : null}
       </AnimatePresence>
     </div>

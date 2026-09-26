@@ -15,6 +15,7 @@ import {
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { detectLexemePresence, detectRepeatedWords } from "@/lib/ai/preprocess";
+import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 
 export type WritingActionState = {
   status: "idle" | "success" | "error";
@@ -333,6 +334,7 @@ export async function evaluateWritingAction(
         const evaluation = await perf.span("ai", () =>
           evaluateWriting({
             userId: user.id,
+            evaluationLocale: evaluationLocaleForPreference(user.preferredTranslation),
             level: session.level,
             mode: session.mode,
             taskType: session.taskType,

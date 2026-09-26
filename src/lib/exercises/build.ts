@@ -1,7 +1,12 @@
 import type { TranslationLanguage } from "@prisma/client";
 import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
-import type { ExerciseDefinition, ExerciseLexeme } from "./types";
+import { deterministicChoiceOptions } from "./options";
+import type {
+  ExerciseDefinition,
+  ExerciseLexeme,
+  ExerciseOptionPools,
+} from "./types";
 
 function preferredMeaning(lexeme: ExerciseLexeme, preference: TranslationLanguage) {
   return lexeme.translations.find((translation) =>
@@ -22,10 +27,15 @@ export function buildCloze(sentence: string, lemma: string) {
     return cleaned === target || (stem.length >= 3 && cleaned.startsWith(stem));
   });
   if (index < 0) return null;
-  const expected = tokens[index].replace(/^[^\p{L}]*/u, "").replace(/[^\p{L}äöüß]*$/iu, "");
+  const expected = tokens[index]
+    .replace(/^[^\p{L}]*/u, "")
+    .replace(/[^\p{L}äöüß]*$/iu, "");
   if (!expected) return null;
   const hidden = tokens[index].replace(expected, "_____");
-  return { prompt: [...tokens.slice(0,index),hidden,...tokens.slice(index+1)].join(""), expected };
+  return {
+    prompt: [...tokens.slice(0, index), hidden, ...tokens.slice(index + 1)].join(""),
+    expected,
+  };
 }
 
 export function eligibleExerciseTypes(lexeme: ExerciseLexeme): ExerciseDefinition["type"][] {
@@ -37,46 +47,135 @@ export function eligibleExerciseTypes(lexeme: ExerciseLexeme): ExerciseDefinitio
   return result;
 }
 
+function choiceOrText(
+  base: Omit<ExerciseDefinition, "interaction" | "options">,
+  pool: Array<string | null | undefined>,
+): ExerciseDefinition {
+  const options = deterministicChoiceOptions(base.expected, pool);
+  if (options.length >= 3) {
+    return { ...base, interaction: "choice", options };
+  }
+  return { ...base, interaction: "short_text" };
+}
+
 export function buildExercise(
   type: ExerciseDefinition["type"],
   lexeme: ExerciseLexeme,
   preference: TranslationLanguage,
+  pools: ExerciseOptionPools = {},
 ): ExerciseDefinition {
   const meaning = preferredMeaning(lexeme, preference);
   const pattern = lexeme.patterns[0]?.pattern;
   const example = lexeme.examples[0]?.german;
-  const cloze = lexeme.examples.map((item) => buildCloze(item.german, lexeme.lemma)).find(Boolean);
+  const cloze = lexeme.examples
+    .map((item) => buildCloze(item.german, lexeme.lemma))
+    .find(Boolean);
 
   switch (type) {
     case "MEANING_RECALL":
-      return { type, prompt:"What does “"+lexeme.lemma+"” mean?", expected:meaning, interaction:"short_text", skill:"meaning", requiresAI:false };
-    case "REVERSE_RECALL":
-      return { type, prompt:"Write the German lexical unit for: "+meaning, expected:lexeme.partOfSpeech==="NOUN"?formatLexemeLabel(lexeme):lexeme.lemma, interaction:"short_text", skill:"production", hint:pattern??undefined, requiresAI:false };
+      return choiceOrText(
+        {
+          type,
+          prompt: "What does “" + lexeme.lemma + "” mean?",
+          expected: meaning,
+          skill: "meaning",
+          requiresAI: false,
+        },
+        pools.meanings ?? [],
+      );
+    case "REVERSE_RECALL": {
+      const expected =
+        lexeme.partOfSpeech === "NOUN"
+          ? formatLexemeLabel(lexeme)
+          : lexeme.lemma;
+      return choiceOrText(
+        {
+          type,
+          prompt: "Which German lexical unit matches: " + meaning,
+          expected,
+          skill: "production",
+          hint: pattern ?? undefined,
+          requiresAI: false,
+        },
+        pools.lemmas ?? [],
+      );
+    }
     case "ARTICLE":
-      return { type, prompt:"Choose the article for “"+lexeme.lemma+"”.", expected:lexeme.article??"", options:["der","die","das"], interaction:"choice", skill:"grammar", requiresAI:false };
+      return {
+        type,
+        prompt: "Choose the article for “" + lexeme.lemma + "”.",
+        expected: lexeme.article ?? "",
+        options: ["der", "die", "das"],
+        interaction: "choice",
+        skill: "grammar",
+        requiresAI: false,
+      };
     case "CASE_PREPOSITION":
-      if (pattern) return { type, prompt:"Complete the stored grammar pattern for “"+lexeme.lemma+"”.", expected:pattern, interaction:"short_text", skill:"grammar", requiresAI:false };
+      if (pattern) {
+        return choiceOrText(
+          {
+            type,
+            prompt: "Which stored grammar pattern belongs to “" + lexeme.lemma + "”?",
+            expected: pattern,
+            skill: "grammar",
+            requiresAI: false,
+          },
+          pools.patterns ?? [],
+        );
+      }
       break;
     case "COLLOCATION":
-      if (pattern) return { type, prompt:"Recall a useful stored pattern for “"+lexeme.lemma+"”.", expected:pattern, interaction:"short_text", skill:"production", requiresAI:false };
+      if (pattern) {
+        return choiceOrText(
+          {
+            type,
+            prompt: "Which lexical pattern belongs to “" + lexeme.lemma + "”?",
+            expected: pattern,
+            skill: "production",
+            requiresAI: false,
+          },
+          pools.patterns ?? [],
+        );
+      }
       break;
     case "CLOZE":
-      if (cloze) return { type, prompt:"Complete the sentence:\n"+cloze.prompt, expected:cloze.expected, interaction:"short_text", skill:"context", requiresAI:false };
+      if (cloze) {
+        return choiceOrText(
+          {
+            type,
+            prompt: "Complete the sentence:\n" + cloze.prompt,
+            expected: cloze.expected,
+            skill: "context",
+            requiresAI: false,
+          },
+          pools.lemmas ?? [],
+        );
+      }
       break;
     case "CONTEXTUAL_CHOICE":
       if (example) {
-        const distractor="Ich benutze „"+lexeme.lemma+"“ ohne passenden Kontext.";
-        return { type, prompt:"Which sentence is the natural saved context for “"+lexeme.lemma+"”?", expected:example, options:[example,distractor], interaction:"choice", skill:"context", requiresAI:false };
+        return choiceOrText(
+          {
+            type,
+            prompt: "Which sentence is the saved natural context for “" + lexeme.lemma + "”?",
+            expected: example,
+            skill: "context",
+            requiresAI: false,
+          },
+          pools.examples ?? [],
+        );
       }
       break;
   }
 
-  return {
-    type:"REVERSE_RECALL",
-    prompt:"Write the German lexical unit for: "+meaning,
-    expected:lexeme.lemma || formatLexemeLabel(lexeme),
-    interaction:"short_text",
-    skill:"production",
-    requiresAI:false,
-  };
+  return choiceOrText(
+    {
+      type: "REVERSE_RECALL",
+      prompt: "Which German lexical unit matches: " + meaning,
+      expected: lexeme.lemma || formatLexemeLabel(lexeme),
+      skill: "production",
+      requiresAI: false,
+    },
+    pools.lemmas ?? [],
+  );
 }

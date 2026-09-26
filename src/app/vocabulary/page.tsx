@@ -24,6 +24,7 @@ export default async function Vocabulary({
     level?: string;
     topic?: string;
     relation?: string;
+    sort?: string;
   }>;
 }) {
   await connection();
@@ -39,6 +40,7 @@ export default async function Vocabulary({
     level: query.level ?? "ALL",
     topic: query.topic ?? "ALL",
     relation: query.relation ?? "ALL",
+    sort: query.sort ?? "RECENTLY_ADDED",
   };
 
   const [items, packs] = await getCachedVocabularyLibrary(user.id);
@@ -147,6 +149,31 @@ export default async function Vocabulary({
     }
   });
 
+  const cefrRank = new Map(LEVELS.map((level, index) => [level, index]));
+  const masteryOf = (item: (typeof items)[number]) =>
+    (item.recognition + item.meaningRecall + item.production + item.contextualUsage) / 4;
+
+  const sorted = [...filtered].sort((a, b) => {
+    switch (current.sort) {
+      case "ALPHABETICAL":
+        return a.lexeme.lemma.localeCompare(b.lexeme.lemma, "de");
+      case "CEFR_ASC":
+        return (cefrRank.get(a.lexeme.cefrLevel ?? "") ?? 99) -
+          (cefrRank.get(b.lexeme.cefrLevel ?? "") ?? 99);
+      case "CEFR_DESC":
+        return (cefrRank.get(b.lexeme.cefrLevel ?? "") ?? -1) -
+          (cefrRank.get(a.lexeme.cefrLevel ?? "") ?? -1);
+      case "MASTERY_ASC":
+        return masteryOf(a) - masteryOf(b);
+      case "MASTERY_DESC":
+        return masteryOf(b) - masteryOf(a);
+      case "NEXT_REVIEW":
+        return (a.nextReviewAt?.getTime() ?? 0) - (b.nextReviewAt?.getTime() ?? 0);
+      default:
+        return b.addedAt.getTime() - a.addedAt.getTime();
+    }
+  });
+
   const partOfSpeechOptions = Array.from(
     new Set(items.map((item) => item.lexeme.partOfSpeech)),
   )
@@ -167,7 +194,7 @@ export default async function Vocabulary({
             Find the word you need, see what is weak, and move directly into learning.
           </p>
           <p className="library-count">
-            <strong>{filtered.length}</strong> shown <span aria-hidden="true">·</span> {items.length} total
+            <strong>{sorted.length}</strong> shown <span aria-hidden="true">·</span> {items.length} total
           </p>
         </div>
         <div className="library-header-actions">
@@ -226,9 +253,9 @@ export default async function Vocabulary({
         )}
       />
 
-      {filtered.length ? (
+      {sorted.length ? (
         <div className="vocabulary-list">
-          {filtered.map((item) => {
+          {sorted.map((item) => {
             const word = item.lexeme;
             const translations = word.translations.filter((translation) =>
               isTranslationVisible(
@@ -272,6 +299,7 @@ export default async function Vocabulary({
                   </div>
                 </div>
                 <div className="vocabulary-row-meta">
+                  <span className="vocabulary-cefr">{word.cefrLevel ?? "—"}</span>
                   <span>{item.state.toLowerCase()}</span>
                   {isDue ? <span className="row-signal">due</span> : null}
                   {isWeak ? <span className="row-signal">weak</span> : null}

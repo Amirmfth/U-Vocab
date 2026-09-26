@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
@@ -46,7 +46,6 @@ export function ReviewSession({
   const queryClient = useQueryClient();
   const reduceMotion = useReducedMotion();
   const queueKey = queryKeys.review.queue(userScope);
-  const repeatCounts = useRef<Record<string, number>>({});
   const [sessionStats, setSessionStats] = useState({ reviewed: 0, again: 0 });
 
   const queue = useQuery({
@@ -84,10 +83,7 @@ export function ReviewSession({
           : current,
       );
 
-      const reviewedCard = previous?.cards.find(
-        (card) => card.userVocabularyId === input.userVocabularyId,
-      );
-      return { previous, perf, reviewedCard };
+      return { previous, perf };
     },
     onError: (error, _input, context) => {
       if (context?.previous) {
@@ -101,26 +97,7 @@ export function ReviewSession({
         reviewed: value.reviewed + 1,
         again: value.again + (input.grade === "AGAIN" ? 1 : 0),
       }));
-      let current = queryClient.getQueryData<ReviewQueueData>(queueKey);
-
-      if (
-        input.grade === "AGAIN" &&
-        context?.reviewedCard &&
-        (repeatCounts.current[input.userVocabularyId] ?? 0) < 1
-      ) {
-        repeatCounts.current[input.userVocabularyId] =
-          (repeatCounts.current[input.userVocabularyId] ?? 0) + 1;
-        queryClient.setQueryData<ReviewQueueData>(queueKey, (value) =>
-          value
-            ? {
-                ...value,
-                dueCount: value.dueCount + 1,
-                cards: [...value.cards, context.reviewedCard!],
-              }
-            : value,
-        );
-        current = queryClient.getQueryData<ReviewQueueData>(queueKey);
-      }
+      const current = queryClient.getQueryData<ReviewQueueData>(queueKey);
 
       if (!current || shouldRefillReviewQueue(current)) {
         await queryClient.invalidateQueries({ queryKey: queueKey });

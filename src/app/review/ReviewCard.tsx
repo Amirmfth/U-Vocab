@@ -7,10 +7,10 @@ import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueCard } from "@/lib/review-queue";
 
 const ratings:Array<{ grade:ReviewGrade;label:string;hint:string }>=[
-  { grade:"AGAIN",label:"Again",hint:"Could not recall" },
-  { grade:"HARD",label:"Hard",hint:"Recalled with effort" },
-  { grade:"GOOD",label:"Good",hint:"Recalled correctly" },
-  { grade:"EASY",label:"Easy",hint:"Immediate recall" },
+  { grade:"AGAIN",label:"Again",hint:"Could not recall · FSRS will schedule it sooner" },
+  { grade:"HARD",label:"Hard",hint:"Recalled with effort · shorter interval" },
+  { grade:"GOOD",label:"Good",hint:"Recalled correctly · normal interval" },
+  { grade:"EASY",label:"Easy",hint:"Immediate recall · longest interval" },
 ];
 
 export function ReviewCard({
@@ -69,7 +69,7 @@ export function ReviewCard({
       <Eye size={18}/>Reveal answer
     </button>:<>
       <div className="learning-card-head">
-        <p className="muted">Rate retrieval difficulty. Keys 1–4 also work.</p>
+        <p className="muted">Rate retrieval difficulty. FSRS uses this to schedule the next review. Keys 1–4 also work.</p>
         <button className="text-button" type="button" onClick={()=>setRevealed(false)} disabled={isSubmitting}>
           <RotateCcw size={15}/>Hide
         </button>

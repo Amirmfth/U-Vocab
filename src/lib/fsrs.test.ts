@@ -17,6 +17,7 @@ test("Again schedules earlier than Easy from a new card", () => {
   const easy = scheduleReview(null, "EASY", now);
 
   assert.ok(again.due.getTime() <= easy.due.getTime());
+  assert.ok(easy.due.getTime() - now.getTime() >= 24 * 60 * 60 * 1000);
 });
 
 

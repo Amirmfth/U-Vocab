@@ -1,6 +1,7 @@
 "use server";
 
 import type { ExerciseType, MistakeType } from "@prisma/client";
+import type { ExerciseInteraction } from "@/lib/exercises/types";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { buildExercise } from "@/lib/exercises/build";
@@ -17,6 +18,7 @@ export type PracticeAnswerInput={
   answer:string;
   startedAt:number;
   conjugation?:{ person:string };
+  interaction:ExerciseInteraction;
 };
 
 export type PracticeAnswerResult=
@@ -63,7 +65,8 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
     const durationMs=Number.isFinite(input.startedAt)&&input.startedAt>0
       ?Math.max(0,Math.min(Date.now()-input.startedAt,30*60*1000))
       :null;
-    const delta=practiceMasteryDelta(exercise.type,evaluation.correct,exercise.interaction);
+    const interaction:ExerciseInteraction=input.interaction==="choice"?"choice":"short_text";
+    const delta=practiceMasteryDelta(exercise.type,evaluation.correct,interaction);
     const mastery=applyMasteryDelta(item,delta);
     const type=mistakeType(exercise.type);
 

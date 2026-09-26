@@ -41,11 +41,11 @@ function PracticeHub() {
           <ArrowRight size={18} />
         </Link>
 
-        <Link href="/read" className="practice-lane">
-          <span className="practice-lane-icon"><ScanText size={21} /></span>
+        <Link href="/stories" className="practice-lane">
+          <span className="practice-lane-icon"><BookOpenText size={21} /></span>
           <span className="practice-lane-copy">
-            <strong>Reading</strong>
-            <small>Paste text, revisit your library, and discover vocabulary</small>
+            <strong>Stories</strong>
+            <small>Read tailored stories with your target vocabulary</small>
           </span>
           <ArrowRight size={18} />
         </Link>
@@ -66,9 +66,9 @@ function PracticeHub() {
           <span>Secondary modes</span>
         </div>
         <div className="practice-shortcut-grid">
-          <Link href="/stories">
-            <BookOpenText size={17} />
-            <span><strong>Stories</strong><small>Contextual reading</small></span>
+          <Link href="/read">
+            <ScanText size={17} />
+            <span><strong>Reading</strong><small>Analyze your own text</small></span>
           </Link>
           <Link href="/missions">
             <Target size={17} />

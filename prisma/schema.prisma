@@ -180,6 +180,7 @@ model Lexeme {
   article      String?
   gender       String?
   plural       String?
+  cefrLevel    String?
   notes        String?
   translations Translation[]
   examples     Example[]

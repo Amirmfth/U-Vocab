@@ -79,6 +79,7 @@ export async function commitIngestionCandidates(
           partOfSpeech: candidate.partOfSpeech,
           article: candidate.article ?? null,
           plural: candidate.plural ?? null,
+          cefrLevel: candidate.cefrLevel ?? null,
           translations: {
             create: [
               ...(candidate.englishMeaning

@@ -28,7 +28,9 @@ export async function generateStory(input: {
   level: string;
   length: "SHORT" | "MEDIUM" | "LONG";
   topic?: string | null;
-  targets: Array<{ lemma: string; pattern?: string | null }>;
+  minimumTargetCount: number;
+  selectedTargets: Array<{ lemma: string; pattern?: string | null }>;
+  candidateTargets: Array<{ lemma: string; pattern?: string | null }>;
 }) {
   const route = aiRoute("story_generation");
   const perf = startOperation("ai.story_generation", { model: route.model });
@@ -39,7 +41,9 @@ export async function generateStory(input: {
     metadata: {
       level: input.level,
       length: input.length,
-      targetCount: input.targets.length,
+      selectedTargetCount: input.selectedTargets.length,
+      candidateTargetCount: input.candidateTargets.length,
+      minimumTargetCount: input.minimumTargetCount,
       hasTopic: Boolean(input.topic),
     },
   });
@@ -52,7 +56,7 @@ export async function generateStory(input: {
           {
             role: "system",
             content:
-              "Write compelling, natural German reading material for a vocabulary learner. Use the target lexical units naturally and avoid keyword stuffing. Match the requested CEFR level and length. Include comprehension and vocabulary questions. Return exact target lemmas that actually appear in the story.",
+              "Write compelling, natural German reading material for a vocabulary learner. Every selectedTargets item is mandatory: use it naturally. Choose additional items from candidateTargets so the story uses at least minimumTargetCount lexical units in total. Do not use candidate words as targets unless you choose them. Avoid keyword stuffing, match the requested CEFR level and length, and include comprehension and vocabulary questions. Return exact lemmas for all selected and chosen target words that actually appear in the story.",
           },
           {
             role: "user",

@@ -267,6 +267,7 @@ export async function addExpansionAction(
         partOfSpeech,
         article,
         plural,
+        cefrLevel: user.targetLevel,
         translations: {
           create: [
             { language: "en", text: englishMeaning },

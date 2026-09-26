@@ -22,7 +22,7 @@ export async function analyzeGermanLexeme(input: string, userId: string) {
         {
           role: "system",
           content:
-            "You analyze German lexical units for U-Vocab. Prefer complete usable lexical patterns, collocations, cases, and prepositions over isolated translations. Return natural English and Persian meanings.",
+            "You analyze German lexical units for U-Vocab. Prefer complete usable lexical patterns, collocations, cases, and prepositions over isolated translations. Return natural English and Persian meanings. Assign the lexical unit's usual CEFR level (A1 through C2).",
         },
         { role: "user", content: input },
       ],

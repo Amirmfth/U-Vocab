@@ -75,6 +75,7 @@ export default async function Vocabulary({
 
     if (
       current.level !== "ALL" &&
+      word.cefrLevel !== current.level &&
       !word.insights.some((insight) => insight.level === current.level)
     ) {
       return false;

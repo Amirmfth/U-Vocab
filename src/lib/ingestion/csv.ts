@@ -60,6 +60,7 @@ export const csvAdapter: IngestionAdapter<string> = {
     const articleIndex = index(["article"]);
     const pluralIndex = index(["plural"]);
     const patternIndex = index(["pattern", "grammar"]);
+    const levelIndex = index(["level", "cefr", "cefr_level"]);
 
     if (lemmaIndex < 0) {
       throw new Error("CSV needs a German/lemma/word/phrase column.");
@@ -83,6 +84,11 @@ export const csvAdapter: IngestionAdapter<string> = {
         partOfSpeech,
         article: articleIndex >= 0 ? values[articleIndex] || null : null,
         plural: pluralIndex >= 0 ? values[pluralIndex] || null : null,
+        cefrLevel: (["A1", "A2", "B1", "B2", "C1", "C2"] as const).includes(
+          values[levelIndex]?.trim().toUpperCase() as "A1" | "A2" | "B1" | "B2" | "C1" | "C2",
+        )
+          ? values[levelIndex]!.trim().toUpperCase() as "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
+          : null,
         englishMeaning: englishIndex >= 0 ? values[englishIndex] ?? "" : "",
         persianMeaning: persianIndex >= 0 ? values[persianIndex] ?? "" : "",
         pattern: patternIndex >= 0 ? values[patternIndex] || null : null,

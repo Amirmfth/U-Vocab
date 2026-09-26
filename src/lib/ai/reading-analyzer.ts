@@ -19,6 +19,7 @@ export const readingAnalysisSchema = z.object({
       ]),
       article: z.string().nullable(),
       plural: z.string().nullable(),
+      cefrLevel: z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]),
       englishMeaning: z.string(),
       persianMeaning: z.string(),
       pattern: z.string().nullable(),
@@ -55,7 +56,7 @@ export async function analyzeReadingText(input: {
         {
           role: "system",
           content:
-            "Analyze this bounded German excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, verb-preposition patterns, separable/reflexive constructions, and meaningful lemmas; do not turn every token into an item. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, concise English/Persian meanings, and at most one useful grammar pattern.",
+            "Analyze this bounded German excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, verb-preposition patterns, separable/reflexive constructions, and meaningful lemmas; do not turn every token into an item. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, concise English/Persian meanings, at most one useful grammar pattern, and each lexical unit's usual CEFR level (A1 through C2).",
         },
         {
           role: "user",

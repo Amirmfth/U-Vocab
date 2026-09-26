@@ -5,8 +5,15 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateStory } from "@/lib/ai/story";
 
+const TARGETS_PER_LENGTH = {
+  SHORT: 5,
+  MEDIUM: 10,
+  LONG: 15,
+} as const;
+const STORY_CANDIDATE_POOL_SIZE = 100;
+
 function escapeRegex(value: string) {
-  return value.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\export type StoryState = {");
+  return value.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\$&");
 }
 
 function storyContainsLemma(content: string, lemma: string) {
@@ -41,11 +48,12 @@ export async function createStory(
   if (!["SHORT", "MEDIUM", "LONG"].includes(length)) {
     return { status: "error", message: "Choose a valid story length." };
   }
+  const minimumTargetCount = TARGETS_PER_LENGTH[length];
 
   try {
     const user = await getCurrentUser();
 
-    const targetRows = selectedIds.length
+    const selectedRows = selectedIds.length
       ? await db.lexeme.findMany({
           where: {
             id: { in: selectedIds },
@@ -59,48 +67,47 @@ export async function createStory(
             lemma: true,
             patterns: { select: { pattern: true } },
           },
-          take: 10,
         })
-      : await db.userVocabulary.findMany({
-          where: {
-            userId: user.id,
-            state: { in: ["NEW", "LEARNING", "FAMILIAR", "ACTIVE"] },
-          },
+      : [];
+    const selectedTargetIds = selectedRows.map((item) => item.id);
+    const candidateRows = await db.userVocabulary.findMany({
+      where: {
+        userId: user.id,
+        lexemeId: { notIn: selectedTargetIds },
+      },
+      select: {
+        lexemeId: true,
+        lexeme: {
           select: {
-            lexemeId: true,
-            lexeme: {
-              select: {
-                lemma: true,
-                patterns: { select: { pattern: true } },
-              },
-            },
+            lemma: true,
+            patterns: { select: { pattern: true } },
           },
-          orderBy: [
-            { production: "asc" },
-            { contextualUsage: "asc" },
-            { meaningRecall: "asc" },
-          ],
-          take: 6,
-        });
+        },
+      },
+      orderBy: [
+        { production: "asc" },
+        { contextualUsage: "asc" },
+        { meaningRecall: "asc" },
+      ],
+      take: STORY_CANDIDATE_POOL_SIZE,
+    });
 
-    const targets = targetRows.map((item) =>
-      "lexeme" in item
-        ? {
-            lexemeId: item.lexemeId,
-            lemma: item.lexeme.lemma,
-            patterns: item.lexeme.patterns,
-          }
-        : {
-            lexemeId: item.id,
-            lemma: item.lemma,
-            patterns: item.patterns,
-          },
-    );
+    const selectedTargets = selectedRows.map((item) => ({
+      lexemeId: item.id,
+      lemma: item.lemma,
+      patterns: item.patterns,
+    }));
+    const candidateTargets = candidateRows.map((item) => ({
+      lexemeId: item.lexemeId,
+      lemma: item.lexeme.lemma,
+      patterns: item.lexeme.patterns,
+    }));
+    const availableTargets = [...selectedTargets, ...candidateTargets];
 
-    if (!targets.length) {
+    if (availableTargets.length < minimumTargetCount) {
       return {
         status: "error",
-        message: "Add or select vocabulary before generating a story.",
+        message: `Add at least ${minimumTargetCount} vocabulary items before creating a ${length.toLowerCase()} story.`,
       };
     }
 
@@ -109,7 +116,12 @@ export async function createStory(
       level,
       length,
       topic,
-      targets: targets.map((item) => ({
+      minimumTargetCount,
+      selectedTargets: selectedTargets.map((item) => ({
+        lemma: item.lemma,
+        pattern: item.patterns[0]?.pattern ?? null,
+      })),
+      candidateTargets: candidateTargets.map((item) => ({
         lemma: item.lemma,
         pattern: item.patterns[0]?.pattern ?? null,
       })),
@@ -121,13 +133,23 @@ export async function createStory(
       ),
     );
 
-    const usedTargets = targets.filter((item) => {
+    const usedTargets = availableTargets.filter((item) => {
       const normalizedLemma = item.lemma.toLocaleLowerCase("de-DE").trim();
       return (
         normalizedUsed.has(normalizedLemma) &&
         storyContainsLemma(generated.content, item.lemma)
       );
     });
+
+    const allSelectedTargetsUsed = selectedTargets.every((item) =>
+      usedTargets.some((used) => used.lexemeId === item.lexemeId),
+    );
+    if (usedTargets.length < minimumTargetCount || !allSelectedTargetsUsed) {
+      return {
+        status: "error",
+        message: "The generated story did not include enough target words. Please try again.",
+      };
+    }
 
     const story = await db.story.create({
       data: {

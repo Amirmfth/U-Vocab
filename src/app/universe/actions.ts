@@ -94,6 +94,7 @@ export async function addUniverseSuggestion(input: {
       partOfSpeech,
       article: input.article,
       plural: input.plural,
+      cefrLevel: user.targetLevel,
       translations: {
         create: [
           { language: "en", text: input.englishMeaning },

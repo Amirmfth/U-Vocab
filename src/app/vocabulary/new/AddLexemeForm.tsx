@@ -84,6 +84,7 @@ export function AddLexemeForm({
                   <div className="word-meta">
                     <strong>{formatLexemeLabel(candidate)}</strong>
                     <span className="badge">{candidate.partOfSpeech}</span>
+                    <span className="badge">{candidate.cefrLevel}</span>
                     <span className="badge">
                       {candidate.userVocabularyId
                         ? candidate.state?.toLowerCase()

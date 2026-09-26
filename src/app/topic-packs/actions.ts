@@ -84,6 +84,7 @@ export async function createTopicPack(
               partOfSpeech: item.partOfSpeech as PartOfSpeech,
               article: item.article,
               plural: item.plural,
+              cefrLevel: level,
             })),
             skipDuplicates: true,
           });

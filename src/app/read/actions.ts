@@ -122,6 +122,7 @@ export async function createReadingDocument(
                     partOfSpeech: unit.partOfSpeech as PartOfSpeech,
                     article: unit.article,
                     plural: unit.plural,
+                    cefrLevel: unit.cefrLevel,
                   })),
                   skipDuplicates: true,
                 });

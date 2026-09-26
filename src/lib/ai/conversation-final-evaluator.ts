@@ -4,6 +4,7 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 
 export const conversationFinalEvaluationSchema = z.object({
   taskSuccess: z.boolean(),
@@ -31,6 +32,7 @@ export type ConversationFinalEvaluation = z.infer<
 
 export async function evaluateConversationSession(input: {
   userId: string;
+  evaluationLocale: EvaluationLocale;
   kind: "PRACTICE" | "MISSION";
   level: string;
   scenario: string;
@@ -60,7 +62,7 @@ export async function evaluateConversationSession(input: {
         {
           role: "system",
           content:
-            "Evaluate the completed German conversation. For a mission, taskSuccess means the conversational objective was actually achieved, not merely mentioned. Assess grammar, naturalness, vocabulary, and each target lexical unit. Be constructive and concise. Do not treat the score as an official CEFR assessment.",
+            evaluationLanguageInstruction(input.evaluationLocale) + " Evaluate the completed German conversation. For a mission, taskSuccess means the conversational objective was actually achieved, not merely mentioned. Assess grammar, naturalness, vocabulary, and each target lexical unit. Feedback must be specific and evidence-based: reference concrete learner utterances, identify the exact grammar/word-choice/collocation/register issue, explain why it matters, and provide a corrected German phrase where useful. Strengths must also cite concrete successful language use. Prioritize patterns and high-impact issues rather than generic advice. Be constructive and concise. Do not treat the score as an official CEFR assessment.",
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined }) },
       ],

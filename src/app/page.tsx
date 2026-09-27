@@ -11,15 +11,24 @@ import { getCurrentUser } from "@/lib/current-user";
 import { startOperation } from "@/lib/performance";
 import { connection } from "next/server";
 import { getCachedHomeStats } from "@/lib/cached-data";
+import { db } from "@/lib/db";
+import { getGrammarRecommendation } from "@/lib/grammar/recommendations";
 
 export default async function Home() {
   await connection();
   const perf = startOperation("page.home");
   const user = await perf.span("auth", () => getCurrentUser());
-  const { total, due, weakProduction, mistakes, recent, today } =
-    await perf.span("dbRead", () =>
-      getCachedHomeStats(user.id, user.timezone),
-    );
+  const [{ total, due, weakProduction, mistakes, recent, today }, grammarRecommendation] =
+    await Promise.all([
+      perf.span("dbRead", () => getCachedHomeStats(user.id, user.timezone)),
+      perf.span("grammarRecommendation", () =>
+        getGrammarRecommendation(db, {
+          userId: user.id,
+          currentLevel: user.currentLevel,
+          targetLevel: user.targetLevel,
+        }),
+      ),
+    ]);
 
   perf.success({ totalWords: total, dueWords: due, openMistakes: mistakes });
 
@@ -77,6 +86,26 @@ export default async function Home() {
           <Link href={recent.href} className="button button-secondary">
             Continue <ArrowRight size={17} />
           </Link>
+        </section>
+      ) : null}
+
+      {grammarRecommendation ? (
+        <section className="panel home-continue">
+          <div>
+            <p className="eyebrow">GRAMMAR · {grammarRecommendation.reasonCode.replaceAll("_", " ")}</p>
+            <h2>{grammarRecommendation.title}</h2>
+            <p className="muted">
+              {grammarRecommendation.level} · {grammarRecommendation.reason}
+            </p>
+          </div>
+          <div className="button-row">
+            <Link href={grammarRecommendation.href} className="button button-secondary">
+              Learn
+            </Link>
+            <Link href={grammarRecommendation.practiceHref} className="button button-primary">
+              Practice <ArrowRight size={17} />
+            </Link>
+          </div>
         </section>
       ) : null}
 

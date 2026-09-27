@@ -225,6 +225,7 @@ export async function rebuildMistakeEmbeddings(input: {
   const rows = await db.mistake.findMany({
     where: {
       userId: input.userId,
+      grammarConceptId: null,
       ...(input.force
         ? {}
         : {

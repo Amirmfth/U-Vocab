@@ -49,6 +49,47 @@ function GrammarAndUsage({ patterns }: { patterns: PrimaryWord["patterns"] }) {
   );
 }
 
+function LexicalGrammarLinks({
+  links,
+}: {
+  links: NonNullable<Awaited<ReturnType<typeof getCachedWordSecondary>>>["grammarLinks"];
+}) {
+  if (!links.length) return null;
+
+  return (
+    <section className="panel word-detail-card">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">GRAMMAR</p>
+          <h2>Structures this word reinforces</h2>
+        </div>
+        <Brain size={19} />
+      </div>
+      <div className="grammar-link-list">
+        {links.map((link) => (
+          <Link
+            href={"/grammar/" + link.grammarConcept.slug}
+            className="grammar-link-row"
+            key={link.id}
+            prefetch
+          >
+            <span>
+              <strong>{link.grammarConcept.title}</strong>
+              <small>
+                {link.lexicalPattern?.pattern ??
+                  link.note ??
+                  link.relationType.replaceAll("_", " ").toLowerCase()}
+              </small>
+            </span>
+            <span className="badge">{link.grammarConcept.introducedAt}</span>
+            <ArrowRight size={16} />
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function WordMastery({ state }: { state: PrimaryWord["userStates"][number] }) {
   const scores = [
     ["Recognition", state.recognition],
@@ -152,6 +193,7 @@ async function DeferredWordDetails({
       </section>
 
       <GrammarAndUsage patterns={patterns} />
+      <LexicalGrammarLinks links={word.grammarLinks} />
 
       <section className="panel intelligence-panel">
         <div className="section-heading">

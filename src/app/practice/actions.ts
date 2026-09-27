@@ -161,7 +161,7 @@ async function submitGrammarAnswer(
     metadata:{
       exerciseType:exercise.type,
       variant:grammarVariant,
-      linkedLexemeId:item?.lexemeId??null,
+      ...(item?.lexemeId ? { linkedLexemeId:item.lexemeId } : {}),
     },
   });
 

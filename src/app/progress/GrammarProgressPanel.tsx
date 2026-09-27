@@ -20,7 +20,7 @@ export async function GrammarProgressPanel({
   currentLevel: CefrLevel;
   targetLevel: CefrLevel;
 }) {
-  const [progress, mistakes, recentEvidence] = await Promise.all([
+  const [progress, mistakes, recentEvidence, transitions] = await Promise.all([
     db.userGrammarProgress.findMany({
       where: { userId },
       include: { grammarConcept: true },
@@ -44,6 +44,16 @@ export async function GrammarProgressPanel({
       },
       orderBy: { createdAt: "desc" },
       take: 8,
+    }),
+    db.grammarProgressTransition.findMany({
+      where: { userId },
+      include: {
+        grammarConcept: {
+          select: { title: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 6,
     }),
   ]);
 
@@ -71,6 +81,43 @@ export async function GrammarProgressPanel({
         (mistakeCounts.get(a.grammarConceptId) ?? 0),
     )
     .slice(0, 5);
+
+  const statusSummary = (items: typeof progress) => {
+    const summary = new Map<string, number>();
+    for (const item of items) {
+      summary.set(item.status, (summary.get(item.status) ?? 0) + 1);
+    }
+    return summary;
+  };
+
+  const byLevel = Array.from(
+    new Set(progress.map((item) => item.grammarConcept.introducedAt)),
+  )
+    .sort((a, b) => ["A1","A2","B1","B2","C1","C2"].indexOf(a) - ["A1","A2","B1","B2","C1","C2"].indexOf(b))
+    .map((level) => ({
+      label: level,
+      summary: statusSummary(
+        progress.filter((item) => item.grammarConcept.introducedAt === level),
+      ),
+      total: progress.filter((item) => item.grammarConcept.introducedAt === level).length,
+    }));
+
+  const byCategory = Array.from(
+    new Set(progress.map((item) => item.grammarConcept.category)),
+  )
+    .map((category) => ({
+      label: category.replaceAll("_", " ").toLowerCase(),
+      summary: statusSummary(
+        progress.filter((item) => item.grammarConcept.category === category),
+      ),
+      total: progress.filter((item) => item.grammarConcept.category === category).length,
+    }))
+    .sort(
+      (a, b) =>
+        (b.summary.get("NEEDS_ATTENTION") ?? 0) -
+          (a.summary.get("NEEDS_ATTENTION") ?? 0) ||
+        a.label.localeCompare(b.label),
+    );
 
   const demonstrated = progress.filter(
     (item) => item.source === "EVIDENCE" && item.evidenceCount > 0,
@@ -107,6 +154,40 @@ export async function GrammarProgressPanel({
         <span><strong>{assumed}</strong> assumed from declared level</span>
       </div>
 
+      {byLevel.length ? (
+        <div className="grammar-progress-section">
+          <h3>By CEFR level</h3>
+          <div className="grammar-profile-breakdown">
+            {byLevel.map((group) => (
+              <div key={group.label}>
+                <strong>{group.label}</strong>
+                <span>{group.total} concepts</span>
+                <small>
+                  {group.summary.get("STRONG") ?? 0} strong · {group.summary.get("LEARNING") ?? 0} learning · {group.summary.get("NEEDS_ATTENTION") ?? 0} needs attention
+                </small>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {byCategory.length ? (
+        <div className="grammar-progress-section">
+          <h3>By category</h3>
+          <div className="grammar-profile-breakdown">
+            {byCategory.map((group) => (
+              <div key={group.label}>
+                <strong>{group.label}</strong>
+                <span>{group.total} concepts</span>
+                <small>
+                  {group.summary.get("STRONG") ?? 0} strong · {group.summary.get("LEARNING") ?? 0} learning · {group.summary.get("NEEDS_ATTENTION") ?? 0} needs attention
+                </small>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {weaknesses.length ? (
         <div className="grammar-progress-section">
           <h3>Needs attention</h3>
@@ -125,6 +206,22 @@ export async function GrammarProgressPanel({
                 </div>
                 <ArrowRight size={16} />
               </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {transitions.length ? (
+        <div className="grammar-progress-section">
+          <h3>Recent profile changes</h3>
+          <div className="weakness-list">
+            {transitions.map((transition) => (
+              <div key={transition.id}>
+                <span>{transition.grammarConcept.title}</span>
+                <strong>
+                  {(transition.fromStatus ?? "new").toLowerCase().replaceAll("_", " ")} → {transition.toStatus.toLowerCase().replaceAll("_", " ")}
+                </strong>
+              </div>
             ))}
           </div>
         </div>

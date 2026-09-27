@@ -62,6 +62,8 @@ enum GrammarCategory {
   SUBJUNCTIVE
   INFINITIVE_CONSTRUCTIONS
   NOUNS
+  ADVERBS_PARTICLES
+  WORD_FORMATION
 }
 
 enum GrammarRelationType {

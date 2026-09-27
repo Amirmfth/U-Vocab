@@ -12,8 +12,10 @@ const initialState: WritingActionState = { status: "idle" };
 
 export function WritingStartForm({
   collections,
+  defaultLevel,
 }: {
   collections: Array<{ value: string; label: string }>;
+  defaultLevel: string;
 }) {
   const router = useRouter();
   const [state, action] = useActionState(createWritingSessionAction, initialState);
@@ -46,7 +48,7 @@ export function WritingStartForm({
           <ActivitySelect
             id="writing-level"
             name="level"
-            defaultValue="B2"
+            defaultValue={defaultLevel}
             options={["A1","A2","B1","B2","C1","C2"].map((value) => ({
               value,
               label: value,

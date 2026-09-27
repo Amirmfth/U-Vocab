@@ -150,3 +150,93 @@ The hub prioritizes:
 4. full curriculum browsing by CEFR/category
 
 `/grammar/[slug]` keeps canonical teaching content concise and exposes learner-state provenance. Personal vocabulary shown there is currently a pedagogical reuse suggestion by part of speech; explicit lexeme ↔ grammar relationships are owned by issue #82.
+
+
+## Grammar practice and Mistake Memory
+
+Grammar practice reuses the existing Practice surface and `Attempt` model. A practice item may target:
+
+- vocabulary only
+- a canonical grammar concept only
+- both a grammar concept and a linked vocabulary item
+
+Pure grammar practice never requires a `UserVocabulary` record.
+
+The first deterministic registry covers core families including:
+
+- case and preposition selection
+- article selection from linked personal nouns
+- adjective endings
+- pronouns and reflexive forms
+- tense formation
+- subordinate-clause word order
+- relative clauses
+- passive
+- Konjunktiv II
+- correction/reorder/cloze/choice formats
+
+The server always rebuilds a grammar exercise from its canonical concept + registered variant before grading. Client-supplied expected answers are never authoritative.
+
+Adaptive grammar sessions are bounded to 3–8 items and prioritize:
+
+1. NEEDS_ATTENTION
+2. LEARNING
+3. unassessed concepts
+4. recurring unresolved grammar mistakes
+5. concepts closest to the current CEFR level
+
+Recommended sessions require prerequisites to be assumed or strong. Explicitly targeted practice remains available even when a prerequisite is incomplete. Recent grammar interaction types are used to avoid needless repetition.
+
+Every grammar response records an `Attempt`, updates canonical grammar Mistake Memory, and submits deterministic evidence through the learner-model service. Grammar practice does not create FSRS cards.
+
+Grammar mistakes are grouped by `grammarConceptId` rather than semantic embeddings, because the canonical concept is already the strongest clustering key.
+
+## Vocabulary ↔ grammar links
+
+`LexemeGrammarConcept` connects a lexical unit to canonical grammar when there is a real pedagogical relationship.
+
+A link may optionally point to the exact `LexicalPattern` that demonstrates the relationship. This preserves the distinction:
+
+- `LexicalPattern`: word-specific fact such as `teilnehmen an + Dat.`
+- `GrammarConcept`: reusable rule such as dative case or prepositional verbs
+- `LexemeGrammarConcept`: the pedagogical connection between them
+
+Relationship types are:
+
+- EXEMPLIFIES
+- GOVERNS
+- TRIGGERS
+- COMMON_WITH
+
+Sources are tracked as DETERMINISTIC, AI, or MANUAL. Manual links have precedence over AI links, and AI links have precedence over deterministic inference for the same relationship.
+
+Newly ingested vocabulary receives deterministic grammar links automatically. Existing vocabulary can be backfilled after the migration and canonical grammar seed with:
+
+```bash
+npm run db:backfill-grammar-links
+```
+
+The backfill is idempotent.
+
+Deterministic mapping recognizes high-confidence relationships such as:
+
+- dative/accusative markers in stored lexical patterns
+- reflexive patterns
+- verb + preposition patterns
+- fixed-case prepositions
+- two-way prepositions
+- coordinating/subordinating conjunctions
+- article-bearing nouns
+- selected adjective/verb practice relationships
+
+It deliberately tolerates no mapping rather than forcing every lexeme into grammar.
+
+Any AI-origin grammar-link proposal must go through `applyAiGrammarLinks`. That boundary:
+
+- accepts only existing, active canonical IDs
+- rejects invented IDs
+- rejects lexical-pattern IDs belonging to another lexeme
+- drops low-confidence AI suggestions
+- never creates a new GrammarConcept
+
+Word detail pages show a compact Grammar section only when explicit links exist. Grammar concept pages and adaptive practice use those same links for personal vocabulary context.

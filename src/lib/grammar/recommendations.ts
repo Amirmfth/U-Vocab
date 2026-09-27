@@ -187,3 +187,19 @@ export async function getGrammarRecommendation(
     practiceHref: "/practice?grammar=" + ranked.candidate.slug,
   };
 }
+
+
+export function grammarRecommendationActionHref(input: {
+  conceptId: string;
+  reasonCode: GrammarRecommendationReason;
+  surface: "home" | "focus" | "practice";
+  action: "learn" | "practice";
+}) {
+  const params = new URLSearchParams({
+    concept: input.conceptId,
+    reason: input.reasonCode,
+    surface: input.surface,
+    action: input.action,
+  });
+  return "/grammar/recommended?" + params.toString();
+}

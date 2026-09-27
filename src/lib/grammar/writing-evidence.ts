@@ -11,6 +11,7 @@ export type ValidWritingGrammarObservation =
   WritingEvaluation["grammarObservations"][number];
 
 const CATEGORY_MISTAKE: Partial<Record<GrammarCategory, MistakeType>> = {
+  SENTENCE_STRUCTURE: "WORD_ORDER",
   ARTICLES: "ARTICLE",
   CASES: "CASE",
   PREPOSITIONS: "PREPOSITION",
@@ -22,6 +23,7 @@ const CATEGORY_MISTAKE: Partial<Record<GrammarCategory, MistakeType>> = {
   RELATIVE_CLAUSES: "RELATIVE_CLAUSE",
   PASSIVE: "PASSIVE",
   SUBJUNCTIVE: "SUBJUNCTIVE",
+  CONJUNCTIONS: "VERB_POSITION",
 };
 
 export function grammarMistakeTypeForCategory(

@@ -313,6 +313,7 @@ model GrammarConcept {
   userProgress     UserGrammarProgress[]
   evidence         GrammarEvidence[]
   lexemeLinks       LexemeGrammarConcept[]
+  readingTargets    StoryGrammarTarget[]
   attempts          Attempt[]
   mistakes          Mistake[]
   createdAt        DateTime                 @default(now())
@@ -726,11 +727,32 @@ model Story {
   englishSummary String?
   persianSummary String?
   questions    Json
+  generationMeta Json?
+  answers      Json?
+  comprehensionScore Float?
+  completedAt  DateTime?
   createdAt    DateTime     @default(now())
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   targets      StoryTarget[]
+  grammarTargets StoryGrammarTarget[]
 
   @@index([userId, createdAt])
+}
+
+model StoryGrammarTarget {
+  id               String         @id @default(cuid())
+  storyId          String
+  grammarConceptId String
+  excerpt          String?
+  explanation      String?
+  intentional      Boolean        @default(true)
+  position         Int            @default(0)
+  story            Story          @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  grammarConcept   GrammarConcept @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, grammarConceptId, excerpt])
+  @@index([storyId, position])
+  @@index([grammarConceptId, storyId])
 }
 
 model StoryTarget {

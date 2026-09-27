@@ -240,3 +240,24 @@ Any AI-origin grammar-link proposal must go through `applyAiGrammarLinks`. That 
 - never creates a new GrammarConcept
 
 Word detail pages show a compact Grammar section only when explicit links exist. Grammar concept pages and adaptive practice use those same links for personal vocabulary context.
+
+
+## Generated Reading product
+
+Reading is now the canonical generated-text learning product.
+
+User-facing routes:
+
+- `/reading` — generated Reading hub
+- `/reading/[id]` — focused reader + comprehension + language summary
+- `/stories` and `/stories/[id]` — permanent redirects for historical generated content
+- `/read` — redirects to generated Reading
+- existing `/read/[id]` URLs remain available only as a legacy compatibility path for previously saved paste-and-scan documents
+
+The internal `Story` model is intentionally retained for now to avoid a risky table rename and preserve historical generated content. It is technical legacy naming only; new product code calls the experience Reading. The old Story form/generator implementation has been removed.
+
+Generated Reading defaults to the learner's `currentLevel`. A deliberate stretch option may use `targetLevel`.
+
+Vocabulary and grammar targets are generation preferences rather than hard quotas. Natural, coherent German wins over target coverage. The server persists only vocabulary that actually appears and grammar coverage whose canonical ID is allowlisted and whose excerpt is present in the generated text.
+
+Grammar exposure alone never increases mastery. Only explicit grammar comprehension questions create modest `READING_COMPREHENSION` / `UNDERSTANDING` evidence. Production mastery is never changed by merely reading a structure.

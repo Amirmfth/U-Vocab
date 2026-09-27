@@ -5237,3 +5237,125 @@ summary {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+
+/* Generated Reading */
+.generated-reading-hub,
+.generated-reading-page {
+  --reading-measure: 68ch;
+}
+
+.reading-generation-form {
+  display: grid;
+  gap: 18px;
+}
+
+.reading-stretch-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.reading-stretch-option span {
+  display: grid;
+  gap: 3px;
+}
+
+.reading-stretch-option small {
+  color: var(--text-muted);
+}
+
+.generated-reading-text {
+  max-width: var(--reading-measure);
+  margin-inline: auto;
+  padding: clamp(22px, 4vw, 40px);
+  font-size: clamp(1.03rem, 2vw, 1.14rem);
+  line-height: 1.8;
+}
+
+.generated-reading-text p + p {
+  margin-top: 1.15em;
+}
+
+.reading-language-notes,
+.reading-assessment,
+.reading-language-summary {
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+.reading-question-list {
+  display: grid;
+  gap: 18px;
+}
+
+.reading-question {
+  display: grid;
+  gap: 12px;
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.reading-question legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-weight: 650;
+}
+
+.reading-question-options {
+  display: grid;
+  gap: 8px;
+}
+
+.reading-question-options label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.reading-answer-correct,
+.reading-answer-wrong {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.reading-answer-correct {
+  font-weight: 600;
+}
+
+.reading-language-notes blockquote {
+  margin: 10px 0;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--border);
+  color: var(--text-muted);
+}
+
+.reading-summary-group {
+  display: grid;
+  gap: 10px;
+}
+
+.reading-summary-group + .reading-summary-group {
+  margin-top: 18px;
+}
+
+@media (max-width: 720px) {
+  .generated-reading-text {
+    padding: 18px;
+    line-height: 1.72;
+  }
+
+  .reading-question-options label {
+    padding: 11px;
+  }
+}

@@ -28,12 +28,17 @@ export function orderGrammarVariants(
   return [...variants].sort((a, b) => {
     if (!progress) {
       if (a.dimension === b.dimension) return 0;
-      return a.dimension === "UNDERSTANDING" ? -1 : 1;
+      if (a.dimension === "UNDERSTANDING") return -1;
+      if (b.dimension === "UNDERSTANDING") return 1;
+      return 0;
     }
     if (progress.understanding < 0.5 && a.dimension !== b.dimension) {
-      return a.dimension === "UNDERSTANDING" ? -1 : 1;
+      if (a.dimension === "UNDERSTANDING") return -1;
+      if (b.dimension === "UNDERSTANDING") return 1;
     }
     if (a.dimension === b.dimension) return 0;
-    return a.dimension === "CONTROLLED_PRODUCTION" ? -1 : 1;
+    if (a.dimension === "CONTROLLED_PRODUCTION") return -1;
+    if (b.dimension === "CONTROLLED_PRODUCTION") return 1;
+    return 0;
   });
 }

@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, CircleAlert, Sparkles } from "lucide-react";
 import { notFound } from "next/navigation";
 import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
 import { db } from "@/lib/db";
@@ -36,6 +36,30 @@ export default async function WritingSessionPage({
   const evaluation = session.evaluation
     ? writingEvaluationSchema.safeParse(session.evaluation)
     : null;
+
+  const grammarObservationIds = evaluation?.success
+    ? Array.from(
+        new Set(
+          evaluation.data.grammarObservations.map(
+            (observation) => observation.grammarConceptId,
+          ),
+        ),
+      )
+    : [];
+  const grammarConcepts = grammarObservationIds.length
+    ? await db.grammarConcept.findMany({
+        where: { id: { in: grammarObservationIds } },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          introducedAt: true,
+        },
+      })
+    : [];
+  const grammarConceptById = new Map(
+    grammarConcepts.map((concept) => [concept.id, concept]),
+  );
 
   const parent = session.parentId
     ? await db.writingSession.findFirst({
@@ -155,6 +179,91 @@ export default async function WritingSessionPage({
             <p className="eyebrow">SUMMARY</p>
             <p>{evaluation.data.summary}</p>
           </section>
+
+          {evaluation.data.grammarObservations.length ? (
+            <section className="panel writing-feedback-section">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">GRAMMAR IN YOUR WRITING</p>
+                  <h2>Concept-level feedback</h2>
+                </div>
+                <Sparkles size={19} />
+              </div>
+
+              <div className="writing-grammar-observations">
+                {evaluation.data.grammarObservations.map((observation, index) => {
+                  const concept = grammarConceptById.get(
+                    observation.grammarConceptId,
+                  );
+                  if (!concept) return null;
+                  const isError = observation.signal === "ERROR";
+                  const isOpportunity = observation.signal === "OPPORTUNITY";
+                  return (
+                    <article
+                      className={
+                        "writing-grammar-observation writing-grammar-observation--" +
+                        observation.signal.toLowerCase()
+                      }
+                      key={
+                        observation.grammarConceptId +
+                        ":" +
+                        observation.signal +
+                        ":" +
+                        index
+                      }
+                    >
+                      <div className="writing-grammar-observation-head">
+                        <div>
+                          <div className="word-meta">
+                            <span className="badge">{concept.introducedAt}</span>
+                            <span className="badge">
+                              {isError
+                                ? "needs work"
+                                : isOpportunity
+                                  ? "opportunity"
+                                  : "used correctly"}
+                            </span>
+                          </div>
+                          <strong>{concept.title}</strong>
+                        </div>
+                        {isError ? (
+                          <CircleAlert size={18} />
+                        ) : (
+                          <CheckCircle2 size={18} />
+                        )}
+                      </div>
+
+                      <p>{observation.original}</p>
+                      {observation.corrected ? (
+                        <p className="muted">
+                          {isOpportunity ? "Try: " : "Correction: "}
+                          <strong>{observation.corrected}</strong>
+                        </p>
+                      ) : null}
+                      <p className="muted">{observation.explanation}</p>
+
+                      <div className="button-row">
+                        <Link
+                          className="button button-secondary"
+                          href={"/grammar/" + concept.slug}
+                        >
+                          Learn
+                        </Link>
+                        {!isOpportunity ? (
+                          <Link
+                            className="button button-primary"
+                            href={"/practice?grammar=" + concept.slug}
+                          >
+                            Practice
+                          </Link>
+                        ) : null}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
 
           <section className="writing-result-grid">
             <article className="panel">

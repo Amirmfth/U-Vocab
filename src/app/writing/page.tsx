@@ -22,6 +22,7 @@ export default async function WritingPage() {
       </section>
 
       <WritingStartForm
+        defaultLevel={user.currentLevel}
         collections={collections.map((item) => ({
           value: item.id,
           label: item.title,

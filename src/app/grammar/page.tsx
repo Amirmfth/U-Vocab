@@ -112,6 +112,13 @@ export default async function GrammarPage({
         <div><strong>{dashboard.counts.ASSUMED}</strong><span>assumed</span></div>
       </section>
 
+      {!dashboard.items.length ? (
+        <div className="empty-state compact-empty">
+          <strong>Grammar curriculum is not loaded yet.</strong>
+          <span className="muted">Run the canonical grammar seed after applying database migrations.</span>
+        </div>
+      ) : null}
+
       {dashboard.needsAttention.length ? (
         <section className="page-section grammar-priority-section">
           <div className="section-heading">

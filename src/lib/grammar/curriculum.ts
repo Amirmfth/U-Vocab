@@ -682,6 +682,7 @@ export const grammarCurriculum: GrammarCurriculumConcept[] = [
   {
     id: "de.relative.prepositions",
     slug: "relative-pronouns-with-prepositions",
+    parentId: "de.relative.basic",
     title: "Relative pronouns with prepositions",
     shortDescription: "Choose relative-pronoun case after prepositions inside relative clauses.",
     category: "RELATIVE_CLAUSES",
@@ -694,6 +695,7 @@ export const grammarCurriculum: GrammarCurriculumConcept[] = [
   {
     id: "de.relative.was-wo",
     slug: "relative-was-wo",
+    parentId: "de.relative.basic",
     title: "Relative clauses with was and wo",
     shortDescription: "Use was and wo in common relative constructions after pronouns, clauses and place expressions.",
     category: "RELATIVE_CLAUSES",
@@ -719,6 +721,7 @@ export const grammarCurriculum: GrammarCurriculumConcept[] = [
   {
     id: "de.passive.past",
     slug: "passive-past",
+    parentId: "de.passive.present",
     title: "Passive in past tenses",
     shortDescription: "Use passive constructions in Präteritum and Perfekt.",
     category: "PASSIVE",
@@ -731,6 +734,7 @@ export const grammarCurriculum: GrammarCurriculumConcept[] = [
   {
     id: "de.passive.alternatives",
     slug: "passive-alternatives",
+    parentId: "de.passive.present",
     title: "Alternatives to the passive",
     shortDescription: "Use man, sich lassen and sein + zu constructions where German prefers alternatives to werden-passive.",
     category: "PASSIVE",
@@ -755,6 +759,7 @@ export const grammarCurriculum: GrammarCurriculumConcept[] = [
   {
     id: "de.subjunctive.konjunktiv-ii-hypothetical",
     slug: "konjunktiv-ii-hypothetical",
+    parentId: "de.subjunctive.konjunktiv-ii-polite",
     title: "Konjunktiv II for hypothetical situations",
     shortDescription: "Express unreal, hypothetical and wished-for situations with Konjunktiv II.",
     category: "SUBJUNCTIVE",
@@ -768,6 +773,7 @@ export const grammarCurriculum: GrammarCurriculumConcept[] = [
   {
     id: "de.subjunctive.konjunktiv-ii-past",
     slug: "konjunktiv-ii-past",
+    parentId: "de.subjunctive.konjunktiv-ii-hypothetical",
     title: "Past Konjunktiv II",
     shortDescription: "Express unreal past conditions, regrets and counterfactual outcomes.",
     category: "SUBJUNCTIVE",

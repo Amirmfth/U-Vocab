@@ -5196,3 +5196,44 @@ summary {
     max-width: min(76%, 700px);
   }
 }
+
+
+/* Writing grammar evidence */
+.writing-grammar-observations {
+  display: grid;
+  gap: 12px;
+}
+
+.writing-grammar-observation {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.writing-grammar-observation--error {
+  border-inline-start: 3px solid var(--text);
+}
+
+.writing-grammar-observation--opportunity {
+  border-style: dashed;
+}
+
+.writing-grammar-observation-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.writing-grammar-observation-head > div {
+  display: grid;
+  gap: 6px;
+}
+
+.writing-grammar-observation .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

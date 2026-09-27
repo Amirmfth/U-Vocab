@@ -16,6 +16,19 @@ import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { detectLexemePresence, detectRepeatedWords } from "@/lib/ai/preprocess";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
+import { CEFR_RANK } from "@/lib/grammar/levels";
+import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
+import {
+  recordGrammarMistake,
+  resolveGrammarMistakes,
+} from "@/lib/grammar/mistakes";
+import {
+  acceptedWritingGrammarObservations,
+  grammarMistakeTypeForCategory,
+  parentErrorConceptIds,
+  writingEvidenceOutcome,
+  writingObservationStrength,
+} from "@/lib/grammar/writing-evidence";
 
 export type WritingActionState = {
   status: "idle" | "success" | "error";
@@ -331,6 +344,47 @@ export async function evaluateWritingAction(
           ? writingEvaluationSchema.safeParse(parent.evaluation)
           : null;
 
+        const grammarConceptRows = await perf.span("dbRead", () =>
+          db.grammarConcept.findMany({
+            where: {
+              active: true,
+              language: "de",
+              introducedAt: {
+                in: (Object.keys(CEFR_RANK) as Array<keyof typeof CEFR_RANK>)
+                  .filter((level) => CEFR_RANK[level] <= CEFR_RANK[user.targetLevel]),
+              },
+            },
+            include: {
+              userProgress: {
+                where: { userId: user.id },
+                take: 1,
+              },
+            },
+            orderBy: { order: "asc" },
+          }),
+        );
+
+        const grammarConcepts = grammarConceptRows
+          .map((concept) => ({
+            id: concept.id,
+            title: concept.title,
+            shortDescription: concept.shortDescription,
+            introducedAt: concept.introducedAt,
+            status: concept.userProgress[0]?.status ?? "UNASSESSED",
+            category: concept.category,
+          }))
+          .sort((a, b) => {
+            const priority = {
+              NEEDS_ATTENTION: 0,
+              LEARNING: 1,
+              ASSUMED: 2,
+              UNASSESSED: 3,
+              STRONG: 4,
+            } as const;
+            return priority[a.status] - priority[b.status];
+          })
+          .slice(0, 36);
+
         const evaluation = await perf.span("ai", () =>
           evaluateWriting({
             userId: user.id,
@@ -352,6 +406,13 @@ export async function evaluateWritingAction(
               lemma: item.lemma,
               patterns: item.patterns,
             })),
+            grammarConcepts: grammarConcepts.map((concept) => ({
+              id: concept.id,
+              title: concept.title,
+              shortDescription: concept.shortDescription,
+              introducedAt: concept.introducedAt,
+              status: concept.status,
+            })),
             rewriteContext: parent
               ? {
                   previousDraft: parent.draft,
@@ -362,6 +423,7 @@ export async function evaluateWritingAction(
                         summary: parentEvaluation.data.summary,
                         improvements: parentEvaluation.data.improvements,
                         corrections: parentEvaluation.data.corrections,
+                        grammarObservations: parentEvaluation.data.grammarObservations,
                       }
                     : undefined,
                 }
@@ -370,6 +432,16 @@ export async function evaluateWritingAction(
         );
 
         const validIds = requiredIds;
+        const grammarConceptById = new Map(
+          grammarConcepts.map((concept) => [concept.id, concept]),
+        );
+        const acceptedGrammar = acceptedWritingGrammarObservations(
+          evaluation.grammarObservations,
+          new Set(grammarConceptById.keys()),
+        );
+        const parentErrors = parentErrorConceptIds(
+          parentEvaluation?.success ? parentEvaluation.data : null,
+        );
         const usageById = new Map(
           evaluation.targetUsage
             .filter((item) => validIds.has(item.lexemeId))
@@ -486,6 +558,66 @@ export async function evaluateWritingAction(
             }),
           );
         }
+
+        await perf.span("grammarEvidence", async () => {
+          for (const [index, observation] of acceptedGrammar.entries()) {
+            const concept = grammarConceptById.get(observation.grammarConceptId);
+            if (!concept) continue;
+
+            const type = grammarMistakeTypeForCategory(concept.category);
+            const isRewriteCorrection =
+              observation.signal === "SUCCESS" &&
+              parentErrors.has(observation.grammarConceptId);
+
+            if (observation.signal === "ERROR") {
+              await recordGrammarMistake({
+                userId: user.id,
+                grammarConceptId: observation.grammarConceptId,
+                type,
+                expected: observation.corrected ?? "",
+                actual: observation.original,
+                explanation: observation.explanation,
+              });
+            } else if (isRewriteCorrection) {
+              await resolveGrammarMistakes({
+                userId: user.id,
+                grammarConceptId: observation.grammarConceptId,
+                type,
+              });
+            }
+
+            await recordGrammarEvidence({
+              userId: user.id,
+              grammarConceptId: observation.grammarConceptId,
+              source: "WRITING",
+              outcome: writingEvidenceOutcome(observation.signal),
+              dimension: "FREE_PRODUCTION",
+              strength: writingObservationStrength(
+                observation,
+                isRewriteCorrection,
+              ),
+              confidence: observation.confidence,
+              dedupeKey:
+                "writing:" +
+                session.id +
+                ":" +
+                observation.grammarConceptId +
+                ":" +
+                observation.signal +
+                ":" +
+                index,
+              sourceRef: session.id,
+              excerpt: observation.original,
+              metadata: {
+                signal: observation.signal,
+                ...(observation.corrected
+                  ? { corrected: observation.corrected }
+                  : {}),
+                rewriteCorrection: isRewriteCorrection,
+              },
+            });
+          }
+        });
 
         await perf.span("revalidation", async () => {
           revalidateUserDomains(

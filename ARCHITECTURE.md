@@ -28,3 +28,17 @@ Use Neon's pooled URL as `DATABASE_URL` and direct URL as `DIRECT_URL`. OpenAI u
 
 ## Next steps
 Authentication/user preferences, full CRUD/editing, translation-mode UI, deterministic FSRS review, active-recall attempts, mistake memory, and session planning build on this foundation.
+
+
+## Grammar curriculum and learner level
+
+Grammar uses the same database-first boundary as vocabulary, but canonical grammar and personal grammar state remain separate:
+
+- `GrammarConcept` is the versioned, curated German curriculum.
+- prerequisite and related-concept records form an internal dependency model.
+- `UserGrammarProgress` is user-specific and initially stores declared-level assumptions.
+- `User.currentLevel` describes present ability; `User.targetLevel` describes the learning destination.
+
+A concept may be introduced, expected and reinforced at different CEFR levels. CEFR placement is curriculum policy, not a claim that CEFR publishes a fixed grammar inventory.
+
+AI may explain or generate material from canonical concepts, but cannot create canonical grammar state or directly assign mastery. Run `npm run db:seed-grammar` after the grammar migration to upsert curriculum data and synchronize existing declared-level assumptions. See `docs/grammar-curriculum.md`.

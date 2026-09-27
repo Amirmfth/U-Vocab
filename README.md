@@ -510,3 +510,18 @@ Quick Practice deliberately avoids open-ended sentence-writing as its default. I
 Standard Review is an active-recall flashcard flow. Card families include German→meaning, meaning→German, contextual cloze and grammar/pattern recall. The FSRS schedule and Again/Hard/Good/Easy ratings remain authoritative. A failed recall can reappear once later in the same session without creating an unbounded loop.
 
 Focused practice for verbs may reuse the same versioned conjugation cache used by the word-detail Conjugate reference, avoiding a second conjugation data source.
+
+
+## Grammar foundation
+
+U-Vocab now has a canonical German grammar curriculum covering A1–B2 with stable concept IDs, CEFR introduction/expectation/reinforcement metadata, prerequisites and structured relationships.
+
+Learners store separate **current** and **target** CEFR levels. Earlier grammar inferred from the current level is marked **assumed**, not mastered, so future Writing/Practice/Reading evidence can correct the initial estimate without forcing an existing B1 learner through A1 from zero.
+
+After applying database migrations, seed/update the canonical curriculum with:
+
+```bash
+npm run db:seed-grammar
+```
+
+The seed is idempotent and also synchronizes declared-level assumptions for existing users. AI is not allowed to invent canonical grammar concepts or own learner mastery. See `docs/grammar-curriculum.md` for governance and semantics.

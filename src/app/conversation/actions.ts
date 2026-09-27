@@ -58,7 +58,7 @@ export async function createConversationSessionAction(
     const setup = await generateConversationSetup({
       userId: user.id,
       kind,
-      level: user.targetLevel,
+      level: user.currentLevel,
       topic,
       tone,
       formality,
@@ -69,7 +69,7 @@ export async function createConversationSessionAction(
       data: {
         userId: user.id,
         kind,
-        level: user.targetLevel,
+        level: user.currentLevel,
         title: setup.title,
         scenario: setup.scenario,
         aiRole: setup.aiRole,

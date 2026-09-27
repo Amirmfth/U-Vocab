@@ -15,7 +15,11 @@ export default async function SettingsPage() {
         <p className="eyebrow">ACCOUNT</p>
         <h1>Settings</h1>
       </section>
-      <SettingsForm preference={user.preferredTranslation} targetLevel={user.targetLevel} />
+      <SettingsForm
+        preference={user.preferredTranslation}
+        currentLevel={user.currentLevel}
+        targetLevel={user.targetLevel}
+      />
       <section className="panel account-links">
         <div>
           <strong>AI operations</strong>

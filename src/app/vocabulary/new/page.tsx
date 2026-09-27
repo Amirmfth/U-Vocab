@@ -12,8 +12,8 @@ export default async function NewWord() {
         <p className="eyebrow">AI-ASSISTED ENTRY</p>
         <h1>Add vocabulary</h1>
         <p className="page-description">
-          Paste a German word, phrase, or text. Review the extracted lexical
-          units before adding them to your vocabulary.
+          Analyze German text or paste a comma-separated list of words. Choose
+          what to add to your vocabulary.
         </p>
       </section>
 

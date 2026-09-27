@@ -20,7 +20,7 @@ export default async function TopicPacksPage() {
     <main className="page">
       <section className="page-header compact"><h1>Topic packs</h1></section>
 
-      <TopicPackForm defaultLevel={user.targetLevel} />
+      <TopicPackForm defaultLevel={user.currentLevel} />
 
       <section className="page-section">
         <h2 className="section-title">Saved</h2>

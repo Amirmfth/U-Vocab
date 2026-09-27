@@ -1,5 +1,6 @@
 export type AIOperation =
   | "lexical_analysis"
+  | "lexical_batch_analysis"
   | "answer_evaluation"
   | "writing_task"
   | "writing_evaluation"
@@ -27,6 +28,7 @@ const DEFAULT_FAST_MODEL = process.env.OPENAI_FAST_MODEL ?? "gpt-6-luna";
 
 const ROUTES: Record<AIOperation, Route> = {
   lexical_analysis: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 1800 },
+  lexical_batch_analysis: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 6500 },
   answer_evaluation: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 900 },
   writing_task: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 700 },
   writing_evaluation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 4200 },

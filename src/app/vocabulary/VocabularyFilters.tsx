@@ -39,7 +39,9 @@ export function VocabularyFilters({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [menu, setMenu] = useState<"types" | FilterKey | null>(null);
+  const [menuOffset, setMenuOffset] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filters: FilterDefinition[] = [
@@ -97,6 +99,19 @@ export function VocabularyFilters({
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!menu) return;
+    function positionMenu() {
+      const button = addButtonRef.current;
+      if (!button) return;
+      const width = Math.min(300, window.innerWidth - 32);
+      setMenuOffset(Math.min(0, window.innerWidth - 16 - button.getBoundingClientRect().left - width));
+    }
+    positionMenu();
+    window.addEventListener("resize", positionMenu);
+    return () => window.removeEventListener("resize", positionMenu);
+  }, [menu]);
 
   function setParam(key: FilterKey, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -169,63 +184,66 @@ export function VocabularyFilters({
             </span>
           ))}
 
-          <button
-            aria-expanded={menu !== null}
-            className="filter-add-button"
-            onClick={() => setMenu((currentMenu) => currentMenu ? null : "types")}
-            type="button"
-          >
-            <Filter size={15} />
-            Add filter
-          </button>
-        </div>
+          <div className="filter-add-anchor">
+            <button
+              ref={addButtonRef}
+              aria-expanded={menu !== null}
+              className="filter-add-button"
+              onClick={() => setMenu((currentMenu) => currentMenu ? null : "types")}
+              type="button"
+            >
+              <Filter size={15} />
+              Add filter
+            </button>
 
-        {menu ? (
-          <div className="filter-menu" role="dialog" aria-label="Vocabulary filters">
-            {selectedFilter ? (
-              <>
-                <button className="filter-menu-back" onClick={() => setMenu("types")} type="button">
-                  <ChevronLeft size={16} />
-                  {selectedFilter.label}
-                </button>
-                <div className="filter-menu-list" role="listbox" aria-label={selectedFilter.label}>
-                  {selectedFilter.options.map((option) => {
-                    const isSelected = option.value === current[selectedFilter.key];
-                    return (
+            {menu ? (
+              <div className="filter-menu" role="dialog" aria-label="Vocabulary filters" style={{ left: menuOffset }}>
+                {selectedFilter ? (
+                  <>
+                    <button className="filter-menu-back" onClick={() => setMenu("types")} type="button">
+                      <ChevronLeft size={16} />
+                      {selectedFilter.label}
+                    </button>
+                    <div className="filter-menu-list" role="listbox" aria-label={selectedFilter.label}>
+                      {selectedFilter.options.map((option) => {
+                        const isSelected = option.value === current[selectedFilter.key];
+                        return (
+                          <button
+                            aria-selected={isSelected}
+                            className={isSelected ? "filter-menu-option is-selected" : "filter-menu-option"}
+                            key={option.value}
+                            onClick={() => setParam(selectedFilter.key, option.value)}
+                            role="option"
+                            type="button"
+                          >
+                            {option.label}
+                            {isSelected ? <span>Selected</span> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <div className="filter-menu-list" role="listbox" aria-label="Filter types">
+                    {filters.map((filter) => (
                       <button
-                        aria-selected={isSelected}
-                        className={isSelected ? "filter-menu-option is-selected" : "filter-menu-option"}
-                        key={option.value}
-                        onClick={() => setParam(selectedFilter.key, option.value)}
+                        aria-selected={!isDefaultValue(filter.key, current[filter.key])}
+                        className="filter-menu-option"
+                        key={filter.key}
+                        onClick={() => setMenu(filter.key)}
                         role="option"
                         type="button"
                       >
-                        {option.label}
-                        {isSelected ? <span>Selected</span> : null}
+                        {filter.label}
+                        {!isDefaultValue(filter.key, current[filter.key]) ? <span>Active</span> : null}
                       </button>
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              <div className="filter-menu-list" role="listbox" aria-label="Filter types">
-                {filters.map((filter) => (
-                  <button
-                    aria-selected={!isDefaultValue(filter.key, current[filter.key])}
-                    className="filter-menu-option"
-                    key={filter.key}
-                    onClick={() => setMenu(filter.key)}
-                    role="option"
-                    type="button"
-                  >
-                    {filter.label}
-                    {!isDefaultValue(filter.key, current[filter.key]) ? <span>Active</span> : null}
-                  </button>
-                ))}
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ) : null}
           </div>
-        ) : null}
+        </div>
       </div>
 
       {(current.q || activeFilters.length) ? (

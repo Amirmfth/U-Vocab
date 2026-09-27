@@ -1,9 +1,11 @@
 "use server";
 
-import { TranslationLanguage } from "@prisma/client";
+import { CefrLevel, TranslationLanguage } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
+import { isValidCefrLevel, targetLevelIsValid } from "@/lib/grammar/levels";
+import { syncDeclaredLevelGrammarAssumptions } from "@/lib/grammar/progress";
 
 export type SettingsState = {
   status: "idle" | "success" | "error";
@@ -15,14 +17,28 @@ export async function updateTranslationPreference(
   formData: FormData,
 ): Promise<SettingsState> {
   const value = String(formData.get("translation"));
+  const currentLevel = String(formData.get("currentLevel"));
   const targetLevel = String(formData.get("targetLevel"));
 
   if (!["ENGLISH", "PERSIAN", "BOTH"].includes(value)) {
     return { status: "error", message: "Choose a valid translation language." };
   }
 
-  if (!["A1", "A2", "B1", "B2", "C1", "C2"].includes(targetLevel)) {
+  if (!isValidCefrLevel(currentLevel)) {
+    return { status: "error", message: "Choose a valid current German level." };
+  }
+
+  if (!isValidCefrLevel(targetLevel)) {
     return { status: "error", message: "Choose a valid CEFR target level." };
+  }
+
+  const current = currentLevel as CefrLevel;
+  const target = targetLevel as CefrLevel;
+  if (!targetLevelIsValid(current, target)) {
+    return {
+      status: "error",
+      message: "Target level must be the same as or higher than your current level.",
+    };
   }
 
   try {
@@ -31,9 +47,12 @@ export async function updateTranslationPreference(
       where: { id: user.id },
       data: {
         preferredTranslation: value as TranslationLanguage,
-        targetLevel,
+        currentLevel: current,
+        targetLevel: target,
       },
     });
+
+    await syncDeclaredLevelGrammarAssumptions(user.id, current);
 
     revalidatePath("/");
     revalidatePath("/vocabulary");

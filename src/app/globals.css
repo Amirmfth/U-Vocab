@@ -5413,3 +5413,31 @@ summary {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
+
+
+.grammar-profile-breakdown {
+  display: grid;
+  gap: 8px;
+}
+
+.grammar-profile-breakdown > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.grammar-profile-breakdown strong {
+  text-transform: capitalize;
+}
+
+.grammar-profile-breakdown span,
+.grammar-profile-breakdown small {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.grammar-profile-breakdown small {
+  grid-column: 1 / -1;
+}

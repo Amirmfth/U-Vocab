@@ -34,7 +34,7 @@ export default async function StoriesPage() {
       <section className="page-header compact"><h1>Stories</h1></section>
 
       <StoryForm
-        defaultLevel={user.targetLevel}
+        defaultLevel={user.currentLevel}
         targets={vocabulary.map((item) => ({
           lexemeId: item.lexemeId,
           label: formatLexemeLabel(item.lexeme),

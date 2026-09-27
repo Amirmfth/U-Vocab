@@ -1,46 +1,23 @@
-import type { GrammarCategory, PartOfSpeech } from "@prisma/client";
+import type { GrammarCategory } from "@prisma/client";
 import { db } from "@/lib/db";
 
-function relevantPartsOfSpeech(category: GrammarCategory): PartOfSpeech[] {
-  switch (category) {
-    case "VERBS":
-    case "TENSES":
-    case "PASSIVE":
-    case "SUBJUNCTIVE":
-    case "INFINITIVE_CONSTRUCTIONS":
-      return ["VERB"];
-    case "ARTICLES":
-    case "CASES":
-    case "NOUNS":
-      return ["NOUN"];
-    case "ADJECTIVES":
-    case "COMPARISON":
-      return ["ADJECTIVE"];
-    case "PREPOSITIONS":
-      return ["PREPOSITION", "VERB"];
-    case "PRONOUNS":
-      return ["PRONOUN"];
-    case "CONJUNCTIONS":
-    case "RELATIVE_CLAUSES":
-      return ["CONJUNCTION", "PRONOUN"];
-    default:
-      return ["PHRASE", "VERB", "CONJUNCTION"];
-  }
-}
-
 /**
- * Temporary pedagogical bridge until #82 adds explicit lexeme ↔ grammar links.
- * These are presented as vocabulary to reuse with a concept, not as claims
- * that the selected lexemes formally instantiate the rule.
+ * Returns only explicit lexeme ↔ grammar relationships. Category is retained
+ * in the signature for compatibility with the concept page while #82 removes
+ * the old part-of-speech guessing behavior.
  */
 export async function getVocabularyForGrammarConcept(
   userId: string,
-  category: GrammarCategory,
+  _category: GrammarCategory,
+  grammarConceptId?: string,
 ) {
-  return db.userVocabulary.findMany({
+  if (!grammarConceptId) return [];
+
+  const links = await db.lexemeGrammarConcept.findMany({
     where: {
-      userId,
-      lexeme: { partOfSpeech: { in: relevantPartsOfSpeech(category) } },
+      grammarConceptId,
+      confidence: { gte: 0.65 },
+      lexeme: { userStates: { some: { userId } } },
     },
     include: {
       lexeme: {
@@ -50,10 +27,39 @@ export async function getVocabularyForGrammarConcept(
           article: true,
           partOfSpeech: true,
           patterns: { take: 2, select: { pattern: true } },
+          userStates: {
+            where: { userId },
+            take: 1,
+            select: {
+              id: true,
+              state: true,
+              production: true,
+              contextualUsage: true,
+            },
+          },
         },
       },
+      lexicalPattern: { select: { pattern: true } },
     },
-    orderBy: [{ contextualUsage: "asc" }, { production: "asc" }],
-    take: 8,
+    orderBy: [{ confidence: "desc" }, { createdAt: "asc" }],
+    take: 12,
   });
+
+  return links
+    .map((link) => ({
+      id: link.lexeme.userStates[0]?.id ?? link.id,
+      relationType: link.relationType,
+      note: link.note,
+      pattern: link.lexicalPattern?.pattern ?? null,
+      lexeme: link.lexeme,
+    }))
+    .sort((a, b) => {
+      const aState = a.lexeme.userStates[0];
+      const bState = b.lexeme.userStates[0];
+      return (
+        (aState?.contextualUsage ?? 1) - (bState?.contextualUsage ?? 1) ||
+        (aState?.production ?? 1) - (bState?.production ?? 1)
+      );
+    })
+    .slice(0, 8);
 }

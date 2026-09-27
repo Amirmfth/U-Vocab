@@ -1,4 +1,4 @@
-import type { CefrLevel } from "@prisma/client";
+import type { CefrLevel, GrammarProgressStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { CEFR_RANK } from "@/lib/grammar/levels";
 import {
@@ -86,7 +86,7 @@ export async function buildGrammarPracticeSession(input: {
   const candidates = concepts
     .map((concept) => {
       const progress = concept.userProgress[0];
-      const status = progress?.status ?? "UNASSESSED";
+      const status: GrammarProgressStatus = progress?.status ?? "UNASSESSED";
       const link = linkedLexeme(concept.lexemeLinks[0] ?? null);
       const variants = grammarExerciseVariants(concept.id, link);
       const mistakeWeight = concept.mistakes.reduce(

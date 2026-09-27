@@ -28,6 +28,7 @@ const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/focus", section: "review", label: "Focus session" },
 
   { prefix: "/practice", section: "practice", label: "Practice" },
+  { prefix: "/grammar", section: "practice", label: "Grammar" },
   { prefix: "/writing", section: "practice", label: "Writing" },
   { prefix: "/read", section: "practice", label: "Reading" },
   { prefix: "/stories", section: "practice", label: "Stories", group: "Reading" },

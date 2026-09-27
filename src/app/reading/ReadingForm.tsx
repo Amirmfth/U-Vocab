@@ -71,7 +71,7 @@ export function ReadingForm({
             options={[
               { label: "Recommended automatically", value: "" },
               ...grammarOptions.map((option) => ({
-                label: \`${option.title} · ${option.level} · ${option.status.toLowerCase().replaceAll("_", " ")}\`,
+                label: `${option.title} · ${option.level} · ${option.status.toLowerCase().replaceAll("_", " ")}`,
                 value: option.id,
               })),
             ]}
@@ -158,7 +158,7 @@ export function ReadingForm({
                 {target.label}
                 <button
                   type="button"
-                  aria-label={\`Remove ${target.label}\`}
+                  aria-label={`Remove ${target.label}`}
                   onClick={() =>
                     setSelectedIds((current) =>
                       current.filter((id) => id !== target.lexemeId),

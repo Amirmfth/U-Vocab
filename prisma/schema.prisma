@@ -86,6 +86,27 @@ enum GrammarProgressSource {
   MANUAL
 }
 
+enum GrammarEvidenceSource {
+  PRACTICE
+  WRITING
+  READING_COMPREHENSION
+  CONVERSATION
+  MANUAL
+}
+
+enum GrammarEvidenceOutcome {
+  SUCCESS
+  ERROR
+  OPPORTUNITY
+  ENCOUNTER
+}
+
+enum GrammarEvidenceDimension {
+  UNDERSTANDING
+  CONTROLLED_PRODUCTION
+  FREE_PRODUCTION
+}
+
 enum RelationType {
   WORD_FAMILY
   SYNONYM
@@ -233,6 +254,7 @@ model User {
   battleSessions         BattleSession[]
   writingSessions        WritingSession[]
   grammarProgress        UserGrammarProgress[]
+  grammarEvidence        GrammarEvidence[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -262,6 +284,7 @@ model GrammarConcept {
   outgoingRelations GrammarConceptRelation[] @relation("GrammarRelationSource")
   incomingRelations GrammarConceptRelation[] @relation("GrammarRelationTarget")
   userProgress     UserGrammarProgress[]
+  evidence         GrammarEvidence[]
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
 
@@ -294,20 +317,50 @@ model GrammarConceptRelation {
 }
 
 model UserGrammarProgress {
-  id               String                @id @default(cuid())
-  userId           String
-  grammarConceptId String
-  status           GrammarProgressStatus @default(UNASSESSED)
-  source           GrammarProgressSource @default(DECLARED_LEVEL)
-  assumedFromLevel CefrLevel?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
-  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  grammarConcept   GrammarConcept        @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+  id                   String                @id @default(cuid())
+  userId               String
+  grammarConceptId     String
+  status               GrammarProgressStatus @default(UNASSESSED)
+  source               GrammarProgressSource @default(DECLARED_LEVEL)
+  assumedFromLevel     CefrLevel?
+  understanding        Float                 @default(0)
+  controlledProduction Float                 @default(0)
+  freeProduction       Float                 @default(0)
+  evidenceCount        Int                   @default(0)
+  lastEvidenceAt       DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grammarConcept       GrammarConcept        @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
 
   @@unique([userId, grammarConceptId])
   @@index([userId, status])
   @@index([grammarConceptId, status])
+  @@index([userId, lastEvidenceAt])
+}
+
+model GrammarEvidence {
+  id               String                   @id @default(cuid())
+  userId           String
+  grammarConceptId String
+  source           GrammarEvidenceSource
+  outcome          GrammarEvidenceOutcome
+  dimension        GrammarEvidenceDimension
+  strength         Float
+  confidence       Float                    @default(1)
+  effectiveWeight  Float
+  accepted         Boolean                  @default(true)
+  dedupeKey        String
+  sourceRef        String?
+  excerpt          String?
+  metadata         Json?
+  createdAt        DateTime                 @default(now())
+  user             User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grammarConcept   GrammarConcept           @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, grammarConceptId, createdAt])
+  @@index([grammarConceptId, outcome, createdAt])
 }
 
 model Lexeme {

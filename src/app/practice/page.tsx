@@ -8,7 +8,6 @@ import {
   GraduationCap,
   PenLine,
   Plus,
-  ScanText,
   Sparkles,
   Swords,
   Target,
@@ -52,11 +51,11 @@ function PracticeHub() {
           <ArrowRight size={18} />
         </Link>
 
-        <Link href="/stories" className="practice-lane">
+        <Link href="/reading" className="practice-lane">
           <span className="practice-lane-icon"><BookOpenText size={21} /></span>
           <span className="practice-lane-copy">
-            <strong>Stories</strong>
-            <small>Read tailored stories with your target vocabulary</small>
+            <strong>Reading</strong>
+            <small>Generated German at your level with comprehension and grammar in context</small>
           </span>
           <ArrowRight size={18} />
         </Link>
@@ -77,10 +76,6 @@ function PracticeHub() {
           <span>Secondary modes</span>
         </div>
         <div className="practice-shortcut-grid">
-          <Link href="/read">
-            <ScanText size={17} />
-            <span><strong>Reading</strong><small>Analyze your own text</small></span>
-          </Link>
           <Link href="/missions">
             <Target size={17} />
             <span><strong>Missions</strong><small>Goal-based speaking</small></span>

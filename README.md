@@ -525,3 +525,42 @@ npm run db:seed-grammar
 ```
 
 The seed is idempotent and also synchronizes declared-level assumptions for existing users. AI is not allowed to invent canonical grammar concepts or own learner mastery. See `docs/grammar-curriculum.md` for governance and semantics.
+
+
+## Grammar learning intelligence
+
+Grammar is a first-class learning domain, but it is **not a second vocabulary deck**.
+
+The final grammar learning model is:
+
+```text
+Canonical Grammar Curriculum
+        +
+Personal Grammar Profile
+        +
+Evidence from Practice / Writing / Reading
+        ↓
+Explainable next-step recommendations
+```
+
+The canonical curriculum owns stable German grammar concepts, prerequisites, CEFR introduction/expectation metadata, examples and relationships. AI may explain canonical concepts or generate contextual material, but it does not invent curriculum IDs and does not assign mastery.
+
+The learner profile distinguishes:
+
+- **ASSUMED** — inferred from the learner's declared current level, not demonstrated mastery
+- **UNASSESSED** — no meaningful evidence yet
+- **LEARNING** — active work in progress
+- **NEEDS_ATTENTION** — repeated or high-confidence evidence of difficulty
+- **STRONG** — supported by meaningful evidence
+
+`currentLevel` describes the learner's present starting point. `targetLevel` describes the direction of recommendations and optional stretch work. They are intentionally different inputs.
+
+Grammar progress is evidence-based and multidimensional: understanding, controlled production, and free production. Grammar does **not** require an FSRS queue. Vocabulary Review remains primarily FSRS-based vocabulary retention.
+
+Evidence can come from deterministic Grammar Practice, structured Writing feedback, and tested Reading comprehension. Merely seeing grammar in a generated Reading does not create mastery.
+
+Reading means **generated personalized German reading with comprehension assessment**. The former paste-and-scan Reading workflow is retired from primary navigation; historical saved documents remain available through legacy detail URLs.
+
+Recommendations are deterministic and explainable. They prioritize recurring weaknesses, concepts already being learned, prerequisite gaps and appropriate next concepts between current and target level while avoiding strong or recently overexposed grammar. Related personal vocabulary is used when it makes practice more relevant.
+
+A user-facing Grammar Universe/graph is intentionally excluded. The prerequisite graph exists internally for sequencing and explanation, not as the product UI.

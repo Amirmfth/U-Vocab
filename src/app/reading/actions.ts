@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { generateReading } from "@/lib/ai/reading-generation";
 import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { scoreReadingAssessment } from "@/lib/reading/assessment";
 
 const TARGETS_PER_LENGTH = { SHORT: 3, MEDIUM: 5, LONG: 7 } as const;
 
@@ -271,10 +272,9 @@ export async function submitReadingAnswers(
     if (!story) return { status: "error", message: "Reading not found." };
 
     const questions = story.questions as unknown as ReadingQuestion[];
-    const correct = questions.map((question, index) => {
-      const answer = Number(formData.get("answer-" + index));
-      return Number.isInteger(answer) && answer === question.correctIndex;
-    });
+    const answers = questions.map((_, index) =>
+      Number(formData.get("answer-" + index)),
+    );
     const answered = questions.filter((_, index) =>
       formData.has("answer-" + index),
     ).length;
@@ -282,17 +282,17 @@ export async function submitReadingAnswers(
       return { status: "error", message: "Answer every question first." };
     }
 
-    const score =
-      questions.length > 0
-        ? correct.filter(Boolean).length / questions.length
-        : 0;
+    const { correct, score, grammarEvidence } = scoreReadingAssessment(
+      questions,
+      answers,
+    );
 
     await db.story.update({
       where: { id: story.id },
       data: {
         answers: questions.map((question, index) => ({
           question: question.question,
-          selectedIndex: Number(formData.get("answer-" + index)),
+          selectedIndex: answers[index],
           correct: correct[index],
         })),
         comprehensionScore: score,
@@ -313,29 +313,35 @@ export async function submitReadingAnswers(
       });
     }
 
-    for (const [index, question] of questions.entries()) {
-      if (question.type !== "GRAMMAR" || !question.grammarConceptId) continue;
-      const concept = await db.grammarConcept.findFirst({
-        where: {
-          id: question.grammarConceptId,
-          active: true,
-          language: "de",
-        },
-        select: { id: true },
-      });
-      if (!concept) continue;
+    const grammarIds = [...new Set(
+      grammarEvidence.map((item) => item.grammarConceptId),
+    )];
+    const validGrammar = grammarIds.length
+      ? await db.grammarConcept.findMany({
+          where: {
+            id: { in: grammarIds },
+            active: true,
+            language: "de",
+          },
+          select: { id: true },
+        })
+      : [];
+    const validGrammarIds = new Set(validGrammar.map((item) => item.id));
 
+    for (const evidence of grammarEvidence) {
+      if (!validGrammarIds.has(evidence.grammarConceptId)) continue;
       await recordGrammarEvidence({
         userId: user.id,
-        grammarConceptId: concept.id,
+        grammarConceptId: evidence.grammarConceptId,
         source: "READING_COMPREHENSION",
-        outcome: correct[index] ? "SUCCESS" : "ERROR",
+        outcome: evidence.correct ? "SUCCESS" : "ERROR",
         dimension: "UNDERSTANDING",
         strength: 0.55,
         confidence: 0.9,
-        dedupeKey: "reading:" + story.id + ":question:" + index,
+        dedupeKey:
+          "reading:" + story.id + ":question:" + evidence.questionIndex,
         sourceRef: story.id,
-        excerpt: question.question,
+        excerpt: questions[evidence.questionIndex]?.question,
         metadata: { questionType: "GRAMMAR" },
       });
     }

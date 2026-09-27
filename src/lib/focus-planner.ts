@@ -1,5 +1,8 @@
 import type { CefrLevel, PrismaClient, SessionActivity, SessionKind } from "@prisma/client";
-import { getGrammarRecommendation } from "@/lib/grammar/recommendations";
+import {
+  getGrammarRecommendation,
+  grammarRecommendationActionHref,
+} from "@/lib/grammar/recommendations";
 
 type PlannedItem = {
   activity: SessionActivity;
@@ -186,7 +189,12 @@ export async function buildSessionPlan(
       activity: "GRAMMAR",
       title: "Grammar: " + grammarRecommendation.title,
       description: grammarRecommendation.reason,
-      href: grammarRecommendation.practiceHref,
+      href: grammarRecommendationActionHref({
+        conceptId: grammarRecommendation.conceptId,
+        reasonCode: grammarRecommendation.reasonCode,
+        surface: "focus",
+        action: "practice",
+      }),
       plannedMinutes: minutes.final,
     });
   } else {

@@ -283,6 +283,8 @@ model User {
   writingSessions        WritingSession[]
   grammarProgress        UserGrammarProgress[]
   grammarEvidence        GrammarEvidence[]
+  grammarTransitions     GrammarProgressTransition[]
+  grammarRecommendationEvents GrammarRecommendationEvent[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -317,6 +319,8 @@ model GrammarConcept {
   readingTargets    StoryGrammarTarget[]
   attempts          Attempt[]
   mistakes          Mistake[]
+  progressTransitions GrammarProgressTransition[]
+  recommendationEvents GrammarRecommendationEvent[]
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
 
@@ -393,6 +397,38 @@ model GrammarEvidence {
   @@unique([userId, dedupeKey])
   @@index([userId, grammarConceptId, createdAt])
   @@index([grammarConceptId, outcome, createdAt])
+}
+
+model GrammarProgressTransition {
+  id               String                @id @default(cuid())
+  userId           String
+  grammarConceptId String
+  fromStatus       GrammarProgressStatus?
+  toStatus         GrammarProgressStatus
+  source           GrammarProgressSource
+  createdAt        DateTime              @default(now())
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grammarConcept   GrammarConcept        @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, grammarConceptId, createdAt])
+  @@index([grammarConceptId, toStatus, createdAt])
+}
+
+model GrammarRecommendationEvent {
+  id               String         @id @default(cuid())
+  userId           String
+  grammarConceptId String
+  surface          String
+  reason           String
+  action           String
+  createdAt        DateTime       @default(now())
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grammarConcept   GrammarConcept @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, surface, reason, createdAt])
+  @@index([grammarConceptId, action, createdAt])
 }
 
 model Lexeme {

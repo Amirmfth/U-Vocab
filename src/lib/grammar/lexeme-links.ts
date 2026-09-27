@@ -188,7 +188,11 @@ export async function replaceLexemeGrammarLinks(
         },
         select: { source: true },
       });
-      const precedence = { DETERMINISTIC: 0, AI: 1, MANUAL: 2 } as const;
+      const precedence: Record<LexemeGrammarLinkSource, number> = {
+        DETERMINISTIC: 0,
+        AI: 1,
+        MANUAL: 2,
+      };
       if (existing && precedence[existing.source] > precedence[source]) continue;
 
       await tx.lexemeGrammarConcept.upsert({

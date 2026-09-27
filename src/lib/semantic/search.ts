@@ -108,6 +108,8 @@ export async function similarMistakePairs(input: {
       ON a."id" < b."id"
      AND a."userId" = b."userId"
     WHERE a."userId" = ${input.userId}
+      AND a."grammarConceptId" IS NULL
+      AND b."grammarConceptId" IS NULL
       AND a."resolvedAt" IS NULL
       AND b."resolvedAt" IS NULL
       AND a."embedding" IS NOT NULL

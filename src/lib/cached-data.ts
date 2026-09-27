@@ -267,6 +267,23 @@ export function getCachedWordSecondary(
             include: { target: true },
             take: 10,
           },
+          grammarLinks: {
+            where: { confidence: { gte: 0.65 } },
+            include: {
+              grammarConcept: {
+                select: {
+                  id: true,
+                  slug: true,
+                  title: true,
+                  shortDescription: true,
+                  introducedAt: true,
+                },
+              },
+              lexicalPattern: { select: { pattern: true } },
+            },
+            orderBy: [{ confidence: "desc" }, { createdAt: "asc" }],
+            take: 8,
+          },
           incoming: {
             include: { source: true },
             take: 10,

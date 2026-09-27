@@ -134,6 +134,10 @@ enum ExerciseType {
   FREE_SENTENCE
   PARAPHRASE
   CONTEXTUAL_CHOICE
+  GRAMMAR_CHOICE
+  GRAMMAR_CLOZE
+  GRAMMAR_REORDER
+  GRAMMAR_CORRECTION
 }
 
 enum SessionKind {
@@ -225,10 +229,33 @@ enum MistakeType {
   PREPOSITION
   REFLEXIVE
   COLLOCATION
+  ADJECTIVE_ENDING
+  VERB_POSITION
+  WORD_ORDER
+  TENSE
+  CONJUGATION
+  PRONOUN
+  AGREEMENT
+  RELATIVE_CLAUSE
+  PASSIVE
+  SUBJUNCTIVE
   WORD_CHOICE
   WORD_FORM
   SPELLING
   OTHER
+}
+
+enum LexemeGrammarRelationType {
+  EXEMPLIFIES
+  GOVERNS
+  TRIGGERS
+  COMMON_WITH
+}
+
+enum LexemeGrammarLinkSource {
+  DETERMINISTIC
+  AI
+  MANUAL
 }
 
 model User {
@@ -285,6 +312,9 @@ model GrammarConcept {
   incomingRelations GrammarConceptRelation[] @relation("GrammarRelationTarget")
   userProgress     UserGrammarProgress[]
   evidence         GrammarEvidence[]
+  lexemeLinks       LexemeGrammarConcept[]
+  attempts          Attempt[]
+  mistakes          Mistake[]
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
 
@@ -393,6 +423,7 @@ model Lexeme {
   conversationTargets ConversationTarget[]
   battleQuestions BattleQuestion[]
   writingTargets WritingTarget[]
+  grammarLinks  LexemeGrammarConcept[]
   createdAt    DateTime         @default(now())
   embedding      Unsupported("vector(1536)")?
   embeddingModel String?
@@ -420,6 +451,7 @@ model LexicalPattern {
   pattern     String
   explanation String?
   lexeme      Lexeme  @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  grammarLinks LexemeGrammarConcept[]
 
   @@index([lexemeId])
 }
@@ -448,6 +480,26 @@ model LexemeRelation {
 
   @@unique([sourceId, targetId, type])
   @@index([targetId, type])
+}
+
+model LexemeGrammarConcept {
+  id               String                    @id @default(cuid())
+  lexemeId         String
+  grammarConceptId String
+  lexicalPatternId String?
+  relationType     LexemeGrammarRelationType @default(EXEMPLIFIES)
+  note             String?
+  source           LexemeGrammarLinkSource   @default(DETERMINISTIC)
+  confidence       Float                     @default(1)
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  lexeme           Lexeme                    @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  grammarConcept   GrammarConcept            @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+  lexicalPattern   LexicalPattern?           @relation(fields: [lexicalPatternId], references: [id], onDelete: SetNull)
+
+  @@unique([lexemeId, grammarConceptId, relationType])
+  @@index([grammarConceptId, lexemeId])
+  @@index([lexicalPatternId])
 }
 
 model UserVocabulary {
@@ -494,6 +546,7 @@ model Attempt {
   id               String          @id @default(cuid())
   userId           String
   userVocabularyId String?
+  grammarConceptId String?
   exerciseType     ExerciseType
   prompt           String
   answer           String
@@ -505,14 +558,17 @@ model Attempt {
   createdAt        DateTime        @default(now())
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userVocabulary   UserVocabulary? @relation(fields: [userVocabularyId], references: [id], onDelete: SetNull)
+  grammarConcept   GrammarConcept?  @relation(fields: [grammarConceptId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
+  @@index([userId, grammarConceptId, createdAt])
 }
 
 model Mistake {
   id             String      @id @default(cuid())
   userId         String
   lexemeId       String?
+  grammarConceptId String?
   type           MistakeType
   expected       String?
   actual         String?
@@ -526,8 +582,10 @@ model Mistake {
   embeddedAt     DateTime?
   user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   lexeme         Lexeme?     @relation(fields: [lexemeId], references: [id], onDelete: SetNull)
+  grammarConcept GrammarConcept? @relation(fields: [grammarConceptId], references: [id], onDelete: SetNull)
 
   @@index([userId, type, lastOccurredAt])
+  @@index([userId, grammarConceptId, resolvedAt, lastOccurredAt])
   @@index([userId, lexemeId, type])
   @@index([userId, resolvedAt, lastOccurredAt])
 }

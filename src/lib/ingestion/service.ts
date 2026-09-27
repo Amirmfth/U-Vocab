@@ -1,4 +1,5 @@
 import type { PartOfSpeech, PrismaClient } from "@prisma/client";
+import { syncDeterministicGrammarLinksForLexeme } from "@/lib/grammar/lexeme-links";
 import type {
   CandidateWithState,
   IngestionCandidate,
@@ -61,7 +62,7 @@ export async function commitIngestionCandidates(
   const unique = deduplicateCandidates(input.candidates);
   const timeout = Math.min(120_000, Math.max(20_000, unique.length * 1_500));
 
-  return db.$transaction(async (tx) => {
+  const ids = await db.$transaction(async (tx) => {
     const ids: string[] = [];
 
     for (const candidate of unique) {
@@ -156,4 +157,10 @@ export async function commitIngestionCandidates(
     maxWait: 10_000,
     timeout,
   });
+
+  for (const lexemeId of ids) {
+    await syncDeterministicGrammarLinksForLexeme(lexemeId);
+  }
+
+  return ids;
 }

@@ -11,7 +11,9 @@ import { submitPracticeAnswer, type PracticeAnswerResult } from "./actions";
 
 export type PracticeSessionExercise={
   id:string;
-  userVocabularyId:string;
+  userVocabularyId:string|null;
+  grammarConceptId?:string;
+  grammarVariant?:string;
   lemma:string;
   retry?:boolean;
   exercise:ExerciseDefinition;
@@ -64,6 +66,8 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
     // rebuilds and independently validates the exercise before saving it.
     void submitPracticeAnswer({
       userVocabularyId:current.userVocabularyId,
+      grammarConceptId:current.grammarConceptId??null,
+      grammarVariant:current.grammarVariant??null,
       exerciseType:current.exercise.type,
       answer:value,
       startedAt:startedAt.current,
@@ -86,9 +90,9 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
       <h1>{correct} of {history.length} correct</h1>
       <p className="muted">Practiced {skills.join(", ")||"vocabulary"} with missed items reinforced once.</p>
       <div className="ia-empty-actions">
-        <Link className="button button-primary" href="/practice?drill=1"><RotateCcw size={17}/> Practice another set</Link>
-        <Link className="button button-secondary" href="/review">Review due cards</Link>
-        <Link className="text-link" href="/vocabulary">Back to words</Link>
+        <Link className="button button-primary" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> Practice another set</Link>
+        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary" href="/grammar">Back to Grammar</Link>:<Link className="button button-secondary" href="/review">Review due cards</Link>}
+        <Link className="text-link" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?"Back to Practice":"Back to words"}</Link>
       </div>
     </section>;
   }

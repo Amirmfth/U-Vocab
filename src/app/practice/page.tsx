@@ -16,6 +16,7 @@ import {
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { buildExercise, eligibleExerciseTypes } from "@/lib/exercises/build";
+import { buildGrammarPracticeSession } from "@/lib/exercises/grammar-session";
 import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
 import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
@@ -101,13 +102,42 @@ function PracticeHub() {
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: Promise<{ lexeme?: string; drill?: string }>;
+  searchParams: Promise<{ lexeme?: string; drill?: string; grammar?: string }>;
 }) {
   await connection();
   const params=await searchParams;
-  if(!params.lexeme&&params.drill!=="1") return <PracticeHub/>;
+  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub/>;
 
   const user=await getCurrentUser();
+
+  if(params.grammar){
+    const grammarExercises=await buildGrammarPracticeSession({
+      userId:user.id,
+      currentLevel:user.currentLevel,
+      targetLevel:user.targetLevel,
+      slug:params.grammar==="1"?null:params.grammar,
+      limit:6,
+    });
+
+    if(!grammarExercises.length){
+      return <main className="page focus-page">
+        <section className="empty-state compact-empty">
+          <strong>No deterministic practice is available for this grammar target yet.</strong>
+          <p className="muted">Try another concept from Grammar. More exercise families can be added without changing the practice engine.</p>
+          <Link href="/grammar" className="button button-primary">Choose grammar</Link>
+          <Link href="/practice" className="text-link">Back to Practice</Link>
+        </section>
+      </main>;
+    }
+
+    return <main className="page focus-page">
+      <div className="focus-meta">
+        <Link href="/grammar">Grammar</Link>
+        <span>{params.grammar==="1"?"Recommended practice":grammarExercises[0].lemma}</span>
+      </div>
+      <PracticeForm exercises={grammarExercises}/>
+    </main>;
+  }
   const [items,distractorItems]=await Promise.all([
     db.userVocabulary.findMany({
     where:{ userId:user.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },

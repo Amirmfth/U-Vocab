@@ -6,6 +6,8 @@ const base = {
   introducedAt: "B1" as const,
   unresolvedMistakes: 0,
   recentEvidenceAt: null,
+  recentEvidenceCount: 0,
+  relatedVocabularyCount: 0,
   prerequisiteIds: [] as string[],
 };
 
@@ -51,4 +53,20 @@ test("strong concepts are not recommended and prerequisite gaps are explainable"
   );
   assert.equal(result?.candidate.id, "prereq");
   assert.equal(result?.reasonCode, "PREREQUISITE");
+});
+
+
+test("new concepts avoid recent overexposure and prefer concepts tied to personal vocabulary", () => {
+  const result = rankGrammarRecommendation(
+    [
+      { ...base, id:"overexposed", slug:"overexposed", title:"Overexposed", status:"UNASSESSED", recentEvidenceCount:3, relatedVocabularyCount:5 },
+      { ...base, id:"linked", slug:"linked", title:"Linked", status:"UNASSESSED", relatedVocabularyCount:3 },
+      { ...base, id:"plain", slug:"plain", title:"Plain", status:"UNASSESSED", relatedVocabularyCount:0 },
+    ],
+    new Map(),
+    "B1",
+    "B2",
+  );
+  assert.equal(result?.candidate.id, "linked");
+  assert.equal(result?.reasonCode, "NEXT_TARGET");
 });

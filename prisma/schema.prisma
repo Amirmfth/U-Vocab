@@ -321,12 +321,42 @@ model GrammarConcept {
   mistakes          Mistake[]
   progressTransitions GrammarProgressTransition[]
   recommendationEvents GrammarRecommendationEvent[]
+  lesson            GrammarLesson?
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
 
   @@index([language, category, order])
   @@index([introducedAt, expectedBy])
   @@index([parentId, order])
+}
+
+model GrammarLesson {
+  id                 String         @id @default(cuid())
+  grammarConceptId   String         @unique
+  version            Int            @default(1)
+  promptVersion      String         @default("v1")
+  generatedByAi      Boolean        @default(true)
+  overview           String
+  intuition          String
+  whenToUse          Json
+  recognitionCues    Json
+  formation          Json
+  ruleDetails        Json
+  tables             Json
+  examples           Json
+  contrasts          Json
+  commonMistakes     Json
+  exceptions         Json
+  usageNotes         Json
+  speakingWritingTips Json
+  memoryAids         Json
+  cheatSheet         Json
+  sourceContentVersion Int
+  generatedAt        DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  grammarConcept     GrammarConcept @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+
+  @@index([updatedAt])
 }
 
 model GrammarPrerequisite {

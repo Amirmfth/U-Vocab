@@ -5,6 +5,7 @@ import {
   ArrowRight,
   BookOpenText,
   MessageCircle,
+  GraduationCap,
   PenLine,
   Plus,
   ScanText,
@@ -32,6 +33,15 @@ function PracticeHub() {
       </section>
 
       <nav className="practice-lanes" aria-label="Practice skills">
+        <Link href="/grammar" className="practice-lane">
+          <span className="practice-lane-icon"><GraduationCap size={21} /></span>
+          <span className="practice-lane-copy">
+            <strong>Grammar</strong>
+            <small>Learn the structure you need now, from B1 gaps to your next level</small>
+          </span>
+          <ArrowRight size={18} />
+        </Link>
+
         <Link href="/writing" className="practice-lane">
           <span className="practice-lane-icon"><PenLine size={21} /></span>
           <span className="practice-lane-copy">

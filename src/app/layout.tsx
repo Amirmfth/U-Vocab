@@ -1,6 +1,7 @@
 import "./globals.css";
 import "./core-experience.css";
 import "./core-learning-polish.css";
+import "./grammar.css";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import type { Viewport } from "next";

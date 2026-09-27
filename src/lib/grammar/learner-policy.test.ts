@@ -68,3 +68,31 @@ test("one error cannot catastrophically downgrade strong grammar", () => {
   ]);
   assert.equal(result.status, "STRONG");
 });
+
+
+test("encounters and opportunities do not fabricate mastery", () => {
+  const encounterPolicy = evaluateGrammarEvidencePolicy({
+    source: "READING_COMPREHENSION",
+    outcome: "ENCOUNTER",
+    dimension: "UNDERSTANDING",
+    confidence: 1,
+  });
+  const opportunityPolicy = evaluateGrammarEvidencePolicy({
+    source: "WRITING",
+    outcome: "OPPORTUNITY",
+    dimension: "FREE_PRODUCTION",
+    confidence: 1,
+  });
+  assert.equal(encounterPolicy.accepted, false);
+  assert.equal(opportunityPolicy.accepted, false);
+  const result = calculateGrammarProfile("ASSUMED", [
+    {
+      outcome: "ENCOUNTER",
+      dimension: "UNDERSTANDING",
+      effectiveWeight: 0,
+      accepted: false,
+    },
+  ]);
+  assert.equal(result.status, "ASSUMED");
+  assert.equal(result.evidenceCount, 0);
+});

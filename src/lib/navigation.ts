@@ -31,7 +31,7 @@ const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/grammar", section: "practice", label: "Grammar" },
   { prefix: "/writing", section: "practice", label: "Writing" },
   { prefix: "/reading", section: "practice", label: "Reading" },
-  { prefix: "/stories", section: "practice", label: "Reading" },
+  { prefix: "/stories", section: "practice", label: "Reading", group: "Reading" },
   { prefix: "/read", section: "practice", label: "Legacy reading", group: "Reading" },
   { prefix: "/conversation", section: "practice", label: "Conversation", group: "Speaking" },
   { prefix: "/missions", section: "practice", label: "Missions", group: "Speaking" },

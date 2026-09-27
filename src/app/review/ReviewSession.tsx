@@ -113,6 +113,7 @@ export function ReviewSession({
       context?.perf.fail(error, { rolledBack: false });
     },
     onSuccess: (_result, input, context) => {
+      window.dispatchEvent(new Event("u-vocab:review-count-changed"));
       context?.perf.success({ rolledBack: false });
       unsavedIds.current.delete(input.userVocabularyId);
       setSaveErrors((errors) => {

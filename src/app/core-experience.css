@@ -242,8 +242,7 @@ body {
   scrollbar-width: none;
 }
 
-.ia-subnav::-webkit-scrollbar,
-.filter-chip-row::-webkit-scrollbar {
+.ia-subnav::-webkit-scrollbar {
   display: none;
 }
 
@@ -291,7 +290,7 @@ body {
 .filter-chip-row {
   display: flex;
   gap: 7px;
-  overflow-x: auto;
+  flex-wrap: wrap;
   padding-bottom: 2px;
 }
 
@@ -852,13 +851,9 @@ body {
 
 @media (max-width: 619px) {
   .filter-menu {
-    position: fixed !important;
-    z-index: 80 !important;
-    inset: auto 10px calc(82px + env(safe-area-inset-bottom)) 10px !important;
+    z-index: 80;
     max-height: min(62dvh, 520px);
     overflow: auto;
-    border-radius: 18px !important;
-    box-shadow: var(--shadow);
   }
 
   .word-detail-topline {

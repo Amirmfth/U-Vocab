@@ -10,6 +10,7 @@ import { WebVitals } from "@/components/web-vitals";
 import { QueryProvider } from "@/components/query-provider";
 import { getCurrentUser } from "@/lib/current-user";
 import { isAppAuthenticated } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 export const metadata = {
   title: { default: "U-Vocab", template: "%s · U-Vocab" },
@@ -24,6 +25,12 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const authenticated = await isAppAuthenticated();
   const user = authenticated ? await getCurrentUser() : null;
+  const initialDueCount = user ? await db.userVocabulary.count({
+    where: {
+      userId: user.id,
+      OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: new Date() } }],
+    },
+  }) : null;
 
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
@@ -32,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         {authenticated ? <WebVitals /> : null}
-        {user ? <AppNavigation translationPreference={user.preferredTranslation} /> : null}
+        {user ? <AppNavigation translationPreference={user.preferredTranslation} initialDueCount={initialDueCount} /> : null}
         <QueryProvider>
           <div
             id="main-content"

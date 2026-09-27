@@ -37,6 +37,7 @@ export function RescueSession({
     try {
       const result = await submitRescueReview(input);
       if (result.status === "error") throw new Error(result.message);
+      window.dispatchEvent(new Event("u-vocab:review-count-changed"));
       setSavedCount((count) => count + 1);
     } catch (error) {
       setErrors((current) => new Map(current).set(input.userVocabularyId, {

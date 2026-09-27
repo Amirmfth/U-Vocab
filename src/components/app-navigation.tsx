@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -49,12 +49,14 @@ function NavLink({
   href,
   label,
   Icon,
+  dueCount,
 }: {
   pathname: string;
   section: LearningSection;
   href: string;
   label: string;
   Icon: LucideIcon;
+  dueCount?: number | null;
 }) {
   const isActive = sectionForPath(pathname) === section;
   return (
@@ -62,21 +64,56 @@ function NavLink({
       href={href}
       className={"nav-link " + (isActive ? "is-active" : "")}
       aria-current={isActive ? (pathname === href ? "page" : "location") : undefined}
+      aria-label={section === "review" && dueCount ? `Review, ${dueCount} due` : undefined}
     >
       <Icon size={18} />
       <span>{label}</span>
+      {section === "review" && dueCount ? <span className="review-nav-badge" title={`${dueCount} reviews due`}>{dueCount > 99 ? "99+" : dueCount}</span> : null}
     </Link>
   );
 }
 
 export function AppNavigation({
   translationPreference,
+  initialDueCount,
 }: {
   translationPreference: "ENGLISH" | "PERSIAN" | "BOTH";
+  initialDueCount: number | null;
 }) {
   const pathname = usePathname();
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
   const [hasOpenedAddSheet, setHasOpenedAddSheet] = useState(false);
+  const [dueCount, setDueCount] = useState<number | null>(initialDueCount);
+
+  useEffect(() => {
+    let active = true;
+    async function refreshDueCount() {
+      try {
+        const response = await fetch("/api/review/due-count", { cache: "no-store" });
+        if (!response.ok) return;
+        const data: { dueCount: number } = await response.json();
+        if (active && Number.isFinite(data.dueCount)) setDueCount(data.dueCount);
+      } catch {
+        // Keep the last known count until the next refresh.
+      }
+    }
+    void refreshDueCount();
+    const interval = window.setInterval(() => void refreshDueCount(), 30_000);
+    const onFocus = () => void refreshDueCount();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") void refreshDueCount();
+    };
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("u-vocab:review-count-changed", onFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("u-vocab:review-count-changed", onFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [pathname]);
   const owner = routeOwner(pathname);
   const isPrimary =
     pathname === "/" ||
@@ -127,6 +164,7 @@ export function AppNavigation({
               href={item.href}
               label={item.label}
               Icon={item.icon}
+              dueCount={item.section === "review" ? dueCount : null}
             />
           ))}
         </nav>
@@ -183,7 +221,10 @@ export function AppNavigation({
               className={"mobile-nav-item " + (isActive ? "is-active" : "")}
               aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
             >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+              <span className="mobile-nav-icon">
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                {item.section === "review" && dueCount ? <span className="review-nav-badge" aria-label={`${dueCount} reviews due`}>{dueCount > 99 ? "99+" : dueCount}</span> : null}
+              </span>
               <span>{item.label}</span>
             </Link>
           );

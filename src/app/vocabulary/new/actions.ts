@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { analyzeGermanLexeme } from "@/lib/ai/analyze-word";
+import { analyzeGermanLexemeBatch } from "@/lib/ai/analyze-word-batch";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { buildReadingExcerpt, rankReadingCandidates } from "@/lib/ai/preprocess";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
+import { startOperation } from "@/lib/performance";
 import {
   attachIngestionState,
   commitIngestionCandidates,
@@ -21,11 +23,6 @@ export type VocabularyPreviewState = {
   status: "idle" | "success" | "error";
   message?: string;
   candidates?: CandidateWithState[];
-};
-
-export type VocabularyCommitState = {
-  status: "idle" | "success" | "error";
-  message?: string;
 };
 
 function candidateFromLexicalAnalysis(
@@ -127,39 +124,124 @@ export async function previewVocabularyText(
   }
 }
 
-export async function addSelectedVocabulary(
-  _previous: VocabularyCommitState,
-  formData: FormData,
-): Promise<VocabularyCommitState> {
+export async function addVocabularyItem(input: {
+  candidate?: IngestionCandidate;
+  word?: string;
+  deferRevalidation?: boolean;
+}) {
+  const perf = startOperation("vocabulary.add_item", { mode: input.word === undefined ? "preview" : "single_word" });
   try {
-    const candidates = JSON.parse(String(formData.get("payload") ?? "")) as IngestionCandidate[];
-    const selected = new Set(formData.getAll("selectedKeys").map(String));
-    const selectedCandidates = candidates.filter((candidate) => selected.has(candidate.key));
+    const user = await perf.span("auth", () => getCurrentUser());
+    let candidate = input.candidate;
+    let sourceType: "PASTED_TEXT" | "CSV" = candidate?.sourceType === "CSV" ? "CSV" : "PASTED_TEXT";
 
-    if (!selectedCandidates.length) {
-      return { status: "error", message: "Select at least one lexical unit." };
+    if (input.word !== undefined) {
+      const word = input.word.trim();
+      if (!word || word.length > 300) throw new Error("Enter one German word or phrase per item.");
+      const analysis = await perf.span("ai", () => analyzeGermanLexeme(word, user.id));
+      candidate = { ...candidateFromLexicalAnalysis(analysis), sourceType: "CSV" };
+      sourceType = "CSV";
     }
 
-    const user = await getCurrentUser();
-    const lexemeIds = await commitIngestionCandidates(db, {
+    if (!candidate) throw new Error("No vocabulary item was provided.");
+    const [lexemeId] = await perf.span("dbSave", () => commitIngestionCandidates(db, {
       userId: user.id,
-      sourceType: "PASTED_TEXT",
-      sourceRef: "pasted-text:" + crypto.randomUUID(),
-      candidates: selectedCandidates,
+      sourceType,
+      sourceRef: `${sourceType.toLocaleLowerCase("en-US")}:${crypto.randomUUID()}`,
+      candidates: [candidate],
+    }));
+    if (!input.deferRevalidation) {
+      await perf.span("invalidate", async () => {
+        revalidateUserDomains(user.id, ["home", "vocabulary", "review", "progress"], [lexemeId]);
+        revalidatePath("/vocabulary");
+      });
+    }
+    perf.success();
+    return { status: "success" as const, lexemeId };
+  } catch (error) {
+    perf.fail(error);
+    return {
+      status: "error" as const,
+      message: error instanceof Error ? error.message : "Could not add this word.",
+    };
+  }
+}
+
+export async function finishVocabularyImport(lexemeIds: string[]) {
+  if (!lexemeIds.length) return;
+  const user = await getCurrentUser();
+  revalidateUserDomains(user.id, ["home", "vocabulary", "review", "progress"], lexemeIds);
+  revalidatePath("/vocabulary");
+}
+
+export async function analyzeVocabularyBatch(words: string[]) {
+  const perf = startOperation("vocabulary.analyze_batch", { wordCount: words.length });
+  try {
+    if (words.length < 1 || words.length > 8 || words.some((word) => !word.trim() || word.length > 300)) {
+      throw new Error("Send 1–8 German words or phrases per batch.");
+    }
+    const user = await perf.span("auth", () => getCurrentUser());
+    const normalized = words.map((word) => word.trim().toLocaleLowerCase("de-DE"));
+    const existing = await perf.span("existingLookup", () => db.lexeme.findMany({
+      where: { language: "de", normalized: { in: normalized } },
+      include: { translations: true, patterns: { take: 1 }, examples: { take: 1 } },
+    }));
+    const byNormalized = new Map<string, typeof existing>();
+    for (const lexeme of existing) {
+      const group = byNormalized.get(lexeme.normalized) ?? [];
+      group.push(lexeme);
+      byNormalized.set(lexeme.normalized, group);
+    }
+
+    const results: Array<{ index: number; candidate: IngestionCandidate }> = [];
+    const missing: Array<{ index: number; word: string }> = [];
+    words.forEach((word, index) => {
+      const matches = byNormalized.get(normalized[index]) ?? [];
+      const match = matches.length === 1 ? matches[0] : null;
+      const english = match?.translations.find((translation) => translation.language === "en")?.text;
+      const persian = match?.translations.find((translation) => translation.language === "fa")?.text;
+      if (match && english && persian) {
+        results.push({ index, candidate: {
+          key: `${match.normalized}:${match.partOfSpeech}`,
+          sourceType: "CSV",
+          lemma: match.lemma,
+          normalized: match.normalized,
+          partOfSpeech: match.partOfSpeech,
+          article: match.article,
+          plural: match.plural,
+          cefrLevel: match.cefrLevel && ["A1", "A2", "B1", "B2", "C1", "C2"].includes(match.cefrLevel)
+            ? match.cefrLevel as IngestionCandidate["cefrLevel"]
+            : null,
+          englishMeaning: english,
+          persianMeaning: persian,
+          pattern: match.patterns[0]?.pattern ?? null,
+          patternExplanation: match.patterns[0]?.explanation ?? null,
+          example: match.examples[0]?.german ?? null,
+        } });
+      } else {
+        missing.push({ index, word });
+      }
     });
 
-    revalidateUserDomains(user.id, ["home", "vocabulary", "review", "progress"], lexemeIds);
-    revalidatePath("/vocabulary");
-    revalidatePath("/vocabulary/new");
-
-    return {
-      status: "success",
-      message: `Added ${selectedCandidates.length} lexical unit${selectedCandidates.length === 1 ? "" : "s"} to your vocabulary.`,
-    };
+    if (missing.length) {
+      async function analyzeChunk(chunk: typeof missing): Promise<void> {
+        try {
+          const analyzed = await analyzeGermanLexemeBatch(chunk.map((item) => item.word), user.id);
+          for (const item of analyzed) {
+            results.push({ index: chunk[item.index].index, candidate: { ...candidateFromLexicalAnalysis(item.analysis), sourceType: "CSV" } });
+          }
+        } catch {
+          if (chunk.length === 1) return;
+          const middle = Math.ceil(chunk.length / 2);
+          await Promise.all([analyzeChunk(chunk.slice(0, middle)), analyzeChunk(chunk.slice(middle))]);
+        }
+      }
+      await perf.span("ai", () => analyzeChunk(missing));
+    }
+    perf.success({ existingCount: words.length - missing.length, analyzedCount: results.length - (words.length - missing.length) });
+    return { status: "success" as const, results };
   } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not add the selected vocabulary.",
-    };
+    perf.fail(error);
+    return { status: "error" as const, message: error instanceof Error ? error.message : "Could not analyze this batch." };
   }
 }

@@ -107,6 +107,19 @@ export function inferDeterministicGrammarLinks(
   return links;
 }
 
+export function invalidGrammarConceptIds(
+  proposals: ProposedGrammarLink[],
+  validIds: ReadonlySet<string>,
+) {
+  return Array.from(
+    new Set(
+      proposals
+        .map((item) => item.grammarConceptId)
+        .filter((id) => !validIds.has(id)),
+    ),
+  );
+}
+
 export async function replaceLexemeGrammarLinks(
   lexemeId: string,
   proposals: ProposedGrammarLink[],
@@ -137,8 +150,12 @@ export async function replaceLexemeGrammarLinks(
   });
   const validIds = new Set(validConcepts.map((item) => item.id));
 
-  if (unique.some((item) => !validIds.has(item.grammarConceptId))) {
-    throw new Error("Grammar link references an unknown or inactive canonical concept.");
+  const invalidConceptIds = invalidGrammarConceptIds(unique, validIds);
+  if (invalidConceptIds.length) {
+    throw new Error(
+      "Grammar link references unknown or inactive canonical concept(s): " +
+        invalidConceptIds.join(", "),
+    );
   }
 
   const patternIds = unique
@@ -161,6 +178,19 @@ export async function replaceLexemeGrammarLinks(
     }
     for (const proposal of unique) {
       const relationType = proposal.relationType ?? LexemeGrammarRelationType.EXEMPLIFIES;
+      const existing = await tx.lexemeGrammarConcept.findUnique({
+        where: {
+          lexemeId_grammarConceptId_relationType: {
+            lexemeId,
+            grammarConceptId: proposal.grammarConceptId,
+            relationType,
+          },
+        },
+        select: { source: true },
+      });
+      const precedence = { DETERMINISTIC: 0, AI: 1, MANUAL: 2 } as const;
+      if (existing && precedence[existing.source] > precedence[source]) continue;
+
       await tx.lexemeGrammarConcept.upsert({
         where: {
           lexemeId_grammarConceptId_relationType: {

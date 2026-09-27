@@ -7,6 +7,7 @@ import { buildActivityDays, localDateKey } from "@/lib/progress";
 import { currentRetrievability } from "@/lib/fsrs";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { TimezoneSync } from "./TimezoneSync";
+import { GrammarProgressPanel } from "./GrammarProgressPanel";
 
 
 const RANGE_DAYS: Record<string, number | null> = {
@@ -323,6 +324,12 @@ export default async function ProgressPage({
           <small>{masteredInRange} reached mastery in range</small>
         </div>
       </section>
+
+      <GrammarProgressPanel
+        userId={user.id}
+        currentLevel={user.currentLevel}
+        targetLevel={user.targetLevel}
+      />
 
       <section className="progress-grid">
         <article className="panel progress-panel">

@@ -59,16 +59,19 @@ export async function recomputeGrammarProgress(
     select: { createdAt: true },
   });
 
-  return db.userGrammarProgress.upsert({
+  const nextStatus = calculated.status as GrammarProgressStatus;
+  const nextSource =
+    calculated.evidenceCount > 0
+      ? GrammarProgressSource.EVIDENCE
+      : (existing?.source ?? GrammarProgressSource.DECLARED_LEVEL);
+
+  const progress = await db.userGrammarProgress.upsert({
     where: { userId_grammarConceptId: { userId, grammarConceptId } },
     create: {
       userId,
       grammarConceptId,
-      status: calculated.status as GrammarProgressStatus,
-      source:
-        calculated.evidenceCount > 0
-          ? GrammarProgressSource.EVIDENCE
-          : GrammarProgressSource.DECLARED_LEVEL,
+      status: nextStatus,
+      source: nextSource,
       understanding: calculated.understanding,
       controlledProduction: calculated.controlledProduction,
       freeProduction: calculated.freeProduction,
@@ -76,10 +79,8 @@ export async function recomputeGrammarProgress(
       lastEvidenceAt: lastAccepted?.createdAt ?? null,
     },
     update: {
-      status: calculated.status as GrammarProgressStatus,
-      ...(calculated.evidenceCount > 0
-        ? { source: GrammarProgressSource.EVIDENCE }
-        : {}),
+      status: nextStatus,
+      source: nextSource,
       understanding: calculated.understanding,
       controlledProduction: calculated.controlledProduction,
       freeProduction: calculated.freeProduction,
@@ -87,6 +88,20 @@ export async function recomputeGrammarProgress(
       lastEvidenceAt: lastAccepted?.createdAt ?? null,
     },
   });
+
+  if (existing?.status !== nextStatus) {
+    await db.grammarProgressTransition.create({
+      data: {
+        userId,
+        grammarConceptId,
+        fromStatus: existing?.status ?? null,
+        toStatus: nextStatus,
+        source: nextSource,
+      },
+    });
+  }
+
+  return progress;
 }
 
 export async function recordGrammarEvidence(input: RecordGrammarEvidenceInput) {

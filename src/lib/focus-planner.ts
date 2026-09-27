@@ -1,4 +1,8 @@
-import type { PrismaClient, SessionActivity, SessionKind } from "@prisma/client";
+import type { CefrLevel, PrismaClient, SessionActivity, SessionKind } from "@prisma/client";
+import {
+  getGrammarRecommendation,
+  grammarRecommendationActionHref,
+} from "@/lib/grammar/recommendations";
 
 type PlannedItem = {
   activity: SessionActivity;
@@ -31,6 +35,8 @@ export async function buildSessionPlan(
     userId: string;
     kind: SessionKind;
     minutes: number;
+    currentLevel: CefrLevel;
+    targetLevel: CefrLevel;
   },
 ) {
   const now = new Date();
@@ -76,6 +82,12 @@ export async function buildSessionPlan(
       select: { id: true, title: true },
     }),
   ]);
+
+  const grammarRecommendation = await getGrammarRecommendation(db, {
+    userId: input.userId,
+    currentLevel: input.currentLevel,
+    targetLevel: input.targetLevel,
+  });
 
   const minutes = splitMinutes(input.minutes, input.kind);
   const items: PlannedItem[] = [];
@@ -138,7 +150,7 @@ export async function buildSessionPlan(
         }
       : {
           title: latestStory!.title,
-          href: "/stories/" + latestStory!.id,
+          href: "/reading/" + latestStory!.id,
         };
 
     items.push({
@@ -152,8 +164,8 @@ export async function buildSessionPlan(
     items.push({
       activity: "CONTEXT",
       title: "Generate contextual reading",
-      description: "Use Reading Mode or a Story for contextual exposure.",
-      href: "/stories",
+      description: "Use personalized Reading for contextual exposure.",
+      href: "/reading",
       plannedMinutes: minutes.context,
     });
   }
@@ -172,20 +184,35 @@ export async function buildSessionPlan(
     });
   }
 
-  const finalWord = prioritizedWeak.find(
-    (item) =>
-      item.lexemeId !== warmup?.lexemeId &&
-      item.lexemeId !== production?.lexemeId,
-  ) ?? due[1] ?? fresh[1] ?? warmup;
-  if (finalWord) {
+  if (grammarRecommendation) {
     items.push({
-      activity: "FINAL_CHALLENGE",
-      lexemeId: finalWord.lexemeId,
-      title: "Final mixed challenge",
-      description: "Finish with retrieval or production on a different lexical unit.",
-      href: "/practice?lexeme=" + finalWord.lexemeId,
+      activity: "GRAMMAR",
+      title: "Grammar: " + grammarRecommendation.title,
+      description: grammarRecommendation.reason,
+      href: grammarRecommendationActionHref({
+        conceptId: grammarRecommendation.conceptId,
+        reasonCode: grammarRecommendation.reasonCode,
+        surface: "focus",
+        action: "practice",
+      }),
       plannedMinutes: minutes.final,
     });
+  } else {
+    const finalWord = prioritizedWeak.find(
+      (item) =>
+        item.lexemeId !== warmup?.lexemeId &&
+        item.lexemeId !== production?.lexemeId,
+    ) ?? due[1] ?? fresh[1] ?? warmup;
+    if (finalWord) {
+      items.push({
+        activity: "FINAL_CHALLENGE",
+        lexemeId: finalWord.lexemeId,
+        title: "Final mixed challenge",
+        description: "Finish with retrieval or production on a different lexical unit.",
+        href: "/practice?lexeme=" + finalWord.lexemeId,
+        plannedMinutes: minutes.final,
+      });
+    }
   }
 
   return items;

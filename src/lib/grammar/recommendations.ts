@@ -19,6 +19,8 @@ export type GrammarRecommendationCandidate = {
   status: GrammarProgressStatus;
   unresolvedMistakes: number;
   recentEvidenceAt: Date | null;
+  recentEvidenceCount: number;
+  relatedVocabularyCount: number;
   prerequisiteIds: string[];
 };
 
@@ -97,10 +99,12 @@ export function rankGrammarRecommendation(
     .filter(
       (candidate) =>
         candidate.status === "UNASSESSED" &&
+        candidate.recentEvidenceCount < 3 &&
         CEFR_RANK[candidate.introducedAt] >= CEFR_RANK[currentLevel],
     )
     .sort(
       (a, b) =>
+        b.relatedVocabularyCount - a.relatedVocabularyCount ||
         CEFR_RANK[a.introducedAt] - CEFR_RANK[b.introducedAt],
     )[0];
   return next
@@ -124,6 +128,7 @@ export async function getGrammarRecommendation(
     targetLevel: CefrLevel;
   },
 ) {
+  const recentCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const concepts = await db.grammarConcept.findMany({
     where: {
       active: true,
@@ -143,6 +148,22 @@ export async function getGrammarRecommendation(
       mistakes: {
         where: { userId: input.userId, resolvedAt: null },
         select: { occurrences: true },
+      },
+      evidence: {
+        where: {
+          userId: input.userId,
+          accepted: true,
+          createdAt: { gte: recentCutoff },
+        },
+        select: { id: true },
+        take: 4,
+      },
+      lexemeLinks: {
+        where: {
+          lexeme: { userStates: { some: { userId: input.userId } } },
+        },
+        select: { id: true },
+        take: 6,
       },
     },
     orderBy: { order: "asc" },
@@ -166,6 +187,8 @@ export async function getGrammarRecommendation(
         0,
       ),
       recentEvidenceAt: concept.userProgress[0]?.lastEvidenceAt ?? null,
+      recentEvidenceCount: concept.evidence.length,
+      relatedVocabularyCount: concept.lexemeLinks.length,
       prerequisiteIds: concept.prerequisites.map(
         (edge) => edge.prerequisiteId,
       ),

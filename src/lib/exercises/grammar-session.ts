@@ -1,7 +1,4 @@
-import type {
-  CefrLevel,
-  GrammarProgressStatus,
-} from "@prisma/client";
+import type { CefrLevel } from "@prisma/client";
 import { db } from "@/lib/db";
 import { CEFR_RANK } from "@/lib/grammar/levels";
 import {
@@ -9,14 +6,11 @@ import {
   grammarExerciseVariants,
   type GrammarLinkedLexeme,
 } from "@/lib/exercises/grammar";
-
-const STATUS_RANK: Record<GrammarProgressStatus, number> = {
-  NEEDS_ATTENTION: 0,
-  LEARNING: 1,
-  UNASSESSED: 2,
-  ASSUMED: 3,
-  STRONG: 4,
-};
+import {
+  grammarPrerequisitesReady,
+  GRAMMAR_STATUS_PRIORITY,
+  orderGrammarVariants,
+} from "@/lib/exercises/grammar-selection";
 
 function linkedLexeme(link: {
   lexeme: { id: string; lemma: string; article: string | null };
@@ -102,13 +96,11 @@ export async function buildGrammarPracticeSession(input: {
       const levelDistance = Math.abs(
         CEFR_RANK[concept.introducedAt] - CEFR_RANK[input.currentLevel],
       );
-      const prerequisitesReady =
-        Boolean(input.slug) ||
-        concept.prerequisites.every((edge) => {
-          const prerequisiteStatus =
-            statusByConcept.get(edge.prerequisiteId) ?? "UNASSESSED";
-          return prerequisiteStatus === "ASSUMED" || prerequisiteStatus === "STRONG";
-        });
+      const prerequisitesReady = grammarPrerequisitesReady(
+        concept.prerequisites.map((edge) => edge.prerequisiteId),
+        statusByConcept,
+        Boolean(input.slug),
+      );
       return {
         concept,
         progress,
@@ -122,7 +114,7 @@ export async function buildGrammarPracticeSession(input: {
     })
     .filter((item) => item.variants.length > 0 && item.prerequisitesReady)
     .sort((a, b) =>
-      STATUS_RANK[a.status] - STATUS_RANK[b.status] ||
+      GRAMMAR_STATUS_PRIORITY[a.status] - GRAMMAR_STATUS_PRIORITY[b.status] ||
       b.mistakeWeight - a.mistakeWeight ||
       a.levelDistance - b.levelDistance ||
       a.concept.order - b.concept.order,
@@ -158,14 +150,12 @@ export async function buildGrammarPracticeSession(input: {
     .reverse();
 
   for (const candidate of candidates) {
-    const orderedVariants = [...candidate.variants].sort((a, b) => {
-      if (!candidate.progress) return a.dimension === "UNDERSTANDING" ? -1 : 1;
-      const understandingWeak = candidate.progress.understanding < 0.5;
-      if (understandingWeak && a.dimension !== b.dimension) {
-        return a.dimension === "UNDERSTANDING" ? -1 : 1;
-      }
-      return a.dimension === "CONTROLLED_PRODUCTION" ? -1 : 1;
-    });
+    const orderedVariants = orderGrammarVariants(
+      candidate.variants,
+      candidate.progress
+        ? { understanding: candidate.progress.understanding }
+        : null,
+    );
 
     for (const variant of orderedVariants) {
       if (exercises.length >= limit) break;

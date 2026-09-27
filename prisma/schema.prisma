@@ -158,6 +158,7 @@ enum SessionActivity {
   CONTEXT
   PRODUCTION
   FINAL_CHALLENGE
+  GRAMMAR
 }
 
 enum ConversationKind {

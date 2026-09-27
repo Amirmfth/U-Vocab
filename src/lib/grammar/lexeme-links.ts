@@ -66,7 +66,7 @@ export function inferDeterministicGrammarLinks(
     if (hasAny(pattern.lower, ["sich ", " reflexiv", "reflexive"])) {
       add("de.verb.reflexive", "EXEMPLIFIES", pattern.pattern, pattern.id, 0.95);
     }
-    if (lexeme.partOfSpeech === "VERB" && /(an|auf|aus|bei|für|gegen|in|mit|nach|über|um|von|vor|zu)/u.test(pattern.lower)) {
+    if (lexeme.partOfSpeech === "VERB" && /\b(an|auf|aus|bei|für|gegen|in|mit|nach|über|um|von|vor|zu)\b/u.test(pattern.lower)) {
       add("de.preposition.prepositional-verbs", "GOVERNS", pattern.pattern, pattern.id, 0.9);
     }
   }

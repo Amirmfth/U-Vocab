@@ -104,3 +104,49 @@ A1 is the default for new users. The migration that introduces this model initia
 Issue #79 adds evidence-based grammar knowledge dimensions and deterministic state transitions. That layer should build on `UserGrammarProgress` rather than changing the canonical curriculum.
 
 Grammar does not require FSRS scheduling. Vocabulary Review remains a separate retention mechanism.
+
+
+## Evidence-based personal grammar profile
+
+Grammar knowledge is refined through `GrammarEvidence` events rather than direct score mutations.
+
+Each event records:
+
+- canonical grammar concept
+- source (Practice, Writing, Reading comprehension, Conversation, or manual/system input)
+- outcome (success, error, opportunity, encounter)
+- learning dimension (understanding, controlled production, free production)
+- strength and confidence
+- effective deterministic weight
+- accepted/rejected state
+- a caller-supplied idempotency key
+- optional source reference, short excerpt, and metadata
+
+Low-confidence observations are retained for audit but do not change mastery. Opportunities and encounters are also preserved without being treated as proof of knowledge.
+
+`src/lib/grammar/learner-policy.ts` owns evidence weighting and status thresholds. `src/lib/grammar/learner-model.ts` is the single persistence/recomputation boundary. AI integrations may submit structured observations to this boundary, but they never set a grammar status or mastery dimension directly.
+
+The profile tracks:
+
+- understanding
+- controlled production
+- free production
+- evidence count and recency
+- status: unassessed, assumed, learning, strong, or needs attention
+
+Status changes use repeated weighted evidence and hysteresis. A single error cannot downgrade a demonstrated strong concept; recurring sufficiently strong errors can.
+
+Grammar is intentionally not added to vocabulary FSRS.
+
+## Grammar learning UI
+
+`/grammar` is part of the Practice/Learning domain without becoming another primary mobile navigation item.
+
+The hub prioritizes:
+
+1. concepts needing attention
+2. concepts already being learned
+3. unassessed concepts in the current → target CEFR path whose prerequisites are ready
+4. full curriculum browsing by CEFR/category
+
+`/grammar/[slug]` keeps canonical teaching content concise and exposes learner-state provenance. Personal vocabulary shown there is currently a pedagogical reuse suggestion by part of speech; explicit lexeme ↔ grammar relationships are owned by issue #82.

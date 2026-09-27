@@ -40,41 +40,54 @@ export async function buildGrammarPracticeSession(input: {
   limit?: number;
 }) {
   const limit = Math.min(8, Math.max(3, input.limit ?? 6));
-  const concepts = await db.grammarConcept.findMany({
-    where: {
-      active: true,
-      language: "de",
-      ...(input.slug ? { slug: input.slug } : {}),
-      introducedAt: { in: Object.keys(CEFR_RANK).filter(
-        (level) => CEFR_RANK[level as CefrLevel] <= CEFR_RANK[input.targetLevel],
-      ) as CefrLevel[] },
-    },
-    include: {
-      userProgress: { where: { userId: input.userId }, take: 1 },
-      lexemeLinks: {
-        where: { lexeme: { userStates: { some: { userId: input.userId } } } },
-        include: {
-          lexeme: { select: { id: true, lemma: true, article: true } },
-          lexicalPattern: { select: { pattern: true } },
+  const allowedLevels = (Object.keys(CEFR_RANK) as CefrLevel[]).filter(
+    (level) => CEFR_RANK[level] <= CEFR_RANK[input.targetLevel],
+  );
+
+  const [concepts, allProgress, recentAttempts] = await Promise.all([
+    db.grammarConcept.findMany({
+      where: {
+        active: true,
+        language: "de",
+        ...(input.slug ? { slug: input.slug } : {}),
+        introducedAt: { in: allowedLevels },
+      },
+      include: {
+        userProgress: { where: { userId: input.userId }, take: 1 },
+        prerequisites: { select: { prerequisiteId: true } },
+        lexemeLinks: {
+          where: { lexeme: { userStates: { some: { userId: input.userId } } } },
+          include: {
+            lexeme: { select: { id: true, lemma: true, article: true } },
+            lexicalPattern: { select: { pattern: true } },
+          },
+          orderBy: [{ confidence: "desc" }, { createdAt: "asc" }],
+          take: 8,
         },
-        orderBy: [{ confidence: "desc" }, { createdAt: "asc" }],
-        take: 8,
+        mistakes: {
+          where: { userId: input.userId, resolvedAt: null },
+          select: { occurrences: true, lastOccurredAt: true },
+          orderBy: { lastOccurredAt: "desc" },
+          take: 10,
+        },
       },
-      mistakes: {
-        where: { userId: input.userId, resolvedAt: null },
-        select: { occurrences: true, lastOccurredAt: true },
-        orderBy: { lastOccurredAt: "desc" },
-        take: 10,
-      },
-      attempts: {
-        where: { userId: input.userId },
-        select: { exerciseType: true, createdAt: true },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      },
-    },
-    orderBy: { order: "asc" },
-  });
+      orderBy: { order: "asc" },
+    }),
+    db.userGrammarProgress.findMany({
+      where: { userId: input.userId },
+      select: { grammarConceptId: true, status: true },
+    }),
+    db.attempt.findMany({
+      where: { userId: input.userId, grammarConceptId: { not: null } },
+      select: { exerciseType: true },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
+  ]);
+
+  const statusByConcept = new Map(
+    allProgress.map((item) => [item.grammarConceptId, item.status]),
+  );
 
   const candidates = concepts
     .map((concept) => {
@@ -89,15 +102,47 @@ export async function buildGrammarPracticeSession(input: {
       const levelDistance = Math.abs(
         CEFR_RANK[concept.introducedAt] - CEFR_RANK[input.currentLevel],
       );
-      return { concept, progress, status, link, variants, mistakeWeight, levelDistance };
+      const prerequisitesReady =
+        Boolean(input.slug) ||
+        concept.prerequisites.every((edge) => {
+          const prerequisiteStatus =
+            statusByConcept.get(edge.prerequisiteId) ?? "UNASSESSED";
+          return prerequisiteStatus === "ASSUMED" || prerequisiteStatus === "STRONG";
+        });
+      return {
+        concept,
+        progress,
+        status,
+        link,
+        variants,
+        mistakeWeight,
+        levelDistance,
+        prerequisitesReady,
+      };
     })
-    .filter((item) => item.variants.length > 0)
+    .filter((item) => item.variants.length > 0 && item.prerequisitesReady)
     .sort((a, b) =>
       STATUS_RANK[a.status] - STATUS_RANK[b.status] ||
       b.mistakeWeight - a.mistakeWeight ||
       a.levelDistance - b.levelDistance ||
       a.concept.order - b.concept.order,
     );
+
+  const userVocabularyByLexeme = new Map(
+    (
+      await db.userVocabulary.findMany({
+        where: {
+          userId: input.userId,
+          lexemeId: {
+            in: candidates
+              .map((candidate) => candidate.link?.id)
+              .filter((id): id is string => Boolean(id)),
+          },
+        },
+        select: { id: true, lexemeId: true },
+      })
+    ).map((item) => [item.lexemeId, item.id]),
+  );
 
   const exercises: Array<{
     id: string;
@@ -107,47 +152,52 @@ export async function buildGrammarPracticeSession(input: {
     lemma: string;
     exercise: NonNullable<ReturnType<typeof buildGrammarExercise>>;
   }> = [];
-  const recentTypes: string[] = [];
+
+  const recentTypes = recentAttempts
+    .map((attempt) => attempt.exerciseType)
+    .reverse();
 
   for (const candidate of candidates) {
-    for (const variant of candidate.variants) {
-      if (exercises.length >= limit) break;
-      if (recentTypes.slice(-2).includes(variant.type)) continue;
-      if (
-        candidate.progress &&
-        candidate.progress.understanding < 0.5 &&
-        variant.dimension !== "UNDERSTANDING" &&
-        candidate.variants.some((item) => item.dimension === "UNDERSTANDING")
-      ) {
-        continue;
+    const orderedVariants = [...candidate.variants].sort((a, b) => {
+      if (!candidate.progress) return a.dimension === "UNDERSTANDING" ? -1 : 1;
+      const understandingWeak = candidate.progress.understanding < 0.5;
+      if (understandingWeak && a.dimension !== b.dimension) {
+        return a.dimension === "UNDERSTANDING" ? -1 : 1;
       }
+      return a.dimension === "CONTROLLED_PRODUCTION" ? -1 : 1;
+    });
+
+    for (const variant of orderedVariants) {
+      if (exercises.length >= limit) break;
+      if (recentTypes.slice(-2).includes(variant.type)) {
+        const hasAlternative = orderedVariants.some(
+          (other) =>
+            other.key !== variant.key &&
+            !recentTypes.slice(-2).includes(other.type),
+        );
+        if (hasAlternative) continue;
+      }
+
       const exercise = buildGrammarExercise(
         candidate.concept.id,
         variant.key,
         candidate.link,
       );
       if (!exercise) continue;
+
       recentTypes.push(variant.type);
-      const linkedUserVocabulary = candidate.link
-        ? await db.userVocabulary.findUnique({
-            where: {
-              userId_lexemeId: {
-                userId: input.userId,
-                lexemeId: candidate.link.id,
-              },
-            },
-            select: { id: true },
-          })
-        : null;
       exercises.push({
         id: "grammar:" + candidate.concept.id + ":" + variant.key,
-        userVocabularyId: linkedUserVocabulary?.id ?? null,
+        userVocabularyId: candidate.link
+          ? userVocabularyByLexeme.get(candidate.link.id) ?? null
+          : null,
         grammarConceptId: candidate.concept.id,
         grammarVariant: variant.key,
         lemma: candidate.concept.title,
         exercise,
       });
     }
+
     if (exercises.length >= limit) break;
   }
 

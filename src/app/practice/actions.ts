@@ -193,9 +193,10 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
     if(!input.userVocabularyId) {
       return { status:"error",message:"Practice target is missing." };
     }
+    const userVocabularyId=input.userVocabularyId;
 
     const item=await perf.span("dbRead",()=>db.userVocabulary.findFirst({
-      where:{ id:input.userVocabularyId,userId:user.id },
+      where:{ id:userVocabularyId,userId:user.id },
       include:{ lexeme:{ include:{ patterns:true,translations:true,examples:true } } },
     }));
     if(!item) return { status:"error",message:"Vocabulary item not found." };

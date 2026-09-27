@@ -144,7 +144,7 @@ export default async function GrammarConceptPage({
               </button>
             </form>
           ) : null}
-          <Link href="/practice" className="button button-secondary">
+          <Link href={"/practice?grammar=" + concept.slug} className="button button-secondary">
             <Brain size={17} />
             Open Practice
           </Link>

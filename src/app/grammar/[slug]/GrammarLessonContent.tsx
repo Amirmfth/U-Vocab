@@ -107,7 +107,7 @@ export function GrammarLessonContent({
         <section className="page-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">DON'T CONFUSE IT WITH…</p>
+              <p className="eyebrow">DON’T CONFUSE IT WITH…</p>
               <h2>Useful contrasts</h2>
             </div>
           </div>

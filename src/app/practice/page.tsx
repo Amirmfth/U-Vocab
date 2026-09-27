@@ -42,6 +42,15 @@ function PracticeHub() {
           <ArrowRight size={18} />
         </Link>
 
+        <Link href="/practice?mixed=1" className="practice-lane">
+          <span className="practice-lane-icon"><Sparkles size={21} /></span>
+          <span className="practice-lane-copy">
+            <strong>Recommended mix</strong>
+            <small>A bounded mix of weak vocabulary and the grammar concept that matters next</small>
+          </span>
+          <ArrowRight size={18} />
+        </Link>
+
         <Link href="/writing" className="practice-lane">
           <span className="practice-lane-icon"><PenLine size={21} /></span>
           <span className="practice-lane-copy">
@@ -97,13 +106,86 @@ function PracticeHub() {
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: Promise<{ lexeme?: string; drill?: string; grammar?: string }>;
+  searchParams: Promise<{ lexeme?: string; drill?: string; grammar?: string; mixed?: string }>;
 }) {
   await connection();
   const params=await searchParams;
-  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub/>;
+  if(!params.lexeme&&params.drill!=="1"&&!params.grammar&&params.mixed!=="1") return <PracticeHub/>;
 
   const user=await getCurrentUser();
+
+  if(params.mixed==="1"){
+    const [grammarExercises, weakVocabulary] = await Promise.all([
+      buildGrammarPracticeSession({
+        userId:user.id,
+        currentLevel:user.currentLevel,
+        targetLevel:user.targetLevel,
+        limit:3,
+      }),
+      db.userVocabulary.findMany({
+        where:{ userId:user.id },
+        include:{
+          lexeme:{
+            include:{
+              patterns:true,
+              translations:true,
+              examples:true,
+              mistakes:{
+                where:{ userId:user.id,resolvedAt:null,grammarConceptId:null },
+                select:{ type:true },
+              },
+            },
+          },
+        },
+        orderBy:[
+          { production:"asc" },
+          { contextualUsage:"asc" },
+          { meaningRecall:"asc" },
+        ],
+        take:3,
+      }),
+    ]);
+
+    const recentVocabularyTypes:ExerciseType[]=[];
+    const vocabularyExercises=weakVocabulary.map((item,index)=>{
+      const type=selectExerciseType({
+        recognition:item.recognition,
+        meaningRecall:item.meaningRecall,
+        production:item.production,
+        contextualUsage:item.contextualUsage,
+        mistakeTypes:item.lexeme.mistakes.map((mistake)=>mistake.type),
+      },eligibleExerciseTypes(item.lexeme),recentVocabularyTypes);
+      recentVocabularyTypes.push(type);
+      return {
+        id:"mixed-vocab:"+item.id+":"+index,
+        userVocabularyId:item.id,
+        lemma:item.lexeme.lemma,
+        exercise:buildExercise(type,item.lexeme,user.preferredTranslation),
+      };
+    });
+
+    const mixedExercises=[
+      ...grammarExercises.slice(0,3),
+      ...vocabularyExercises,
+    ].slice(0,6);
+
+    if(!mixedExercises.length){
+      return <main className="page focus-page">
+        <section className="empty-state compact-empty">
+          <strong>No recommended practice is available yet.</strong>
+          <Link href="/practice" className="text-link">Back to Practice</Link>
+        </section>
+      </main>;
+    }
+
+    return <main className="page focus-page">
+      <div className="focus-meta">
+        <Link href="/practice">Practice</Link>
+        <span>Recommended mix</span>
+      </div>
+      <PracticeForm exercises={mixedExercises}/>
+    </main>;
+  }
 
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({

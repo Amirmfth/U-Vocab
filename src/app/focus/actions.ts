@@ -32,6 +32,8 @@ export async function createFocusSession(formData: FormData) {
     userId: user.id,
     kind,
     minutes,
+    currentLevel: user.currentLevel,
+    targetLevel: user.targetLevel,
   });
 
   if (!plan.length) redirect("/vocabulary/new");

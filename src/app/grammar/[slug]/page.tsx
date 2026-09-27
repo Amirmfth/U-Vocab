@@ -105,6 +105,7 @@ export default async function GrammarConceptPage({
   const vocabulary = await getVocabularyForGrammarConcept(
     user.id,
     concept.category,
+    concept.id,
   );
   const progress = concept.userProgress[0] ?? null;
   const status = (progress?.status ?? "UNASSESSED") as GrammarStatusCode;
@@ -273,8 +274,7 @@ export default async function GrammarConceptPage({
             </div>
           </div>
           <p className="muted grammar-vocab-note">
-            These are useful personal words to bring into examples and practice.
-            Explicit word-to-grammar links are added in the next vocabulary integration phase.
+            These are words from your own vocabulary that are explicitly linked to this grammar concept.
           </p>
           <div className="grammar-vocab-grid">
             {vocabulary.map((item) => (
@@ -283,10 +283,12 @@ export default async function GrammarConceptPage({
                   {item.lexeme.article ? item.lexeme.article + " " : ""}
                   {item.lexeme.lemma}
                 </strong>
-                {item.lexeme.patterns[0] ? (
+                {item.pattern ? (
+                  <span>{item.pattern}</span>
+                ) : item.lexeme.patterns[0] ? (
                   <span>{item.lexeme.patterns[0].pattern}</span>
                 ) : (
-                  <span>{item.lexeme.partOfSpeech.toLowerCase()}</span>
+                  <span>{item.relationType.replaceAll("_", " ").toLowerCase()}</span>
                 )}
               </Link>
             ))}

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { inferDeterministicGrammarLinks } from "./lexeme-links";
+import {
+  inferDeterministicGrammarLinks,
+  invalidGrammarConceptIds,
+} from "./lexeme-links";
 
 test("dative verb pattern maps to canonical dative and prepositional grammar", () => {
   const links = inferDeterministicGrammarLinks({
@@ -39,4 +42,16 @@ test("ordinary nouns are not assigned unrelated case concepts", () => {
     links.map((item) => item.grammarConceptId),
     ["de.article.definite"],
   );
+});
+
+
+test("unknown AI grammar concept IDs are rejected by the canonical allowlist", () => {
+  const invalid = invalidGrammarConceptIds(
+    [
+      { grammarConceptId: "de.case.dative", confidence: 0.95 },
+      { grammarConceptId: "de.fake.invented", confidence: 0.99 },
+    ],
+    new Set(["de.case.dative"]),
+  );
+  assert.deepEqual(invalid, ["de.fake.invented"]);
 });

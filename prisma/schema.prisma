@@ -36,6 +36,54 @@ enum TranslationLanguage {
   BOTH
 }
 
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum GrammarCategory {
+  SENTENCE_STRUCTURE
+  CASES
+  VERBS
+  TENSES
+  ARTICLES
+  ADJECTIVES
+  PREPOSITIONS
+  PRONOUNS
+  CONJUNCTIONS
+  RELATIVE_CLAUSES
+  NEGATION
+  COMPARISON
+  PASSIVE
+  SUBJUNCTIVE
+  INFINITIVE_CONSTRUCTIONS
+  NOUNS
+}
+
+enum GrammarRelationType {
+  RELATED
+  CONTRASTS_WITH
+  EXTENDS
+}
+
+enum GrammarProgressStatus {
+  UNASSESSED
+  ASSUMED
+  LEARNING
+  STRONG
+  NEEDS_ATTENTION
+}
+
+enum GrammarProgressSource {
+  DECLARED_LEVEL
+  EVIDENCE
+  MANUAL
+}
+
 enum RelationType {
   WORD_FAMILY
   SYNONYM
@@ -164,7 +212,8 @@ model User {
   id                   String              @id @default(cuid())
   email                String              @unique
   preferredTranslation TranslationLanguage @default(ENGLISH)
-  targetLevel          String              @default("B2")
+  currentLevel         CefrLevel           @default(A1)
+  targetLevel          CefrLevel           @default(B2)
   timezone             String              @default("UTC")
   vocabulary           UserVocabulary[]
   attempts             Attempt[]
@@ -181,8 +230,82 @@ model User {
   conversationMessages   ConversationMessage[]
   battleSessions         BattleSession[]
   writingSessions        WritingSession[]
+  grammarProgress        UserGrammarProgress[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
+}
+
+model GrammarConcept {
+  id               String                   @id
+  slug             String                   @unique
+  language         String                   @default("de")
+  title            String
+  shortDescription String
+  category         GrammarCategory
+  introducedAt     CefrLevel
+  expectedBy       CefrLevel?
+  reinforcedAt     CefrLevel[]
+  order            Int
+  contentVersion   Int                      @default(1)
+  active           Boolean                  @default(true)
+  explanation      String?
+  rules            Json?
+  exceptions       Json?
+  examples         Json?
+  parentId         String?
+  parent           GrammarConcept?          @relation("GrammarConceptTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children         GrammarConcept[]         @relation("GrammarConceptTree")
+  prerequisites    GrammarPrerequisite[]    @relation("GrammarPrerequisiteConcept")
+  requiredBy       GrammarPrerequisite[]    @relation("GrammarPrerequisiteRequirement")
+  outgoingRelations GrammarConceptRelation[] @relation("GrammarRelationSource")
+  incomingRelations GrammarConceptRelation[] @relation("GrammarRelationTarget")
+  userProgress     UserGrammarProgress[]
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  @@index([language, category, order])
+  @@index([introducedAt, expectedBy])
+  @@index([parentId, order])
+}
+
+model GrammarPrerequisite {
+  id             String         @id @default(cuid())
+  conceptId      String
+  prerequisiteId String
+  concept        GrammarConcept @relation("GrammarPrerequisiteConcept", fields: [conceptId], references: [id], onDelete: Cascade)
+  prerequisite   GrammarConcept @relation("GrammarPrerequisiteRequirement", fields: [prerequisiteId], references: [id], onDelete: Cascade)
+
+  @@unique([conceptId, prerequisiteId])
+  @@index([prerequisiteId])
+}
+
+model GrammarConceptRelation {
+  id       String              @id @default(cuid())
+  sourceId String
+  targetId String
+  type     GrammarRelationType @default(RELATED)
+  source   GrammarConcept      @relation("GrammarRelationSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target   GrammarConcept      @relation("GrammarRelationTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId, type])
+  @@index([targetId, type])
+}
+
+model UserGrammarProgress {
+  id               String                @id @default(cuid())
+  userId           String
+  grammarConceptId String
+  status           GrammarProgressStatus @default(UNASSESSED)
+  source           GrammarProgressSource @default(DECLARED_LEVEL)
+  assumedFromLevel CefrLevel?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grammarConcept   GrammarConcept        @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, grammarConceptId])
+  @@index([userId, status])
+  @@index([grammarConceptId, status])
 }
 
 model Lexeme {

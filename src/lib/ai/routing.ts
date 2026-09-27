@@ -11,6 +11,8 @@ export type AIOperation =
   | "word_comparison"
   | "word_expansion"
   | "lexical_insight"
+  | "lexical_examples"
+  | "quick_teach"
   | "story_generation"
   | "topic_pack_generation"
   | "verb_conjugation";
@@ -36,6 +38,8 @@ const ROUTES: Record<AIOperation, Route> = {
   word_comparison: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 2400 },
   word_expansion: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 1600 },
   lexical_insight: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 2200 },
+  lexical_examples: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 1300 },
+  quick_teach: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 1100 },
   story_generation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 3600 },
   topic_pack_generation: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 2600 },
   verb_conjugation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 5200 },

@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { generateLexicalInsight } from "@/lib/ai/lexical-insight";
+import { generateLexicalExamples } from "@/lib/ai/lexical-examples";
+import { generateQuickTeach } from "@/lib/ai/quick-teach";
 import { generateWordExpansion } from "@/lib/ai/expand-word";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 
@@ -12,6 +14,114 @@ export type InsightActionState = {
   status: "idle" | "success" | "error";
   message?: string;
 };
+
+export async function generateQuickTeachAction(lexemeId: string) {
+  try {
+    const user = await getCurrentUser();
+    const lexeme = await db.lexeme.findFirst({
+      where: { id: lexemeId, userStates: { some: { userId: user.id } } },
+      select: {
+        lemma: true,
+        article: true,
+        partOfSpeech: true,
+        translations: { select: { language: true, text: true } },
+        patterns: { select: { pattern: true }, take: 2 },
+      },
+    });
+    if (!lexeme) return { status: "error" as const, message: "This word is not in your vocabulary." };
+
+    const language = user.preferredTranslation === "PERSIAN" ? "Persian" : "English";
+    const meaning = lexeme.translations.find((item) => item.language === (language === "Persian" ? "fa" : "en"))?.text
+      ?? lexeme.translations[0]?.text
+      ?? "";
+    const lesson = await generateQuickTeach({
+      userId: user.id,
+      lemma: lexeme.lemma,
+      article: lexeme.article,
+      partOfSpeech: lexeme.partOfSpeech,
+      level: user.targetLevel,
+      meaning: meaning.slice(0, 120),
+      language,
+      patterns: lexeme.patterns.map((item) => item.pattern.slice(0, 80)),
+    });
+    return { status: "success" as const, lesson };
+  } catch (error) {
+    return {
+      status: "error" as const,
+      message: error instanceof Error ? error.message : "Could not generate a lesson.",
+    };
+  }
+}
+
+export async function generateExamplesAction(
+  _previous: InsightActionState,
+  formData: FormData,
+): Promise<InsightActionState> {
+  const lexemeId = String(formData.get("lexemeId") ?? "");
+
+  try {
+    const user = await getCurrentUser();
+    const lexeme = await db.lexeme.findFirst({
+      where: { id: lexemeId, userStates: { some: { userId: user.id } } },
+      include: {
+        patterns: { select: { pattern: true } },
+        examples: { select: { german: true } },
+      },
+    });
+    if (!lexeme) {
+      return { status: "error", message: "This word is not in your vocabulary." };
+    }
+
+    const generated = await generateLexicalExamples({
+      userId: user.id,
+      lemma: lexeme.lemma,
+      article: lexeme.article,
+      partOfSpeech: lexeme.partOfSpeech,
+      level: user.targetLevel,
+      patterns: lexeme.patterns.map((pattern) => pattern.pattern),
+      existingExamples: lexeme.examples.slice(0, 8).map((example) => example.german),
+    });
+    const seen = new Set<string>();
+    const unique = generated.filter((example) => {
+      const normalized = example.german.toLocaleLowerCase("de-DE").trim();
+      if (!normalized || seen.has(normalized)) return false;
+      seen.add(normalized);
+      return true;
+    });
+
+    if (unique.length) {
+      await db.$transaction(async (tx) => {
+        await tx.example.deleteMany({ where: { lexemeId: lexeme.id } });
+        await tx.example.createMany({
+          data: unique.slice(0, 4).map((example) => ({
+            lexemeId: lexeme.id,
+            german: example.german,
+            english: example.english,
+            persian: example.persian,
+            register: example.register,
+            level: user.targetLevel,
+            generatedByAi: true,
+          })),
+        });
+      });
+      revalidateUserDomains(user.id, ["vocabulary"], [lexeme.id]);
+      revalidatePath(`/vocabulary/${lexeme.id}`);
+      revalidatePath(`/vocabulary/${lexeme.id}/teach`);
+    }
+
+    return {
+      status: "success",
+      message: unique.length
+        ? `${Math.min(unique.length, 4)} example${unique.length === 1 ? "" : "s"} replaced the previous examples.`
+        : "No new examples were generated. Try again for different contexts.",
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Could not generate examples.",
+    };
+  }
+}
 
 export type ExpansionSuggestion = {
   lemma: string;
@@ -38,7 +148,6 @@ export async function generateInsightAction(
   formData: FormData,
 ): Promise<InsightActionState> {
   const lexemeId = String(formData.get("lexemeId") ?? "");
-  const compareWith = String(formData.get("compareWith") ?? "").trim() || null;
 
   try {
     const user = await getCurrentUser();
@@ -62,11 +171,9 @@ export async function generateInsightAction(
       partOfSpeech: lexeme.partOfSpeech,
       patterns: lexeme.patterns.map((pattern) => pattern.pattern),
       level: user.targetLevel,
-      compareWith,
     });
 
-    await db.$transaction(async (tx) => {
-      await tx.lexemeInsight.upsert({
+    await db.lexemeInsight.upsert({
         where: {
           lexemeId_level: {
             lexemeId: lexeme.id,
@@ -80,48 +187,16 @@ export async function generateInsightAction(
           englishExplanation: result.englishExplanation,
           persianExplanation: result.persianExplanation,
           grammarNotes: result.grammarNotes,
-          comparisonTarget: result.comparisonTarget,
-          comparisonNotes: result.comparisonNotes,
         },
         update: {
           germanDefinition: result.germanDefinition,
           englishExplanation: result.englishExplanation,
           persianExplanation: result.persianExplanation,
           grammarNotes: result.grammarNotes,
-          comparisonTarget: result.comparisonTarget,
-          comparisonNotes: result.comparisonNotes,
+          comparisonTarget: null,
+          comparisonNotes: null,
           version: { increment: 1 },
         },
-      });
-
-      const existingExamples = await tx.example.findMany({
-        where: { lexemeId: lexeme.id },
-        select: { german: true },
-      });
-      const seen = new Set(
-        existingExamples.map((example) =>
-          example.german.toLocaleLowerCase("de-DE").trim(),
-        ),
-      );
-
-      const newExamples = result.examples.filter(
-        (example) =>
-          !seen.has(example.german.toLocaleLowerCase("de-DE").trim()),
-      );
-
-      if (newExamples.length) {
-        await tx.example.createMany({
-          data: newExamples.map((example) => ({
-            lexemeId: lexeme.id,
-            german: example.german,
-            english: example.english,
-            persian: example.persian,
-            level: user.targetLevel,
-            register: example.register,
-            generatedByAi: true,
-          })),
-        });
-      }
     });
 
     revalidateUserDomains(user.id, ["vocabulary"], [lexeme.id]);
@@ -130,9 +205,7 @@ export async function generateInsightAction(
 
     return {
       status: "success",
-      message: compareWith
-        ? "Explanation and comparison regenerated."
-        : "Contextual explanation regenerated.",
+      message: "Contextual explanation regenerated.",
     };
   } catch (error) {
     return {

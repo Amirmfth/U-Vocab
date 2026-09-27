@@ -25,6 +25,7 @@ export async function applyReviewResult(input: {
   exerciseType: ExerciseType;
   prompt: string;
   durationMs?: number | null;
+  allowEarlyReview?: boolean;
 }) {
   const now = new Date();
 
@@ -34,7 +35,7 @@ export async function applyReviewResult(input: {
     });
     if (!item) throw new Error("Vocabulary item not found.");
 
-    if (!isReviewDue(item.nextReviewAt, now)) {
+    if (!input.allowEarlyReview && !isReviewDue(item.nextReviewAt, now)) {
       throw new Error("This vocabulary item is not due for review yet.");
     }
 
@@ -52,7 +53,9 @@ export async function applyReviewResult(input: {
       where: {
         id: item.id,
         userId: input.userId,
-        OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
+        ...(input.allowEarlyReview
+          ? { nextReviewAt: item.nextReviewAt }
+          : { OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }] }),
       },
       data: {
         fsrsCard: scheduled.nextCard,

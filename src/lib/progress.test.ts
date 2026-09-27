@@ -1,6 +1,27 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildActivityDays, localDateKey } from "./progress";
+import { scheduleReview } from "./fsrs";
+import { buildActivityDays, localDateKey, recentFailedRetrievals, rescueRisk } from "./progress";
+
+test("successful retrieval clears earlier rescue failures", () => {
+  const failures = recentFailedRetrievals([
+    { userVocabularyId: "word", correct: false },
+    { userVocabularyId: "word", correct: true },
+  ]);
+  assert.equal(failures.get("word"), 0);
+
+  const now = new Date("2026-09-27T00:00:00Z");
+  const scheduled = scheduleReview(null, "GOOD", now);
+  const risk = rescueRisk({
+    fsrsCard: scheduled.nextCard,
+    nextReviewAt: scheduled.due,
+    stability: scheduled.stability,
+    recentFailures: failures.get("word") ?? 0,
+    now,
+  });
+  assert.ok(risk.score < 0.16);
+  assert.ok(!risk.reasons.some((reason) => reason.includes("failed retrieval")));
+});
 
 test("localDateKey respects the learner timezone", () => {
   const instant = new Date("2026-09-24T21:30:00Z");

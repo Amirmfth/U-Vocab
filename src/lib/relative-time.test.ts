@@ -22,3 +22,7 @@ test("formats multi-day review times", () => {
     "in 6 days",
   );
 });
+
+test("formats dates returned as strings from the cache", () => {
+  assert.equal(formatRelativeReviewTime("2026-09-26T12:18:00.000Z", now), "in 18 min");
+});

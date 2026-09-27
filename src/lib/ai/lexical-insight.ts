@@ -10,16 +10,6 @@ export const lexicalInsightSchema = z.object({
   englishExplanation: z.string(),
   persianExplanation: z.string(),
   grammarNotes: z.string(),
-  comparisonTarget: z.string().nullable(),
-  comparisonNotes: z.string().nullable(),
-  examples: z.array(
-    z.object({
-      german: z.string(),
-      english: z.string(),
-      persian: z.string(),
-      register: z.enum(["neutral", "formal", "informal", "professional", "daily"]),
-    }),
-  ).min(3).max(6),
 });
 
 export type LexicalInsightResult = z.infer<typeof lexicalInsightSchema>;
@@ -32,7 +22,6 @@ export async function generateLexicalInsight(input: {
   partOfSpeech: string;
   patterns: string[];
   level: string;
-  compareWith?: string | null;
 }) {
   const route = aiRoute("lexical_insight");
   const perf = startOperation("ai.lexical_insight", { model: route.model });
@@ -40,7 +29,7 @@ export async function generateLexicalInsight(input: {
     userId: input.userId,
     operation: "lexical_insight",
     model: route.model,
-    metadata: { level: input.level, patternCount: input.patterns.length, hasComparison: Boolean(input.compareWith) },
+    metadata: { level: input.level, patternCount: input.patterns.length },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -50,7 +39,7 @@ export async function generateLexicalInsight(input: {
         {
           role: "system",
           content:
-            "You are U-Vocab's German lexical tutor. Teach usable vocabulary, not flashcards. Keep the German explanation appropriate for the requested CEFR level. Explain grammar and lexical patterns precisely. Produce varied natural examples across contexts/registers. Always provide natural English and Persian explanations/translations. If a comparison target is provided, explain the practical difference between the two German expressions.",
+            "You are a German vocabulary tutor. Return four distinct plain-text fields for the supplied word. germanDefinition: define the word in natural German at the requested CEFR level. englishExplanation: explain its meaning and a useful usage nuance in natural English. persianExplanation: explain the same meaning and nuance in natural Persian (فارسی), using Persian script and punctuation; keep German words in German script. grammarNotes: give only practical grammar or usage rules in English, including relevant supplied patterns. Be concise, avoid repeating the same sentence across fields, and do not include comparisons with other words, headings, Markdown, or invented facts.",
         },
         {
           role: "user",

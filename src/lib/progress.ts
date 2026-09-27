@@ -116,3 +116,19 @@ export function rescueRisk(input: {
 
   return { score, retrievability, reasons };
 }
+
+// Attempts must be ordered oldest first so a successful retrieval clears earlier failures.
+export function recentFailedRetrievals(attempts: Array<{
+  userVocabularyId: string | null;
+  correct: boolean;
+}>) {
+  const counts = new Map<string, number>();
+  for (const attempt of attempts) {
+    if (!attempt.userVocabularyId) continue;
+    counts.set(
+      attempt.userVocabularyId,
+      attempt.correct ? 0 : (counts.get(attempt.userVocabularyId) ?? 0) + 1,
+    );
+  }
+  return counts;
+}

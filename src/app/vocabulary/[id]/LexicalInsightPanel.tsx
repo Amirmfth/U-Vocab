@@ -23,19 +23,6 @@ export function LexicalInsightPanel({
   return (
     <form action={action} className="insight-action">
       <input type="hidden" name="lexemeId" value={lexemeId} />
-      <div className="field">
-        <label htmlFor="compareWith">
-          Compare with another German word or phrase <span className="muted">(optional)</span>
-        </label>
-        <input
-          id="compareWith"
-          name="compareWith"
-          placeholder="z. B. Bedingung"
-          autoCapitalize="none"
-          autoComplete="off"
-        />
-      </div>
-
       {state.status === "success" ? (
         <StatusNotice tone="success">{state.message}</StatusNotice>
       ) : null}

@@ -24,15 +24,10 @@ export function ExpansionPanel({
     <section className="panel intelligence-panel" id="expand">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">WORD FAMILY</p>
           <h2>Expand this word</h2>
         </div>
         <Network size={20} />
       </div>
-
-      <p className="muted">
-        Find useful derivations, phrases, collocations, and semantic neighbors.
-      </p>
 
       <form action={action}>
         <input type="hidden" name="lexemeId" value={lexemeId} />

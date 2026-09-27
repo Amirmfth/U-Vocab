@@ -10,14 +10,15 @@ import {
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { getReviewQueueData } from "@/lib/review-queue";
+import { getRescueWords } from "@/lib/rescue";
 import { ReviewSession } from "./ReviewSession";
 
 function ReviewModes({
   mistakes,
-  weak,
+  rescueCount,
 }: {
   mistakes: number;
-  weak: number;
+  rescueCount: number;
 }) {
   return (
     <nav className="review-mode-list" aria-label="Review modes">
@@ -28,7 +29,7 @@ function ReviewModes({
       </Link>
       <Link href="/rescue">
         <LifeBuoy size={18} />
-        <span><strong>Rescue</strong><small>{weak} weak-production words</small></span>
+        <span><strong>Rescue</strong><small>{rescueCount} words need rescue</small></span>
         <ArrowRight size={16} />
       </Link>
       <Link href="/focus">
@@ -57,7 +58,7 @@ export default async function ReviewPage({
   }
 
   const now = new Date();
-  const [dueCount, mistakeCount, weakCount] = await Promise.all([
+  const [dueCount, mistakeCount, rescueWords] = await Promise.all([
     db.userVocabulary.count({
       where: {
         userId: user.id,
@@ -65,10 +66,9 @@ export default async function ReviewPage({
       },
     }),
     db.mistake.count({ where: { userId: user.id, resolvedAt: null } }),
-    db.userVocabulary.count({
-      where: { userId: user.id, production: { lt: 0.4 } },
-    }),
+    getRescueWords(user.id, Number.POSITIVE_INFINITY),
   ]);
+  const rescueCount = rescueWords.length;
 
   return (
       <main className="page review-landing review-page">
@@ -98,10 +98,10 @@ export default async function ReviewPage({
         <section className="review-queue-summary" aria-label="Review status">
           <div><strong>{dueCount}</strong><span>due</span></div>
           <div><strong>{mistakeCount}</strong><span>mistakes</span></div>
-          <div><strong>{weakCount}</strong><span>weak</span></div>
+          <div><strong>{rescueCount}</strong><span>rescue</span></div>
         </section>
 
-        <ReviewModes mistakes={mistakeCount} weak={weakCount} />
+        <ReviewModes mistakes={mistakeCount} rescueCount={rescueCount} />
       </main>
   );
 }

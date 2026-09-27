@@ -11,32 +11,92 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
-import { formatRelativeReviewTime } from "@/lib/relative-time";
+import { formatRelativeReviewTime, toDate } from "@/lib/relative-time";
 import { startOperation } from "@/lib/performance";
 import {
   getCachedWordPrimary,
   getCachedWordSecondary,
 } from "@/lib/cached-data";
-import { isTranslationVisible, translationLabel } from "@/lib/translations";
+import { isTranslationVisible } from "@/lib/translations";
 import { LexicalInsightPanel } from "./LexicalInsightPanel";
 import { TranslationModeControl } from "@/components/translation-mode-control";
 import { ExpansionPanel } from "./ExpansionPanel";
 import { VerbConjugation } from "./VerbConjugation";
+import { ExampleGenerationPanel } from "./ExampleGenerationPanel";
+import { TeachWordSheet } from "./TeachWordSheet";
+import { WordPageScrollReset } from "./WordPageScrollReset";
+
+type PrimaryWord = NonNullable<Awaited<ReturnType<typeof getCachedWordPrimary>>>;
+
+function GrammarAndUsage({ patterns }: { patterns: PrimaryWord["patterns"] }) {
+  return (
+    <details className="panel word-detail-card word-detail-disclosure" open>
+      <summary>
+        <span>
+          <strong>Grammar & usage</strong>
+        </span>
+        <span className="disclosure-hint">{patterns.length} saved</span>
+      </summary>
+      <div className="word-disclosure-content">
+        {patterns.length ? patterns.map((pattern) => (
+          <div className="pattern-block" key={pattern.id}>
+            <strong>{pattern.pattern}</strong>
+            {pattern.explanation ? <p className="muted">{pattern.explanation}</p> : null}
+          </div>
+        )) : <p className="muted">No stored patterns yet.</p>}
+      </div>
+    </details>
+  );
+}
+
+function WordMastery({ state }: { state: PrimaryWord["userStates"][number] }) {
+  const scores = [
+    ["Recognition", state.recognition],
+    ["Meaning recall", state.meaningRecall],
+    ["Production", state.production],
+    ["Context", state.contextualUsage],
+  ] as const;
+  const overall = Math.round(scores.reduce((sum, [, value]) => sum + Number(value), 0) / scores.length * 100);
+
+  return (
+    <section className="panel word-detail-card word-mastery-section">
+      <h2>Mastery</h2>
+      <p className="muted"><strong>{overall}%</strong> overall mastery</p>
+      {scores.map(([label, value]) => {
+        const score = Math.round(Number(value) * 100);
+        return (
+          <div className="mastery-row" key={label}>
+            <div><span>{label}</span><strong>{score}%</strong></div>
+            <div className="metric-bar"><span style={{ width: score + "%" }} /></div>
+          </div>
+        );
+      })}
+      {state.nextReviewAt ? (
+        <p className="muted" title={toDate(state.nextReviewAt).toLocaleString()}>
+          Next review: {formatRelativeReviewTime(state.nextReviewAt)}
+        </p>
+      ) : null}
+    </section>
+  );
+}
 
 function SecondaryWordSkeleton() {
   return (
     <>
-      <section className="panel intelligence-panel" aria-busy="true">
-        <div className="skeleton-stack">
-          <div className="skeleton skeleton-kicker" />
-          <div className="skeleton skeleton-title" />
-          <div className="skeleton skeleton-copy" />
+      <section className="page-section" aria-busy="true">
+        <div className="skeleton skeleton-title" />
+        <div className="word-history-grid">
+          <div className="skeleton skeleton-card" />
+          <div className="skeleton skeleton-card" />
         </div>
       </section>
-      <section className="word-history-grid" aria-busy="true">
-        <div className="skeleton skeleton-card" />
-        <div className="skeleton skeleton-card" />
-        <div className="skeleton skeleton-card" />
+      <section className="panel word-detail-card" aria-busy="true">
+        <div className="skeleton skeleton-title" />
+        <div className="skeleton skeleton-copy" />
+      </section>
+      <section className="panel intelligence-panel" aria-busy="true">
+        <div className="skeleton skeleton-title" />
+        <div className="skeleton skeleton-copy" />
       </section>
     </>
   );
@@ -47,11 +107,15 @@ async function DeferredWordDetails({
   lexemeId,
   level,
   preferredTranslation,
+  patterns,
+  primaryState,
 }: {
   userId: string;
   lexemeId: string;
   level: string;
   preferredTranslation: "ENGLISH" | "PERSIAN" | "BOTH";
+  patterns: PrimaryWord["patterns"];
+  primaryState: PrimaryWord["userStates"][number];
 }) {
   const word = await getCachedWordSecondary(userId, lexemeId, level);
   if (!word) return null;
@@ -61,10 +125,37 @@ async function DeferredWordDetails({
 
   return (
     <>
-      <section className="panel intelligence-panel" id="compare">
+      <section className="page-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">OPENAI · GENERATED CONTENT</p>
+            <h2>Examples</h2>
+          </div>
+          <BookOpenCheck size={20} />
+        </div>
+
+        {word.examples.length ? (
+          <div className="grid">
+            {word.examples.slice(0, 4).map((example) => (
+              <article className="card example-card" key={example.id}>
+                <div className="word-meta">
+                  {example.level ? <span className="badge">{example.level}</span> : null}
+                  {example.register ? <span className="badge">{example.register}</span> : null}
+                </div>
+                <strong>{example.german}</strong>
+                {preferredTranslation !== "PERSIAN" && example.english ? <p className="muted">{example.english}</p> : null}
+                {preferredTranslation !== "ENGLISH" && example.persian ? <p className="rtl muted">{example.persian}</p> : null}
+              </article>
+            ))}
+          </div>
+        ) : <p className="muted">No examples yet.</p>}
+        <ExampleGenerationPanel lexemeId={word.id} hasExamples={word.examples.length > 0} />
+      </section>
+
+      <GrammarAndUsage patterns={patterns} />
+
+      <section className="panel intelligence-panel">
+        <div className="section-heading">
+          <div>
             <h2>Contextual explanation</h2>
           </div>
           <Sparkles size={20} />
@@ -72,49 +163,34 @@ async function DeferredWordDetails({
 
         {insight ? (
           <div className="insight-content">
-            <div>
+            <div className="word-insight-language word-insight-language--ltr" dir="ltr" lang="de">
               <h3>German definition</h3>
               <p>{insight.germanDefinition}</p>
             </div>
 
             {preferredTranslation !== "PERSIAN" ? (
-              <div>
+              <div className="word-insight-language word-insight-language--ltr" dir="ltr" lang="en">
                 <h3>English explanation</h3>
                 <p className="muted">{insight.englishExplanation}</p>
               </div>
             ) : null}
 
             {preferredTranslation !== "ENGLISH" ? (
-              <div className="rtl">
+              <div className="word-insight-language word-insight-language--rtl" dir="rtl" lang="fa">
                 <h3>توضیح فارسی</h3>
                 <p className="muted">{insight.persianExplanation}</p>
               </div>
             ) : null}
 
-            <div>
+            <div className="word-insight-language word-insight-language--ltr" dir="ltr" lang="en">
               <h3>Grammar notes</h3>
               <p>{insight.grammarNotes}</p>
             </div>
 
-            {insight.comparisonTarget && insight.comparisonNotes ? (
-              <div className="comparison-box">
-                <p className="eyebrow">COMPARE</p>
-                <h3>
-                  {word.lemma} vs. {insight.comparisonTarget}
-                </h3>
-                <p>{insight.comparisonNotes}</p>
-              </div>
-            ) : null}
-
-            <p className="generated-meta">
-              AI-generated · {insight.level} · version {insight.version}
-            </p>
           </div>
         ) : (
           <div className="empty-state compact-empty">
-            <Sparkles size={22} />
             <strong>No contextual explanation generated yet.</strong>
-            <span>Generate one at your current {level} target level.</span>
           </div>
         )}
 
@@ -124,46 +200,13 @@ async function DeferredWordDetails({
         />
       </section>
 
-      <section className="page-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">CONTEXT</p>
-            <h2>Examples</h2>
-          </div>
-          <BookOpenCheck size={20} />
-        </div>
-
-        <div className="grid">
-          {word.examples.map((example) => (
-            <article className="card example-card" key={example.id}>
-              <div className="word-meta">
-                {example.level ? (
-                  <span className="badge">{example.level}</span>
-                ) : null}
-                {example.register ? (
-                  <span className="badge">{example.register}</span>
-                ) : null}
-                <span className="badge">
-                  {example.generatedByAi ? "AI generated" : "canonical"}
-                </span>
-              </div>
-              <strong>{example.german}</strong>
-              {preferredTranslation !== "PERSIAN" && example.english ? (
-                <p className="muted">{example.english}</p>
-              ) : null}
-              {preferredTranslation !== "ENGLISH" && example.persian ? (
-                <p className="rtl muted">{example.persian}</p>
-              ) : null}
-            </article>
-          ))}
-        </div>
-      </section>
+      <WordMastery state={primaryState} />
+      <ExpansionPanel lexemeId={word.id} />
 
       {word.outgoing.length ? (
         <section className="panel intelligence-panel">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">LEXICAL GRAPH</p>
               <h2>Connections</h2>
             </div>
             <Network size={20} />
@@ -205,7 +248,7 @@ async function DeferredWordDetails({
               {state.reviews.map((review) => (
                 <div className="history-row" key={review.id}>
                   <span>{review.rating.toLowerCase()}</span>
-                  <small>{review.reviewedAt.toLocaleString()}</small>
+                  <small>{toDate(review.reviewedAt).toLocaleString()}</small>
                 </div>
               ))}
             </div>
@@ -222,7 +265,7 @@ async function DeferredWordDetails({
               {word.encounters.map((encounter) => (
                 <div className="history-row" key={encounter.id}>
                   <span>{encounter.source}</span>
-                  <small>{encounter.createdAt.toLocaleString()}</small>
+                  <small>{toDate(encounter.createdAt).toLocaleString()}</small>
                 </div>
               ))}
             </div>
@@ -280,7 +323,6 @@ async function DeferredWordDetails({
         </section>
       </details>
 
-      <ExpansionPanel lexemeId={word.id} />
     </>
   );
 }
@@ -313,19 +355,6 @@ export default async function Word({
       translation.language,
     ),
   );
-  const masteryScores = [
-    { label: "recognition", value: state.recognition },
-    { label: "meaning recall", value: state.meaningRecall },
-    { label: "production", value: state.production },
-    { label: "context", value: state.contextualUsage },
-  ];
-  const overallMastery = Math.round(
-    (masteryScores.reduce((sum, item) => sum + Number(item.value), 0) / masteryScores.length) * 100,
-  );
-  const weakestSkill = [...masteryScores].sort(
-    (a, b) => Number(a.value) - Number(b.value),
-  )[0];
-
   perf.success({
     found: true,
     primaryPatternCount: word.patterns.length,
@@ -333,12 +362,13 @@ export default async function Word({
 
   return (
     <main className="page word-detail-page">
+      <WordPageScrollReset wordId={word.id} />
       <section className="page-header word-identity-hero">
         <div className="word-detail-topline">
           <div className="word-meta">
             <span className="badge">{word.partOfSpeech}</span>
             <span className="badge">{state.state}</span>
-            <span className="badge">{user.targetLevel} explanations</span>
+            <span className="badge">{user.targetLevel}</span>
           </div>
           <TranslationModeControl value={user.preferredTranslation} />
         </div>
@@ -349,118 +379,33 @@ export default async function Word({
           <p className="page-description">Plural: {word.plural}</p>
         ) : null}
 
-        <div className="word-identity-mastery" aria-label={"Overall mastery " + overallMastery + "%"}>
-          <div>
-            <span><strong>{overallMastery}%</strong> overall mastery</span>
-            <small>Next focus: {weakestSkill.label}</small>
-          </div>
-          <div className="metric-bar" aria-hidden="true">
-            <span style={{ width: overallMastery + "%" }} />
-          </div>
-        </div>
-
-        <div className="word-primary-actions">
-          <Link
-            href={"/vocabulary/" + word.id + "/teach"}
-            className="button button-primary"
-            prefetch
-          >
-            <BookOpenCheck size={18} />
-            Teach me this word
-          </Link>
-          <nav className="word-quick-actions" aria-label="Word actions">
-            <Link href={"/practice?lexeme=" + word.id} prefetch>
-              <Brain size={17} />
-              Practice
-            </Link>
-            {word.partOfSpeech === "VERB" ? (
-              <VerbConjugation lexemeId={word.id} />
-            ) : null}
-            <a href="#compare">Explain</a>
-            <a href="#expand">Expand</a>
-          </nav>
-        </div>
-      </section>
-
-      <section className="word-detail-grid">
-        <article className="panel word-detail-card">
-          <p className="eyebrow">CANONICAL MEANING</p>
-          <h2>Meaning</h2>
-          {translations.map((translation) => (
-            <div key={translation.id} className="meaning-block">
-              <small className="muted">
-                {translationLabel(translation.language)}
-              </small>
+        <div className="word-hero-meanings">
+          <div className="word-hero-meaning-list">
+            {translations.map((translation) => (
               <p
-                className={
-                  translation.language === "fa"
-                    ? "rtl lesson-meaning"
-                    : "lesson-meaning"
-                }
+                key={translation.id}
+                className={"word-hero-meaning word-hero-meaning--" + (translation.language === "fa" ? "fa" : "en")}
+                dir={translation.language === "fa" ? "rtl" : "ltr"}
+                lang={translation.language === "fa" ? "fa" : "en"}
               >
                 {translation.text}
               </p>
-            </div>
-          ))}
-        </article>
-
-        <article className="panel word-detail-card">
-          <p className="eyebrow">LEARNER MODEL</p>
-          <h2>Mastery</h2>
-
-          {[
-            ["Recognition", state.recognition],
-            ["Meaning recall", state.meaningRecall],
-            ["Production", state.production],
-            ["Context", state.contextualUsage],
-          ].map(([label, value]) => {
-            const score = Number(value);
-            return (
-              <div className="mastery-row" key={String(label)}>
-                <div>
-                  <span>{label}</span>
-                  <strong>{Math.round(score * 100)}%</strong>
-                </div>
-                <div className="metric-bar">
-                  <span
-                    style={{ width: Math.round(score * 100) + "%" }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-
-          {state.nextReviewAt ? (
-            <p className="muted" title={state.nextReviewAt.toLocaleString()}>
-              Next review: {formatRelativeReviewTime(state.nextReviewAt)}
-            </p>
-          ) : null}
-        </article>
-
-        <details className="panel word-detail-card word-detail-disclosure">
-          <summary>
-            <span>
-              <small className="eyebrow">LEXICAL PATTERNS</small>
-              <strong>Grammar & usage</strong>
-            </span>
-            <span className="disclosure-hint">{word.patterns.length} saved</span>
-          </summary>
-          <div className="word-disclosure-content">
-            {word.patterns.length ? (
-              word.patterns.map((pattern) => (
-                <div className="pattern-block" key={pattern.id}>
-                  <strong>{pattern.pattern}</strong>
-                  {pattern.explanation ? (
-                    <p className="muted">{pattern.explanation}</p>
-                  ) : null}
-                </div>
-              ))
-            ) : (
-              <p className="muted">No stored patterns yet.</p>
-            )}
+            ))}
           </div>
-        </details>
+        </div>
       </section>
+
+      <nav className="word-detail-actions" aria-label="Word actions">
+          <TeachWordSheet
+            lexemeId={word.id}
+            label={formatLexemeLabel(word)}
+            language={user.preferredTranslation === "PERSIAN" ? "fa" : "en"}
+          />
+          <Link href={"/practice?lexeme=" + word.id} className="button button-secondary" prefetch>
+            <Brain size={17} /> Practice
+          </Link>
+          {word.partOfSpeech === "VERB" ? <VerbConjugation lexemeId={word.id} /> : null}
+      </nav>
 
       <Suspense fallback={<SecondaryWordSkeleton />}>
         <DeferredWordDetails
@@ -468,6 +413,8 @@ export default async function Word({
           lexemeId={word.id}
           level={user.targetLevel}
           preferredTranslation={user.preferredTranslation}
+          patterns={word.patterns}
+          primaryState={state}
         />
       </Suspense>
     </main>

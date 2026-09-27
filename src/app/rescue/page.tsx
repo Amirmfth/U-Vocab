@@ -7,7 +7,8 @@ import { buildExercise } from "@/lib/exercises/build";
 import { selectReviewExerciseType } from "@/lib/exercises/review-select";
 import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
-import { RescueCard } from "./RescueCard";
+import { RescueSession } from "./RescueSession";
+import type { RescueSessionCard } from "./RescueCard";
 
 
 export default async function RescuePage({
@@ -17,7 +18,8 @@ export default async function RescuePage({
 }) {
   await connection();
   const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
-  const ranked = await getRescueWords(user.id, 100);
+  const requestedIds = Array.from(new Set(query.ids?.split(",").filter(Boolean) ?? [])).slice(0, 20);
+  const ranked = await getRescueWords(user.id, 100, requestedIds);
 
   if (!query.ids) {
     const top = ranked.slice(0, 20);
@@ -92,81 +94,38 @@ export default async function RescuePage({
     );
   }
 
-  const requestedIds = query.ids.split(",").filter(Boolean);
-  const stableIds = requestedIds;
-  const step = Math.max(0, Number(query.step ?? 0) || 0);
-  const currentId = stableIds[step];
-  const current = ranked.find((item) => item.id === currentId);
-
-  if (!current) {
-    return (
-      <main className="page focus-page">
-        <section className="page-header compact">
-          <Link href="/review" className="back-link">
-            <ArrowLeft size={16} />
-            Review
-          </Link>
-          <CheckCircle2 size={28} className="rescue-complete-icon" />
-          <h1>Rescue complete</h1>
-          <p className="page-description">
-            The selected words have been reviewed and their learner state has been updated.
-          </p>
-          <div className="hero-actions">
-            <Link href="/rescue" className="button button-primary">
-              Back to rescue words
-            </Link>
-            <Link href="/review" className="button button-secondary">
-              Regular review
-            </Link>
-          </div>
-        </section>
-      </main>
+  const byId = new Map(ranked.map((item) => [item.id, item]));
+  const cards: Array<RescueSessionCard | null> = requestedIds.map((id) => {
+    const item = byId.get(id);
+    if (!item) return null;
+    const exerciseType = selectReviewExerciseType(
+      {
+        recognition: item.recognition,
+        meaningRecall: item.meaningRecall,
+        production: item.production,
+        contextualUsage: item.contextualUsage,
+        mistakeTypes: item.lexeme.mistakes.map((mistake) => mistake.type),
+      },
+      [],
     );
-  }
+    return {
+      userVocabularyId: item.id,
+      lemma: item.lexeme.lemma,
+      article: item.lexeme.article,
+      translations: item.lexeme.translations.filter((translation) =>
+        isTranslationVisible(user.preferredTranslation, translation.language),
+      ),
+      exercise: buildExercise(exerciseType, item.lexeme, user.preferredTranslation),
+      riskPercent: Math.round(item.risk.score * 100),
+      reasons: item.risk.reasons.length
+        ? item.risk.reasons
+        : ["low confidence compared with stronger vocabulary"],
+    };
+  });
+  const requestedStep = Number(query.step ?? 0);
+  const initialStep = Number.isFinite(requestedStep)
+    ? Math.min(cards.length, Math.max(0, Math.floor(requestedStep)))
+    : 0;
 
-  const exerciseType = selectReviewExerciseType(
-    {
-      recognition: current.recognition,
-      meaningRecall: current.meaningRecall,
-      production: current.production,
-      contextualUsage: current.contextualUsage,
-      mistakeTypes: current.lexeme.mistakes.map((mistake) => mistake.type),
-    },
-    [],
-  );
-
-  const exercise = buildExercise(
-    exerciseType,
-    current.lexeme,
-    user.preferredTranslation,
-  );
-
-  const translations = current.lexeme.translations.filter((translation) =>
-    isTranslationVisible(user.preferredTranslation, translation.language),
-  );
-
-  return (
-    <main className="page focus-page review-session-shell">
-      <header className="review-session-topbar">
-        <Link href="/rescue" className="text-link">Rescue words</Link>
-        <span>{step + 1} / {stableIds.length}</span>
-      </header>
-
-      <RescueCard
-        userVocabularyId={current.id}
-        ids={stableIds.join(",")}
-        step={step}
-        lemma={current.lexeme.lemma}
-        article={current.lexeme.article}
-        translations={translations}
-        exercise={exercise}
-        riskPercent={Math.round(current.risk.score * 100)}
-        reasons={
-          current.risk.reasons.length
-            ? current.risk.reasons
-            : ["low confidence compared with stronger vocabulary"]
-        }
-      />
-    </main>
-  );
+  return <RescueSession cards={cards} initialStep={initialStep} />;
 }

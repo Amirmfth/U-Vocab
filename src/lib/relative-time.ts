@@ -1,5 +1,9 @@
-export function formatRelativeReviewTime(target: Date, now = new Date()) {
-  const diffMs = target.getTime() - now.getTime();
+export function toDate(value: Date | string): Date {
+  return value instanceof Date ? value : new Date(value);
+}
+
+export function formatRelativeReviewTime(target: Date | string, now = new Date()) {
+  const diffMs = toDate(target).getTime() - now.getTime();
   if (diffMs <= 0) return "due now";
 
   const minutes = Math.max(1, Math.round(diffMs / 60_000));

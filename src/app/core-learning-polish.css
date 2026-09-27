@@ -188,14 +188,190 @@
 
 .word-identity-hero h1 {
   max-width: 900px;
-  font-size: clamp(2.6rem, 14vw, 5.8rem);
-  line-height: 0.9;
+  font-size: clamp(2.2rem, 8vw, 4.6rem);
+  line-height: 1.02;
   letter-spacing: -0.065em;
+  overflow-wrap: anywhere;
 }
 
 .word-identity-hero .page-description {
   color: var(--text-muted);
   font-size: 0.82rem;
+}
+
+.word-detail-page .word-detail-topline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+}
+
+.word-detail-page .word-detail-topline .word-meta {
+  min-width: 0;
+}
+
+.word-hero-meanings {
+  margin-top: 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.word-hero-meaning-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+}
+
+.word-hero-meaning {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+  font-size: clamp(1.12rem, 2.7vw, 1.65rem);
+  font-weight: 580;
+  line-height: 1.45;
+}
+
+.word-hero-meaning--fa { text-align: right; }
+.word-hero-meaning--en { text-align: left; }
+
+.word-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.word-detail-actions > .button,
+.word-detail-actions > .word-quick-action-button {
+  flex: 1 1 165px;
+  min-height: var(--tap-target);
+}
+
+.word-example-action {
+  align-items: flex-start;
+}
+
+.teach-sheet-overlay {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.teach-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(5px);
+}
+
+.teach-sheet {
+  position: relative;
+  z-index: 1;
+  width: min(640px, 100%);
+  max-height: min(76dvh, 680px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.teach-sheet-handle {
+  width: 38px;
+  height: 4px;
+  flex: 0 0 auto;
+  margin: 10px auto 0;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.teach-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.teach-sheet-header h2 {
+  margin: 4px 0 0;
+  font-size: clamp(1.35rem, 4vw, 1.8rem);
+}
+
+.teach-sheet-content {
+  min-height: 130px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px;
+}
+
+.teach-sheet-lesson {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.teach-sheet-lesson--fa { text-align: right; }
+.teach-sheet-lesson--en { text-align: left; }
+
+.teach-sheet-lesson > :first-child { margin-top: 0; }
+.teach-sheet-lesson > :last-child { margin-bottom: 0; }
+.teach-sheet-lesson p,
+.teach-sheet-lesson ul,
+.teach-sheet-lesson ol,
+.teach-sheet-lesson blockquote { margin: 0 0 14px; }
+.teach-sheet-lesson h1,
+.teach-sheet-lesson h2,
+.teach-sheet-lesson h3 {
+  margin: 18px 0 8px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.teach-sheet-lesson ul,
+.teach-sheet-lesson ol { padding-inline-start: 1.4rem; }
+.teach-sheet-lesson li + li { margin-top: 6px; }
+.teach-sheet-lesson strong { color: var(--text); }
+.teach-sheet-lesson a { color: var(--primary-strong); text-decoration: underline; }
+.teach-sheet-lesson blockquote {
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--primary);
+  color: var(--text-soft);
+}
+.teach-sheet-lesson pre {
+  overflow-x: auto;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  direction: ltr;
+  text-align: left;
+}
+.teach-sheet-lesson code { direction: ltr; unicode-bidi: isolate; }
+.teach-sheet-lesson table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.teach-sheet-lesson th,
+.teach-sheet-lesson td { padding: 7px 10px; border: 1px solid var(--border); }
+
+.teach-sheet-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 22px max(16px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 619px) {
+  .teach-sheet-overlay { padding: 0; }
+  .teach-sheet { width: 100%; }
 }
 
 .word-identity-mastery {
@@ -276,9 +452,12 @@
   gap: 18px;
 }
 
-.word-detail-page .insight-content > div:not(.comparison-box) {
+.word-detail-page .insight-content > div {
   max-width: 760px;
 }
+
+.word-insight-language--ltr { text-align: left; }
+.word-insight-language--rtl { text-align: right; }
 
 .word-detail-page .example-card {
   min-height: 150px;

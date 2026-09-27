@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Eye, RotateCcw } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
-import { ActionButton } from "@/components/action-button";
-import { submitRescueReview } from "./actions";
+import type { ReviewGrade } from "@/lib/fsrs";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 
 const ratings = [
@@ -15,20 +14,21 @@ const ratings = [
   { grade: "EASY", label: "Easy", hint: "Immediate recall" },
 ] as const;
 
-export function RescueCard(props: {
+export type RescueSessionCard = {
   userVocabularyId: string;
-  ids: string;
-  step: number;
   lemma: string;
   article: string | null;
   translations: Array<{ language: string; text: string }>;
   exercise: ExerciseDefinition;
   riskPercent: number;
   reasons: string[];
+};
+
+export function RescueCard(props: RescueSessionCard & {
+  onGrade: (grade: ReviewGrade, startedAt: number) => void;
 }) {
   const [revealed, setRevealed] = useState(false);
   const startedAt = useRef(Date.now());
-  const gradeForms = useRef<Array<HTMLFormElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const label = formatLexemeLabel(props);
 
@@ -41,13 +41,13 @@ export function RescueCard(props: {
       }
       if (revealed && ["1", "2", "3", "4"].includes(event.key)) {
         event.preventDefault();
-        gradeForms.current[Number(event.key) - 1]?.requestSubmit();
+        props.onGrade(ratings[Number(event.key) - 1].grade, startedAt.current);
       }
     }
 
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
-  }, [revealed]);
+  }, [props, revealed]);
 
   return (
     <section className="panel learning-card review-flashcard rescue-card">
@@ -106,32 +106,16 @@ export function RescueCard(props: {
 
           <div className="grade-grid review-grade-grid">
             {ratings.map((rating, index) => (
-              <form
-                action={submitRescueReview}
+              <button
+                className={"button " + (rating.grade === "AGAIN" ? "button-danger" : rating.grade === "EASY" ? "button-success" : "button-secondary")}
                 key={rating.grade}
-                ref={(element) => { gradeForms.current[index] = element; }}
+                onClick={() => props.onGrade(rating.grade, startedAt.current)}
+                type="button"
+                title={rating.hint}
               >
-                <input type="hidden" name="userVocabularyId" value={props.userVocabularyId} />
-                <input type="hidden" name="grade" value={rating.grade} />
-                <input type="hidden" name="exerciseType" value={props.exercise.type} />
-                <input type="hidden" name="prompt" value={props.exercise.prompt} />
-                <input type="hidden" name="ids" value={props.ids} />
-                <input type="hidden" name="step" value={props.step} />
-                <input type="hidden" name="startedAt" value={startedAt.current} />
-                <ActionButton
-                  variant={
-                    rating.grade === "AGAIN"
-                      ? "danger"
-                      : rating.grade === "EASY"
-                        ? "success"
-                        : "secondary"
-                  }
-                  pendingLabel="Saving…"
-                >
-                  <span>{rating.label}</span>
-                  <small>{index + 1}</small>
-                </ActionButton>
-              </form>
+                <span>{rating.label}</span>
+                <small>{index + 1}</small>
+              </button>
             ))}
           </div>
         </>

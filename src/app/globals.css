@@ -1010,13 +1010,6 @@ summary {
   line-height: 1.58;
 }
 
-.comparison-box {
-  padding: 16px;
-  border: 1px solid rgba(139, 124, 255, 0.2);
-  border-radius: var(--radius-md);
-  background: var(--primary-soft);
-}
-
 .generated-meta {
   margin: 0;
   color: var(--text-muted);

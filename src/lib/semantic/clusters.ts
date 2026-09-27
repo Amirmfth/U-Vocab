@@ -3,7 +3,7 @@ import { similarMistakePairs } from "./search";
 
 export async function clusterOpenMistakes(userId: string) {
   const mistakes = await db.mistake.findMany({
-    where: { userId, resolvedAt: null },
+    where: { userId, resolvedAt: null, grammarConceptId: null },
     include: { lexeme: true },
     orderBy: [{ occurrences: "desc" }, { lastOccurredAt: "desc" }],
     take: 100,

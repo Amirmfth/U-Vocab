@@ -12,7 +12,10 @@ import { startOperation } from "@/lib/performance";
 import { connection } from "next/server";
 import { getCachedHomeStats } from "@/lib/cached-data";
 import { db } from "@/lib/db";
-import { getGrammarRecommendation } from "@/lib/grammar/recommendations";
+import {
+  getGrammarRecommendation,
+  grammarRecommendationActionHref,
+} from "@/lib/grammar/recommendations";
 
 export default async function Home() {
   await connection();
@@ -30,7 +33,12 @@ export default async function Home() {
       ),
     ]);
 
-  perf.success({ totalWords: total, dueWords: due, openMistakes: mistakes });
+  perf.success({
+    totalWords: total,
+    dueWords: due,
+    openMistakes: mistakes,
+    grammarRecommendationReason: grammarRecommendation?.reasonCode,
+  });
 
   const nextHref =
     due > 0
@@ -99,10 +107,20 @@ export default async function Home() {
             </p>
           </div>
           <div className="button-row">
-            <Link href={grammarRecommendation.href} className="button button-secondary">
+            <Link href={grammarRecommendationActionHref({
+                conceptId: grammarRecommendation.conceptId,
+                reasonCode: grammarRecommendation.reasonCode,
+                surface: "home",
+                action: "learn",
+              })} className="button button-secondary">
               Learn
             </Link>
-            <Link href={grammarRecommendation.practiceHref} className="button button-primary">
+            <Link href={grammarRecommendationActionHref({
+                conceptId: grammarRecommendation.conceptId,
+                reasonCode: grammarRecommendation.reasonCode,
+                surface: "home",
+                action: "practice",
+              })} className="button button-primary">
               Practice <ArrowRight size={17} />
             </Link>
           </div>

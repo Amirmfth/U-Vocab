@@ -18,7 +18,7 @@ test("rich grammar lesson schema accepts a complete structured lesson", () => {
     }],
     examples: Array.from({ length: 6 }, (_, index) => ({
       german: "Das ist Beispiel " + index + ".",
-      english: "This is example " + index + ".",
+      translation: "This is example " + index + ".",
       note: "Shows the structure.",
     })),
     contrasts: [{

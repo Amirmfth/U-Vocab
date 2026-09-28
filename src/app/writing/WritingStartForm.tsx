@@ -11,10 +11,8 @@ import { createWritingSessionAction, type WritingActionState } from "./actions";
 const initialState: WritingActionState = { status: "idle" };
 
 export function WritingStartForm({
-  collections,
   defaultLevel,
 }: {
-  collections: Array<{ value: string; label: string }>;
   defaultLevel: string;
 }) {
   const router = useRouter();
@@ -108,19 +106,6 @@ export function WritingStartForm({
       <div className="field writing-topic-field">
         <label htmlFor="writing-topic">Topic</label>
         <input id="writing-topic" name="topic" placeholder="z. B. Homeoffice, Reisen, Wohnen" />
-      </div>
-
-      <div className="field">
-        <label htmlFor="writing-collection-trigger">Guided collection</label>
-        <ActivitySelect
-          id="writing-collection"
-          name="collectionId"
-          defaultValue="NONE"
-          options={[
-            { value: "NONE", label: "Adaptive weak vocabulary" },
-            ...collections,
-          ]}
-        />
       </div>
 
       {state.status === "error" ? (

@@ -64,11 +64,6 @@ export async function getUniverseBranch(input: {
         },
         take: 20,
       },
-      topicPackItems: {
-        where: { topicPack: { userId: input.userId } },
-        include: { topicPack: true },
-        take: 12,
-      },
     },
   });
   if (!root) throw new Error("Lexical unit not found.");
@@ -136,25 +131,6 @@ export async function getUniverseBranch(input: {
       source: relation.source.id,
       target: root.id,
       label: relation.type.replaceAll("_", " ").toLowerCase(),
-    });
-  }
-
-  for (const membership of root.topicPackItems) {
-    const topicId = "topic:" + membership.topicPack.id;
-    nodes.set(topicId, {
-      id: topicId,
-      kind: "TOPIC",
-      label: membership.topicPack.topic,
-      sublabel: membership.topicPack.title,
-      meaning: membership.topicPack.description,
-      state: "topic",
-      lexemeId: null,
-    });
-    edges.set("topic-edge:" + membership.id, {
-      id: "topic-edge:" + membership.id,
-      source: root.id,
-      target: topicId,
-      label: "topic",
     });
   }
 

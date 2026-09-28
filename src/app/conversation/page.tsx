@@ -6,45 +6,28 @@ import { getCurrentUser } from "@/lib/current-user";
 import { ConversationStartForm } from "./ConversationStartForm";
 
 
-export default async function ConversationPage() {
+export default async function ConversationPage({ searchParams }: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
   await connection();
-  const user = await getCurrentUser();
-  const [collections, sessions] = await Promise.all([
-    db.topicPack.findMany({
-      where: { userId: user.id },
-      select: { id: true, title: true },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    }),
-    db.conversationSession.findMany({
-      where: { userId: user.id, kind: "PRACTICE" },
-      orderBy: { updatedAt: "desc" },
-      take: 10,
-    }),
-  ]);
+  const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
+  const sessions = await db.conversationSession.findMany({
+    where: { userId: user.id },
+    orderBy: { updatedAt: "desc" },
+    take: 10,
+  });
 
   return (
     <main className="page">
       <section className="page-header compact">
-        <p className="eyebrow">ACTIVE USE</p>
-        <h1>Conversation practice</h1>
-        <p className="page-description">
-          Natural German conversations designed around vocabulary you are
-          currently trying to activate.
-        </p>
+        <h1>Speaking practice</h1>
       </section>
 
-      <ConversationStartForm
-        kind="PRACTICE"
-        collections={collections.map((item) => ({
-          value: item.id,
-          label: item.title,
-        }))}
-      />
+      <ConversationStartForm initialMode={params.mode === "MISSION" ? "MISSION" : "PRACTICE"} />
 
       {sessions.length ? (
         <section className="page-section">
-          <h2 className="section-title">Recent conversations</h2>
+          <h2 className="section-title">Recent speaking sessions</h2>
           <div className="collection-list">
             {sessions.map((session) => (
               <Link
@@ -55,7 +38,7 @@ export default async function ConversationPage() {
                 <div>
                   <strong>{session.title}</strong>
                   <span>
-                    {session.status.toLowerCase()} · {session.level}
+                    {session.kind === "MISSION" ? "mission" : "conversation"} · {session.status.toLowerCase()} · {session.level}
                   </span>
                 </div>
                 <ArrowRight size={16} />

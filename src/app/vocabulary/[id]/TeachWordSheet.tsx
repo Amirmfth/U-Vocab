@@ -6,12 +6,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { BookOpenCheck, RefreshCcw, X } from "lucide-react";
 import { generateQuickTeachAction } from "./actions";
+import { useWordLanguage } from "./WordLanguage";
 
-export function TeachWordSheet({ lexemeId, label, language }: {
+export function TeachWordSheet({ lexemeId, label }: {
   lexemeId: string;
   label: string;
-  language: "fa" | "en";
 }) {
+  const language = useWordLanguage() === "PERSIAN" ? "fa" : "en";
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lesson, setLesson] = useState<string | null>(null);
@@ -75,7 +76,7 @@ export function TeachWordSheet({ lexemeId, label, language }: {
     setLesson(null);
     setError(null);
     try {
-      const result = await generateQuickTeachAction(lexemeId);
+      const result = await generateQuickTeachAction(lexemeId, language);
       if (requestId.current !== id) return;
       if (result.status === "error") setError(result.message);
       else setLesson(result.lesson);

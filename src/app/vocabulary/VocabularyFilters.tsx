@@ -3,8 +3,9 @@
 import { ChevronLeft, Filter, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { TranslationLanguage } from "@prisma/client";
 
-type FilterKey = "status" | "pos" | "level" | "topic" | "relation" | "sort";
+type FilterKey = "status" | "pos" | "level" | "relation" | "sort";
 
 type FilterOption = {
   label: string;
@@ -29,12 +30,14 @@ export function VocabularyFilters({
   current,
   partOfSpeechOptions,
   levelOptions,
-  topicOptions,
+  language,
+  onLanguageChange,
 }: {
   current: Record<FilterKey | "q", string>;
   partOfSpeechOptions: FilterOption[];
   levelOptions: FilterOption[];
-  topicOptions: FilterOption[];
+  language: TranslationLanguage;
+  onLanguageChange: (language: TranslationLanguage) => void;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,7 +65,6 @@ export function VocabularyFilters({
     },
     { key: "pos", label: "Part of speech", options: withAll("Any part of speech", partOfSpeechOptions) },
     { key: "level", label: "CEFR level", options: withAll("Any CEFR level", levelOptions) },
-    { key: "topic", label: "Topic", options: withAll("Any topic", topicOptions) },
     {
       key: "sort",
       label: "Sort",
@@ -168,22 +170,21 @@ export function VocabularyFilters({
         </button>
       </form>
 
-      <div className="filter-builder" ref={menuRef}>
-        <div className="filter-chip-row" aria-label="Active vocabulary filters">
-          {activeFilters.map((filter) => (
-            <span className="filter-chip" key={filter.key}>
-              <span className="filter-chip-type">{filter.label}</span>
-              <span className="filter-chip-value">{filter.valueLabel}</span>
-              <button
-                aria-label={`Remove ${filter.label} filter`}
-                onClick={() => setParam(filter.key, "ALL")}
-                type="button"
-              >
-                <X size={14} />
-              </button>
-            </span>
+      <div className="vocabulary-controls-row">
+        <div className="translation-switch" aria-label="Translation language">
+          {([ ["ENGLISH", "EN"], ["PERSIAN", "FA"], ["BOTH", "Both"] ] as const).map(([mode, label]) => (
+            <button
+              type="button"
+              key={mode}
+              className={language === mode ? "is-active" : ""}
+              aria-pressed={language === mode}
+              onClick={() => onLanguageChange(mode)}
+            >
+              {label}
+            </button>
           ))}
-
+        </div>
+        <div className="filter-builder" ref={menuRef}>
           <div className="filter-add-anchor">
             <button
               ref={addButtonRef}
@@ -245,6 +246,24 @@ export function VocabularyFilters({
           </div>
         </div>
       </div>
+
+      {activeFilters.length ? (
+        <div className="filter-chip-row" aria-label="Active vocabulary filters">
+          {activeFilters.map((filter) => (
+            <span className="filter-chip" key={filter.key}>
+              <span className="filter-chip-type">{filter.label}</span>
+              <span className="filter-chip-value">{filter.valueLabel}</span>
+              <button
+                aria-label={`Remove ${filter.label} filter`}
+                onClick={() => setParam(filter.key, "ALL")}
+                type="button"
+              >
+                <X size={14} />
+              </button>
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       {(current.q || activeFilters.length) ? (
         <button type="button" className="text-button library-clear" onClick={() => router.push("/vocabulary")}>

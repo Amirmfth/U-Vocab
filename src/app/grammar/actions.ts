@@ -71,7 +71,7 @@ export async function generateGrammarQuickTeachAction(
     const concept = await db.grammarConcept.findFirst({
       where: { id: grammarConceptId, active: true, language: "de" },
       include: {
-        lesson: true,
+        lessons: { select: { language: true, overview: true, intuition: true } },
         mistakes: {
           where: { userId: user.id, resolvedAt: null },
           orderBy: { lastOccurredAt: "desc" },
@@ -122,6 +122,8 @@ export async function generateGrammarQuickTeachAction(
 
     const language =
       user.preferredTranslation === "PERSIAN" ? "Persian" : "English";
+    const preferredLesson = concept.lessons.find((item) => item.language === (language === "Persian" ? "fa" : "en"))
+      ?? concept.lessons.find((item) => item.language === "en");
     const lesson = await generateGrammarQuickTeach({
       userId: user.id,
       title: concept.title,
@@ -131,8 +133,8 @@ export async function generateGrammarQuickTeachAction(
       canonicalSummary:
         concept.shortDescription +
         (concept.explanation ? "\n" + concept.explanation : ""),
-      mainLessonSummary: concept.lesson
-        ? concept.lesson.overview + "\n" + concept.lesson.intuition
+      mainLessonSummary: preferredLesson
+        ? preferredLesson.overview + "\n" + preferredLesson.intuition
         : concept.explanation ?? concept.shortDescription,
       rules: stringArray(concept.rules),
       recentMistakes,

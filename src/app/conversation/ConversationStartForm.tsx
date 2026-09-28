@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, Target } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
@@ -14,12 +14,11 @@ import {
 const initialState: ConversationActionState = { status: "idle" };
 
 export function ConversationStartForm({
-  kind,
-  collections,
+  initialMode = "PRACTICE",
 }: {
-  kind: "PRACTICE" | "MISSION";
-  collections: Array<{ value: string; label: string }>;
+  initialMode?: "PRACTICE" | "MISSION";
 }) {
+  const [kind, setKind] = useState(initialMode);
   const router = useRouter();
   const [state, action] = useActionState(
     createConversationSessionAction,
@@ -34,7 +33,19 @@ export function ConversationStartForm({
 
   return (
     <form action={action} className="panel conversation-start-form">
-      <input type="hidden" name="kind" value={kind} />
+      <div className="field">
+        <label htmlFor="conversation-mode-trigger">Mode</label>
+        <ActivitySelect
+          id="conversation-mode"
+          name="kind"
+          defaultValue={initialMode}
+          onValueChange={(value) => setKind(value === "MISSION" ? "MISSION" : "PRACTICE")}
+          options={[
+            { value: "PRACTICE", label: "Conversation", description: "Practice naturally with visible target words" },
+            { value: "MISSION", label: "Mission", description: "Achieve a role-play objective" },
+          ]}
+        />
+      </div>
 
       <div className="field">
         <label htmlFor={kind + "-topic"}>Situation or topic <span className="muted">(optional)</span></label>
@@ -42,19 +53,6 @@ export function ConversationStartForm({
           id={kind + "-topic"}
           name="topic"
           placeholder={kind === "MISSION" ? "z. B. Arbeit, Wohnung, Reise" : "z. B. Alltag, Arbeit, Freizeit"}
-        />
-      </div>
-
-      <div className="field">
-        <label htmlFor={kind + "-collection-trigger"}>Prioritize collection</label>
-        <ActivitySelect
-          id={kind + "-collection"}
-          name="collectionId"
-          defaultValue="NONE"
-          options={[
-            { value: "NONE", label: "Adaptive weak vocabulary" },
-            ...collections,
-          ]}
         />
       </div>
 

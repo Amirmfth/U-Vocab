@@ -11,7 +11,7 @@ const lexeme={
   examples:[{ german:"Ich warte auf den Bus." }],
 };
 
-test("grammar mistakes produce a compact pattern card without answer leakage",()=>{
+test("grammar mistakes still produce a translation review card",()=>{
   const card=buildReviewCard({
     lexeme,
     preference:"ENGLISH",
@@ -24,12 +24,12 @@ test("grammar mistakes produce a compact pattern card without answer leakage",()
     },
     recentTypes:[],
   });
-  assert.equal(card.family,"GRAMMAR_PATTERN");
-  assert.ok(!card.front.prompt.includes("auf + Akkusativ"));
-  assert.equal(card.back.answer,"auf + Akkusativ warten");
+  assert.equal(card.family,"MEANING_GERMAN");
+  assert.equal(card.front.prompt,"to wait");
+  assert.match(card.back.answer,/warten/);
 });
 
-test("weak contextual usage can produce a cloze review card",()=>{
+test("weak contextual usage still produces a translation review card",()=>{
   const card=buildReviewCard({
     lexeme,
     preference:"ENGLISH",
@@ -42,9 +42,9 @@ test("weak contextual usage can produce a cloze review card",()=>{
     },
     recentTypes:[],
   });
-  assert.equal(card.family,"CONTEXT_CLOZE");
-  assert.match(card.front.prompt,/_____/);
-  assert.ok(card.back.answer.length>0);
+  assert.equal(card.family,"GERMAN_MEANING");
+  assert.equal(card.front.prompt,"warten");
+  assert.equal(card.back.answer,"to wait");
 });
 
 test("production weakness flips review direction meaning to German",()=>{

@@ -43,24 +43,34 @@ export function ReadingAssessment({
         {questions.map((question, index) => (
           <fieldset className="reading-question" key={index}>
             <legend>
-              <span className="badge">{question.type.toLowerCase()}</span>
-              {question.question}
+              <span className="reading-question-number">{String(index + 1).padStart(2, "0")}</span>
+              <span className="reading-question-heading">
+                <span className="badge">{question.type.toLowerCase()}</span>
+                <strong>{question.question}</strong>
+              </span>
             </legend>
             <div className="reading-question-options">
               {question.options.map((option, optionIndex) => (
-                <label key={optionIndex}>
+                <label
+                  className={
+                    "reading-question-option" +
+                    (state.status === "success" && optionIndex === question.correctIndex ? " is-correct" : "")
+                  }
+                  key={optionIndex}
+                >
                   <input
                     type="radio"
                     name={"answer-" + index}
                     value={optionIndex}
                     required
                   />
-                  <span>{option}</span>
+                  <span className="reading-option-letter" aria-hidden="true">{String.fromCharCode(65 + optionIndex)}</span>
+                  <span className="reading-option-text">{option}</span>
                 </label>
               ))}
             </div>
             {state.status === "success" ? (
-              <p className={state.correct?.[index] ? "reading-answer-correct" : "reading-answer-wrong"}>
+              <p className={state.correct?.[index] ? "reading-answer-feedback is-correct" : "reading-answer-feedback is-wrong"}>
                 {state.correct?.[index] ? "Correct. " : "Not quite. "}
                 {question.explanation}
               </p>

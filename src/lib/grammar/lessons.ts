@@ -50,7 +50,7 @@ export async function getGrammarLessonSource(
 
 export async function generateAndPersistGrammarLesson(
   db: PrismaClient,
-  input: { grammarConceptId: string; userId?: string },
+  input: { grammarConceptId: string; language: "en" | "fa"; userId?: string },
 ) {
   const source = await getGrammarLessonSource(db, input.grammarConceptId);
   if (!source) throw new Error("Grammar concept not found.");
@@ -58,12 +58,14 @@ export async function generateAndPersistGrammarLesson(
   const generated = await generateGrammarLesson({
     userId: input.userId,
     concept: source,
+    language: input.language,
   });
 
   return db.grammarLesson.upsert({
-    where: { grammarConceptId: source.id },
+    where: { grammarConceptId_language: { grammarConceptId: source.id, language: input.language } },
     create: {
       grammarConceptId: source.id,
+      language: input.language,
       sourceContentVersion: source.contentVersion,
       overview: generated.overview,
       intuition: generated.intuition,

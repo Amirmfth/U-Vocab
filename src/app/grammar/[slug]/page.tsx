@@ -100,7 +100,7 @@ export default async function GrammarConceptPage({
         orderBy: { createdAt: "desc" },
         take: 6,
       },
-      lesson: true,
+      lessons: true,
     },
   });
 
@@ -116,8 +116,11 @@ export default async function GrammarConceptPage({
   const rules = stringArray(concept.rules);
   const examples = stringArray(concept.examples);
   const exceptions = stringArray(concept.exceptions);
-  const lesson = concept.lesson
-    ? grammarLessonSchema.safeParse(concept.lesson)
+  const lessonLanguage = user.preferredTranslation === "PERSIAN" ? "fa" : "en";
+  const selectedLesson = concept.lessons.find((item) => item.language === lessonLanguage)
+    ?? concept.lessons.find((item) => item.language === "en");
+  const lesson = selectedLesson
+    ? grammarLessonSchema.safeParse(selectedLesson)
     : null;
   const richLesson = lesson?.success ? lesson.data : null;
 
@@ -223,7 +226,7 @@ export default async function GrammarConceptPage({
       </section>
 
       {richLesson ? (
-        <GrammarLessonContent lesson={richLesson} />
+        <GrammarLessonContent lesson={richLesson} language={selectedLesson?.language === "fa" ? "fa" : "en"} />
       ) : (
         <>
           <div className="grammar-detail-grid">

@@ -7,19 +7,7 @@ import { generateReading } from "@/lib/ai/reading-generation";
 import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { scoreReadingAssessment } from "@/lib/reading/assessment";
-
-const TARGETS_PER_LENGTH = { SHORT: 3, MEDIUM: 5, LONG: 7 } as const;
-
-function escapeRegex(value: string) {
-  return value.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\$&");
-}
-
-function containsLemma(content: string, lemma: string) {
-  return new RegExp(
-    "(?<![\\p{L}\\p{N}_])" + escapeRegex(lemma) + "(?![\\p{L}\\p{N}_])",
-    "iu",
-  ).test(content);
-}
+import { containsReadingTarget, READING_TARGETS_PER_LENGTH } from "@/lib/reading/targets";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -150,34 +138,50 @@ export async function createGeneratedReading(
       patterns: item.lexeme.patterns,
     }));
 
-    const generated = await generateReading({
-      userId: user.id,
-      level,
-      length,
-      topic,
-      selectedTargets: selectedTargets.map((item) => ({
-        lemma: item.lemma,
-        pattern: item.patterns[0]?.pattern ?? null,
-      })),
-      candidateTargets: candidateTargets
-        .slice(0, Math.max(12, TARGETS_PER_LENGTH[length] * 3))
-        .map((item) => ({
-          lemma: item.lemma,
-          pattern: item.patterns[0]?.pattern ?? null,
-        })),
-      grammarConcepts: [...grammarById.values()],
+    const minimumTargets = READING_TARGETS_PER_LENGTH[length];
+    const seenLemmas = new Set<string>();
+    const targetPool = [...selectedTargets, ...candidateTargets].filter((item) => {
+      const lemma = item.lemma.toLocaleLowerCase("de-DE").trim();
+      if (!lemma || seenLemmas.has(lemma)) return false;
+      seenLemmas.add(lemma);
+      return true;
     });
+    if (targetPool.length < minimumTargets) {
+      return {
+        status: "error",
+        message: `Add at least ${minimumTargets} distinct vocabulary words before generating a ${length.toLowerCase()} reading.`,
+      };
+    }
 
-    const targetPool = [...selectedTargets, ...candidateTargets];
-    const usedLemmaSet = new Set(
-      generated.usedTargets.map((lemma) =>
-        lemma.toLocaleLowerCase("de-DE").trim(),
-      ),
-    );
-    const usedTargets = targetPool.filter((item) => {
-      const normalized = item.lemma.toLocaleLowerCase("de-DE").trim();
-      return usedLemmaSet.has(normalized) && containsLemma(generated.content, item.lemma);
-    });
+    const selectedSet = new Set(selectedTargets.map((item) => item.lexemeId));
+    const generationPool = targetPool.slice(0, Math.max(minimumTargets * 2, 20));
+    let generated: Awaited<ReturnType<typeof generateReading>> | null = null;
+    let usedTargets: typeof targetPool = [];
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const draft = await generateReading({
+        userId: user.id,
+        level,
+        length,
+        topic,
+        minimumTargets,
+        selectedTargets: generationPool
+          .filter((item) => selectedSet.has(item.lexemeId))
+          .map((item) => ({ lemma: item.lemma, pattern: item.patterns[0]?.pattern ?? null })),
+        candidateTargets: generationPool
+          .filter((item) => !selectedSet.has(item.lexemeId))
+          .map((item) => ({ lemma: item.lemma, pattern: item.patterns[0]?.pattern ?? null })),
+        grammarConcepts: [...grammarById.values()],
+      });
+      const found = generationPool.filter((item) => containsReadingTarget(draft.content, item.lemma));
+      if (found.length >= minimumTargets) {
+        generated = draft;
+        usedTargets = found;
+        break;
+      }
+    }
+    if (!generated) {
+      return { status: "error", message: `The reading did not include ${minimumTargets} target words. Please try again.` };
+    }
 
     const validCoverage = generated.grammarCoverage.filter(
       (coverage) =>
@@ -202,10 +206,11 @@ export async function createGeneratedReading(
           currentLevel: user.currentLevel,
           targetLevel: user.targetLevel,
           requestedGrammarIds: [...grammarById.keys()],
+          requiredTargetCount: minimumTargets,
           usedTargetCount: usedTargets.length,
         },
         targets: {
-          create: usedTargets.slice(0, TARGETS_PER_LENGTH[length] + 3).map((item, index) => ({
+          create: usedTargets.slice(0, 20).map((item, index) => ({
             lexemeId: item.lexemeId,
             position: index,
           })),

@@ -68,12 +68,7 @@ export default async function MistakesPage() {
   return (
     <main className="page">
       <section className="page-header compact">
-        <p className="eyebrow">MISTAKE MEMORY</p>
         <h1>Recurring weaknesses</h1>
-        <p className="page-description">
-          Similar recurring errors are grouped semantically so practice targets patterns,
-          not just individual corrections.
-        </p>
         <p className="muted">{total} open mistakes · {clusters.length + grammarGroups.length} patterns</p>
         <MistakeRefreshButton />
       </section>

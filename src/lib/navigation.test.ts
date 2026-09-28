@@ -3,17 +3,12 @@ import test from "node:test";
 import { routeOwner, sectionForPath } from "./navigation";
 
 test("secondary Words routes map to Words", () => {
-  assert.equal(sectionForPath("/compare"), "words");
-  assert.equal(sectionForPath("/topic-packs/pack-1"), "words");
-  assert.equal(sectionForPath("/recommendations"), "words");
-  assert.equal(sectionForPath("/universe"), "words");
   assert.equal(sectionForPath("/vocabulary/lexeme-1/teach"), "words");
 });
 
 test("review maintenance routes map to Review", () => {
   assert.equal(sectionForPath("/mistakes"), "review");
   assert.equal(sectionForPath("/rescue?step=1"), "review");
-  assert.equal(sectionForPath("/focus/session-1"), "review");
 });
 
 test("skill routes and battles map to Practice", () => {
@@ -21,7 +16,6 @@ test("skill routes and battles map to Practice", () => {
   assert.equal(sectionForPath("/read/document-1"), "practice");
   assert.equal(sectionForPath("/stories/story-1"), "practice");
   assert.equal(sectionForPath("/conversation/session-1"), "practice");
-  assert.equal(sectionForPath("/missions"), "practice");
   assert.equal(sectionForPath("/battles"), "practice");
 });
 

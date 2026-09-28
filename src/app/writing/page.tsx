@@ -9,25 +9,15 @@ import { getCachedWritingIndex } from "@/lib/cached-data";
 export default async function WritingPage() {
   await connection();
   const user = await getCurrentUser();
-  const [collections, sessions] = await getCachedWritingIndex(user.id);
+  const sessions = await getCachedWritingIndex(user.id);
 
   return (
     <main className="page writing-hub">
       <section className="page-header compact practice-workbench-header">
-        <p className="eyebrow">WRITING PRACTICE</p>
         <h1>Writing studio</h1>
-        <p className="page-description">
-          Build a focused German task around your level and vocabulary, then get actionable feedback on the result.
-        </p>
       </section>
 
-      <WritingStartForm
-        defaultLevel={user.currentLevel}
-        collections={collections.map((item) => ({
-          value: item.id,
-          label: item.title,
-        }))}
-      />
+      <WritingStartForm defaultLevel={user.currentLevel} />
 
       {sessions.length ? (
         <section className="page-section">

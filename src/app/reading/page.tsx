@@ -49,11 +49,7 @@ export default async function ReadingPage() {
   return (
     <main className="page reading-hub generated-reading-hub">
       <section className="page-header compact practice-workbench-header">
-        <p className="eyebrow">READING</p>
         <h1>Personalized German reading</h1>
-        <p className="page-description">
-          Generate natural text at your current level, read for meaning, then check comprehension.
-        </p>
       </section>
 
       <ReadingForm

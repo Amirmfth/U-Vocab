@@ -1,16 +1,14 @@
 import { connection } from "next/server";
 import type { ExerciseType } from "@prisma/client";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
-  ArrowRight,
   BookOpenText,
   MessageCircle,
   GraduationCap,
   PenLine,
   Plus,
   Sparkles,
-  Swords,
-  Target,
 } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
@@ -24,81 +22,43 @@ import { formatLexemeLabel } from "@/lib/lexeme-display";
 function PracticeHub() {
   return (
     <main className="page practice-hub">
-      <section className="page-header compact practice-header">
-        <p className="eyebrow">PRACTICE</p>
-        <h1>Use your German</h1>
-        <p className="page-description">
-          Pick one skill and get into practice quickly.
-        </p>
-      </section>
 
       <nav className="practice-lanes" aria-label="Practice skills">
-        <Link href="/grammar" className="practice-lane">
-          <span className="practice-lane-icon"><GraduationCap size={21} /></span>
+        <Link href="/grammar" className="practice-lane practice-lane-grammar">
+          <span className="practice-lane-icon"><GraduationCap size={30} /></span>
           <span className="practice-lane-copy">
             <strong>Grammar</strong>
-            <small>Learn the structure you need now, from B1 gaps to your next level</small>
           </span>
-          <ArrowRight size={18} />
         </Link>
 
-        <Link href="/practice?mixed=1" className="practice-lane">
-          <span className="practice-lane-icon"><Sparkles size={21} /></span>
+        <Link href="/practice?drill=1" className="practice-lane">
+          <span className="practice-lane-icon"><Sparkles size={30} /></span>
           <span className="practice-lane-copy">
-            <strong>Recommended mix</strong>
-            <small>A bounded mix of weak vocabulary and the grammar concept that matters next</small>
+            <strong>Vocabulary</strong>
           </span>
-          <ArrowRight size={18} />
         </Link>
 
         <Link href="/writing" className="practice-lane">
-          <span className="practice-lane-icon"><PenLine size={21} /></span>
+          <span className="practice-lane-icon"><PenLine size={30} /></span>
           <span className="practice-lane-copy">
             <strong>Writing</strong>
-            <small>Guided, open, exam-style, and rewrite practice</small>
           </span>
-          <ArrowRight size={18} />
         </Link>
 
         <Link href="/reading" className="practice-lane">
-          <span className="practice-lane-icon"><BookOpenText size={21} /></span>
+          <span className="practice-lane-icon"><BookOpenText size={30} /></span>
           <span className="practice-lane-copy">
             <strong>Reading</strong>
-            <small>Generated German at your level with comprehension and grammar in context</small>
           </span>
-          <ArrowRight size={18} />
         </Link>
 
         <Link href="/conversation" className="practice-lane">
-          <span className="practice-lane-icon"><MessageCircle size={21} /></span>
+          <span className="practice-lane-icon"><MessageCircle size={30} /></span>
           <span className="practice-lane-copy">
             <strong>Speaking</strong>
-            <small>Free conversation, scenarios, and vocabulary missions</small>
           </span>
-          <ArrowRight size={18} />
         </Link>
       </nav>
-
-      <section className="practice-shortcuts">
-        <div className="practice-shortcuts-heading">
-          <p className="eyebrow">MORE IN PRACTICE</p>
-          <span>Secondary modes</span>
-        </div>
-        <div className="practice-shortcut-grid">
-          <Link href="/missions">
-            <Target size={17} />
-            <span><strong>Missions</strong><small>Goal-based speaking</small></span>
-          </Link>
-          <Link href="/practice?drill=1">
-            <Sparkles size={17} />
-            <span><strong>Quick drill</strong><small>Weak vocabulary</small></span>
-          </Link>
-          <Link href="/battles">
-            <Swords size={17} />
-            <span><strong>Battles</strong><small>Fast vocabulary mode</small></span>
-          </Link>
-        </div>
-      </section>
     </main>
   );
 }
@@ -110,82 +70,10 @@ export default async function PracticePage({
 }) {
   await connection();
   const params=await searchParams;
-  if(!params.lexeme&&params.drill!=="1"&&!params.grammar&&params.mixed!=="1") return <PracticeHub/>;
+  if(params.mixed==="1") redirect("/practice?drill=1");
+  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub/>;
 
   const user=await getCurrentUser();
-
-  if(params.mixed==="1"){
-    const [grammarExercises, weakVocabulary] = await Promise.all([
-      buildGrammarPracticeSession({
-        userId:user.id,
-        currentLevel:user.currentLevel,
-        targetLevel:user.targetLevel,
-        limit:3,
-      }),
-      db.userVocabulary.findMany({
-        where:{ userId:user.id },
-        include:{
-          lexeme:{
-            include:{
-              patterns:true,
-              translations:true,
-              examples:true,
-              mistakes:{
-                where:{ userId:user.id,resolvedAt:null,grammarConceptId:null },
-                select:{ type:true },
-              },
-            },
-          },
-        },
-        orderBy:[
-          { production:"asc" },
-          { contextualUsage:"asc" },
-          { meaningRecall:"asc" },
-        ],
-        take:3,
-      }),
-    ]);
-
-    const recentVocabularyTypes:ExerciseType[]=[];
-    const vocabularyExercises=weakVocabulary.map((item,index)=>{
-      const type=selectExerciseType({
-        recognition:item.recognition,
-        meaningRecall:item.meaningRecall,
-        production:item.production,
-        contextualUsage:item.contextualUsage,
-        mistakeTypes:item.lexeme.mistakes.map((mistake)=>mistake.type),
-      },eligibleExerciseTypes(item.lexeme),recentVocabularyTypes);
-      recentVocabularyTypes.push(type);
-      return {
-        id:"mixed-vocab:"+item.id+":"+index,
-        userVocabularyId:item.id,
-        lemma:item.lexeme.lemma,
-        exercise:buildExercise(type,item.lexeme,user.preferredTranslation),
-      };
-    });
-
-    const mixedExercises=[
-      ...grammarExercises.slice(0,3),
-      ...vocabularyExercises,
-    ].slice(0,6);
-
-    if(!mixedExercises.length){
-      return <main className="page focus-page">
-        <section className="empty-state compact-empty">
-          <strong>No recommended practice is available yet.</strong>
-          <Link href="/practice" className="text-link">Back to Practice</Link>
-        </section>
-      </main>;
-    }
-
-    return <main className="page focus-page">
-      <div className="focus-meta">
-        <Link href="/practice">Practice</Link>
-        <span>Recommended mix</span>
-      </div>
-      <PracticeForm exercises={mixedExercises}/>
-    </main>;
-  }
 
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
@@ -247,7 +135,7 @@ export default async function PracticePage({
         },
       },
       orderBy:{ addedAt:"desc" },
-      take:60,
+      take:200,
     }),
   ]);
 
@@ -293,15 +181,31 @@ export default async function PracticePage({
     const available=eligibleExerciseTypes(item.lexeme);
     const count=params.lexeme?Math.min(6,Math.max(3,available.length+1)):1;
     for(let position=0;position<count;position+=1){
-      const type=selectExerciseType(snapshot,available,recent);
-      recent.push(type);
+      const preferred=selectExerciseType(snapshot,available,recent);
+      const choice=params.lexeme
+        ? buildExercise(preferred,item.lexeme,user.preferredTranslation,optionPools)
+        : [preferred,...available.filter((type)=>type!==preferred)]
+          .map((type)=>buildExercise(type,item.lexeme,user.preferredTranslation,optionPools))
+          .find((exercise)=>exercise.interaction==="choice"&&(exercise.options?.length??0)>=2);
+      if(!choice) continue;
+      recent.push(choice.type);
       exercises.push({
-        id:item.id+":"+position+":"+type,
+        id:item.id+":"+position+":"+choice.type,
         userVocabularyId:item.id,
         lemma:item.lexeme.lemma,
-        exercise:buildExercise(type,item.lexeme,user.preferredTranslation,optionPools),
+        exercise:choice,
       });
     }
+  }
+
+  if(!params.lexeme&&!exercises.length){
+    return <main className="page focus-page">
+      <section className="empty-state compact-empty">
+        <strong>Not enough distinct answer choices for vocabulary practice yet.</strong>
+        <p className="muted">Add more vocabulary to unlock multiple-choice practice.</p>
+        <Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>Add word</Link>
+      </section>
+    </main>;
   }
 
   if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
@@ -335,7 +239,7 @@ export default async function PracticePage({
   return <main className="page focus-page">
     <div className="focus-meta">
       <Link href="/practice">Practice</Link>
-      <span>{params.lexeme?items[0].lexeme.lemma:"Quick drill"}</span>
+      <span>{params.lexeme?items[0].lexeme.lemma:"Vocabulary"}</span>
     </div>
     <PracticeForm exercises={exercises}/>
   </main>;

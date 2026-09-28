@@ -6,7 +6,7 @@ import { createAIUsageRecorder } from "./usage-recorder";
 
 const grammarLessonExampleSchema = z.object({
   german: z.string().max(500),
-  english: z.string().max(500),
+  translation: z.string().max(500),
   note: z.string().max(500),
 });
 
@@ -68,6 +68,7 @@ export type GrammarLessonSource = {
 export async function generateGrammarLesson(input: {
   userId?: string;
   concept: GrammarLessonSource;
+  language: "en" | "fa";
 }) {
   const route = aiRoute("grammar_lesson");
   const usageRecorder = input.userId
@@ -78,6 +79,7 @@ export async function generateGrammarLesson(input: {
         metadata: {
           conceptId: input.concept.id,
           level: input.concept.introducedAt,
+          language: input.language,
         },
       })
     : null;
@@ -90,7 +92,7 @@ export async function generateGrammarLesson(input: {
         {
           role: "system",
           content:
-            "You are writing the complete teaching lesson for ONE canonical German grammar concept in U-Vocab. The supplied concept is authoritative. Expand it pedagogically; do not rename it, change its CEFR placement, invent prerequisites, contradict supplied rules, or create new curriculum concepts. The learner should be able to study this page alone and understand the concept deeply. Write explanations in clear English while keeping German examples in German. Explain intuition as well as mechanics. Use tables only when they materially clarify forms or patterns. Examples must be natural modern German and progress from simple to harder. Explicitly contrast commonly confused nearby structures when relevant. Include realistic wrong/correct learner mistakes. Exceptions must be genuine and useful; return an empty array if none are important. Avoid filler, motivational prose, Markdown, external links, and textbook-style jargon without explanation. The cheat sheet must be concise enough to scan before speaking or writing.",
+            `You are writing the complete teaching lesson for ONE canonical German grammar concept in U-Vocab. The supplied concept is authoritative. Expand it pedagogically; do not rename it, change its CEFR placement, invent prerequisites, contradict supplied rules, or create new curriculum concepts. The learner should be able to study this page alone and understand the concept deeply. Write all explanations, table labels, notes, and example translations in ${input.language === "fa" ? "natural Persian (Farsi) using Persian script" : "clear English"}, while keeping German examples, German grammar forms, and wrong/correct German sentences in German. The example translation field must contain the ${input.language === "fa" ? "Persian" : "English"} translation. Explain intuition as well as mechanics. Use tables only when they materially clarify forms or patterns. Examples must be natural modern German and progress from simple to harder. Explicitly contrast commonly confused nearby structures when relevant. Include realistic wrong/correct learner mistakes. Exceptions must be genuine and useful; return an empty array if none are important. Avoid filler, motivational prose, Markdown, external links, and textbook-style jargon without explanation. The cheat sheet must be concise enough to scan before speaking or writing.`,
         },
         {
           role: "user",

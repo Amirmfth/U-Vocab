@@ -321,7 +321,7 @@ model GrammarConcept {
   mistakes          Mistake[]
   progressTransitions GrammarProgressTransition[]
   recommendationEvents GrammarRecommendationEvent[]
-  lesson            GrammarLesson?
+  lessons           GrammarLesson[]
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
 
@@ -332,7 +332,8 @@ model GrammarConcept {
 
 model GrammarLesson {
   id                 String         @id @default(cuid())
-  grammarConceptId   String         @unique
+  grammarConceptId   String
+  language           String         @default("en")
   version            Int            @default(1)
   promptVersion      String         @default("v1")
   generatedByAi      Boolean        @default(true)
@@ -356,6 +357,7 @@ model GrammarLesson {
   updatedAt          DateTime       @updatedAt
   grammarConcept     GrammarConcept @relation(fields: [grammarConceptId], references: [id], onDelete: Cascade)
 
+  @@unique([grammarConceptId, language])
   @@index([updatedAt])
 }
 

@@ -9,7 +9,6 @@ export const cacheTags = {
   mistakes: (userId: string) => `mistakes:${userId}`,
   usage: (userId: string) => `usage:${userId}`,
   recommendations: (userId: string) => `recommendations:${userId}`,
-  topicPacks: (userId: string) => `topic-packs:${userId}`,
   reading: (userId: string) => `reading:${userId}`,
   writing: (userId: string) => `writing:${userId}`,
   conversation: (userId: string) => `conversation:${userId}`,
@@ -23,7 +22,6 @@ type UserDomain =
   | "mistakes"
   | "usage"
   | "recommendations"
-  | "topicPacks"
   | "reading"
   | "writing"
   | "conversation";

@@ -70,7 +70,7 @@ export function ConversationReplay({
         </ActionButton>
       </form>
       <Link
-        href={kind === "MISSION" ? "/missions" : "/conversation"}
+        href="/conversation"
         className="button button-primary"
       >
         New {kind === "MISSION" ? "mission" : "conversation"}

@@ -14,7 +14,8 @@
     "db:backfill-cefr": "tsx scripts/backfill-cefr-levels.ts",
     "semantic:benchmark": "tsx scripts/benchmark-semantic-search.ts",
     "db:seed-grammar": "tsx scripts/seed-grammar-curriculum.ts",
-    "db:backfill-grammar-links": "tsx scripts/backfill-lexeme-grammar.ts"
+    "db:backfill-grammar-links": "tsx scripts/backfill-lexeme-grammar.ts",
+    "db:backfill-grammar-lessons": "tsx scripts/backfill-grammar-lessons.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

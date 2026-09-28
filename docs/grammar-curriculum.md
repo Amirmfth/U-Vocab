@@ -261,3 +261,32 @@ Generated Reading defaults to the learner's `currentLevel`. A deliberate stretch
 Vocabulary and grammar targets are generation preferences rather than hard quotas. Natural, coherent German wins over target coverage. The server persists only vocabulary that actually appears and grammar coverage whose canonical ID is allowlisted and whose excerpt is present in the generated text.
 
 Grammar exposure alone never increases mastery. Only explicit grammar comprehension questions create modest `READING_COMPREHENSION` / `UNDERSTANDING` evidence. Production mastery is never changed by merely reading a structure.
+
+
+## Rich grammar lessons and Teach me more
+
+`GrammarConcept` remains the canonical curriculum definition. `GrammarLesson` is a separate, AI-generated teaching layer rendered directly inside `/grammar/[slug]`.
+
+A stored lesson contains structured sections for intuition, use cases, recognition cues, formation, detailed rules, reference tables, progressive examples, contrasts, common mistakes, exceptions, usage notes, speaking/writing advice, memory aids, and a concise cheat sheet.
+
+The lesson is generated from canonical concept data. AI may elaborate and teach the concept, but may not rename it, change CEFR placement, invent prerequisites, or create curriculum concepts.
+
+Populate existing curriculum lessons after migration with:
+
+```bash
+npm run db:backfill-grammar-lessons
+```
+
+The command is resumable and idempotent. It generates only missing lessons or lessons whose `sourceContentVersion` is older than `GrammarConcept.contentVersion`.
+
+Useful maintenance options:
+
+```bash
+npm run db:backfill-grammar-lessons -- --force
+npm run db:backfill-grammar-lessons -- --concept=de.case.dative
+npm run db:backfill-grammar-lessons -- --limit=5
+```
+
+`--force` regenerates matching lessons. Per-concept failures do not erase successful rows, so a normal rerun continues with missing/stale concepts.
+
+The **Teach me more** action is separate from the persistent lesson. It opens the existing bottom-sheet interaction pattern and generates a fresh personalized explanation on demand. It receives the canonical concept, stored lesson summary, current/target level, recent concept mistakes, and explicitly linked personal vocabulary. It does not overwrite `GrammarLesson`. Each subsequent open/regeneration avoids the previous teaching angle when possible.

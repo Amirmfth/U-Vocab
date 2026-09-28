@@ -8,7 +8,10 @@ import type {
   ExerciseOptionPools,
 } from "./types";
 
-function preferredMeaning(lexeme: ExerciseLexeme, preference: TranslationLanguage) {
+function preferredMeaning(
+  lexeme: ExerciseLexeme,
+  preference: TranslationLanguage,
+) {
   const preferredLanguage = preference === "PERSIAN" ? "fa" : "en";
   return (
     lexeme.translations.find(
@@ -41,16 +44,28 @@ export function buildCloze(sentence: string, lemma: string) {
   if (!expected) return null;
   const hidden = tokens[index].replace(expected, "_____");
   return {
-    prompt: [...tokens.slice(0, index), hidden, ...tokens.slice(index + 1)].join(""),
+    prompt: [
+      ...tokens.slice(0, index),
+      hidden,
+      ...tokens.slice(index + 1),
+    ].join(""),
     expected,
   };
 }
 
-export function eligibleExerciseTypes(lexeme: ExerciseLexeme): ExerciseDefinition["type"][] {
-  const result: ExerciseDefinition["type"][] = ["MEANING_RECALL", "REVERSE_RECALL"];
+export function eligibleExerciseTypes(
+  lexeme: ExerciseLexeme,
+): ExerciseDefinition["type"][] {
+  const result: ExerciseDefinition["type"][] = [
+    "MEANING_RECALL",
+    "REVERSE_RECALL",
+  ];
   if (lexeme.partOfSpeech === "NOUN" && lexeme.article) result.push("ARTICLE");
   if (lexeme.patterns.length) result.push("CASE_PREPOSITION", "COLLOCATION");
-  if (lexeme.examples.some((example) => buildCloze(example.german, lexeme.lemma))) result.push("CLOZE");
+  if (
+    lexeme.examples.some((example) => buildCloze(example.german, lexeme.lemma))
+  )
+    result.push("CLOZE");
   if (lexeme.examples.length) result.push("CONTEXTUAL_CHOICE");
   return result;
 }
@@ -84,7 +99,7 @@ export function buildExercise(
       return choiceOrText(
         {
           type,
-          prompt: "What does “" + lexeme.lemma + "” mean?",
+          prompt: lexeme.lemma,
           expected: meaning,
           skill: "meaning",
           requiresAI: false,
@@ -99,7 +114,7 @@ export function buildExercise(
       return choiceOrText(
         {
           type,
-          prompt: "Which German lexical unit matches: " + meaning,
+          prompt: meaning,
           expected,
           skill: "production",
           hint: pattern ?? undefined,
@@ -123,7 +138,8 @@ export function buildExercise(
         return choiceOrText(
           {
             type,
-            prompt: "Which stored grammar pattern belongs to “" + lexeme.lemma + "”?",
+            prompt:
+              "Which stored grammar pattern belongs to “" + lexeme.lemma + "”?",
             expected: pattern,
             skill: "grammar",
             requiresAI: false,
@@ -165,7 +181,10 @@ export function buildExercise(
         return choiceOrText(
           {
             type,
-            prompt: "Which sentence is the saved natural context for “" + lexeme.lemma + "”?",
+            prompt:
+              "Which sentence is the saved natural context for “" +
+              lexeme.lemma +
+              "”?",
             expected: example,
             skill: "context",
             requiresAI: false,

@@ -1,16 +1,11 @@
-import Link from "next/link";
 import type { RelationType } from "@prisma/client";
-import { BookOpen, GitCompareArrows, Layers3, Network, Plus, ScanText, Star } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
-import { isTranslationVisible } from "@/lib/translations";
 import { currentRetrievability } from "@/lib/fsrs";
-import { TranslationModeControl } from "@/components/translation-mode-control";
-import { VocabularyFilters } from "./VocabularyFilters";
 import { VocabularyScrollRestoration } from "./VocabularyScrollRestoration";
 import { connection } from "next/server";
 import { getCachedVocabularyLibrary } from "@/lib/cached-data";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
-
+import { VocabularyDisplay } from "./VocabularyDisplay";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -26,7 +21,6 @@ export default async function Vocabulary({
     status?: string;
     pos?: string;
     level?: string;
-    topic?: string;
     relation?: string;
     sort?: string;
   }>;
@@ -44,12 +38,11 @@ export default async function Vocabulary({
     status: query.status ?? "ALL",
     pos: query.pos ?? "ALL",
     level: query.level ?? "ALL",
-    topic: query.topic ?? "ALL",
     relation: query.relation ?? "ALL",
     sort: query.sort ?? "RECENTLY_ADDED",
   };
 
-  const [items, packs] = await getCachedVocabularyLibrary(user.id);
+  const items = await getCachedVocabularyLibrary(user.id);
 
   const normalizedQuery = current.q.toLocaleLowerCase("de-DE");
 
@@ -65,11 +58,7 @@ export default async function Vocabulary({
     if (normalizedQuery) {
       const searchable = [
         word.lemma,
-        ...word.translations
-          .filter((translation) =>
-            isTranslationVisible(user.preferredTranslation, translation.language),
-          )
-          .map((translation) => translation.text),
+        ...word.translations.map((translation) => translation.text),
         ...word.outgoing.map((relation) => relation.target.lemma),
         ...word.incoming.map((relation) => relation.source.lemma),
       ]
@@ -83,15 +72,7 @@ export default async function Vocabulary({
 
     if (
       current.level !== "ALL" &&
-      word.cefrLevel !== current.level &&
-      !word.insights.some((insight) => insight.level === current.level)
-    ) {
-      return false;
-    }
-
-    if (
-      current.topic !== "ALL" &&
-      !word.topicPackItems.some((item) => item.topicPack.topic === current.topic)
+      word.cefrLevel !== current.level
     ) {
       return false;
     }
@@ -190,144 +171,34 @@ export default async function Vocabulary({
       label: value.replaceAll("_", " ").toLowerCase(),
     }));
 
+  const rows = sorted.map((item) => {
+    const word = item.lexeme;
+    const mastery = Math.round(
+      ((item.recognition + item.meaningRecall + item.production + item.contextualUsage) / 4) * 100,
+    );
+    return {
+      id: word.id,
+      label: formatLexemeLabel(word),
+      translations: word.translations.map(({ id, language, text }) => ({ id, language, text })),
+      cefrLevel: word.cefrLevel,
+      state: item.state,
+      mastery,
+      isDue: !item.nextReviewAt || dateTime(item.nextReviewAt) <= nowTime,
+      isWeak: mastery < 45,
+    };
+  });
+
   return (
     <main className="page vocabulary-page">
       <VocabularyScrollRestoration />
-      <section className="page-header compact library-header">
-        <div className="library-header-copy">
-          <p className="eyebrow">YOUR LEXICON</p>
-          <h1>Vocabulary</h1>
-          <p className="library-header-description">
-            Find the word you need, see what is weak, and move directly into learning.
-          </p>
-          <p className="library-count">
-            <strong>{sorted.length}</strong> shown <span aria-hidden="true">·</span> {items.length} total
-          </p>
-        </div>
-        <div className="library-header-actions">
-          <TranslationModeControl value={user.preferredTranslation} />
-          <div className="library-primary-actions">
-            <Link href="/vocabulary/new" className="button button-primary" prefetch>
-              <Plus size={18} />
-              Add word
-            </Link>
-            <Link href="/read" className="button button-secondary">
-              <ScanText size={17} />
-              Scan
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <details className="words-explore">
-        <summary>
-          <span>
-            <strong>Explore & tools</strong>
-            <small>Packs, recommendations, compare, and universe</small>
-          </span>
-          <Layers3 size={18} />
-        </summary>
-        <div className="ia-tool-strip" aria-label="Words tools">
-          <Link href="/topic-packs" className="ia-tool-link">
-            <Layers3 size={17} /><span><strong>Packs</strong><small>Topic collections</small></span>
-          </Link>
-          <Link href="/recommendations" className="ia-tool-link">
-            <Star size={17} /><span><strong>Recommendations</strong><small>What to learn next</small></span>
-          </Link>
-          <Link href="/compare" className="ia-tool-link">
-            <GitCompareArrows size={17} /><span><strong>Compare</strong><small>Distinguish similar words</small></span>
-          </Link>
-          <Link href="/universe" className="ia-tool-link">
-            <Network size={17} /><span><strong>Universe</strong><small>Explore your lexical graph</small></span>
-          </Link>
-        </div>
-      </details>
-
-      <nav className="ia-subnav" aria-label="Words views">
-        <Link href="/vocabulary" className={current.status === "ALL" ? "is-active" : ""}>All</Link>
-        <Link href="/vocabulary?status=WEAK" className={current.status === "WEAK" ? "is-active" : ""}>Weak</Link>
-        <Link href="/vocabulary?status=NEW" className={current.status === "NEW" ? "is-active" : ""}>New</Link>
-        <Link href="/vocabulary?status=MASTERED" className={current.status === "MASTERED" ? "is-active" : ""}>Mastered</Link>
-        <Link href="/topic-packs"><Layers3 size={14} /> Packs</Link>
-      </nav>
-
-      <VocabularyFilters
+      <VocabularyDisplay
+        preferredTranslation={user.preferredTranslation}
+        rows={rows}
+        total={items.length}
         current={current}
         partOfSpeechOptions={partOfSpeechOptions}
         levelOptions={LEVELS.map((level) => ({ value: level, label: level }))}
-        topicOptions={Array.from(
-          new Map(packs.map((pack) => [pack.topic, { value: pack.topic, label: pack.topic }])).values(),
-        )}
       />
-
-      {sorted.length ? (
-        <div className="vocabulary-list">
-          {sorted.map((item) => {
-            const word = item.lexeme;
-            const translations = word.translations.filter((translation) =>
-              isTranslationVisible(
-                user.preferredTranslation,
-                translation.language,
-              ),
-            );
-            const mastery = Math.round(
-              ((item.recognition +
-                item.meaningRecall +
-                item.production +
-                item.contextualUsage) /
-                4) *
-                100,
-            );
-            const isDue = !item.nextReviewAt || dateTime(item.nextReviewAt) <= nowTime;
-            const isWeak = mastery < 45;
-
-            return (
-              <Link
-                className="vocabulary-row"
-                key={item.id}
-                href={"/vocabulary/" + word.id}
-                prefetch
-              >
-                <div className="vocabulary-row-main">
-                  <div className="word">
-                    {formatLexemeLabel(word)}
-                  </div>
-                  <div className="translation-line">
-                    {translations.slice(0, 1).map((translation) => (
-                      <span
-                        key={translation.id}
-                        className={
-                          translation.language === "fa" ? "rtl" : undefined
-                        }
-                      >
-                        {translation.text}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="vocabulary-row-meta">
-                  <span className="vocabulary-cefr">{word.cefrLevel ?? "—"}</span>
-                  <span>{item.state.toLowerCase()}</span>
-                  {isDue ? <span className="row-signal">due</span> : null}
-                  {isWeak ? <span className="row-signal">weak</span> : null}
-                  <strong>{mastery}%</strong>
-                </div>
-                <div className="mastery-line" aria-label={"Mastery " + mastery + "%"}>
-                  <span style={{ width: mastery + "%" }} />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="empty-state compact-empty">
-          <BookOpen size={22} />
-          <strong>No vocabulary matches these filters.</strong>
-          <Link href="/vocabulary" className="button button-secondary">
-            Clear filters
-          </Link>
-        </div>
-      )}
     </main>
   );
 }

@@ -1,10 +1,8 @@
 import { connection } from "next/server";
 import Link from "next/link";
 import {
-  ArrowRight,
   Brain,
   LifeBuoy,
-  TimerReset,
   TriangleAlert,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -21,21 +19,16 @@ function ReviewModes({
   rescueCount: number;
 }) {
   return (
-    <nav className="review-mode-list" aria-label="Review modes">
-      <Link href="/mistakes">
-        <TriangleAlert size={18} />
-        <span><strong>Mistakes</strong><small>{mistakes} unresolved</small></span>
-        <ArrowRight size={16} />
+    <nav className="practice-lanes review-mode-grid" aria-label="Review modes">
+      <Link href="/mistakes" className="practice-lane">
+        <span className="review-mode-count" aria-label={`${mistakes} unresolved mistakes`}>{mistakes}</span>
+        <span className="practice-lane-icon"><TriangleAlert size={30} /></span>
+        <span className="practice-lane-copy"><strong>Mistakes</strong></span>
       </Link>
-      <Link href="/rescue">
-        <LifeBuoy size={18} />
-        <span><strong>Rescue</strong><small>{rescueCount} words need rescue</small></span>
-        <ArrowRight size={16} />
-      </Link>
-      <Link href="/focus">
-        <TimerReset size={18} />
-        <span><strong>Focus block</strong><small>Mix review and targeted practice</small></span>
-        <ArrowRight size={16} />
+      <Link href="/rescue" className="practice-lane">
+        <span className="review-mode-count" aria-label={`${rescueCount} rescue words`}>{rescueCount}</span>
+        <span className="practice-lane-icon"><LifeBuoy size={30} /></span>
+        <span className="practice-lane-copy"><strong>Rescue</strong></span>
       </Link>
     </nav>
   );
@@ -74,7 +67,6 @@ export default async function ReviewPage({
       <main className="page review-landing review-page">
         <section className="review-hero">
           <div>
-            <p className="eyebrow">MEMORY MAINTENANCE</p>
             <h1>{dueCount ? dueCount + " due now" : "You're caught up"}</h1>
             <p>
               {dueCount
@@ -93,12 +85,6 @@ export default async function ReviewPage({
               Reinforce weak words
             </Link>
           )}
-        </section>
-
-        <section className="review-queue-summary" aria-label="Review status">
-          <div><strong>{dueCount}</strong><span>due</span></div>
-          <div><strong>{mistakeCount}</strong><span>mistakes</span></div>
-          <div><strong>{rescueCount}</strong><span>rescue</span></div>
         </section>
 
         <ReviewModes mistakes={mistakeCount} rescueCount={rescueCount} />

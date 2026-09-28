@@ -16,7 +16,9 @@ export type AIOperation =
   | "quick_teach"
   | "story_generation"
   | "topic_pack_generation"
-  | "verb_conjugation";
+  | "verb_conjugation"
+  | "grammar_lesson"
+  | "grammar_quick_teach";
 
 type Route = {
   model: string;
@@ -45,6 +47,8 @@ const ROUTES: Record<AIOperation, Route> = {
   story_generation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 3600 },
   topic_pack_generation: { model: DEFAULT_FAST_MODEL, maxOutputTokens: 2600 },
   verb_conjugation: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 5200 },
+  grammar_lesson: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 8200 },
+  grammar_quick_teach: { model: DEFAULT_COMPLEX_MODEL, maxOutputTokens: 2200 },
 };
 
 function envKey(operation: AIOperation) {

@@ -57,7 +57,7 @@ export function SettingsForm({
 
       <div className="field">
         <label htmlFor="targetLevel-trigger">Target German level</label>
-        <span className="muted">Your learning destination. Recommendations may gradually stretch toward this level.</span>
+        <span className="muted">Your learning destination for level based practice.</span>
         <ActivitySelect
           defaultValue={targetLevel}
           id="targetLevel"

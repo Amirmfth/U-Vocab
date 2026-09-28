@@ -17,15 +17,10 @@ type RouteOwner = {
 const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/vocabulary/new", section: "words", label: "Add word" },
   { prefix: "/vocabulary", section: "words", label: "My words" },
-  { prefix: "/topic-packs", section: "words", label: "Topic packs" },
-  { prefix: "/recommendations", section: "words", label: "Recommendations" },
-  { prefix: "/compare", section: "words", label: "Compare" },
-  { prefix: "/universe", section: "words", label: "Universe" },
 
   { prefix: "/review", section: "review", label: "Standard review" },
   { prefix: "/mistakes", section: "review", label: "Mistakes" },
   { prefix: "/rescue", section: "review", label: "Rescue words" },
-  { prefix: "/focus", section: "review", label: "Focus session" },
 
   { prefix: "/practice", section: "practice", label: "Practice" },
   { prefix: "/grammar", section: "practice", label: "Grammar" },
@@ -34,7 +29,6 @@ const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/stories", section: "practice", label: "Reading", group: "Reading" },
   { prefix: "/read", section: "practice", label: "Legacy reading", group: "Reading" },
   { prefix: "/conversation", section: "practice", label: "Conversation", group: "Speaking" },
-  { prefix: "/missions", section: "practice", label: "Missions", group: "Speaking" },
   { prefix: "/battles", section: "practice", label: "Battles" },
 
   { prefix: "/progress", section: "home", label: "Full progress" },

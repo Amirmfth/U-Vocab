@@ -32,11 +32,7 @@ export default async function RescuePage({
             <ArrowLeft size={16} />
             Review
           </Link>
-          <p className="eyebrow">RETENTION</p>
           <h1>Rescue words</h1>
-          <p className="page-description">
-            Ranked from current FSRS retrievability, overdue status, recent failed retrievals, and stability.
-          </p>
         </section>
 
         {top.length ? (

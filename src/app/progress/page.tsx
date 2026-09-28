@@ -72,7 +72,6 @@ export default async function ProgressPage({
     heatEncounters,
     activityMistakes,
     openMistakes,
-    topicPacks,
   ] = await Promise.all([
     db.userVocabulary.findMany({
       where: { userId: user.id },
@@ -133,28 +132,6 @@ export default async function ProgressPage({
     db.mistake.findMany({
       where: { userId: user.id, resolvedAt: null },
       select: { type: true, occurrences: true },
-    }),
-    db.topicPack.findMany({
-      where: { userId: user.id },
-      select: {
-        id: true,
-        title: true,
-        items: {
-          select: {
-            lexeme: {
-              select: {
-                userStates: {
-                  where: { userId: user.id },
-                  select: { state: true },
-                  take: 1,
-                },
-              },
-            },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 6,
     }),
   ]);
 
@@ -258,19 +235,6 @@ export default async function ProgressPage({
     1,
     ...monthlyTrend.map((item) => Math.max(item.learned, item.mastered)),
   );
-
-  const topicCoverage = topicPacks.map((pack) => {
-    const covered = pack.items.filter((item) => {
-      const state = item.lexeme.userStates[0]?.state;
-      return state && state !== "NEW";
-    }).length;
-    return {
-      id: pack.id,
-      title: pack.title,
-      covered,
-      total: pack.items.length,
-    };
-  });
 
   return (
     <main className="page">
@@ -477,34 +441,6 @@ export default async function ProgressPage({
           </div>
         </div>
       </section>
-
-      {topicCoverage.length ? (
-        <section className="panel progress-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">TOPIC COVERAGE</p>
-              <h2>Saved packs</h2>
-            </div>
-          </div>
-          <div className="topic-coverage-list">
-            {topicCoverage.map((topic) => {
-              const coverage = topic.total ? topic.covered / topic.total : 0;
-              return (
-                <Link href={"/topic-packs/" + topic.id} key={topic.id} className="topic-coverage-row">
-                  <div>
-                    <strong>{topic.title}</strong>
-                    <span>{topic.covered} / {topic.total} beyond new</span>
-                  </div>
-                  <div className="metric-bar"><span style={{ width: percent(coverage) + "%" }} /></div>
-                </Link>
-              );
-            })}
-          </div>
-          <p className="analytics-caveat">
-            Topic coverage reflects your saved packs. U-Vocab does not infer official CEFR certification from these metrics.
-          </p>
-        </section>
-      ) : null}
 
       <section className="progress-actions">
         <Link href="/rescue" className="button button-primary">

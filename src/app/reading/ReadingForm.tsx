@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
-import { ArrowRight, BookOpenText, Plus, Search, X } from "lucide-react";
+import { useActionState, useEffect, useMemo, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { BookOpenText, Plus, Search, X } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
 import { ActivitySelect } from "@/components/ui/activity-select";
@@ -12,6 +13,22 @@ import {
 } from "./actions";
 
 const initialState: ReadingCreateState = { status: "idle" };
+
+function ReadingGenerationPreview({ navigating }: { navigating: boolean }) {
+  const { pending } = useFormStatus();
+  if (!pending && !navigating) return null;
+
+  return (
+    <div className="reading-generation-preview" role="status" aria-live="polite" aria-label="Generating reading">
+      <strong>{pending ? "Generating your reading…" : "Opening your reading…"}</strong>
+      <div className="skeleton loading-generated-title" aria-hidden="true" />
+      <div className="loading-generated-paragraphs" aria-hidden="true">
+        <div className="skeleton" /><div className="skeleton" /><div className="skeleton" />
+        <div className="skeleton" /><div className="skeleton" />
+      </div>
+    </div>
+  );
+}
 
 type TargetOption = { lexemeId: string; label: string; state: string };
 type GrammarOption = { id: string; title: string; level: string; status: string };
@@ -27,7 +44,13 @@ export function ReadingForm({
   targets: TargetOption[];
   grammarOptions: GrammarOption[];
 }) {
+  const router = useRouter();
   const [state, action] = useActionState(createGeneratedReading, initialState);
+  useEffect(() => {
+    if (state.status === "success" && state.readingId) {
+      router.push(`/reading/${state.readingId}`);
+    }
+  }, [router, state]);
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedTargets = useMemo(
@@ -56,9 +79,9 @@ export function ReadingForm({
             id="reading-length"
             name="length"
             options={[
-              { label: "Short", value: "SHORT" },
-              { label: "Medium", value: "MEDIUM" },
-              { label: "Long", value: "LONG" },
+              { label: "Short · 5 target words", value: "SHORT" },
+              { label: "Medium · 10 target words", value: "MEDIUM" },
+              { label: "Long · 15 target words", value: "LONG" },
             ]}
           />
         </div>
@@ -180,16 +203,7 @@ export function ReadingForm({
       {state.status === "error" ? (
         <StatusNotice tone="error">{state.message}</StatusNotice>
       ) : null}
-      {state.status === "success" ? (
-        <StatusNotice tone="success">
-          {state.message}
-          {state.readingId ? (
-            <Link href={"/reading/" + state.readingId} className="status-link">
-              Read now <ArrowRight size={15} />
-            </Link>
-          ) : null}
-        </StatusNotice>
-      ) : null}
+      <ReadingGenerationPreview navigating={state.status === "success" && Boolean(state.readingId)} />
 
       <ActionButton pendingLabel="Generating reading…">
         <BookOpenText size={18} />

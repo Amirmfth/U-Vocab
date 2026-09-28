@@ -25,11 +25,9 @@ export type VocabularyRecommendation = {
 export function scoreRecommendation(input: {
   similarity: number;
   graphNeighbor: boolean;
-  topicOverlap: boolean;
   recentEncounter: boolean;
   levelMatch: boolean;
   weakAnchor: boolean;
-  usefulness: number;
 }) {
   const reasons: RecommendationReason[] = [];
   let score = 0;
@@ -37,13 +35,6 @@ export function scoreRecommendation(input: {
   if (input.graphNeighbor) {
     score += 0.24;
     reasons.push({ label: "connected to vocabulary you know", weight: 0.24 });
-  }
-  if (input.topicOverlap) {
-    score += 0.15;
-    reasons.push({
-      label: "fits a topic or collection you are learning",
-      weight: 0.15,
-    });
   }
   if (input.recentEncounter) {
     score += 0.16;
@@ -56,14 +47,6 @@ export function scoreRecommendation(input: {
   if (input.weakAnchor) {
     score += 0.08;
     reasons.push({ label: "reinforces a recurring weak area", weight: 0.08 });
-  }
-  if (input.usefulness >= 4) {
-    const usefulnessWeight = input.usefulness === 5 ? 0.08 : 0.05;
-    score += usefulnessWeight;
-    reasons.push({
-      label: "high-usefulness vocabulary",
-      weight: usefulnessWeight,
-    });
   }
   if (input.similarity > 0) {
     const semanticWeight = Math.max(
@@ -105,9 +88,6 @@ export async function getVocabularyRecommendations(
           include: {
             outgoing: { select: { targetId: true } },
             incoming: { select: { sourceId: true } },
-            topicPackItems: {
-              select: { topicPackId: true, usefulness: true },
-            },
             mistakes: {
               where: { userId, resolvedAt: null },
               select: { occurrences: true },
@@ -144,11 +124,6 @@ export async function getVocabularyRecommendations(
       ...item.lexeme.incoming.map((relation) => relation.sourceId),
     ]),
   );
-  const topicIds = new Set(
-    known.flatMap((item) =>
-      item.lexeme.topicPackItems.map((topic) => topic.topicPackId),
-    ),
-  );
   const encounteredIds = new Set(
     recentUnknownEncounters.map((encounter) => encounter.lexemeId),
   );
@@ -165,30 +140,15 @@ export async function getVocabularyRecommendations(
     .slice(0, 8)
     .map((item) => item.lexemeId);
 
-  const [topicCandidates, levelCandidates] = await Promise.all([
-    topicIds.size
-      ? db.topicPackItem.findMany({
-          where: {
-            topicPackId: { in: [...topicIds] },
-            lexeme: {
-              userStates: { none: { userId } },
-            },
-          },
-          select: { lexemeId: true },
-          orderBy: [{ usefulness: "desc" }, { position: "asc" }],
-          take: 120,
-        })
-      : Promise.resolve([]),
-    db.lexeme.findMany({
+  const levelCandidates = await db.lexeme.findMany({
       where: {
         userStates: { none: { userId } },
-        insights: { some: { level: user.targetLevel } },
+        cefrLevel: user.targetLevel,
       },
       select: { id: true },
       take: 120,
       orderBy: { updatedAt: "desc" },
-    }),
-  ]);
+    });
 
   const semanticSimilarities = new Map<string, number>();
 
@@ -230,7 +190,6 @@ export async function getVocabularyRecommendations(
   const signalIds = new Set<string>([
     ...graphIds,
     ...encounteredIds,
-    ...topicCandidates.map((item) => item.lexemeId),
     ...levelCandidates.map((item) => item.id),
     ...semanticSimilarities.keys(),
   ]);
@@ -249,10 +208,6 @@ export async function getVocabularyRecommendations(
     },
     include: {
       translations: true,
-      insights: { select: { level: true } },
-      topicPackItems: {
-        select: { topicPackId: true, usefulness: true },
-      },
     },
   });
 
@@ -260,27 +215,16 @@ export async function getVocabularyRecommendations(
     .map((candidate) => {
       const similarity = semanticSimilarities.get(candidate.id) ?? 0;
       const graphNeighbor = graphIds.has(candidate.id);
-      const topicOverlap = candidate.topicPackItems.some((topic) =>
-        topicIds.has(topic.topicPackId),
-      );
       const recentEncounter = encounteredIds.has(candidate.id);
-      const levelMatch = candidate.insights.some(
-        (insight) => insight.level === user.targetLevel,
-      );
+      const levelMatch = candidate.cefrLevel === user.targetLevel;
       const semanticWeakLink = similarity >= 0.72;
-      const usefulness = candidate.topicPackItems.reduce(
-        (max, item) => Math.max(max, item.usefulness),
-        0,
-      );
 
       const ranked = scoreRecommendation({
         similarity,
         graphNeighbor,
-        topicOverlap,
         recentEncounter,
         levelMatch,
         weakAnchor: semanticWeakLink,
-        usefulness,
       });
 
       const english =

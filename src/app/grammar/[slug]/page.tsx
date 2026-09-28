@@ -19,6 +19,9 @@ import {
 } from "@/lib/grammar/learner-policy";
 import { getVocabularyForGrammarConcept } from "@/lib/grammar/related-vocabulary";
 import { startGrammarConceptAction } from "../actions";
+import { grammarLessonSchema } from "@/lib/ai/grammar-lesson";
+import { GrammarLessonContent } from "./GrammarLessonContent";
+import { TeachGrammarSheet } from "./TeachGrammarSheet";
 
 function stringArray(value: unknown): string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string")
@@ -97,6 +100,7 @@ export default async function GrammarConceptPage({
         orderBy: { createdAt: "desc" },
         take: 6,
       },
+      lessons: true,
     },
   });
 
@@ -112,6 +116,13 @@ export default async function GrammarConceptPage({
   const rules = stringArray(concept.rules);
   const examples = stringArray(concept.examples);
   const exceptions = stringArray(concept.exceptions);
+  const lessonLanguage = user.preferredTranslation === "PERSIAN" ? "fa" : "en";
+  const selectedLesson = concept.lessons.find((item) => item.language === lessonLanguage)
+    ?? concept.lessons.find((item) => item.language === "en");
+  const lesson = selectedLesson
+    ? grammarLessonSchema.safeParse(selectedLesson)
+    : null;
+  const richLesson = lesson?.success ? lesson.data : null;
 
   return (
     <main className="page grammar-detail">
@@ -135,6 +146,11 @@ export default async function GrammarConceptPage({
         <p className="page-description">{concept.shortDescription}</p>
 
         <div className="grammar-detail-actions">
+          <TeachGrammarSheet
+            grammarConceptId={concept.id}
+            label={concept.title}
+            language={user.preferredTranslation === "PERSIAN" ? "fa" : "en"}
+          />
           {status !== "STRONG" ? (
             <form action={startGrammarConceptAction}>
               <input type="hidden" name="grammarConceptId" value={concept.id} />
@@ -185,47 +201,68 @@ export default async function GrammarConceptPage({
         </section>
       ) : null}
 
-      <div className="grammar-detail-grid">
-        <section className="panel grammar-teaching-card">
-          <p className="eyebrow">WHY IT MATTERS</p>
-          <h2>{concept.title}</h2>
-          <p>{concept.explanation || concept.shortDescription}</p>
-        </section>
-
+      <section className="panel grammar-canonical-reference">
+        <p className="eyebrow">CANONICAL REFERENCE</p>
+        <h2>The curriculum definition</h2>
+        <p>{concept.explanation || concept.shortDescription}</p>
         {rules.length ? (
-          <section className="panel grammar-teaching-card">
-            <p className="eyebrow">THE PATTERN</p>
-            <h2>Rules</h2>
+          <details>
+            <summary>Canonical rules</summary>
             <ol className="grammar-rule-list">
               {rules.map((rule) => <li key={rule}>{rule}</li>)}
             </ol>
-          </section>
+          </details>
         ) : null}
-      </div>
-
-      {examples.length ? (
-        <section className="page-section">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">EXAMPLES</p>
-              <h2>See the structure in context</h2>
+        {examples.length ? (
+          <details>
+            <summary>Canonical examples</summary>
+            <div className="grammar-example-list">
+              {examples.map((example) => (
+                <div className="grammar-example" key={example}>{example}</div>
+              ))}
             </div>
+          </details>
+        ) : null}
+      </section>
+
+      {richLesson ? (
+        <GrammarLessonContent lesson={richLesson} language={selectedLesson?.language === "fa" ? "fa" : "en"} />
+      ) : (
+        <>
+          <div className="grammar-detail-grid">
+            <section className="panel grammar-teaching-card">
+              <p className="eyebrow">WHY IT MATTERS</p>
+              <h2>{concept.title}</h2>
+              <p>{concept.explanation || concept.shortDescription}</p>
+            </section>
+            {rules.length ? (
+              <section className="panel grammar-teaching-card">
+                <p className="eyebrow">THE PATTERN</p>
+                <h2>Rules</h2>
+                <ol className="grammar-rule-list">
+                  {rules.map((rule) => <li key={rule}>{rule}</li>)}
+                </ol>
+              </section>
+            ) : null}
           </div>
-          <div className="grammar-example-list">
-            {examples.map((example) => (
-              <div className="grammar-example" key={example}>{example}</div>
-            ))}
-          </div>
-        </section>
-      ) : null}
+          <section className="panel grammar-lesson-missing">
+            <p className="eyebrow">FULL LESSON</p>
+            <h2>Rich lesson data has not been generated yet</h2>
+            <p className="muted">
+              Run the grammar lesson backfill to populate the complete lesson for this concept.
+              “Teach me more” is still available above for an on-demand explanation.
+            </p>
+          </section>
+        </>
+      )}
 
       <section className="panel grammar-watch-card">
         <CircleAlert size={20} />
         <div>
-          <p className="eyebrow">WATCH FOR</p>
+          <p className="eyebrow">QUICK WARNING</p>
           <h2>Common source of mistakes</h2>
           <p>{watchFor(concept.category)}</p>
-          {exceptions.length ? (
+          {!richLesson && exceptions.length ? (
             <ul>
               {exceptions.map((exception) => <li key={exception}>{exception}</li>)}
             </ul>

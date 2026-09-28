@@ -22,9 +22,6 @@ export async function createConversationSessionAction(
     String(formData.get("kind") ?? "PRACTICE") === "MISSION"
       ? "MISSION"
       : "PRACTICE";
-  const collectionRaw = String(formData.get("collectionId") ?? "").trim();
-  const collectionId =
-    collectionRaw && collectionRaw !== "NONE" ? collectionRaw : null;
   const topic = String(formData.get("topic") ?? "").trim() || null;
   const toneRaw = String(formData.get("tone") ?? "FRIENDLY");
   const tone = ["FRIENDLY","PROFESSIONAL","PLAYFUL","DIRECT","SUPPORTIVE"].includes(toneRaw)
@@ -44,7 +41,6 @@ export async function createConversationSessionAction(
     const user = await getCurrentUser();
     const targets = await selectConversationTargets({
       userId: user.id,
-      collectionId,
       limit: targetCount,
     });
 
@@ -94,7 +90,6 @@ export async function createConversationSessionAction(
     });
 
     revalidatePath("/conversation");
-    revalidatePath("/missions");
 
     return {
       status: "success",
@@ -233,7 +228,6 @@ export async function completeConversationAction(
 
     revalidatePath("/conversation/" + session.id);
     revalidatePath("/conversation");
-    revalidatePath("/missions");
 
     return {
       status: "success",

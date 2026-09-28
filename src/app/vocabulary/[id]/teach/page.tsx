@@ -8,7 +8,6 @@ import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { buildExercise } from "@/lib/exercises/build";
 import { PracticeForm } from "@/app/practice/PracticeForm";
-import { LexicalInsightPanel } from "../LexicalInsightPanel";
 import { ScheduleReviewForm } from "./ScheduleReviewForm";
 
 
@@ -29,10 +28,6 @@ export default async function TeachWordPage({
       translations: true,
       patterns: true,
       examples: { take: 6 },
-      insights: {
-        where: { level: user.targetLevel },
-        take: 1,
-      },
       outgoing: {
         include: { target: { include: { translations: true } } },
         take: 8,
@@ -46,7 +41,6 @@ export default async function TeachWordPage({
 
   if (!word || !word.userStates[0]) notFound();
 
-  const insight = word.insights[0];
   const item = word.userStates[0];
   const visibleTranslations = word.translations.filter((translation) =>
     isTranslationVisible(user.preferredTranslation, translation.language),
@@ -91,23 +85,6 @@ export default async function TeachWordPage({
             </p>
           ))}
 
-          {insight ? (
-            <>
-              <h3>German definition</h3>
-              <p>{insight.germanDefinition}</p>
-              {user.preferredTranslation !== "PERSIAN" ? (
-                <p className="muted">{insight.englishExplanation}</p>
-              ) : null}
-              {user.preferredTranslation !== "ENGLISH" ? (
-                <p className="rtl muted">{insight.persianExplanation}</p>
-              ) : null}
-            </>
-          ) : (
-            <div className="empty-state compact-empty">
-              <strong>No guided explanation yet.</strong>
-              <span>Generate one at your current {user.targetLevel} level.</span>
-            </div>
-          )}
         </article>
 
         <article className="panel lesson-section">
@@ -130,7 +107,6 @@ export default async function TeachWordPage({
             <p className="muted">No structured grammar pattern is stored yet.</p>
           )}
 
-          {insight ? <p>{insight.grammarNotes}</p> : null}
         </article>
 
         <article className="panel lesson-section">
@@ -180,16 +156,10 @@ export default async function TeachWordPage({
               ))}
             </div>
           ) : (
-            <p className="muted">Use “Expand this word” to build this lexical family.</p>
+            <p className="muted">Related vocabulary will appear here when available.</p>
           )}
         </article>
       </section>
-
-      {!insight ? (
-        <section className="panel learning-card">
-          <LexicalInsightPanel lexemeId={word.id} hasInsight={false} />
-        </section>
-      ) : null}
 
       <section className="lesson-production">
         <div className="section-heading">

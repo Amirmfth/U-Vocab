@@ -564,3 +564,10 @@ Reading means **generated personalized German reading with comprehension assessm
 Recommendations are deterministic and explainable. They prioritize recurring weaknesses, concepts already being learned, prerequisite gaps and appropriate next concepts between current and target level while avoiding strong or recently overexposed grammar. Related personal vocabulary is used when it makes practice more relevant.
 
 A user-facing Grammar Universe/graph is intentionally excluded. The prerequisite graph exists internally for sequencing and explanation, not as the product UI.
+
+
+### Rich grammar teaching
+
+Grammar concept pages contain a complete stored lesson directly at `/grammar/[slug]`; there is no separate grammar teaching route. Canonical curriculum data remains separate from AI-generated teaching content. Existing concepts can be populated or refreshed with `npm run db:backfill-grammar-lessons`.
+
+The page-level **Teach me more** bottom sheet generates a fresh alternative explanation without overwriting the stored lesson.

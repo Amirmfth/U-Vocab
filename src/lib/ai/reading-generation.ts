@@ -37,6 +37,7 @@ export async function generateReading(input: {
   userId: string;
   level: string;
   length: "SHORT" | "MEDIUM" | "LONG";
+  minimumTargets: number;
   topic?: string | null;
   selectedTargets: Array<{ lemma: string; pattern?: string | null }>;
   candidateTargets: Array<{ lemma: string; pattern?: string | null }>;
@@ -75,7 +76,7 @@ export async function generateReading(input: {
           {
             role: "system",
             content:
-              "Generate natural, coherent German reading material whose main purpose is reading comprehension. Match the requested CEFR level. selectedTargets and grammarConcepts are preferences, not quotas: use them only where natural and never damage idiomatic text to force coverage. candidateTargets are optional vocabulary candidates. Return usedTargets only for exact target lemmas that genuinely appear. grammarConcepts is the ONLY grammar-ID allowlist; grammarCoverage and GRAMMAR questions may reference only those IDs. Coverage must quote an excerpt that actually demonstrates the concept. It is acceptable to return lower grammar/vocabulary coverage when naturalness requires it. Include mostly comprehension questions, with at most two vocabulary/grammar questions. Questions must be answerable from the text and have exactly four options. A GRAMMAR question should test understanding of the structure in context, not terminology trivia. Do not reveal question answers in annotations or explanations embedded in the reading text.",
+              "Generate natural, coherent German reading material whose main purpose is reading comprehension. Match the requested CEFR level. Include at least minimumTargets DISTINCT vocabulary lemmas from selectedTargets and candidateTargets as exact standalone words or phrases in the content, prioritizing selectedTargets. Plan the story around them so the prose remains idiomatic. Return usedTargets only for target lemmas that genuinely appear. grammarConcepts is the ONLY grammar-ID allowlist; grammarCoverage and GRAMMAR questions may reference only those IDs. Coverage must quote an excerpt that actually demonstrates the concept. Grammar coverage may be lower when naturalness requires it. Include mostly comprehension questions, with at most two vocabulary/grammar questions. Questions must be answerable from the text and have exactly four options. A GRAMMAR question should test understanding of the structure in context, not terminology trivia. Do not reveal question answers in annotations or explanations embedded in the reading text.",
           },
           {
             role: "user",

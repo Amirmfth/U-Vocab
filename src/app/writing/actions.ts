@@ -38,37 +38,8 @@ export type WritingActionState = {
 
 async function selectGuidedTargets(input: {
   userId: string;
-  collectionId?: string | null;
   limit: number;
 }) {
-  if (input.collectionId) {
-    const pack = await db.topicPack.findFirst({
-      where: { id: input.collectionId, userId: input.userId },
-      select: {
-        items: {
-          select: {
-            lexemeId: true,
-            lexeme: {
-              select: {
-                lemma: true,
-                patterns: { select: { pattern: true } },
-              },
-            },
-          },
-          orderBy: [{ usefulness: "desc" }, { position: "asc" }],
-          take: input.limit,
-        },
-      },
-    });
-    if (pack?.items.length) {
-      return pack.items.map((item) => ({
-        id: item.lexemeId,
-        lemma: item.lexeme.lemma,
-        patterns: item.lexeme.patterns.map((pattern) => pattern.pattern),
-      }));
-    }
-  }
-
   const weak = await db.userVocabulary.findMany({
     where: { userId: input.userId },
     select: {
@@ -118,9 +89,6 @@ export async function createWritingSessionAction(
     60,
     Math.min(500, Number.isFinite(requestedWords) ? requestedWords : 120),
   );
-  const rawCollection = String(formData.get("collectionId") ?? "").trim();
-  const collectionId =
-    rawCollection && rawCollection !== "NONE" ? rawCollection : null;
 
   return instrumentOperation(
     "writing.create",
@@ -129,7 +97,6 @@ export async function createWritingSessionAction(
       level,
       taskType,
       targetWords,
-      hasCollection: Boolean(collectionId),
     },
     async (perf) => {
       try {
@@ -139,7 +106,6 @@ export async function createWritingSessionAction(
             ? await perf.span("dbRead", () =>
                 selectGuidedTargets({
                   userId: user.id,
-                  collectionId,
                   limit: 6,
                 }),
               )

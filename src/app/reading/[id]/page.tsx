@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { isTranslationVisible } from "@/lib/translations";
 import { ReadingAssessment } from "./ReadingAssessment";
+import { ReadingText } from "./ReadingText";
 
 type ReadingQuestion = {
   type: "COMPREHENSION" | "VOCABULARY" | "GRAMMAR";
@@ -66,11 +67,21 @@ export default async function ReadingDetailPage({
         ) : null}
       </section>
 
-      <article className="panel generated-reading-text">
-        {reading.content.split(/\n{2,}/u).map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
-        ))}
-      </article>
+      <ReadingText
+        content={reading.content}
+        preference={user.preferredTranslation}
+        targets={reading.targets.map((target) => ({
+          id: target.lexeme.id,
+          lemma: target.lexeme.lemma,
+          article: target.lexeme.article,
+          partOfSpeech: target.lexeme.partOfSpeech,
+          cefrLevel: target.lexeme.cefrLevel,
+          translations: target.lexeme.translations.map((translation) => ({
+            language: translation.language,
+            text: translation.text,
+          })),
+        }))}
+      />
 
       {reading.grammarTargets.length ? (
         <section className="panel reading-language-notes">

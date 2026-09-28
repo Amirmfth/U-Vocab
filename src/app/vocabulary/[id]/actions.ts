@@ -1,13 +1,10 @@
 "use server";
 
-import type { PartOfSpeech, RelationType, VocabularyState } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
-import { generateLexicalInsight } from "@/lib/ai/lexical-insight";
 import { generateLexicalExamples } from "@/lib/ai/lexical-examples";
 import { generateQuickTeach } from "@/lib/ai/quick-teach";
-import { generateWordExpansion } from "@/lib/ai/expand-word";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 
 export type InsightActionState = {
@@ -15,7 +12,7 @@ export type InsightActionState = {
   message?: string;
 };
 
-export async function generateQuickTeachAction(lexemeId: string) {
+export async function generateQuickTeachAction(lexemeId: string, displayLanguage?: "en" | "fa") {
   try {
     const user = await getCurrentUser();
     const lexeme = await db.lexeme.findFirst({
@@ -30,7 +27,9 @@ export async function generateQuickTeachAction(lexemeId: string) {
     });
     if (!lexeme) return { status: "error" as const, message: "This word is not in your vocabulary." };
 
-    const language = user.preferredTranslation === "PERSIAN" ? "Persian" : "English";
+    const language = (displayLanguage ?? (user.preferredTranslation === "PERSIAN" ? "fa" : "en")) === "fa"
+      ? "Persian"
+      : "English";
     const meaning = lexeme.translations.find((item) => item.language === (language === "Persian" ? "fa" : "en"))?.text
       ?? lexeme.translations[0]?.text
       ?? "";
@@ -123,279 +122,25 @@ export async function generateExamplesAction(
   }
 }
 
-export type ExpansionSuggestion = {
-  lemma: string;
-  partOfSpeech: string;
-  article: string | null;
-  plural: string | null;
-  englishMeaning: string;
-  persianMeaning: string;
-  relationType: string;
-  rationale: string;
-  usefulness: number;
-  existingLexemeId: string | null;
-  userState: VocabularyState | null;
-};
-
-export type ExpansionState = {
-  status: "idle" | "success" | "error";
-  message?: string;
-  suggestions?: ExpansionSuggestion[];
-};
-
 export async function generateInsightAction(
   _previous: InsightActionState,
-  formData: FormData,
+  _formData: FormData,
 ): Promise<InsightActionState> {
-  const lexemeId = String(formData.get("lexemeId") ?? "");
-
-  try {
-    const user = await getCurrentUser();
-    const lexeme = await db.lexeme.findFirst({
-      where: {
-        id: lexemeId,
-        userStates: { some: { userId: user.id } },
-      },
-      include: { patterns: true },
-    });
-
-    if (!lexeme) {
-      return { status: "error", message: "This lexical unit is not in your vocabulary." };
-    }
-
-    const result = await generateLexicalInsight({
-      userId: user.id,
-      lemma: lexeme.lemma,
-      article: lexeme.article,
-      plural: lexeme.plural,
-      partOfSpeech: lexeme.partOfSpeech,
-      patterns: lexeme.patterns.map((pattern) => pattern.pattern),
-      level: user.targetLevel,
-    });
-
-    await db.lexemeInsight.upsert({
-        where: {
-          lexemeId_level: {
-            lexemeId: lexeme.id,
-            level: user.targetLevel,
-          },
-        },
-        create: {
-          lexemeId: lexeme.id,
-          level: user.targetLevel,
-          germanDefinition: result.germanDefinition,
-          englishExplanation: result.englishExplanation,
-          persianExplanation: result.persianExplanation,
-          grammarNotes: result.grammarNotes,
-        },
-        update: {
-          germanDefinition: result.germanDefinition,
-          englishExplanation: result.englishExplanation,
-          persianExplanation: result.persianExplanation,
-          grammarNotes: result.grammarNotes,
-          comparisonTarget: null,
-          comparisonNotes: null,
-          version: { increment: 1 },
-        },
-    });
-
-    revalidateUserDomains(user.id, ["vocabulary"], [lexeme.id]);
-    revalidatePath(`/vocabulary/${lexeme.id}`);
-    revalidatePath(`/vocabulary/${lexeme.id}/teach`);
-
-    return {
-      status: "success",
-      message: "Contextual explanation regenerated.",
-    };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not generate this explanation.",
-    };
-  }
+  return { status: "error", message: "Contextual explanations are disabled." };
 }
 
 export async function generateExpansionAction(
-  _previous: ExpansionState,
-  formData: FormData,
-): Promise<ExpansionState> {
-  const lexemeId = String(formData.get("lexemeId") ?? "");
-
-  try {
-    const user = await getCurrentUser();
-    const lexeme = await db.lexeme.findFirst({
-      where: {
-        id: lexemeId,
-        userStates: { some: { userId: user.id } },
-      },
-      include: { patterns: true },
-    });
-
-    if (!lexeme) {
-      return { status: "error", message: "This lexical unit is not in your vocabulary." };
-    }
-
-    const refresh = String(formData.get("refresh") ?? "") === "true";
-    const result = await generateWordExpansion({
-      refresh,
-      userId: user.id,
-      lemma: lexeme.lemma,
-      partOfSpeech: lexeme.partOfSpeech,
-      patterns: lexeme.patterns.map((pattern) => pattern.pattern),
-      level: user.targetLevel,
-    });
-
-    const uniqueSuggestions = Array.from(
-      new Map(
-        result.suggestions
-          .filter(
-            (suggestion) =>
-              suggestion.lemma.toLocaleLowerCase("de-DE").trim() !== lexeme.normalized,
-          )
-          .map((suggestion) => [
-            suggestion.lemma.toLocaleLowerCase("de-DE").trim() + ":" + suggestion.partOfSpeech,
-            suggestion,
-          ]),
-      ).values(),
-    ).sort((a, b) => b.usefulness - a.usefulness);
-
-    const suggestions = await Promise.all(
-      uniqueSuggestions.map(async (suggestion) => {
-          const existing = await db.lexeme.findUnique({
-            where: {
-              language_normalized_partOfSpeech: {
-                language: "de",
-                normalized: suggestion.lemma.toLocaleLowerCase("de-DE"),
-                partOfSpeech: suggestion.partOfSpeech,
-              },
-            },
-            include: {
-              userStates: {
-                where: { userId: user.id },
-                select: { state: true },
-                take: 1,
-              },
-            },
-          });
-
-          return {
-            ...suggestion,
-            existingLexemeId: existing?.id ?? null,
-            userState: existing?.userStates[0]?.state ?? null,
-          };
-        }),
-    );
-
-    return { status: "success", suggestions };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not expand this word.",
-    };
-  }
+  _previous: InsightActionState,
+  _formData: FormData,
+): Promise<InsightActionState> {
+  return { status: "error", message: "Word expansion is disabled." };
 }
 
-export type AddExpansionState = {
-  status: "idle" | "success" | "error";
-  message?: string;
-};
-
 export async function addExpansionAction(
-  _previous: AddExpansionState,
-  formData: FormData,
-): Promise<AddExpansionState> {
-  const sourceId = String(formData.get("sourceId") ?? "");
-  const lemma = String(formData.get("lemma") ?? "").trim();
-  const partOfSpeech = String(formData.get("partOfSpeech") ?? "") as PartOfSpeech;
-  const article = String(formData.get("article") ?? "").trim() || null;
-  const plural = String(formData.get("plural") ?? "").trim() || null;
-  const englishMeaning = String(formData.get("englishMeaning") ?? "").trim();
-  const persianMeaning = String(formData.get("persianMeaning") ?? "").trim();
-  const relationType = String(formData.get("relationType") ?? "") as RelationType;
-
-  try {
-    const user = await getCurrentUser();
-    const source = await db.lexeme.findFirst({
-      where: {
-        id: sourceId,
-        userStates: { some: { userId: user.id } },
-      },
-    });
-    if (!source) {
-      return { status: "error", message: "Source vocabulary item not found." };
-    }
-
-    const normalized = lemma.toLocaleLowerCase("de-DE");
-    const target = await db.lexeme.upsert({
-      where: {
-        language_normalized_partOfSpeech: {
-          language: "de",
-          normalized,
-          partOfSpeech,
-        },
-      },
-      create: {
-        lemma,
-        normalized,
-        partOfSpeech,
-        article,
-        plural,
-        cefrLevel: user.targetLevel,
-        translations: {
-          create: [
-            { language: "en", text: englishMeaning },
-            { language: "fa", text: persianMeaning },
-          ],
-        },
-      },
-      update: {},
-    });
-
-    await db.$transaction([
-      db.userVocabulary.upsert({
-        where: {
-          userId_lexemeId: { userId: user.id, lexemeId: target.id },
-        },
-        create: {
-          userId: user.id,
-          lexemeId: target.id,
-          state: "NEW",
-          nextReviewAt: new Date(),
-        },
-        update: {},
-      }),
-      db.lexemeRelation.upsert({
-        where: {
-          sourceId_targetId_type: {
-            sourceId: source.id,
-            targetId: target.id,
-            type: relationType,
-          },
-        },
-        create: {
-          sourceId: source.id,
-          targetId: target.id,
-          type: relationType,
-        },
-        update: {},
-      }),
-    ]);
-
-    revalidateUserDomains(
-      user.id,
-      ["home", "vocabulary", "review", "progress"],
-      [source.id, target.id],
-    );
-    revalidatePath(`/vocabulary/${source.id}`);
-    revalidatePath("/vocabulary");
-
-    return { status: "success", message: "Added to vocabulary and linked in the lexical graph." };
-  } catch (error) {
-    return {
-      status: "error",
-      message: error instanceof Error ? error.message : "Could not add this lexical unit.",
-    };
-  }
+  _previous: InsightActionState,
+  _formData: FormData,
+): Promise<InsightActionState> {
+  return { status: "error", message: "Word expansion is disabled." };
 }
 
 export async function scheduleTeachReviewAction(

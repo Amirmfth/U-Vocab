@@ -5,7 +5,6 @@ import {
   BookOpenCheck,
   Brain,
   Network,
-  Sparkles,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -17,10 +16,7 @@ import {
   getCachedWordPrimary,
   getCachedWordSecondary,
 } from "@/lib/cached-data";
-import { isTranslationVisible } from "@/lib/translations";
-import { LexicalInsightPanel } from "./LexicalInsightPanel";
-import { TranslationModeControl } from "@/components/translation-mode-control";
-import { ExpansionPanel } from "./ExpansionPanel";
+import { WordExampleMeaning, WordLanguageProvider, WordLanguageSwitch, WordMeaning } from "./WordLanguage";
 import { VerbConjugation } from "./VerbConjugation";
 import { ExampleGenerationPanel } from "./ExampleGenerationPanel";
 import { TeachWordSheet } from "./TeachWordSheet";
@@ -124,21 +120,15 @@ function WordMastery({ state }: { state: PrimaryWord["userStates"][number] }) {
 function SecondaryWordSkeleton() {
   return (
     <>
-      <section className="page-section" aria-busy="true">
-        <div className="skeleton skeleton-title" />
-        <div className="word-history-grid">
-          <div className="skeleton skeleton-card" />
-          <div className="skeleton skeleton-card" />
+      <section className="page-section" aria-busy="true" aria-label="Loading word details">
+        <div className="skeleton loading-section-heading" />
+        <div className="loading-example-grid">
+          <div className="skeleton loading-example-card" />
+          <div className="skeleton loading-example-card" />
         </div>
       </section>
-      <section className="panel word-detail-card" aria-busy="true">
-        <div className="skeleton skeleton-title" />
-        <div className="skeleton skeleton-copy" />
-      </section>
-      <section className="panel intelligence-panel" aria-busy="true">
-        <div className="skeleton skeleton-title" />
-        <div className="skeleton skeleton-copy" />
-      </section>
+      <div className="skeleton loading-word-disclosure" aria-hidden="true" />
+      <div className="skeleton loading-word-disclosure" aria-hidden="true" />
     </>
   );
 }
@@ -147,14 +137,12 @@ async function DeferredWordDetails({
   userId,
   lexemeId,
   level,
-  preferredTranslation,
   patterns,
   primaryState,
 }: {
   userId: string;
   lexemeId: string;
   level: string;
-  preferredTranslation: "ENGLISH" | "PERSIAN" | "BOTH";
   patterns: PrimaryWord["patterns"];
   primaryState: PrimaryWord["userStates"][number];
 }) {
@@ -162,7 +150,6 @@ async function DeferredWordDetails({
   if (!word) return null;
 
   const state = word.userStates[0];
-  const insight = word.insights[0];
 
   return (
     <>
@@ -183,8 +170,7 @@ async function DeferredWordDetails({
                   {example.register ? <span className="badge">{example.register}</span> : null}
                 </div>
                 <strong>{example.german}</strong>
-                {preferredTranslation !== "PERSIAN" && example.english ? <p className="muted">{example.english}</p> : null}
-                {preferredTranslation !== "ENGLISH" && example.persian ? <p className="rtl muted">{example.persian}</p> : null}
+                <WordExampleMeaning english={example.english} persian={example.persian} />
               </article>
             ))}
           </div>
@@ -195,55 +181,7 @@ async function DeferredWordDetails({
       <GrammarAndUsage patterns={patterns} />
       <LexicalGrammarLinks links={word.grammarLinks} />
 
-      <section className="panel intelligence-panel">
-        <div className="section-heading">
-          <div>
-            <h2>Contextual explanation</h2>
-          </div>
-          <Sparkles size={20} />
-        </div>
-
-        {insight ? (
-          <div className="insight-content">
-            <div className="word-insight-language word-insight-language--ltr" dir="ltr" lang="de">
-              <h3>German definition</h3>
-              <p>{insight.germanDefinition}</p>
-            </div>
-
-            {preferredTranslation !== "PERSIAN" ? (
-              <div className="word-insight-language word-insight-language--ltr" dir="ltr" lang="en">
-                <h3>English explanation</h3>
-                <p className="muted">{insight.englishExplanation}</p>
-              </div>
-            ) : null}
-
-            {preferredTranslation !== "ENGLISH" ? (
-              <div className="word-insight-language word-insight-language--rtl" dir="rtl" lang="fa">
-                <h3>توضیح فارسی</h3>
-                <p className="muted">{insight.persianExplanation}</p>
-              </div>
-            ) : null}
-
-            <div className="word-insight-language word-insight-language--ltr" dir="ltr" lang="en">
-              <h3>Grammar notes</h3>
-              <p>{insight.grammarNotes}</p>
-            </div>
-
-          </div>
-        ) : (
-          <div className="empty-state compact-empty">
-            <strong>No contextual explanation generated yet.</strong>
-          </div>
-        )}
-
-        <LexicalInsightPanel
-          lexemeId={word.id}
-          hasInsight={Boolean(insight)}
-        />
-      </section>
-
       <WordMastery state={primaryState} />
-      <ExpansionPanel lexemeId={word.id} />
 
       {word.outgoing.length ? (
         <section className="panel intelligence-panel">
@@ -340,28 +278,6 @@ async function DeferredWordDetails({
           )}
         </article>
 
-        <article className="panel word-detail-card">
-          <p className="eyebrow">COLLECTIONS</p>
-          <h2>Saved context</h2>
-          {word.topicPackItems.length ? (
-            <div className="relation-list">
-              {word.topicPackItems.map((item) => (
-                <Link
-                  href={"/topic-packs/" + item.topicPack.id}
-                  className="relation-chip"
-                  key={item.id}
-                  prefetch
-                >
-                  <span>{item.topicPack.title}</span>
-                  <small>{item.topicPack.level}</small>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="muted">Not in a topic pack yet.</p>
-          )}
-        </article>
-
         </section>
       </details>
 
@@ -391,12 +307,6 @@ export default async function Word({
   }
 
   const state = word.userStates[0];
-  const translations = word.translations.filter((translation) =>
-    isTranslationVisible(
-      user.preferredTranslation,
-      translation.language,
-    ),
-  );
   perf.success({
     found: true,
     primaryPatternCount: word.patterns.length,
@@ -404,6 +314,7 @@ export default async function Word({
 
   return (
     <main className="page word-detail-page">
+      <WordLanguageProvider preference={user.preferredTranslation}>
       <WordPageScrollReset wordId={word.id} />
       <section className="page-header word-identity-hero">
         <div className="word-detail-topline">
@@ -412,7 +323,7 @@ export default async function Word({
             <span className="badge">{state.state}</span>
             <span className="badge">{user.targetLevel}</span>
           </div>
-          <TranslationModeControl value={user.preferredTranslation} />
+          <WordLanguageSwitch />
         </div>
 
         <h1>{formatLexemeLabel(word)}</h1>
@@ -423,16 +334,7 @@ export default async function Word({
 
         <div className="word-hero-meanings">
           <div className="word-hero-meaning-list">
-            {translations.map((translation) => (
-              <p
-                key={translation.id}
-                className={"word-hero-meaning word-hero-meaning--" + (translation.language === "fa" ? "fa" : "en")}
-                dir={translation.language === "fa" ? "rtl" : "ltr"}
-                lang={translation.language === "fa" ? "fa" : "en"}
-              >
-                {translation.text}
-              </p>
-            ))}
+            <WordMeaning translations={word.translations} />
           </div>
         </div>
       </section>
@@ -441,7 +343,6 @@ export default async function Word({
           <TeachWordSheet
             lexemeId={word.id}
             label={formatLexemeLabel(word)}
-            language={user.preferredTranslation === "PERSIAN" ? "fa" : "en"}
           />
           <Link href={"/practice?lexeme=" + word.id} className="button button-secondary" prefetch>
             <Brain size={17} /> Practice
@@ -454,11 +355,11 @@ export default async function Word({
           userId={user.id}
           lexemeId={word.id}
           level={user.targetLevel}
-          preferredTranslation={user.preferredTranslation}
           patterns={word.patterns}
           primaryState={state}
         />
       </Suspense>
+      </WordLanguageProvider>
     </main>
   );
 }

@@ -37,7 +37,7 @@ export default async function ConversationSessionPage({
 
   if (!session) notFound();
 
-  const backHref = session.kind === "MISSION" ? "/missions" : "/conversation";
+  const backHref = "/conversation";
   const summary = session.summary
     ? conversationFinalEvaluationSchema.safeParse(session.summary)
     : null;
@@ -47,7 +47,7 @@ export default async function ConversationSessionPage({
       <section className="page-header compact">
         <Link href={backHref} className="back-link">
           <ArrowLeft size={16} />
-          {session.kind === "MISSION" ? "Missions" : "Conversation"}
+          Speaking
         </Link>
 
         <div className="word-meta">

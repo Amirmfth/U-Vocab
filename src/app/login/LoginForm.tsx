@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { StatusNotice } from "@/components/status-notice";
@@ -14,7 +13,6 @@ export function LoginForm({
   returnTo: string;
   passwordReset: boolean;
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,17 +38,17 @@ export function LoginForm({
       });
 
       if (result.error) {
-        setNeedsVerification(result.error.status === 403);
+        const emailNotVerified = result.error.code === "EMAIL_NOT_VERIFIED";
+        setNeedsVerification(emailNotVerified);
         setError(
-          result.error.status === 403
+          emailNotVerified
             ? "Verify your email before signing in. We sent a new verification link."
             : result.error.message || "Could not sign in.",
         );
         return;
       }
 
-      router.replace(returnTo);
-      router.refresh();
+      window.location.replace(returnTo);
     } catch {
       setError("Could not sign in. Check your connection and try again.");
     } finally {

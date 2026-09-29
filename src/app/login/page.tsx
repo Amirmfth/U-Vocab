@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getAuthSession } from "@/lib/auth";
 import { safeReturnTo } from "@/lib/auth-routing";
 import { LoginForm } from "./LoginForm";
 
@@ -9,6 +11,7 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const returnTo = safeReturnTo(params.returnTo);
+  if (await getAuthSession()) redirect(returnTo);
 
   return (
     <main className="login-page">

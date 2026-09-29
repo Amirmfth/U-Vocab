@@ -92,7 +92,7 @@ export function ReadingAssessment({
       {state.status === "success" ? (
         <StatusNotice tone="success">
           <CheckCircle2 size={16} />
-          {t("reading.comprehension", { value: formatPercent(locale, state.score ?? 0).replace("%", "").replace("٪", "") })}
+          {t("reading.comprehension", { percent: formatPercent(locale, state.score ?? 0) })}
         </StatusNotice>
       ) : null}
       {state.status === "error" ? (

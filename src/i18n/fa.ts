@@ -1011,6 +1011,18 @@ export const fa = {
   "progress.grammar.recentEvidence": "شواهد اخیر",
   "progress.grammar.openProfile": "باز کردن پروفایل گرامر",
 
+
+  "loading.surface": "در حال بارگذاری {surface}",
+  "loading.word": "واژه",
+  "loading.readingDetail": "متن خواندنی",
+  "loading.speakingSession": "جلسه گفتاری",
+  "loading.writingTask": "تکلیف نوشتاری",
+  "loading.recurringWeaknesses": "ضعف‌های تکرارشونده",
+  "loading.rescueWords": "واژه‌های تقویتی",
+  "errors.actionTitle": "این عملیات کامل نشد.",
+  "errors.savedSafe": "واژگان ذخیره‌شده شما تغییری نکرده است. این صفحه را دوباره امتحان کنید.",
+  "errors.requestFailed": "درخواست پیش از تکمیل عملیات توسط U-Vocab ناموفق شد.",
+
   "errors.genericTitle": "مشکلی پیش آمد",
   "errors.genericBody": "U-Vocab با یک خطای غیرمنتظره روبه‌رو شد.",
   "errors.tryAgain": "تلاش دوباره",

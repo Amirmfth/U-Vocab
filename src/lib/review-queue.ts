@@ -18,14 +18,15 @@ export type ReviewQueueData={
 
 export async function getReviewQueueData(input:{
   userId:string;
+  userCourseId:string;
   preferredTranslation:TranslationLanguage;
   limit?:number;
   excludeIds?:string[];
 }):Promise<ReviewQueueData>{
   const now=new Date();
-  await repairImpossibleEasySchedules(input.userId,now);
+  await repairImpossibleEasySchedules(input.userCourseId,now);
   const where={
-    userId:input.userId,
+    userCourseId:input.userCourseId,
     id:{ notIn:input.excludeIds??[] },
     OR:[{ nextReviewAt:null },{ nextReviewAt:{ lte:now } }],
   };
@@ -41,7 +42,7 @@ export async function getReviewQueueData(input:{
             patterns:true,
             examples:true,
             mistakes:{
-              where:{ userId:input.userId,resolvedAt:null },
+              where:{ userCourseId:input.userCourseId,resolvedAt:null },
               select:{ type:true },
             },
           },

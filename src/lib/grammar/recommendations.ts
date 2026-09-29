@@ -4,6 +4,7 @@ import type {
   PrismaClient,
 } from "@prisma/client";
 import { CEFR_RANK } from "@/lib/grammar/levels";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type GrammarRecommendationReason =
   | "WEAKNESS"
@@ -124,6 +125,8 @@ export async function getGrammarRecommendation(
   db: PrismaClient,
   input: {
     userId: string;
+    userCourseId: string;
+    targetLanguage: import("@prisma/client").TargetLanguage;
     currentLevel: CefrLevel;
     targetLevel: CefrLevel;
   },
@@ -132,7 +135,7 @@ export async function getGrammarRecommendation(
   const concepts = await db.grammarConcept.findMany({
     where: {
       active: true,
-      language: "de",
+      language: targetLanguageConfig(input.targetLanguage).code,
       introducedAt: {
         in: (Object.keys(CEFR_RANK) as CefrLevel[]).filter(
           (level) => CEFR_RANK[level] <= CEFR_RANK[input.targetLevel],
@@ -141,17 +144,17 @@ export async function getGrammarRecommendation(
     },
     include: {
       userProgress: {
-        where: { userId: input.userId },
+        where: { userCourseId: input.userCourseId },
         take: 1,
       },
       prerequisites: { select: { prerequisiteId: true } },
       mistakes: {
-        where: { userId: input.userId, resolvedAt: null },
+        where: { userCourseId: input.userCourseId, resolvedAt: null },
         select: { occurrences: true },
       },
       evidence: {
         where: {
-          userId: input.userId,
+          userCourseId: input.userCourseId,
           accepted: true,
           createdAt: { gte: recentCutoff },
         },
@@ -160,7 +163,7 @@ export async function getGrammarRecommendation(
       },
       lexemeLinks: {
         where: {
-          lexeme: { userStates: { some: { userId: input.userId } } },
+          lexeme: { userStates: { some: { userCourseId: input.userCourseId } } },
         },
         select: { id: true },
         take: 6,

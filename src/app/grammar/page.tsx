@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import type { CefrLevel, GrammarCategory } from "@prisma/client";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { getGrammarDashboard } from "@/lib/grammar/dashboard";
 import { grammarStatusLabel } from "@/lib/grammar/learner-policy";
 import { CEFR_LEVELS } from "@/lib/grammar/levels";
@@ -62,8 +64,9 @@ export default async function GrammarPage({
   searchParams: Promise<{ level?: string; category?: string }>;
 }) {
   await connection();
-  const user = await getCurrentUser();
-  const dashboard = await getGrammarDashboard(user.id);
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const dashboard = await getGrammarDashboard(user.id, course.id);
+  const language = targetLanguageConfig(course.targetLanguage);
   const params = await searchParams;
 
   const selectedLevel = CEFR_LEVELS.includes(params.level as CefrLevel)
@@ -86,13 +89,13 @@ export default async function GrammarPage({
       <section className="grammar-hero">
         <div>
           <p className="eyebrow">GRAMMAR</p>
-          <h1>Your German structure</h1>
+          <h1>Your {language.label} structure</h1>
           <p className="page-description">
             A curated curriculum that starts from what you already know and
             gets more accurate as U-Vocab sees real evidence.
           </p>
         </div>
-        <div className="grammar-level-path" aria-label="Current and target German levels">
+        <div className="grammar-level-path" aria-label={"Current and target " + language.label + " levels"}>
           <span>
             <small>Current</small>
             <strong>{dashboard.currentLevel}</strong>

@@ -3,9 +3,11 @@
 import { CefrLevel, TranslationLanguage } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { isValidCefrLevel, targetLevelIsValid } from "@/lib/grammar/levels";
 import { syncDeclaredLevelGrammarAssumptions } from "@/lib/grammar/progress";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type SettingsState = {
   status: "idle" | "success" | "error";
@@ -23,11 +25,9 @@ export async function updateTranslationPreference(
   if (!["ENGLISH", "PERSIAN", "BOTH"].includes(value)) {
     return { status: "error", message: "Choose a valid translation language." };
   }
-
   if (!isValidCefrLevel(currentLevel)) {
-    return { status: "error", message: "Choose a valid current German level." };
+    return { status: "error", message: "Choose a valid current level." };
   }
-
   if (!isValidCefrLevel(targetLevel)) {
     return { status: "error", message: "Choose a valid CEFR target level." };
   }
@@ -42,30 +42,35 @@ export async function updateTranslationPreference(
   }
 
   try {
-    const user = await getCurrentUser();
-    await db.user.update({
-      where: { id: user.id },
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    await db.userCourse.update({
+      where: { id: course.id },
       data: {
-        preferredTranslation: value as TranslationLanguage,
+        explanationLanguage: value as TranslationLanguage,
         currentLevel: current,
         targetLevel: target,
       },
     });
 
-    await syncDeclaredLevelGrammarAssumptions(user.id, current);
+    await syncDeclaredLevelGrammarAssumptions({
+      userId: user.id,
+      userCourseId: course.id,
+      currentLevel: current,
+      targetLanguage: course.targetLanguage,
+    });
 
-    revalidatePath("/");
-    revalidatePath("/vocabulary");
-    revalidatePath("/review");
-    revalidatePath("/practice");
-    revalidatePath("/settings");
+    for (const path of ["/", "/vocabulary", "/review", "/practice", "/grammar", "/progress", "/settings"]) {
+      revalidatePath(path);
+    }
 
-    return { status: "success", message: "Learning preferences saved." };
+    return {
+      status: "success",
+      message: `${targetLanguageConfig(course.targetLanguage).label} learning preferences saved.`,
+    };
   } catch (error) {
     return {
       status: "error",
-      message:
-        error instanceof Error ? error.message : "Could not save settings.",
+      message: error instanceof Error ? error.message : "Could not save settings.",
     };
   }
 }

@@ -2,23 +2,23 @@ import {
   CefrLevel,
   GrammarProgressSource,
   GrammarProgressStatus,
+  TargetLanguage,
 } from "@prisma/client";
 import { db } from "@/lib/db";
 import { isConceptAssumedForLevel } from "@/lib/grammar/levels";
+import { targetLanguageConfig } from "@/lib/languages";
 
-/**
- * Rebuilds only grammar state inferred from the user's declared CEFR level.
- *
- * Future evidence-backed/manual progress is intentionally untouched. This is
- * what makes it safe for a learner to change their declared current level
- * without erasing demonstrated knowledge or weaknesses.
- */
-export async function syncDeclaredLevelGrammarAssumptions(
-  userId: string,
-  currentLevel: CefrLevel,
-) {
+export async function syncDeclaredLevelGrammarAssumptions(input: {
+  userId: string;
+  userCourseId: string;
+  currentLevel: CefrLevel;
+  targetLanguage: TargetLanguage;
+}) {
   const concepts = await db.grammarConcept.findMany({
-    where: { active: true, language: "de" },
+    where: {
+      active: true,
+      language: targetLanguageConfig(input.targetLanguage).code,
+    },
     select: {
       id: true,
       introducedAt: true,
@@ -29,7 +29,7 @@ export async function syncDeclaredLevelGrammarAssumptions(
   const assumedConceptIds = concepts
     .filter((concept) =>
       isConceptAssumedForLevel(
-        currentLevel,
+        input.currentLevel,
         concept.introducedAt,
         concept.expectedBy,
       ),
@@ -39,7 +39,7 @@ export async function syncDeclaredLevelGrammarAssumptions(
   await db.$transaction(async (tx) => {
     await tx.userGrammarProgress.deleteMany({
       where: {
-        userId,
+        userCourseId: input.userCourseId,
         source: GrammarProgressSource.DECLARED_LEVEL,
       },
     });
@@ -48,11 +48,12 @@ export async function syncDeclaredLevelGrammarAssumptions(
 
     await tx.userGrammarProgress.createMany({
       data: assumedConceptIds.map((grammarConceptId) => ({
-        userId,
+        userId: input.userId,
+        userCourseId: input.userCourseId,
         grammarConceptId,
         status: GrammarProgressStatus.ASSUMED,
         source: GrammarProgressSource.DECLARED_LEVEL,
-        assumedFromLevel: currentLevel,
+        assumedFromLevel: input.currentLevel,
       })),
       skipDuplicates: true,
     });

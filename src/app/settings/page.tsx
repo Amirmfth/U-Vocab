@@ -2,23 +2,27 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { BarChart3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { SettingsForm } from "./SettingsForm";
 import { SignOutButton } from "./SignOutButton";
 
 export default async function SettingsPage() {
   await connection();
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const language = targetLanguageConfig(course.targetLanguage);
 
   return (
     <main className="page">
       <section className="page-header compact">
         <p className="eyebrow">ACCOUNT</p>
         <h1>Settings</h1>
+        <p className="page-description">Active course: {language.label} · {course.currentLevel} → {course.targetLevel}</p>
       </section>
       <SettingsForm
-        preference={user.preferredTranslation}
-        currentLevel={user.currentLevel}
-        targetLevel={user.targetLevel}
+        preference={course.explanationLanguage}
+        currentLevel={course.currentLevel}
+        targetLevel={course.targetLevel}
       />
       <section className="panel account-links">
         <div>

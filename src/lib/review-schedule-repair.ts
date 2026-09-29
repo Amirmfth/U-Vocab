@@ -3,10 +3,10 @@ import { scheduleReview } from "@/lib/fsrs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export async function repairImpossibleEasySchedules(userId: string, now = new Date()) {
+export async function repairImpossibleEasySchedules(userCourseId: string, now = new Date()) {
   const candidates = await db.userVocabulary.findMany({
     where: {
-      userId,
+      userCourseId,
       nextReviewAt: { lte: now },
       reviews: { some: { rating: "EASY" } },
     },

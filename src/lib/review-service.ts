@@ -20,6 +20,7 @@ function nextVocabularyState(stability: number): VocabularyState {
 
 export async function applyReviewResult(input: {
   userId: string;
+  userCourseId: string;
   userVocabularyId: string;
   grade: ReviewGrade;
   exerciseType: ExerciseType;
@@ -31,7 +32,7 @@ export async function applyReviewResult(input: {
 
   return db.$transaction(async (tx) => {
     const item = await tx.userVocabulary.findFirst({
-      where: { id: input.userVocabularyId, userId: input.userId },
+      where: { id: input.userVocabularyId, userId: input.userId, userCourseId: input.userCourseId },
     });
     if (!item) throw new Error("Vocabulary item not found.");
 
@@ -53,6 +54,7 @@ export async function applyReviewResult(input: {
       where: {
         id: item.id,
         userId: input.userId,
+        userCourseId: input.userCourseId,
         ...(input.allowEarlyReview
           ? { nextReviewAt: item.nextReviewAt }
           : { OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }] }),
@@ -88,6 +90,7 @@ export async function applyReviewResult(input: {
     await tx.attempt.create({
       data: {
         userId: input.userId,
+        userCourseId: input.userCourseId,
         userVocabularyId: item.id,
         exerciseType: input.exerciseType,
         prompt: input.prompt,

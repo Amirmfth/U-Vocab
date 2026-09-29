@@ -1,13 +1,14 @@
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { isUnauthorizedError } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const user = await getCurrentUser();
+    const course = await getCurrentCourse();
     const dueCount = await db.userVocabulary.count({
       where: {
-        userId: user.id,
+        userCourseId: course.id,
         OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: new Date() } }],
       },
     });

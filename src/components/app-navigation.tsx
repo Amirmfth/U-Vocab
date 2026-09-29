@@ -8,7 +8,7 @@ import {
   BarChart3,
   BookOpen,
   Brain,
-  Home,
+  GraduationCap,
   Plus,
   Settings,
   Sparkles,
@@ -35,14 +35,17 @@ const primary: Array<{
   labelKey: MessageKey;
   icon: LucideIcon;
 }> = [
-  { section: "home", href: LEARNING_SECTIONS.home.href, labelKey: "nav.home", icon: Home },
   { section: "words", href: LEARNING_SECTIONS.words.href, labelKey: "nav.words", icon: BookOpen },
+  { section: "grammar", href: LEARNING_SECTIONS.grammar.href, labelKey: "nav.grammar", icon: GraduationCap },
   { section: "review", href: LEARNING_SECTIONS.review.href, labelKey: "nav.review", icon: Brain },
   { section: "practice", href: LEARNING_SECTIONS.practice.href, labelKey: "nav.practice", icon: Sparkles },
 ];
 
+const insights: Array<{ href: string; labelKey: MessageKey; icon: LucideIcon }> = [
+  { href: "/progress", labelKey: "nav.fullProgress", icon: BarChart3 },
+];
+
 const system: Array<{ href: string; labelKey: MessageKey; icon: LucideIcon }> = [
-  { href: "/usage", labelKey: "nav.aiUsage", icon: BarChart3 },
   { href: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
@@ -160,15 +163,15 @@ export function AppNavigation({
 
   const owner = routeOwner(pathname);
   const isPrimary =
-    pathname === "/" ||
     pathname === "/vocabulary" ||
+    pathname === "/grammar" ||
     pathname === "/review" ||
     pathname === "/practice";
 
   return (
     <>
       <header className="mobile-header">
-        <Link href="/" className="brand" aria-label={t("nav.brandHome")}>
+        <Link href="/vocabulary" className="brand" aria-label={t("nav.brandWords")}>
           <span className="brand-mark">U</span>
           <span>U-Vocab</span>
         </Link>
@@ -193,7 +196,7 @@ export function AppNavigation({
       </header>
 
       <aside className="desktop-sidebar">
-        <Link href="/" className="brand sidebar-brand" aria-label={t("nav.brandHome")}>
+        <Link href="/" className="brand sidebar-brand" aria-label={t("nav.brandWords")}>
           <span className="brand-mark">U</span>
           <span>U-Vocab</span>
         </Link>
@@ -214,6 +217,23 @@ export function AppNavigation({
         </nav>
 
         <div className="sidebar-secondary">
+          <p className="nav-eyebrow">{t("common.insights")}</p>
+          {insights.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={"nav-link " + (isActive ? "is-active" : "")}
+                aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
+              >
+                <Icon size={18} />
+                <span>{t(item.labelKey)}</span>
+              </Link>
+            );
+          })}
           <p className="nav-eyebrow">{t("common.account")}</p>
           {system.map((item) => {
             const Icon = item.icon;
@@ -242,10 +262,10 @@ export function AppNavigation({
         <nav className="section-context-nav" aria-label={t("nav.sectionContext")}>
           <Link href={LEARNING_SECTIONS[owner.section].href}>
             {t(
-              owner.section === "home"
-                ? "nav.home"
-                : owner.section === "words"
-                  ? "nav.words"
+              owner.section === "words"
+                ? "nav.words"
+                : owner.section === "grammar"
+                  ? "nav.grammar"
                   : owner.section === "review"
                     ? "nav.review"
                     : "nav.practice",

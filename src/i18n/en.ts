@@ -1009,6 +1009,18 @@ export const en = {
   "progress.grammar.recentEvidence": "Recent evidence",
   "progress.grammar.openProfile": "Open grammar profile",
 
+
+  "loading.surface": "Loading {surface}",
+  "loading.word": "word",
+  "loading.readingDetail": "reading",
+  "loading.speakingSession": "speaking session",
+  "loading.writingTask": "writing task",
+  "loading.recurringWeaknesses": "recurring weaknesses",
+  "loading.rescueWords": "rescue words",
+  "errors.actionTitle": "That action did not finish.",
+  "errors.savedSafe": "Your saved vocabulary is untouched. Retry the current screen.",
+  "errors.requestFailed": "The request failed before U-Vocab could finish the operation.",
+
   "errors.genericTitle": "Something went wrong",
   "errors.genericBody": "U-Vocab hit an unexpected error.",
   "errors.tryAgain": "Try again",

@@ -4,6 +4,8 @@ import { ChevronLeft, Filter, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { TranslationLanguage } from "@prisma/client";
+import { useTranslations } from "@/i18n/client";
+import type { MessageKey } from "@/i18n/core";
 
 type FilterKey = "status" | "pos" | "level" | "relation" | "sort";
 
@@ -26,6 +28,19 @@ function isDefaultValue(key: FilterKey, value: string) {
   return value === "ALL" || (key === "sort" && value === "RECENTLY_ADDED");
 }
 
+const partOfSpeechKeys: Record<string, MessageKey> = {
+  NOUN: "vocab.pos.noun",
+  VERB: "vocab.pos.verb",
+  ADJECTIVE: "vocab.pos.adjective",
+  ADVERB: "vocab.pos.adverb",
+  PRONOUN: "vocab.pos.pronoun",
+  PREPOSITION: "vocab.pos.preposition",
+  CONJUNCTION: "vocab.pos.conjunction",
+  INTERJECTION: "vocab.pos.interjection",
+  PHRASE: "vocab.pos.phrase",
+  OTHER: "vocab.pos.other",
+};
+
 export function VocabularyFilters({
   current,
   partOfSpeechOptions,
@@ -46,46 +61,60 @@ export function VocabularyFilters({
   const menuRef = useRef<HTMLDivElement>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const t = useTranslations();
+
+  const localizedPosOptions = partOfSpeechOptions.map((option) => ({
+    ...option,
+    label: partOfSpeechKeys[option.value] ? t(partOfSpeechKeys[option.value]) : option.label,
+  }));
 
   const filters: FilterDefinition[] = [
     {
       key: "status",
-      label: "Status",
+      label: t("vocab.filter.status"),
       options: [
-        { value: "ALL", label: "All vocabulary" },
-        { value: "NEW", label: "New" },
-        { value: "LEARNING", label: "Learning" },
-        { value: "WEAK", label: "Weak" },
-        { value: "STRONG", label: "Strong" },
-        { value: "MASTERED", label: "Mastered" },
-        { value: "DUE", label: "Due" },
-        { value: "RECENT", label: "Recently encountered" },
-        { value: "DIFFICULT", label: "Difficult / forgotten" },
+        { value: "ALL", label: t("vocab.filter.allVocabulary") },
+        { value: "NEW", label: t("vocab.filter.new") },
+        { value: "LEARNING", label: t("vocab.filter.learning") },
+        { value: "WEAK", label: t("vocab.filter.weak") },
+        { value: "STRONG", label: t("vocab.filter.strong") },
+        { value: "MASTERED", label: t("vocab.filter.mastered") },
+        { value: "DUE", label: t("vocab.filter.due") },
+        { value: "RECENT", label: t("vocab.filter.recent") },
+        { value: "DIFFICULT", label: t("vocab.filter.difficult") },
       ],
     },
-    { key: "pos", label: "Part of speech", options: withAll("Any part of speech", partOfSpeechOptions) },
-    { key: "level", label: "CEFR level", options: withAll("Any CEFR level", levelOptions) },
+    {
+      key: "pos",
+      label: t("vocab.filter.pos"),
+      options: withAll(t("vocab.filter.anyPos"), localizedPosOptions),
+    },
+    {
+      key: "level",
+      label: t("vocab.filter.level"),
+      options: withAll(t("vocab.filter.anyLevel"), levelOptions),
+    },
     {
       key: "sort",
-      label: "Sort",
+      label: t("vocab.filter.sort"),
       options: [
-        { value: "RECENTLY_ADDED", label: "Recently added" },
-        { value: "ALPHABETICAL", label: "Alphabetical A–Z" },
-        { value: "CEFR_ASC", label: "CEFR A1 → C2" },
-        { value: "CEFR_DESC", label: "CEFR C2 → A1" },
-        { value: "MASTERY_ASC", label: "Lowest mastery first" },
-        { value: "MASTERY_DESC", label: "Highest mastery first" },
-        { value: "NEXT_REVIEW", label: "Next review first" },
+        { value: "RECENTLY_ADDED", label: t("vocab.filter.recentlyAdded") },
+        { value: "ALPHABETICAL", label: t("vocab.filter.alphabetical") },
+        { value: "CEFR_ASC", label: t("vocab.filter.cefrAsc") },
+        { value: "CEFR_DESC", label: t("vocab.filter.cefrDesc") },
+        { value: "MASTERY_ASC", label: t("vocab.filter.lowestMastery") },
+        { value: "MASTERY_DESC", label: t("vocab.filter.highestMastery") },
+        { value: "NEXT_REVIEW", label: t("vocab.filter.nextReview") },
       ],
     },
     {
       key: "relation",
-      label: "Relationship",
+      label: t("vocab.filter.relationship"),
       options: [
-        { value: "ALL", label: "Any relationship" },
-        { value: "WORD_FAMILY", label: "Has word family" },
-        { value: "COLLOCATION", label: "Has collocations" },
-        { value: "RELATED", label: "Has semantic relations" },
+        { value: "ALL", label: t("vocab.filter.anyRelationship") },
+        { value: "WORD_FAMILY", label: t("vocab.filter.wordFamily") },
+        { value: "COLLOCATION", label: t("vocab.filter.collocations") },
+        { value: "RELATED", label: t("vocab.filter.semantic") },
       ],
     },
   ];
@@ -108,7 +137,12 @@ export function VocabularyFilters({
       const button = addButtonRef.current;
       if (!button) return;
       const width = Math.min(300, window.innerWidth - 32);
-      setMenuOffset(Math.min(0, window.innerWidth - 16 - button.getBoundingClientRect().left - width));
+      const rect = button.getBoundingClientRect();
+      const inlineStart =
+        document.documentElement.dir === "rtl"
+          ? window.innerWidth - rect.right
+          : rect.left;
+      setMenuOffset(Math.min(0, window.innerWidth - 16 - inlineStart - width));
     }
     positionMenu();
     window.addEventListener("resize", positionMenu);
@@ -137,16 +171,15 @@ export function VocabularyFilters({
   }
 
   const activeFilters = filters.flatMap((filter) => {
-    if (
-      isDefaultValue(filter.key, current[filter.key])
-    ) return [];
+    if (isDefaultValue(filter.key, current[filter.key])) return [];
     const option = filter.options.find((item) => item.value === current[filter.key]);
     return option ? [{ ...filter, valueLabel: option.label }] : [];
   });
 
-  const selectedFilter = typeof menu === "string" && menu !== "types"
-    ? filters.find((filter) => filter.key === menu)
-    : null;
+  const selectedFilter =
+    typeof menu === "string" && menu !== "types"
+      ? filters.find((filter) => filter.key === menu)
+      : null;
 
   return (
     <section className="library-tools">
@@ -155,8 +188,8 @@ export function VocabularyFilters({
           name="q"
           defaultValue={current.q}
           onChange={(event) => updateSearch(event.currentTarget.value)}
-          placeholder="Search German, English, or Persian…"
-          aria-label="Search vocabulary"
+          placeholder={t("vocab.searchPlaceholder")}
+          aria-label={t("vocab.search")}
         />
         {filters.map((filter) => {
           const value = current[filter.key];
@@ -165,25 +198,28 @@ export function VocabularyFilters({
             <input key={filter.key} type="hidden" name={filter.key} value={value} />
           ) : null;
         })}
-        <button type="submit" className="icon-button" aria-label="Search">
+        <button type="submit" className="icon-button" aria-label={t("vocab.search")}>
           <Search size={17} />
         </button>
       </form>
 
       <div className="vocabulary-controls-row">
-        <div className="translation-switch" aria-label="Translation language">
-          {([ ["ENGLISH", "EN"], ["PERSIAN", "FA"], ["BOTH", "Both"] ] as const).map(([mode, label]) => (
-            <button
-              type="button"
-              key={mode}
-              className={language === mode ? "is-active" : ""}
-              aria-pressed={language === mode}
-              onClick={() => onLanguageChange(mode)}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="translation-switch" aria-label={t("vocab.translationLanguage")}>
+          {([["ENGLISH", "EN"], ["PERSIAN", "FA"], ["BOTH", "EN+FA"]] as const).map(
+            ([mode, label]) => (
+              <button
+                type="button"
+                key={mode}
+                className={language === mode ? "is-active" : ""}
+                aria-pressed={language === mode}
+                onClick={() => onLanguageChange(mode)}
+              >
+                {label}
+              </button>
+            ),
+          )}
         </div>
+
         <div className="filter-builder" ref={menuRef}>
           <div className="filter-add-anchor">
             <button
@@ -194,15 +230,20 @@ export function VocabularyFilters({
               type="button"
             >
               <Filter size={15} />
-              Add filter
+              {t("vocab.addFilter")}
             </button>
 
             {menu ? (
-              <div className="filter-menu" role="dialog" aria-label="Vocabulary filters" style={{ left: menuOffset }}>
+              <div
+                className="filter-menu"
+                role="dialog"
+                aria-label={t("vocab.filters")}
+                style={{ insetInlineStart: menuOffset }}
+              >
                 {selectedFilter ? (
                   <>
                     <button className="filter-menu-back" onClick={() => setMenu("types")} type="button">
-                      <ChevronLeft size={16} />
+                      <ChevronLeft className="rtl-mirror" size={16} />
                       {selectedFilter.label}
                     </button>
                     <div className="filter-menu-list" role="listbox" aria-label={selectedFilter.label}>
@@ -218,14 +259,14 @@ export function VocabularyFilters({
                             type="button"
                           >
                             {option.label}
-                            {isSelected ? <span>Selected</span> : null}
+                            {isSelected ? <span>{t("vocab.selected")}</span> : null}
                           </button>
                         );
                       })}
                     </div>
                   </>
                 ) : (
-                  <div className="filter-menu-list" role="listbox" aria-label="Filter types">
+                  <div className="filter-menu-list" role="listbox" aria-label={t("vocab.filterTypes")}>
                     {filters.map((filter) => (
                       <button
                         aria-selected={!isDefaultValue(filter.key, current[filter.key])}
@@ -236,7 +277,9 @@ export function VocabularyFilters({
                         type="button"
                       >
                         {filter.label}
-                        {!isDefaultValue(filter.key, current[filter.key]) ? <span>Active</span> : null}
+                        {!isDefaultValue(filter.key, current[filter.key]) ? (
+                          <span>{t("vocab.active")}</span>
+                        ) : null}
                       </button>
                     ))}
                   </div>
@@ -248,13 +291,13 @@ export function VocabularyFilters({
       </div>
 
       {activeFilters.length ? (
-        <div className="filter-chip-row" aria-label="Active vocabulary filters">
+        <div className="filter-chip-row" aria-label={t("vocab.activeFilters")}>
           {activeFilters.map((filter) => (
             <span className="filter-chip" key={filter.key}>
               <span className="filter-chip-type">{filter.label}</span>
               <span className="filter-chip-value">{filter.valueLabel}</span>
               <button
-                aria-label={`Remove ${filter.label} filter`}
+                aria-label={t("vocab.removeFilter", { label: filter.label })}
                 onClick={() => setParam(filter.key, "ALL")}
                 type="button"
               >
@@ -265,10 +308,14 @@ export function VocabularyFilters({
         </div>
       ) : null}
 
-      {(current.q || activeFilters.length) ? (
-        <button type="button" className="text-button library-clear" onClick={() => router.push("/vocabulary")}>
+      {current.q || activeFilters.length ? (
+        <button
+          type="button"
+          className="text-button library-clear"
+          onClick={() => router.push("/vocabulary")}
+        >
           <X size={15} />
-          Clear filters
+          {t("vocab.clearFilters")}
         </button>
       ) : null}
     </section>

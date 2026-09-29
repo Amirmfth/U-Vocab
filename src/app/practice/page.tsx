@@ -79,6 +79,8 @@ export default async function PracticePage({
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
       userId:user.id,
+      userCourseId:course.id,
+      targetLanguage:course.targetLanguage,
       currentLevel:course.currentLevel,
       targetLevel:course.targetLevel,
       slug:params.grammar==="1"?null:params.grammar,

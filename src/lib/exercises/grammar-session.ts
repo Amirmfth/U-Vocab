@@ -1,6 +1,7 @@
-import type { CefrLevel, GrammarProgressStatus } from "@prisma/client";
+import type { CefrLevel, GrammarProgressStatus, TargetLanguage } from "@prisma/client";
 import { db } from "@/lib/db";
 import { CEFR_RANK } from "@/lib/grammar/levels";
+import { targetLanguageConfig } from "@/lib/languages";
 import {
   buildGrammarExercise,
   grammarExerciseVariants,
@@ -28,6 +29,8 @@ function linkedLexeme(link: {
 
 export async function buildGrammarPracticeSession(input: {
   userId: string;
+  userCourseId: string;
+  targetLanguage: TargetLanguage;
   currentLevel: CefrLevel;
   targetLevel: CefrLevel;
   slug?: string | null;
@@ -42,15 +45,15 @@ export async function buildGrammarPracticeSession(input: {
     db.grammarConcept.findMany({
       where: {
         active: true,
-        language: "de",
+        language: targetLanguageConfig(input.targetLanguage).code,
         ...(input.slug ? { slug: input.slug } : {}),
         introducedAt: { in: allowedLevels },
       },
       include: {
-        userProgress: { where: { userId: input.userId }, take: 1 },
+        userProgress: { where: { userCourseId: input.userCourseId }, take: 1 },
         prerequisites: { select: { prerequisiteId: true } },
         lexemeLinks: {
-          where: { lexeme: { userStates: { some: { userId: input.userId } } } },
+          where: { lexeme: { userStates: { some: { userCourseId: input.userCourseId } } } },
           include: {
             lexeme: { select: { id: true, lemma: true, article: true } },
             lexicalPattern: { select: { pattern: true } },
@@ -59,7 +62,7 @@ export async function buildGrammarPracticeSession(input: {
           take: 8,
         },
         mistakes: {
-          where: { userId: input.userId, resolvedAt: null },
+          where: { userCourseId: input.userCourseId, resolvedAt: null },
           select: { occurrences: true, lastOccurredAt: true },
           orderBy: { lastOccurredAt: "desc" },
           take: 10,
@@ -68,11 +71,11 @@ export async function buildGrammarPracticeSession(input: {
       orderBy: { order: "asc" },
     }),
     db.userGrammarProgress.findMany({
-      where: { userId: input.userId },
+      where: { userCourseId: input.userCourseId },
       select: { grammarConceptId: true, status: true },
     }),
     db.attempt.findMany({
-      where: { userId: input.userId, grammarConceptId: { not: null } },
+      where: { userCourseId: input.userCourseId, grammarConceptId: { not: null } },
       select: { exerciseType: true },
       orderBy: { createdAt: "desc" },
       take: 6,
@@ -124,7 +127,7 @@ export async function buildGrammarPracticeSession(input: {
     (
       await db.userVocabulary.findMany({
         where: {
-          userId: input.userId,
+          userCourseId: input.userCourseId,
           lexemeId: {
             in: candidates
               .map((candidate) => candidate.link?.id)

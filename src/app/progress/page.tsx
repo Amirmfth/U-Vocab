@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Clock3, Flame, ShieldCheck, TrendingUp } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { buildActivityDays, localDateKey } from "@/lib/progress";
 import { currentRetrievability } from "@/lib/fsrs";
 import { ActivityHeatmap } from "./ActivityHeatmap";
@@ -50,17 +51,17 @@ export default async function ProgressPage({
   searchParams: Promise<{ range?: string; day?: string }>;
 }) {
   await connection();
-  const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
+  const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
   const range = query.range && query.range in RANGE_DAYS ? query.range : "30";
   const cutoff = rangeCutoff(range);
   const activityCutoff = new Date();
   activityCutoff.setDate(activityCutoff.getDate() - 366);
 
-  const metricAttemptWhere = cutoff ? { userId: user.id, createdAt: { gte: cutoff } } : { userId: user.id };
+  const metricAttemptWhere = cutoff ? { userCourseId: course.id, createdAt: { gte: cutoff } } : { userCourseId: course.id };
   const metricReviewWhere = cutoff
-    ? { userVocabulary: { userId: user.id }, reviewedAt: { gte: cutoff } }
-    : { userVocabulary: { userId: user.id } };
-  const metricEncounterWhere = cutoff ? { userId: user.id, createdAt: { gte: cutoff } } : { userId: user.id };
+    ? { userVocabulary: { userCourseId: course.id }, reviewedAt: { gte: cutoff } }
+    : { userVocabulary: { userCourseId: course.id } };
+  const metricEncounterWhere = cutoff ? { userCourseId: course.id, createdAt: { gte: cutoff } } : { userCourseId: course.id };
 
   const [
     vocabulary,
@@ -74,7 +75,7 @@ export default async function ProgressPage({
     openMistakes,
   ] = await Promise.all([
     db.userVocabulary.findMany({
-      where: { userId: user.id },
+      where: { userCourseId: course.id },
       select: {
         id: true,
         state: true,
@@ -108,29 +109,29 @@ export default async function ProgressPage({
       select: { createdAt: true, source: true },
     }),
     db.attempt.findMany({
-      where: { userId: user.id, createdAt: { gte: activityCutoff } },
+      where: { userCourseId: course.id, createdAt: { gte: activityCutoff } },
       select: { createdAt: true, exerciseType: true, durationMs: true },
     }),
     db.review.findMany({
       where: {
-        userVocabulary: { userId: user.id },
+        userVocabulary: { userCourseId: course.id },
         reviewedAt: { gte: activityCutoff },
       },
       select: { reviewedAt: true },
     }),
     db.encounter.findMany({
-      where: { userId: user.id, createdAt: { gte: activityCutoff } },
+      where: { userCourseId: course.id, createdAt: { gte: activityCutoff } },
       select: { createdAt: true, source: true },
     }),
     db.mistake.findMany({
       where: {
-        userId: user.id,
+        userCourseId: course.id,
         resolvedAt: { gte: activityCutoff },
       },
       select: { resolvedAt: true },
     }),
     db.mistake.findMany({
-      where: { userId: user.id, resolvedAt: null },
+      where: { userCourseId: course.id, resolvedAt: null },
       select: { type: true, occurrences: true },
     }),
   ]);
@@ -291,8 +292,9 @@ export default async function ProgressPage({
 
       <GrammarProgressPanel
         userId={user.id}
-        currentLevel={user.currentLevel}
-        targetLevel={user.targetLevel}
+        userCourseId={course.id}
+        currentLevel={course.currentLevel}
+        targetLevel={course.targetLevel}
       />
 
       <section className="progress-grid">

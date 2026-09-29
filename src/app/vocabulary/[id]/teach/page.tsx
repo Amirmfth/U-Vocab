@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpenCheck, Brain, Network } from "lucide-react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { buildExercise } from "@/lib/exercises/build";
@@ -17,12 +18,12 @@ export default async function TeachWordPage({
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
 
   const word = await db.lexeme.findFirst({
     where: {
       id,
-      userStates: { some: { userId: user.id } },
+      userStates: { some: { userCourseId: course.id } },
     },
     include: {
       translations: true,
@@ -43,13 +44,13 @@ export default async function TeachWordPage({
 
   const item = word.userStates[0];
   const visibleTranslations = word.translations.filter((translation) =>
-    isTranslationVisible(user.preferredTranslation, translation.language),
+    isTranslationVisible(course.explanationLanguage, translation.language),
   );
 
   const productionExercise = buildExercise(
     "REVERSE_RECALL",
     word,
-    user.preferredTranslation,
+    course.explanationLanguage,
   );
 
   return (
@@ -59,7 +60,7 @@ export default async function TeachWordPage({
           <ArrowLeft size={16} />
           Back to word
         </Link>
-        <p className="eyebrow">GUIDED WORD LESSON · {user.targetLevel}</p>
+        <p className="eyebrow">GUIDED WORD LESSON · {course.targetLevel}</p>
         <h1>{formatLexemeLabel(word)}</h1>
         <p className="page-description">
           Understand the lexical unit, see how it behaves, then produce it yourself.
@@ -122,10 +123,10 @@ export default async function TeachWordPage({
             {word.examples.slice(0, 4).map((example) => (
               <div className="lesson-example" key={example.id}>
                 <strong>{example.german}</strong>
-                {user.preferredTranslation !== "PERSIAN" && example.english ? (
+                {course.explanationLanguage !== "PERSIAN" && example.english ? (
                   <span>{example.english}</span>
                 ) : null}
-                {user.preferredTranslation !== "ENGLISH" && example.persian ? (
+                {course.explanationLanguage !== "ENGLISH" && example.persian ? (
                   <span className="rtl">{example.persian}</span>
                 ) : null}
               </div>

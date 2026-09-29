@@ -4,6 +4,7 @@ import type { ExerciseType, MistakeType } from "@prisma/client";
 import type { ExerciseInteraction } from "@/lib/exercises/types";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { buildExercise } from "@/lib/exercises/build";
 import { checkDeterministicAnswer } from "@/lib/exercises/check";
 import { applyMasteryDelta, practiceMasteryDelta } from "@/lib/exercises/mastery";
@@ -201,7 +202,7 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
     }));
     if(!item) return { status:"error",message:"Vocabulary item not found." };
 
-    let exercise=buildExercise(input.exerciseType,item.lexeme,user.preferredTranslation);
+    let exercise=buildExercise(input.exerciseType,item.lexeme,course.explanationLanguage);
     if(input.conjugation){
       const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:item.lexemeId });
       if(conjugation.status!=="ok") return { status:"error",message:"Verb conjugation is unavailable." };

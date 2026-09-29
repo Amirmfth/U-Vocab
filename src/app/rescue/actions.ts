@@ -2,6 +2,7 @@
 
 import type { ExerciseType } from "@prisma/client";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { applyReviewResult } from "@/lib/review-service";
 import type { ReviewGrade } from "@/lib/fsrs";
 import { revalidateUserDomains } from "@/lib/cache-tags";
@@ -20,7 +21,7 @@ export async function submitRescueReview(input: RescueReviewInput) {
       throw new Error("Invalid rescue review.");
     }
 
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const durationMs = Number.isFinite(input.startedAt) && input.startedAt > 0
       ? Math.max(0, Math.min(Date.now() - input.startedAt, 30 * 60 * 1000))
       : null;

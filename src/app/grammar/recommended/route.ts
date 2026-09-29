@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 
 const REASONS = new Set([
   "WEAKNESS",
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
   const surface = url.searchParams.get("surface") ?? "";
   const action = url.searchParams.get("action") ?? "";
 
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const concept = await db.grammarConcept.findFirst({
     where: { id: conceptId, active: true, language: "de" },
     select: { id: true, slug: true },

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { generateLexicalExamples } from "@/lib/ai/lexical-examples";
 import { generateQuickTeach } from "@/lib/ai/quick-teach";
 import { revalidateUserDomains } from "@/lib/cache-tags";
@@ -14,9 +15,9 @@ export type InsightActionState = {
 
 export async function generateQuickTeachAction(lexemeId: string, displayLanguage?: "en" | "fa") {
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const lexeme = await db.lexeme.findFirst({
-      where: { id: lexemeId, userStates: { some: { userId: user.id } } },
+      where: { id: lexemeId, userStates: { some: { userCourseId: course.id } } },
       select: {
         lemma: true,
         article: true,
@@ -27,7 +28,7 @@ export async function generateQuickTeachAction(lexemeId: string, displayLanguage
     });
     if (!lexeme) return { status: "error" as const, message: "This word is not in your vocabulary." };
 
-    const language = (displayLanguage ?? (user.preferredTranslation === "PERSIAN" ? "fa" : "en")) === "fa"
+    const language = (displayLanguage ?? (course.explanationLanguage === "PERSIAN" ? "fa" : "en")) === "fa"
       ? "Persian"
       : "English";
     const meaning = lexeme.translations.find((item) => item.language === (language === "Persian" ? "fa" : "en"))?.text
@@ -38,7 +39,7 @@ export async function generateQuickTeachAction(lexemeId: string, displayLanguage
       lemma: lexeme.lemma,
       article: lexeme.article,
       partOfSpeech: lexeme.partOfSpeech,
-      level: user.targetLevel,
+      level: course.targetLevel,
       meaning: meaning.slice(0, 120),
       language,
       patterns: lexeme.patterns.map((item) => item.pattern.slice(0, 80)),
@@ -59,9 +60,9 @@ export async function generateExamplesAction(
   const lexemeId = String(formData.get("lexemeId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const lexeme = await db.lexeme.findFirst({
-      where: { id: lexemeId, userStates: { some: { userId: user.id } } },
+      where: { id: lexemeId, userStates: { some: { userCourseId: course.id } } },
       include: {
         patterns: { select: { pattern: true } },
         examples: { select: { german: true } },
@@ -76,7 +77,7 @@ export async function generateExamplesAction(
       lemma: lexeme.lemma,
       article: lexeme.article,
       partOfSpeech: lexeme.partOfSpeech,
-      level: user.targetLevel,
+      level: course.targetLevel,
       patterns: lexeme.patterns.map((pattern) => pattern.pattern),
       existingExamples: lexeme.examples.slice(0, 8).map((example) => example.german),
     });
@@ -98,12 +99,12 @@ export async function generateExamplesAction(
             english: example.english,
             persian: example.persian,
             register: example.register,
-            level: user.targetLevel,
+            level: course.targetLevel,
             generatedByAi: true,
           })),
         });
       });
-      revalidateUserDomains(user.id, ["vocabulary"], [lexeme.id]);
+      revalidateUserDomains(user.id, course.id, ["vocabulary"], [lexeme.id]);
       revalidatePath(`/vocabulary/${lexeme.id}`);
       revalidatePath(`/vocabulary/${lexeme.id}/teach`);
     }
@@ -150,10 +151,10 @@ export async function scheduleTeachReviewAction(
   const lexemeId = String(formData.get("lexemeId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const item = await db.userVocabulary.findUnique({
       where: {
-        userId_lexemeId: { userId: user.id, lexemeId },
+        userCourseId_lexemeId: { userCourseId: course.id, lexemeId },
       },
     });
 

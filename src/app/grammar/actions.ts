@@ -3,6 +3,7 @@
 import { GrammarProgressSource, GrammarProgressStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { generateGrammarQuickTeach } from "@/lib/ai/grammar-quick-teach";
 
@@ -11,7 +12,7 @@ export async function startGrammarConceptAction(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   if (!grammarConceptId || !slug) return;
 
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const concept = await db.grammarConcept.findFirst({
     where: { id: grammarConceptId, slug, active: true },
     select: { id: true },
@@ -20,8 +21,8 @@ export async function startGrammarConceptAction(formData: FormData) {
 
   const existing = await db.userGrammarProgress.findUnique({
     where: {
-      userId_grammarConceptId: {
-        userId: user.id,
+      userCourseId_grammarConceptId: {
+        userCourseId: course.id,
         grammarConceptId,
       },
     },
@@ -31,13 +32,14 @@ export async function startGrammarConceptAction(formData: FormData) {
 
   await db.userGrammarProgress.upsert({
     where: {
-      userId_grammarConceptId: {
-        userId: user.id,
+      userCourseId_grammarConceptId: {
+        userCourseId: course.id,
         grammarConceptId,
       },
     },
     create: {
       userId: user.id,
+      userCourseId: course.id,
       grammarConceptId,
       status: GrammarProgressStatus.LEARNING,
       source: GrammarProgressSource.MANUAL,
@@ -67,7 +69,7 @@ export async function generateGrammarQuickTeachAction(
   previousAngle?: string | null,
 ) {
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const concept = await db.grammarConcept.findFirst({
       where: { id: grammarConceptId, active: true, language: "de" },
       include: {
@@ -121,14 +123,14 @@ export async function generateGrammarQuickTeachAction(
     );
 
     const language =
-      user.preferredTranslation === "PERSIAN" ? "Persian" : "English";
+      course.explanationLanguage === "PERSIAN" ? "Persian" : "English";
     const preferredLesson = concept.lessons.find((item) => item.language === (language === "Persian" ? "fa" : "en"))
       ?? concept.lessons.find((item) => item.language === "en");
     const lesson = await generateGrammarQuickTeach({
       userId: user.id,
       title: concept.title,
-      level: user.currentLevel,
-      targetLevel: user.targetLevel,
+      level: course.currentLevel,
+      targetLevel: course.targetLevel,
       language,
       canonicalSummary:
         concept.shortDescription +

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { buildExercise, eligibleExerciseTypes } from "@/lib/exercises/build";
 import { buildGrammarPracticeSession } from "@/lib/exercises/grammar-session";
 import { selectExerciseType } from "@/lib/exercises/select";
@@ -78,8 +79,8 @@ export default async function PracticePage({
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
       userId:user.id,
-      currentLevel:user.currentLevel,
-      targetLevel:user.targetLevel,
+      currentLevel:course.currentLevel,
+      targetLevel:course.targetLevel,
       slug:params.grammar==="1"?null:params.grammar,
       limit:6,
     });
@@ -149,7 +150,7 @@ export default async function PracticePage({
     </main>;
   }
 
-  const optionLanguage=user.preferredTranslation==="PERSIAN"?"fa":"en";
+  const optionLanguage=course.explanationLanguage==="PERSIAN"?"fa":"en";
   const optionPools={
     meanings:distractorItems.flatMap((item)=>
       item.lexeme.translations
@@ -183,9 +184,9 @@ export default async function PracticePage({
     for(let position=0;position<count;position+=1){
       const preferred=selectExerciseType(snapshot,available,recent);
       const choice=params.lexeme
-        ? buildExercise(preferred,item.lexeme,user.preferredTranslation,optionPools)
+        ? buildExercise(preferred,item.lexeme,course.explanationLanguage,optionPools)
         : [preferred,...available.filter((type)=>type!==preferred)]
-          .map((type)=>buildExercise(type,item.lexeme,user.preferredTranslation,optionPools))
+          .map((type)=>buildExercise(type,item.lexeme,course.explanationLanguage,optionPools))
           .find((exercise)=>exercise.interaction==="choice"&&(exercise.options?.length??0)>=2);
       if(!choice) continue;
       recent.push(choice.type);

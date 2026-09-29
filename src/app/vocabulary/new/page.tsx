@@ -1,10 +1,11 @@
 import { connection } from "next/server";
 import { AddLexemeForm } from "./AddLexemeForm";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 
 export default async function NewWord() {
   await connection();
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
 
   return (
     <main className="page">
@@ -17,7 +18,7 @@ export default async function NewWord() {
         </p>
       </section>
 
-      <AddLexemeForm translationPreference={user.preferredTranslation} />
+      <AddLexemeForm translationPreference={course.explanationLanguage} />
     </main>
   );
 }

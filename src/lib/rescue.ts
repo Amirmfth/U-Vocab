@@ -1,14 +1,14 @@
 import { db } from "@/lib/db";
 import { recentFailedRetrievals, rescueRisk } from "@/lib/progress";
 
-export async function getRescueWords(userId: string, limit = 10, includeIds: string[] = []) {
+export async function getRescueWords(userId: string, userCourseId: string, limit = 10, includeIds: string[] = []) {
   const since = new Date();
   since.setDate(since.getDate() - 30);
 
   const [items, attempts] = await Promise.all([
     db.userVocabulary.findMany({
       where: {
-        userId,
+        userCourseId,
         state: { notIn: ["NEW"] },
       },
       include: {
@@ -18,7 +18,7 @@ export async function getRescueWords(userId: string, limit = 10, includeIds: str
             patterns: true,
             examples: { take: 3 },
             mistakes: {
-              where: { userId, resolvedAt: null },
+              where: { userCourseId, resolvedAt: null },
               select: { type: true },
             },
           },
@@ -27,7 +27,7 @@ export async function getRescueWords(userId: string, limit = 10, includeIds: str
     }),
     db.attempt.findMany({
       where: {
-        userId,
+        userCourseId,
         createdAt: { gte: since },
         userVocabularyId: { not: null },
       },

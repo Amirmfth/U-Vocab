@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, CheckCircle2, LifeBuoy } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { getRescueWords } from "@/lib/rescue";
 import { buildExercise } from "@/lib/exercises/build";
 import { selectReviewExerciseType } from "@/lib/exercises/review-select";
@@ -17,7 +18,7 @@ export default async function RescuePage({
   searchParams: Promise<{ ids?: string; step?: string }>;
 }) {
   await connection();
-  const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
+  const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
   const requestedIds = Array.from(new Set(query.ids?.split(",").filter(Boolean) ?? [])).slice(0, 20);
   const ranked = await getRescueWords(user.id, 100, requestedIds);
 
@@ -109,9 +110,9 @@ export default async function RescuePage({
       lemma: item.lexeme.lemma,
       article: item.lexeme.article,
       translations: item.lexeme.translations.filter((translation) =>
-        isTranslationVisible(user.preferredTranslation, translation.language),
+        isTranslationVisible(course.explanationLanguage, translation.language),
       ),
-      exercise: buildExercise(exerciseType, item.lexeme, user.preferredTranslation),
+      exercise: buildExercise(exerciseType, item.lexeme, course.explanationLanguage),
       riskPercent: Math.round(item.risk.score * 100),
       reasons: item.risk.reasons.length
         ? item.risk.reasons

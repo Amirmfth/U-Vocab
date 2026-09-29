@@ -7,11 +7,11 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { getServerTranslator } from "@/i18n/server";
-import { formatNumber, formatPercent } from "@/i18n/format";
+import { formatNumber } from "@/i18n/format";
 import type { MessageKey } from "@/i18n/core";
 import { ReadingForm } from "./ReadingForm";
 
-const lengthKeys: Record<string, MessageKey> = {
+const LENGTH_KEYS: Record<string, MessageKey> = {
   SHORT: "reading.length.short",
   MEDIUM: "reading.length.medium",
   LONG: "reading.length.long",
@@ -24,6 +24,7 @@ export default async function ReadingPage() {
   const language = targetLanguageConfig(course.targetLanguage);
   const languageLabel =
     course.targetLanguage === "GERMAN" ? t("common.german") : language.label;
+
   const [readings, vocabulary, grammar] = await Promise.all([
     db.story.findMany({
       where: { userCourseId: course.id },
@@ -70,6 +71,7 @@ export default async function ReadingPage() {
       <ReadingForm
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
+        targetLanguage={language.code}
         targets={vocabulary.map((item) => ({
           lexemeId: item.lexemeId,
           label: formatLexemeLabel(item.lexeme),
@@ -104,8 +106,7 @@ export default async function ReadingPage() {
                     {reading.title}
                   </strong>
                   <span>
-                    {reading.level} ·{" "}
-                    {t(lengthKeys[reading.length] ?? "reading.length.medium")} ·{" "}
+                    {reading.level} · {t(LENGTH_KEYS[reading.length] ?? "reading.length.medium")} ·{" "}
                     {t("reading.targetWords", {
                       count: formatNumber(locale, reading._count.targets),
                     })}
@@ -117,10 +118,12 @@ export default async function ReadingPage() {
                       : ""}
                     {reading.completedAt
                       ? " · " +
-                        t("reading.comprehension", { percent: formatPercent(
+                        t("reading.comprehension", {
+                          value: formatNumber(
                             locale,
-                            reading.comprehensionScore ?? 0,
-                          ) })
+                            Math.round((reading.comprehensionScore ?? 0) * 100),
+                          ),
+                        })
                       : ""}
                   </span>
                 </div>

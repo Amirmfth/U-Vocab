@@ -1,5 +1,8 @@
 export type LearningSection = "words" | "grammar" | "review" | "practice";
 
+export const PRIMARY_LEARNING_SECTIONS = ["words", "grammar", "review", "practice"] as const;
+export const AUTHENTICATED_ROOT_DESTINATION = "/vocabulary";
+
 export const LEARNING_SECTIONS = {
   words: { href: "/vocabulary", label: "Words" },
   grammar: { href: "/grammar", label: "Grammar" },

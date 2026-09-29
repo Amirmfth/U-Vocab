@@ -20,39 +20,31 @@ import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { getServerTranslator } from "@/i18n/server";
 import type { Translator } from "@/i18n/core";
+import { PRACTICE_HUB_DESTINATIONS } from "@/lib/practice-hub";
 
 function PracticeHub({ t }: { t: Translator }) {
   return (
     <main className="page practice-hub">
 
       <nav className="practice-lanes" aria-label={t("practice.skills")}>
-        <Link href="/practice?drill=1" className="practice-lane">
-          <span className="practice-lane-icon"><Sparkles size={30} /></span>
-          <span className="practice-lane-copy">
-            <strong>{t("practice.vocabulary")}</strong>
-          </span>
-        </Link>
-
-        <Link href="/writing" className="practice-lane">
-          <span className="practice-lane-icon"><PenLine size={30} /></span>
-          <span className="practice-lane-copy">
-            <strong>{t("nav.writing")}</strong>
-          </span>
-        </Link>
-
-        <Link href="/reading" className="practice-lane">
-          <span className="practice-lane-icon"><BookOpenText size={30} /></span>
-          <span className="practice-lane-copy">
-            <strong>{t("nav.reading")}</strong>
-          </span>
-        </Link>
-
-        <Link href="/conversation" className="practice-lane">
-          <span className="practice-lane-icon"><MessageCircle size={30} /></span>
-          <span className="practice-lane-copy">
-            <strong>{t("practice.speaking")}</strong>
-          </span>
-        </Link>
+        {PRACTICE_HUB_DESTINATIONS.map((destination) => {
+          const Icon =
+            destination.href === "/writing"
+              ? PenLine
+              : destination.href === "/reading"
+                ? BookOpenText
+                : destination.href === "/conversation"
+                  ? MessageCircle
+                  : Sparkles;
+          return (
+            <Link key={destination.href} href={destination.href} className="practice-lane">
+              <span className="practice-lane-icon"><Icon size={30} /></span>
+              <span className="practice-lane-copy">
+                <strong>{t(destination.labelKey)}</strong>
+              </span>
+            </Link>
+          );
+        })}
       </nav>
     </main>
   );

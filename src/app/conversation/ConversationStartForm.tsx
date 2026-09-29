@@ -42,9 +42,7 @@ export function ConversationStartForm({
           id="conversation-mode"
           name="kind"
           defaultValue={initialMode}
-          onValueChange={(value) =>
-            setKind(value === "MISSION" ? "MISSION" : "PRACTICE")
-          }
+          onValueChange={(value) => setKind(value === "MISSION" ? "MISSION" : "PRACTICE")}
           options={[
             {
               value: "PRACTICE",
@@ -68,19 +66,17 @@ export function ConversationStartForm({
         <input
           id={kind + "-topic"}
           name="topic"
-          dir="auto"
           placeholder={
             kind === "MISSION"
               ? t("conversation.topicMissionPlaceholder")
               : t("conversation.topicPracticePlaceholder")
           }
+          dir="auto"
         />
       </div>
 
       <div className="field">
-        <label htmlFor={kind + "-target-count"}>
-          {t("conversation.targets")}
-        </label>
+        <label htmlFor={kind + "-target-count"}>{t("conversation.targets")}</label>
         <ActivitySelect
           id={kind + "-target-count"}
           name="targetCount"
@@ -131,9 +127,7 @@ export function ConversationStartForm({
       </div>
 
       <div className="field">
-        <label htmlFor={kind + "-formality-trigger"}>
-          {t("conversation.formality")}
-        </label>
+        <label htmlFor={kind + "-formality-trigger"}>{t("conversation.formality")}</label>
         <ActivitySelect
           id={kind + "-formality"}
           name="formality"
@@ -180,9 +174,7 @@ export function ConversationStartForm({
         }
       >
         {kind === "MISSION" ? <Target size={18} /> : <MessageCircle size={18} />}
-        {kind === "MISSION"
-          ? t("conversation.createMission")
-          : t("conversation.start")}
+        {kind === "MISSION" ? t("conversation.createMission") : t("conversation.start")}
       </ActionButton>
     </form>
   );

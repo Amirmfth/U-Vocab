@@ -35,6 +35,7 @@ export type ReadingAnalysis = z.infer<typeof readingAnalysisSchema>;
 
 export async function analyzeReadingText(input: {
   userId: string;
+  userCourseId: string;
   text: string;
   originalTextChars: number;
   candidates: Array<{ token: string; count: number }>;
@@ -44,6 +45,7 @@ export async function analyzeReadingText(input: {
   const perf = startOperation("ai.reading_analysis", { model: route.model, inputChars: input.text.length, targetLevel: input.targetLevel });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "reading_analysis",
     model: route.model,
     metadata: { inputChars: input.text.length, originalTextChars: input.originalTextChars, candidateCount: input.candidates.length, targetLevel: input.targetLevel, lengthBucket: input.originalTextChars < 2000 ? "short" : input.originalTextChars < 8000 ? "medium" : "long" },

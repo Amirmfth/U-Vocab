@@ -13,6 +13,7 @@ export const writingTaskSchema = z.object({
 
 export async function generateWritingTask(input: {
   userId: string;
+  userCourseId: string;
   mode: "GUIDED" | "OPEN";
   level: string;
   taskType: string;
@@ -29,6 +30,7 @@ export async function generateWritingTask(input: {
   });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "writing_task",
     model: route.model,
     metadata: {
@@ -52,7 +54,7 @@ export async function generateWritingTask(input: {
           },
           {
             role: "user",
-            content: JSON.stringify({ ...input, userId: undefined }),
+            content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined }),
           },
         ],
         text: { format: zodTextFormat(writingTaskSchema, "writing_task") },

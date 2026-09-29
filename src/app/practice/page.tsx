@@ -19,44 +19,46 @@ import { selectExerciseType } from "@/lib/exercises/select";
 import { PracticeForm } from "./PracticeForm";
 import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { getServerTranslator } from "@/i18n/server";
+import type { Translator } from "@/i18n/core";
 
-function PracticeHub() {
+function PracticeHub({ t }: { t: Translator }) {
   return (
     <main className="page practice-hub">
 
-      <nav className="practice-lanes" aria-label="Practice skills">
+      <nav className="practice-lanes" aria-label={t("practice.skills")}>
         <Link href="/grammar" className="practice-lane practice-lane-grammar">
           <span className="practice-lane-icon"><GraduationCap size={30} /></span>
           <span className="practice-lane-copy">
-            <strong>Grammar</strong>
+            <strong>{t("nav.grammar")}</strong>
           </span>
         </Link>
 
         <Link href="/practice?drill=1" className="practice-lane">
           <span className="practice-lane-icon"><Sparkles size={30} /></span>
           <span className="practice-lane-copy">
-            <strong>Vocabulary</strong>
+            <strong>{t("practice.vocabulary")}</strong>
           </span>
         </Link>
 
         <Link href="/writing" className="practice-lane">
           <span className="practice-lane-icon"><PenLine size={30} /></span>
           <span className="practice-lane-copy">
-            <strong>Writing</strong>
+            <strong>{t("nav.writing")}</strong>
           </span>
         </Link>
 
         <Link href="/reading" className="practice-lane">
           <span className="practice-lane-icon"><BookOpenText size={30} /></span>
           <span className="practice-lane-copy">
-            <strong>Reading</strong>
+            <strong>{t("nav.reading")}</strong>
           </span>
         </Link>
 
         <Link href="/conversation" className="practice-lane">
           <span className="practice-lane-icon"><MessageCircle size={30} /></span>
           <span className="practice-lane-copy">
-            <strong>Speaking</strong>
+            <strong>{t("practice.speaking")}</strong>
           </span>
         </Link>
       </nav>
@@ -71,10 +73,12 @@ export default async function PracticePage({
 }) {
   await connection();
   const params=await searchParams;
+  const user=await getCurrentUser();
+  const { t }=await getServerTranslator(user);
   if(params.mixed==="1") redirect("/practice?drill=1");
-  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub/>;
+  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub t={t}/>;
 
-  const [user,course]=await Promise.all([getCurrentUser(),getCurrentCourse()]);
+  const course=await getCurrentCourse();
 
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
@@ -90,18 +94,18 @@ export default async function PracticePage({
     if(!grammarExercises.length){
       return <main className="page focus-page">
         <section className="empty-state compact-empty">
-          <strong>No deterministic practice is available for this grammar target yet.</strong>
-          <p className="muted">Try another concept from Grammar. More exercise families can be added without changing the practice engine.</p>
-          <Link href="/grammar" className="button button-primary">Choose grammar</Link>
-          <Link href="/practice" className="text-link">Back to Practice</Link>
+          <strong>{t("practice.noGrammar")}</strong>
+          <p className="muted">{t("practice.noGrammarHelp")}</p>
+          <Link href="/grammar" className="button button-primary">{t("practice.chooseGrammar")}</Link>
+          <Link href="/practice" className="text-link">{t("practice.back")}</Link>
         </section>
       </main>;
     }
 
     return <main className="page focus-page">
       <div className="focus-meta">
-        <Link href="/grammar">Grammar</Link>
-        <span>{params.grammar==="1"?"Recommended practice":grammarExercises[0].lemma}</span>
+        <Link href="/grammar">{t("nav.grammar")}</Link>
+        <span className={params.grammar==="1"?undefined:"learning-content"} lang={params.grammar==="1"?undefined:"de"} dir={params.grammar==="1"?undefined:"ltr"}>{params.grammar==="1"?t("practice.recommended"):grammarExercises[0].lemma}</span>
       </div>
       <PracticeForm exercises={grammarExercises}/>
     </main>;
@@ -145,9 +149,9 @@ export default async function PracticePage({
   if(!items.length){
     return <main className="page focus-page">
       <section className="empty-state compact-empty">
-        <strong>{params.lexeme?"Word not found in your vocabulary":"Add a word to start practicing"}</strong>
-        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>Add word</Link>:null}
-        <Link href="/practice" className="text-link">Back to Practice</Link>
+        <strong>{params.lexeme?t("practice.wordNotFound"):t("practice.addToStart")}</strong>
+        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>{t("nav.addWord")}</Link>:null}
+        <Link href="/practice" className="text-link">{t("practice.back")}</Link>
       </section>
     </main>;
   }
@@ -204,9 +208,9 @@ export default async function PracticePage({
   if(!params.lexeme&&!exercises.length){
     return <main className="page focus-page">
       <section className="empty-state compact-empty">
-        <strong>Not enough distinct answer choices for vocabulary practice yet.</strong>
-        <p className="muted">Add more vocabulary to unlock multiple-choice practice.</p>
-        <Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>Add word</Link>
+        <strong>{t("practice.notEnoughChoices")}</strong>
+        <p className="muted">{t("practice.addMore")}</p>
+        <Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>{t("nav.addWord")}</Link>
       </section>
     </main>;
   }
@@ -227,7 +231,7 @@ export default async function PracticePage({
           conjugation:{ person:"du" },
           exercise:{
             type:"REVERSE_RECALL",
-            prompt:"Which form is correct for du in Präsens?",
+            prompt:t("practice.verbPrompt"),
             expected:form.form,
             interaction:verbOptions.length>=3?"choice":"short_text",
             options:verbOptions.length>=3?verbOptions:undefined,
@@ -241,8 +245,8 @@ export default async function PracticePage({
 
   return <main className="page focus-page">
     <div className="focus-meta">
-      <Link href="/practice">Practice</Link>
-      <span>{params.lexeme?items[0].lexeme.lemma:"Vocabulary"}</span>
+      <Link href="/practice">{t("nav.practice")}</Link>
+      <span className={params.lexeme?"learning-content":undefined} lang={params.lexeme?"de":undefined} dir={params.lexeme?"ltr":undefined}>{params.lexeme?items[0].lexeme.lemma:t("practice.vocabulary")}</span>
     </div>
     <PracticeForm exercises={exercises}/>
   </main>;

@@ -480,6 +480,11 @@ export const en = {
   "conversation.newMission": "New mission",
   "conversation.newConversation": "New conversation",
 
+
+  "reading.length.short": "short",
+  "reading.length.medium": "medium",
+  "reading.length.long": "long",
+
   "errors.genericTitle": "Something went wrong",
   "errors.genericBody": "U-Vocab hit an unexpected error.",
   "errors.tryAgain": "Try again",

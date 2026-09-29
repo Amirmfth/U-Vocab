@@ -1,8 +1,8 @@
-export type LearningSection = "home" | "words" | "review" | "practice";
+export type LearningSection = "words" | "grammar" | "review" | "practice";
 
 export const LEARNING_SECTIONS = {
-  home: { href: "/", label: "Home" },
   words: { href: "/vocabulary", label: "Words" },
+  grammar: { href: "/grammar", label: "Grammar" },
   review: { href: "/review", label: "Review" },
   practice: { href: "/practice", label: "Practice" },
 } as const;
@@ -18,12 +18,13 @@ const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/vocabulary/new", section: "words", label: "Add word" },
   { prefix: "/vocabulary", section: "words", label: "My words" },
 
+  { prefix: "/grammar", section: "grammar", label: "Grammar" },
+
   { prefix: "/review", section: "review", label: "Standard review" },
   { prefix: "/mistakes", section: "review", label: "Mistakes" },
   { prefix: "/rescue", section: "review", label: "Rescue words" },
 
   { prefix: "/practice", section: "practice", label: "Practice" },
-  { prefix: "/grammar", section: "practice", label: "Grammar" },
   { prefix: "/writing", section: "practice", label: "Writing" },
   { prefix: "/reading", section: "practice", label: "Reading" },
   { prefix: "/stories", section: "practice", label: "Reading", group: "Reading" },
@@ -31,7 +32,7 @@ const ROUTE_OWNERS: RouteOwner[] = [
   { prefix: "/conversation", section: "practice", label: "Conversation", group: "Speaking" },
   { prefix: "/battles", section: "practice", label: "Battles" },
 
-  { prefix: "/progress", section: "home", label: "Full progress" },
+  { prefix: "/progress", section: null, label: "Full progress" },
   { prefix: "/settings", section: null, label: "Settings" },
   { prefix: "/usage", section: null, label: "AI Usage" },
 ];
@@ -40,7 +41,7 @@ export function routeOwner(pathname: string) {
   const path = pathname.split(/[?#]/u)[0] || "/";
 
   if (path === "/") {
-    return { section: "home" as const, label: "Home", group: undefined };
+    return { section: "words" as const, label: "My words", group: undefined };
   }
 
   const match = ROUTE_OWNERS

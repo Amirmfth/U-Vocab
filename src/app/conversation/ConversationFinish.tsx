@@ -67,18 +67,13 @@ export function ConversationReplay({
     <div className="conversation-replay">
       <form action={action}>
         <input type="hidden" name="sessionId" value={sessionId} />
-        <ActionButton
-          variant="secondary"
-          pendingLabel={t("conversation.preparingReplay")}
-        >
+        <ActionButton variant="secondary" pendingLabel={t("conversation.preparingReplay")}>
           <RotateCcw size={17} />
           {t("conversation.replay")}
         </ActionButton>
       </form>
       <Link href="/conversation" className="button button-primary">
-        {kind === "MISSION"
-          ? t("conversation.newMission")
-          : t("conversation.newConversation")}
+        {kind === "MISSION" ? t("conversation.newMission") : t("conversation.newConversation")}
       </Link>
       {state.status === "error" ? (
         <StatusNotice tone="error">{state.message}</StatusNotice>

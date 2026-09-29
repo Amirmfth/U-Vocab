@@ -154,6 +154,7 @@ async function submitGrammarAnswer(
 
   await recordGrammarEvidence({
     userId,
+    userCourseId,
     grammarConceptId,
     source:"PRACTICE",
     outcome:evaluation.correct?"SUCCESS":"ERROR",

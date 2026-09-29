@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { rebuildMistakeEmbeddings } from "@/lib/semantic/embeddings";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 
@@ -18,9 +19,9 @@ export async function resolveMistake(
   const mistakeId = String(formData.get("mistakeId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const mistake = await db.mistake.findFirst({
-      where: { id: mistakeId, userId: user.id, resolvedAt: null },
+      where: { id: mistakeId, userId: user.id, userCourseId: course.id, resolvedAt: null },
       select: { lexemeId: true },
     });
     if (!mistake) {
@@ -31,6 +32,7 @@ export async function resolveMistake(
       where: {
         id: mistakeId,
         userId: user.id,
+        userCourseId: course.id,
         resolvedAt: null,
       },
       data: { resolvedAt: new Date() },
@@ -42,6 +44,7 @@ export async function resolveMistake(
 
     revalidateUserDomains(
       user.id,
+      course.id,
       ["home", "mistakes", "progress", "review"],
       mistake.lexemeId ? [mistake.lexemeId] : [],
     );
@@ -60,9 +63,9 @@ export async function refreshMistakeEmbeddings(
   _previous: MistakeActionState,
 ): Promise<MistakeActionState> {
   try {
-    const user = await getCurrentUser();
-    const result = await rebuildMistakeEmbeddings({ userId: user.id, limit: 30 });
-    revalidateUserDomains(user.id, ["mistakes"]);
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const result = await rebuildMistakeEmbeddings({ userId: user.id, userCourseId: course.id, limit: 30 });
+    revalidateUserDomains(user.id, course.id, ["mistakes"]);
     revalidatePath("/mistakes");
     return {
       status: result.failed ? "error" : "success",

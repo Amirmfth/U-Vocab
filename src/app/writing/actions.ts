@@ -571,6 +571,7 @@ export async function evaluateWritingAction(
 
             await recordGrammarEvidence({
               userId: user.id,
+              userCourseId: course.id,
               grammarConceptId: observation.grammarConceptId,
               source: "WRITING",
               outcome: writingEvidenceOutcome(observation.signal),

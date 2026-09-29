@@ -23,6 +23,7 @@ function vectorLiteral(values: number[]) {
 
 export async function embedText(input: {
   userId: string;
+  userCourseId?: string | null;
   operation: string;
   text: string;
 }) {
@@ -39,6 +40,7 @@ export async function embedText(input: {
 
     await recordAIUsage({
       userId: input.userId,
+      userCourseId: input.userCourseId,
       operation: input.operation,
       model: EMBEDDING_MODEL,
       status: "SUCCESS",
@@ -55,6 +57,7 @@ export async function embedText(input: {
   } catch (error) {
     await recordAIUsage({
       userId: input.userId,
+      userCourseId: input.userCourseId,
       operation: input.operation,
       model: EMBEDDING_MODEL,
       status: "ERROR",
@@ -93,6 +96,7 @@ async function lexemeEmbeddingText(lexemeId: string) {
 export async function ensureLexemeEmbedding(
   lexemeId: string,
   userId: string,
+  userCourseId?: string | null,
   force = false,
 ) {
   const metadata = await db.lexeme.findUnique({
@@ -118,6 +122,7 @@ export async function ensureLexemeEmbedding(
   const text = await lexemeEmbeddingText(lexemeId);
   const embedding = await embedText({
     userId,
+    userCourseId,
     operation: "lexeme_embedding",
     text,
   });
@@ -138,10 +143,11 @@ export async function ensureLexemeEmbedding(
 export async function ensureMistakeEmbedding(
   mistakeId: string,
   userId: string,
+  userCourseId: string,
   force = false,
 ) {
   const mistake = await db.mistake.findFirst({
-    where: { id: mistakeId, userId },
+    where: { id: mistakeId, userId, userCourseId },
     include: { lexeme: true },
   });
   if (!mistake) return;
@@ -167,6 +173,7 @@ export async function ensureMistakeEmbedding(
 
   const embedding = await embedText({
     userId,
+    userCourseId,
     operation: "mistake_embedding",
     text,
   });
@@ -179,13 +186,14 @@ export async function ensureMistakeEmbedding(
           "embeddingModel" = ${EMBEDDING_MODEL},
           "embeddingVersion" = ${EMBEDDING_VERSION},
           "embeddedAt" = NOW()
-      WHERE "id" = ${mistakeId} AND "userId" = ${userId}
+      WHERE "id" = ${mistakeId} AND "userId" = ${userId} AND "userCourseId" = ${userCourseId}
     `,
   );
 }
 
 export async function rebuildLexemeEmbeddings(input: {
   userId: string;
+  userCourseId?: string | null;
   limit?: number;
   force?: boolean;
 }) {
@@ -207,7 +215,7 @@ export async function rebuildLexemeEmbeddings(input: {
   let completed = 0;
   for (const row of rows) {
     try {
-      await ensureLexemeEmbedding(row.id, input.userId, Boolean(input.force));
+      await ensureLexemeEmbedding(row.id, input.userId, input.userCourseId, Boolean(input.force));
       completed += 1;
     } catch (error) {
       console.error("Failed to rebuild lexeme embedding", row.id, error);
@@ -219,12 +227,14 @@ export async function rebuildLexemeEmbeddings(input: {
 
 export async function rebuildMistakeEmbeddings(input: {
   userId: string;
+  userCourseId: string;
   limit?: number;
   force?: boolean;
 }) {
   const rows = await db.mistake.findMany({
     where: {
       userId: input.userId,
+      userCourseId: input.userCourseId,
       grammarConceptId: null,
       ...(input.force
         ? {}
@@ -245,7 +255,7 @@ export async function rebuildMistakeEmbeddings(input: {
   let failed = 0;
   for (const row of rows) {
     try {
-      await ensureMistakeEmbedding(row.id, input.userId, Boolean(input.force));
+      await ensureMistakeEmbedding(row.id, input.userId, input.userCourseId, Boolean(input.force));
       completed += 1;
     } catch (error) {
       failed += 1;

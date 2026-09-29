@@ -33,6 +33,7 @@ test("recordMistakesBatch groups duplicate mistake keys and preserves occurrence
 
   await recordMistakesBatch(db, {
     userId: "user-1",
+    userCourseId: "course-1",
     mistakes: [
       {
         lexemeId: "lexeme-1",
@@ -63,6 +64,7 @@ test("recordMistakesBatch increments an existing unresolved mistake by the group
 
   await recordMistakesBatch(db, {
     userId: "user-1",
+    userCourseId: "course-1",
     mistakes: [
       {
         lexemeId: "lexeme-1",

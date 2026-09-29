@@ -97,6 +97,7 @@ export async function recomputeGrammarProgress(
     await db.grammarProgressTransition.create({
       data: {
         userId,
+        userCourseId,
         grammarConceptId,
         fromStatus: existing?.status ?? null,
         toStatus: nextStatus,

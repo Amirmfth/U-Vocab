@@ -100,16 +100,27 @@ async function seedGrammarCurriculum() {
     db.grammarConceptRelation.createMany({ data: relations }),
   ]);
 
-  const users = await db.user.findMany({
-    select: { id: true, currentLevel: true },
+  const courses = await db.userCourse.findMany({
+    where: { targetLanguage: "GERMAN", status: "ACTIVE" },
+    select: {
+      id: true,
+      userId: true,
+      currentLevel: true,
+      targetLanguage: true,
+    },
   });
 
-  for (const user of users) {
-    await syncDeclaredLevelGrammarAssumptions(user.id, user.currentLevel);
+  for (const course of courses) {
+    await syncDeclaredLevelGrammarAssumptions({
+      userId: course.userId,
+      userCourseId: course.id,
+      currentLevel: course.currentLevel,
+      targetLanguage: course.targetLanguage,
+    });
   }
 
   console.log(
-    `Seeded ${grammarCurriculum.length} canonical German grammar concepts and synchronized ${users.length} learner profile(s).`,
+    `Seeded ${grammarCurriculum.length} canonical German grammar concepts and synchronized ${courses.length} learner profile(s).`,
   );
 }
 

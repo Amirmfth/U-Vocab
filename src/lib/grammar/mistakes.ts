@@ -37,6 +37,7 @@ export async function recordGrammarMistake(input: {
 
   return db.mistake.create({
     data: {
+      userId: input.userId,
       userCourseId: input.userCourseId,
       grammarConceptId: input.grammarConceptId,
       lexemeId: input.lexemeId ?? null,

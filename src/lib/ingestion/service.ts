@@ -17,6 +17,7 @@ export function deduplicateCandidates(
 export async function attachIngestionState(
   db: PrismaClient,
   userId: string,
+  userCourseId: string,
   candidates: IngestionCandidate[],
 ): Promise<CandidateWithState[]> {
   const unique = deduplicateCandidates(candidates);
@@ -33,7 +34,7 @@ export async function attachIngestionState(
         },
         include: {
           userStates: {
-            where: { userId },
+            where: { userCourseId },
             select: { id: true, state: true },
             take: 1,
           },
@@ -54,6 +55,7 @@ export async function commitIngestionCandidates(
   db: PrismaClient,
   input: {
     userId: string;
+    userCourseId: string;
     sourceType: IngestionSourceType;
     sourceRef?: string | null;
     candidates: IngestionCandidate[];
@@ -113,13 +115,14 @@ export async function commitIngestionCandidates(
 
       await tx.userVocabulary.upsert({
         where: {
-          userId_lexemeId: {
-            userId: input.userId,
+          userCourseId_lexemeId: {
+            userCourseId: input.userCourseId,
             lexemeId: lexeme.id,
           },
         },
         create: {
           userId: input.userId,
+          userCourseId: input.userCourseId,
           lexemeId: lexeme.id,
           nextReviewAt: new Date(),
         },
@@ -129,8 +132,8 @@ export async function commitIngestionCandidates(
       if (input.sourceRef) {
         await tx.encounter.upsert({
           where: {
-            userId_lexemeId_source_sourceRef: {
-              userId: input.userId,
+            userCourseId_lexemeId_source_sourceRef: {
+              userCourseId: input.userCourseId,
               lexemeId: lexeme.id,
               source: input.sourceType.toLocaleLowerCase("en-US"),
               sourceRef: input.sourceRef,
@@ -138,6 +141,7 @@ export async function commitIngestionCandidates(
           },
           create: {
             userId: input.userId,
+            userCourseId: input.userCourseId,
             lexemeId: lexeme.id,
             source: input.sourceType.toLocaleLowerCase("en-US"),
             sourceRef: input.sourceRef,

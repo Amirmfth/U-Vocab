@@ -610,6 +610,12 @@ export const fa = {
   "word.lesson.scheduling": "در حال زمان‌بندی…",
   "word.lesson.addQueue": "افزودن به صف مرور",
 
+
+  "word.verbClass.strong": "قوی",
+  "word.verbClass.weak": "ضعیف",
+  "word.verbClass.mixed": "مختلط",
+  "word.verbClass.irregular": "بی‌قاعده",
+
   "errors.genericTitle": "مشکلی پیش آمد",
   "errors.genericBody": "U-Vocab با یک خطای غیرمنتظره روبه‌رو شد.",
   "errors.tryAgain": "تلاش دوباره",

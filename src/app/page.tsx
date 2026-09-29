@@ -15,7 +15,6 @@ import { getCachedHomeStats } from "@/lib/cached-data";
 import { db } from "@/lib/db";
 import { getServerTranslator } from "@/i18n/server";
 import { formatNumber } from "@/i18n/format";
-import { LearningText } from "@/i18n/learning-content";
 import {
   getGrammarRecommendation,
   grammarRecommendationActionHref,
@@ -115,9 +114,7 @@ export default async function Home() {
             <p className="eyebrow">
               {t("home.grammar")} · {grammarRecommendation.reasonCode.replaceAll("_", " ")}
             </p>
-            <LearningText language="en" className="block">
-              <h2>{grammarRecommendation.title}</h2>
-            </LearningText>
+            <h2 lang="en" dir="ltr" className="learning-content">{grammarRecommendation.title}</h2>
             <p className="muted">
               {grammarRecommendation.level} · {grammarRecommendation.reason}
             </p>

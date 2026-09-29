@@ -517,7 +517,7 @@ export const en = {
   "word.grammarEyebrow": "GRAMMAR",
   "word.structures": "Structures this word reinforces",
   "word.mastery": "Mastery",
-  "word.overallMastery": "{value}% overall mastery",
+  "word.overallMastery": "{percent} overall mastery",
   "word.recognition": "Recognition",
   "word.meaningRecall": "Meaning recall",
   "word.production": "Production",

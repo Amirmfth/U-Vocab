@@ -608,6 +608,12 @@ export const en = {
   "word.lesson.scheduling": "Scheduling…",
   "word.lesson.addQueue": "Add to review queue",
 
+
+  "word.verbClass.strong": "strong",
+  "word.verbClass.weak": "weak",
+  "word.verbClass.mixed": "mixed",
+  "word.verbClass.irregular": "irregular",
+
   "errors.genericTitle": "Something went wrong",
   "errors.genericBody": "U-Vocab hit an unexpected error.",
   "errors.tryAgain": "Try again",

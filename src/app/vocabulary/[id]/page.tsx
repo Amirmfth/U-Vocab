@@ -351,7 +351,7 @@ export default async function Word({
           <Link href={"/practice?lexeme=" + word.id} className="button button-secondary" prefetch>
             <Brain size={17} /> Practice
           </Link>
-          {word.partOfSpeech === "VERB" ? <VerbConjugation lexemeId={word.id} /> : null}
+          {word.partOfSpeech === "VERB" ? <VerbConjugation lexemeId={word.id} userScope={course.id} /> : null}
       </nav>
 
       <Suspense fallback={<SecondaryWordSkeleton />}>

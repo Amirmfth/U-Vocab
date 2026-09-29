@@ -3,6 +3,10 @@ import type { User, UserCourse } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
+export function courseOwnershipWhere(userId: string, courseId: string) {
+  return { id: courseId, userId } as const;
+}
+
 const DEFAULT_COURSE = {
   targetLanguage: "GERMAN" as const,
   currentLevel: "A1" as const,
@@ -65,7 +69,7 @@ export const getCurrentCourse = cache(async function getCurrentCourse() {
 export async function requireOwnedCourse(courseId: string) {
   const user = await getCurrentUser();
   const course = await db.userCourse.findFirst({
-    where: { id: courseId, userId: user.id },
+    where: courseOwnershipWhere(user.id, courseId),
   });
   if (!course) throw new Error("Course not found.");
   return course;

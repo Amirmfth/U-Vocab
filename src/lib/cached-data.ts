@@ -207,7 +207,7 @@ export function getCachedWordPrimary(userId: string, userCourseId: string, lexem
     ["word-primary", userCourseId, lexemeId],
     {
       tags: [
-        cacheTags.word(lexemeId),
+        cacheTags.word(userCourseId, lexemeId),
         cacheTags.vocabulary(userCourseId),
         cacheTags.review(userCourseId),
       ],
@@ -278,7 +278,7 @@ export function getCachedWordSecondary(
     ["word-secondary", userCourseId, lexemeId, level],
     {
       tags: [
-        cacheTags.word(lexemeId),
+        cacheTags.word(userCourseId, lexemeId),
         cacheTags.review(userCourseId),
         cacheTags.mistakes(userCourseId),
       ],

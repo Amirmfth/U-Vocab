@@ -213,7 +213,7 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
 
     let exercise=buildExercise(input.exerciseType,item.lexeme,course.explanationLanguage);
     if(input.conjugation){
-      const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:item.lexemeId });
+      const conjugation=await getVerbConjugationForUser({ userId:user.id,userCourseId:course.id,lexemeId:item.lexemeId });
       if(conjugation.status!=="ok") return { status:"error",message:"Verb conjugation is unavailable." };
       const row=conjugation.data.indicative.present.forms.find((form)=>form.person===input.conjugation?.person);
       if(!row) return { status:"error",message:"Requested verb form is unavailable." };

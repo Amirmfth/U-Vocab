@@ -3,7 +3,7 @@ import { revalidateTag } from "next/cache";
 export const cacheTags = {
   home: (courseId: string) => `home:${courseId}`,
   vocabulary: (courseId: string) => `vocabulary:${courseId}`,
-  word: (lexemeId: string) => `word:${lexemeId}`,
+  word: (courseId: string, lexemeId: string) => `word:${courseId}:${lexemeId}`,
   review: (courseId: string) => `review:${courseId}`,
   progress: (courseId: string) => `progress:${courseId}`,
   mistakes: (courseId: string) => `mistakes:${courseId}`,
@@ -37,7 +37,7 @@ export function revalidateUserDomains(
   );
 
   for (const wordId of wordIds) {
-    if (wordId) uniqueTags.add(cacheTags.word(wordId));
+    if (wordId) uniqueTags.add(cacheTags.word(userCourseId, wordId));
   }
   for (const tag of uniqueTags) revalidateTag(tag);
 }

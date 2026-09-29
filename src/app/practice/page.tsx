@@ -212,7 +212,7 @@ export default async function PracticePage({
   }
 
   if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
-    const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:items[0].lexemeId });
+    const conjugation=await getVerbConjugationForUser({ userId:user.id,userCourseId:course.id,lexemeId:items[0].lexemeId });
     if(conjugation.status==="ok"){
       const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
       if(form){

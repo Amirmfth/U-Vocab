@@ -25,8 +25,9 @@ export const queryKeys = {
   },
   word: {
     all: ["word"] as const,
-    detail: (lexemeId: string) => ["word", lexemeId] as const,
-    conjugation: (lexemeId: string) => ["word", lexemeId, "conjugation"] as const,
+    detail: (scope: string, lexemeId: string) => ["word", scope, lexemeId] as const,
+    conjugation: (scope: string, lexemeId: string) =>
+      ["word", scope, lexemeId, "conjugation"] as const,
   },
   review: {
     all: ["review"] as const,
@@ -34,24 +35,24 @@ export const queryKeys = {
   },
   mistakes: {
     all: ["mistakes"] as const,
-    open: () => ["mistakes", "open"] as const,
+    open: (scope: string) => ["mistakes", scope, "open"] as const,
   },
   recommendations: {
     all: ["recommendations"] as const,
-    list: () => ["recommendations", "list"] as const,
+    list: (scope: string) => ["recommendations", scope, "list"] as const,
   },
   writing: {
     all: ["writing"] as const,
-    session: (sessionId: string) => ["writing", sessionId] as const,
+    session: (scope: string, sessionId: string) => ["writing", scope, sessionId] as const,
   },
   conversation: {
     all: ["conversation"] as const,
-    session: (sessionId: string) => ["conversation", sessionId] as const,
+    session: (scope: string, sessionId: string) => ["conversation", scope, sessionId] as const,
   },
   usage: {
     all: ["usage"] as const,
-    filtered: (period: string, filters: Record<string, string>) =>
-      ["usage", period, normalizedFilters(filters)] as const,
+    filtered: (scope: string, period: string, filters: Record<string, string>) =>
+      ["usage", scope, period, normalizedFilters(filters)] as const,
   },
 } as const;
 

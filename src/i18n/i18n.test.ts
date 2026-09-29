@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createTranslator, translate } from "./core";
+import { createTranslator, translate, type MessageKey } from "./core";
 import {
   localeDocumentAttributes,
   uiLocaleFromDb,
@@ -12,6 +12,10 @@ import {
   formatRelativeTime,
 } from "./format";
 import { learningContentAttributes } from "./learning-content";
+import {
+  parseUiLocalePreference,
+  UI_LOCALE_COOKIE,
+} from "./preference";
 
 test("locale config maps persisted values and document direction", () => {
   assert.equal(uiLocaleFromDb("EN"), "en");
@@ -70,6 +74,42 @@ test("mixed-direction learning content stays explicitly directed", () => {
   assert.deepEqual(learningContentAttributes("fa"), {
     lang: "fa",
     dir: "rtl",
+    className: "learning-content",
+  });
+});
+
+
+test("missing translation keys fail loudly outside production", () => {
+  if (process.env.NODE_ENV === "production") return;
+  assert.throws(
+    () => translate("en", "missing.key" as MessageKey),
+    /Missing i18n message/,
+  );
+});
+
+test("settings preference maps one locale to account storage and browser cookie", () => {
+  assert.deepEqual(parseUiLocalePreference("fa"), {
+    locale: "fa",
+    dbLocale: "FA",
+    cookieLocale: "fa",
+  });
+  assert.deepEqual(parseUiLocalePreference("en"), {
+    locale: "en",
+    dbLocale: "EN",
+    cookieLocale: "en",
+  });
+  assert.equal(parseUiLocalePreference("de"), null);
+  assert.equal(UI_LOCALE_COOKIE, "u-vocab-ui-locale");
+});
+
+test("Persian representative UI copy is translated while learning languages stay separate", () => {
+  const t = createTranslator("fa");
+  assert.equal(t("settings.title"), "تنظیمات");
+  assert.equal(t("vocab.title"), "واژگان");
+  assert.equal(t("review.start"), "شروع مرور");
+  assert.deepEqual(learningContentAttributes("de"), {
+    lang: "de",
+    dir: "ltr",
     className: "learning-content",
   });
 });

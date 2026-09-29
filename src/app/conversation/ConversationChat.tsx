@@ -115,10 +115,7 @@ export function ConversationChat({
           const isUser = message.role === "USER";
           return (
             <article
-              className={
-                "conversation-message " +
-                (isUser ? "is-user" : "is-assistant")
-              }
+              className={"conversation-message " + (isUser ? "is-user" : "is-assistant")}
               key={message.id}
             >
               <div className="conversation-avatar" aria-hidden="true">
@@ -146,6 +143,7 @@ export function ConversationChat({
           aria-label={t("conversation.yourGermanReply")}
           lang="de"
           dir="ltr"
+          className="learning-content"
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
             if (
@@ -163,22 +161,12 @@ export function ConversationChat({
           className="conversation-send-button"
           disabled={!canSend}
           aria-busy={streaming}
-          aria-label={
-            streaming
-              ? t("conversation.tutorReplying")
-              : t("conversation.send")
-          }
-          title={
-            streaming
-              ? t("conversation.tutorReplyingLong")
-              : t("conversation.sendEnter")
-          }
+          aria-label={streaming ? t("conversation.tutorReplying") : t("conversation.send")}
+          title={streaming ? t("conversation.tutorReplyingLong") : t("conversation.sendEnter")}
         >
           <Send className="rtl-mirror" size={18} />
         </button>
-        <span className="conversation-composer-hint">
-          {t("conversation.composerHint")}
-        </span>
+        <span className="conversation-composer-hint">{t("conversation.composerHint")}</span>
       </form>
 
       {error ? (

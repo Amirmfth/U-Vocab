@@ -6,13 +6,36 @@ import { Eye, RotateCcw } from "lucide-react";
 import type { ExerciseDefinition } from "@/lib/exercises/types";
 import type { ReviewGrade } from "@/lib/fsrs";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
+import type { MessageKey } from "@/i18n/core";
 
-const ratings = [
-  { grade: "AGAIN", label: "Again", hint: "Could not recall" },
-  { grade: "HARD", label: "Hard", hint: "Recalled with effort" },
-  { grade: "GOOD", label: "Good", hint: "Recalled correctly" },
-  { grade: "EASY", label: "Easy", hint: "Immediate recall" },
-] as const;
+const ratings: Array<{
+  grade: ReviewGrade;
+  labelKey: MessageKey;
+  hintKey: MessageKey;
+}> = [
+  {
+    grade: "AGAIN",
+    labelKey: "review.ratingAgain",
+    hintKey: "rescue.ratingAgainHint",
+  },
+  {
+    grade: "HARD",
+    labelKey: "review.ratingHard",
+    hintKey: "rescue.ratingHardHint",
+  },
+  {
+    grade: "GOOD",
+    labelKey: "review.ratingGood",
+    hintKey: "rescue.ratingGoodHint",
+  },
+  {
+    grade: "EASY",
+    labelKey: "review.ratingEasy",
+    hintKey: "rescue.ratingEasyHint",
+  },
+];
 
 export type RescueSessionCard = {
   userVocabularyId: string;
@@ -24,12 +47,15 @@ export type RescueSessionCard = {
   reasons: string[];
 };
 
-export function RescueCard(props: RescueSessionCard & {
-  onGrade: (grade: ReviewGrade, startedAt: number) => void;
-}) {
+export function RescueCard(
+  props: RescueSessionCard & {
+    onGrade: (grade: ReviewGrade, startedAt: number) => void;
+  },
+) {
   const [revealed, setRevealed] = useState(false);
   const startedAt = useRef(Date.now());
   const reduceMotion = useReducedMotion();
+  const { locale, t } = useI18n();
   const label = formatLexemeLabel(props);
 
   useEffect(() => {
@@ -41,7 +67,10 @@ export function RescueCard(props: RescueSessionCard & {
       }
       if (revealed && ["1", "2", "3", "4"].includes(event.key)) {
         event.preventDefault();
-        props.onGrade(ratings[Number(event.key) - 1].grade, startedAt.current);
+        props.onGrade(
+          ratings[Number(event.key) - 1].grade,
+          startedAt.current,
+        );
       }
     }
 
@@ -52,32 +81,55 @@ export function RescueCard(props: RescueSessionCard & {
   return (
     <section className="panel learning-card review-flashcard rescue-card">
       <div className="learning-card-head">
-        <span className="badge">rescue review</span>
-        <span className="muted">{props.riskPercent}% risk score</span>
+        <span className="badge">{t("rescue.reviewBadge")}</span>
+        <span className="muted">
+          {formatNumber(locale, props.riskPercent)} {t("rescue.score")}
+        </span>
       </div>
 
       <motion.div
         animate={{ rotateY: revealed ? 180 : 0 }}
         className="review-card-flip"
         style={{ transformStyle: "preserve-3d" }}
-        transition={{ duration: reduceMotion ? 0 : 0.42, ease: "easeInOut" }}
+        transition={{
+          duration: reduceMotion ? 0 : 0.42,
+          ease: "easeInOut",
+        }}
       >
-        <div aria-hidden={revealed} className="review-card-face review-card-front">
-          <p className="eyebrow">RESCUE RECALL</p>
-          <h1 className="learning-prompt">{props.exercise.prompt}</h1>
-          <div className="rescue-reasons" aria-label="Why this word needs rescue">
-            {props.reasons.map((reason) => <span key={reason}>{reason}</span>)}
+        <div
+          aria-hidden={revealed}
+          className="review-card-face review-card-front"
+        >
+          <p className="eyebrow">{t("rescue.recall")}</p>
+          <h1 className="learning-prompt learning-content" dir="auto">
+            {props.exercise.prompt}
+          </h1>
+          <div className="rescue-reasons" aria-label={t("rescue.why")}>
+            {props.reasons.map((reason) => (
+              <span key={reason}>{reason}</span>
+            ))}
           </div>
         </div>
 
-        <div aria-hidden={!revealed} className="answer-panel review-card-face review-card-back">
-          <p className="eyebrow">CHECK</p>
-          <strong>{props.exercise.expected || label}</strong>
-          {props.exercise.expected && props.exercise.expected !== label ? <p className="word">{label}</p> : null}
+        <div
+          aria-hidden={!revealed}
+          className="answer-panel review-card-face review-card-back"
+        >
+          <p className="eyebrow">{t("review.check")}</p>
+          <strong className="learning-content" dir="auto">
+            {props.exercise.expected || label}
+          </strong>
+          {props.exercise.expected && props.exercise.expected !== label ? (
+            <p className="word learning-content" lang="de" dir="ltr">
+              {label}
+            </p>
+          ) : null}
           {props.translations.map((translation) => (
             <p
               key={translation.language + translation.text}
-              className={translation.language === "fa" ? "rtl" : undefined}
+              className="learning-content"
+              lang={translation.language === "fa" ? "fa" : "en"}
+              dir={translation.language === "fa" ? "rtl" : "ltr"}
             >
               {translation.text}
             </p>
@@ -92,29 +144,42 @@ export function RescueCard(props: RescueSessionCard & {
           onClick={() => setRevealed(true)}
         >
           <Eye size={18} />
-          Reveal answer
+          {t("review.reveal")}
         </button>
       ) : (
         <>
           <div className="learning-card-head">
-            <p className="muted">Rate retrieval difficulty. Keys 1–4 also work.</p>
-            <button className="text-button" type="button" onClick={() => setRevealed(false)}>
+            <p className="muted">{t("rescue.rateHelp")}</p>
+            <button
+              className="text-button"
+              type="button"
+              onClick={() => setRevealed(false)}
+            >
               <RotateCcw size={15} />
-              Hide
+              {t("review.hide")}
             </button>
           </div>
 
           <div className="grade-grid review-grade-grid">
             {ratings.map((rating, index) => (
               <button
-                className={"button " + (rating.grade === "AGAIN" ? "button-danger" : rating.grade === "EASY" ? "button-success" : "button-secondary")}
+                className={
+                  "button " +
+                  (rating.grade === "AGAIN"
+                    ? "button-danger"
+                    : rating.grade === "EASY"
+                      ? "button-success"
+                      : "button-secondary")
+                }
                 key={rating.grade}
-                onClick={() => props.onGrade(rating.grade, startedAt.current)}
+                onClick={() =>
+                  props.onGrade(rating.grade, startedAt.current)
+                }
                 type="button"
-                title={rating.hint}
+                title={t(rating.hintKey)}
               >
-                <span>{rating.label}</span>
-                <small>{index + 1}</small>
+                <span>{t(rating.labelKey)}</span>
+                <small>{formatNumber(locale, index + 1)}</small>
               </button>
             ))}
           </div>

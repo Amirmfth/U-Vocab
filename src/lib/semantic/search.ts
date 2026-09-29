@@ -8,11 +8,12 @@ function vectorLiteral(values: number[]) {
 
 export async function findSimilarLexemes(input: {
   userId: string;
+  userCourseId: string;
   lexemeId: string;
   limit?: number;
   excludeUserVocabulary?: boolean;
 }) {
-  await ensureLexemeEmbedding(input.lexemeId, input.userId);
+  await ensureLexemeEmbedding(input.lexemeId, input.userId, input.userCourseId);
 
   const rows = await db.$queryRaw<Array<{ id: string; similarity: number }>>(
     Prisma.sql`
@@ -28,7 +29,7 @@ export async function findSimilarLexemes(input: {
               AND NOT EXISTS (
                 SELECT 1
                 FROM "UserVocabulary" uv
-                WHERE uv."userId" = ${input.userId}
+                WHERE uv."userCourseId" = ${input.userCourseId}
                   AND uv."lexemeId" = candidate."id"
               )
             `
@@ -54,12 +55,14 @@ export async function findSimilarLexemes(input: {
 
 export async function semanticLexemeSearch(input: {
   userId: string;
+  userCourseId: string;
   query: string;
   limit?: number;
   excludeKnown?: boolean;
 }) {
   const embedding = await embedText({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "semantic_query_embedding",
     text: input.query,
   });
@@ -89,6 +92,7 @@ export async function semanticLexemeSearch(input: {
 
 export async function similarMistakePairs(input: {
   userId: string;
+  userCourseId: string;
   threshold?: number;
 }) {
   const threshold = input.threshold ?? 0.82;
@@ -106,8 +110,9 @@ export async function similarMistakePairs(input: {
     FROM "Mistake" a
     JOIN "Mistake" b
       ON a."id" < b."id"
-     AND a."userId" = b."userId"
+     AND a."userCourseId" = b."userCourseId"
     WHERE a."userId" = ${input.userId}
+      AND a."userCourseId" = ${input.userCourseId}
       AND a."grammarConceptId" IS NULL
       AND b."grammarConceptId" IS NULL
       AND a."resolvedAt" IS NULL

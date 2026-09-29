@@ -44,7 +44,7 @@ export async function recordMistakes(
 
   const embeddingResults = await Promise.allSettled(
     touched.map((mistake) =>
-      ensureMistakeEmbedding(mistake.id, input.userId, true),
+      ensureMistakeEmbedding(mistake.id, input.userId, input.userCourseId, true),
     ),
   );
 

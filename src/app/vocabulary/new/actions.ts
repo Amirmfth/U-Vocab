@@ -30,7 +30,7 @@ export type VocabularyPreviewState = {
 function candidateFromLexicalAnalysis(
   analysis: Awaited<ReturnType<typeof analyzeGermanLexeme>>,
 ): IngestionCandidate {
-  const normalized = analysis.lemma.toLocaleLowerCase(language.locale);
+  const normalized = analysis.lemma.toLocaleLowerCase("de-DE");
   return {
     key: normalized + ":" + analysis.partOfSpeech,
     sourceType: "PASTED_TEXT",

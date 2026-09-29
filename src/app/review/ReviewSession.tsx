@@ -7,16 +7,25 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { startOperation } from "@/lib/performance";
-import { optimisticReviewAdvance, REVIEW_QUEUE_QUERY_POLICY, shouldRefillReviewQueue } from "@/lib/review-query";
+import {
+  optimisticReviewAdvance,
+  REVIEW_QUEUE_QUERY_POLICY,
+  shouldRefillReviewQueue,
+} from "@/lib/review-query";
 import type { ReviewGrade } from "@/lib/fsrs";
 import type { ReviewQueueData } from "@/lib/review-queue";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
 import {
   submitReviewMutation,
   type ReviewMutationInput,
 } from "./actions";
 import { ReviewCard } from "./ReviewCard";
 
-async function fetchReviewQueue(excludeIds: ReadonlySet<string>): Promise<ReviewQueueData> {
+async function fetchReviewQueue(
+  excludeIds: ReadonlySet<string>,
+  refreshError: string,
+): Promise<ReviewQueueData> {
   const url = new URL("/api/review/queue", window.location.origin);
   for (const id of excludeIds) url.searchParams.append("exclude", id);
   const response = await fetch(url, {
@@ -31,9 +40,7 @@ async function fetchReviewQueue(excludeIds: ReadonlySet<string>): Promise<Review
     );
     throw new Error("Unauthorized");
   }
-  if (!response.ok) {
-    throw new Error("Could not refresh the review queue.");
-  }
+  if (!response.ok) throw new Error(refreshError);
 
   return response.json() as Promise<ReviewQueueData>;
 }
@@ -47,20 +54,25 @@ export function ReviewSession({
 }) {
   const queryClient = useQueryClient();
   const reduceMotion = useReducedMotion();
+  const { locale, t } = useI18n();
   const queueKey = queryKeys.review.queue(userScope);
   const [sessionStats, setSessionStats] = useState({ reviewed: 0, again: 0 });
   const answeredIds = useRef(new Set<string>());
   const unsavedIds = useRef(new Set<string>());
   const [pendingCount, setPendingCount] = useState(0);
-  const [saveErrors, setSaveErrors] = useState<Map<string, { input: ReviewMutationInput; message: string }>>(new Map());
+  const [saveErrors, setSaveErrors] = useState<
+    Map<string, { input: ReviewMutationInput; message: string }>
+  >(new Map());
 
   const queue = useQuery({
     queryKey: queueKey,
     queryFn: async () => {
-      const data = await fetchReviewQueue(unsavedIds.current);
+      const data = await fetchReviewQueue(unsavedIds.current, t("review.refreshError"));
       return {
         ...data,
-        cards: data.cards.filter((item) => !answeredIds.current.has(item.userVocabularyId)),
+        cards: data.cards.filter(
+          (item) => !answeredIds.current.has(item.userVocabularyId),
+        ),
       };
     },
     initialData,
@@ -106,10 +118,12 @@ export function ReviewSession({
       return { perf };
     },
     onError: (error, input, context) => {
-      setSaveErrors((errors) => new Map(errors).set(input.userVocabularyId, {
-        input,
-        message: error instanceof Error ? error.message : "Could not save the review.",
-      }));
+      setSaveErrors((errors) =>
+        new Map(errors).set(input.userVocabularyId, {
+          input,
+          message: error instanceof Error ? error.message : t("review.saveError"),
+        }),
+      );
       context?.perf.fail(error, { rolledBack: false });
     },
     onSuccess: (_result, input, context) => {
@@ -130,7 +144,11 @@ export function ReviewSession({
     onSettled: () => {
       setPendingCount((count) => count - 1);
       const current = queryClient.getQueryData<ReviewQueueData>(queueKey);
-      if (!current || shouldRefillReviewQueue(current) || current.cards.length === 0) {
+      if (
+        !current ||
+        shouldRefillReviewQueue(current) ||
+        current.cards.length === 0
+      ) {
         void queryClient.invalidateQueries({ queryKey: queueKey });
       }
     },
@@ -138,24 +156,30 @@ export function ReviewSession({
 
   const queueData = queue.data ?? initialData;
   const card = queueData.cards[0];
-  const saveErrorNotice = saveErrors.size > 0 ? (
-    <div className="optimistic-error" role="alert">
-      <AlertCircle size={17} />
-      <span>
-        {saveErrors.size} review{saveErrors.size === 1 ? "" : "s"} could not be saved. {saveErrors.values().next().value?.message}
-      </span>
-      <button
-        className="text-button"
-        onClick={() => {
-          for (const { input } of saveErrors.values()) review.mutate(input);
-        }}
-        type="button"
-      >
-        <RotateCcw size={15} />
-        Retry
-      </button>
-    </div>
-  ) : null;
+  const saveErrorNotice =
+    saveErrors.size > 0 ? (
+      <div className="optimistic-error" role="alert">
+        <AlertCircle size={17} />
+        <span>
+          {t.plural(
+            { one: "review.saveErrors.one", other: "review.saveErrors.other" },
+            saveErrors.size,
+            { count: formatNumber(locale, saveErrors.size) },
+          )}{" "}
+          {saveErrors.values().next().value?.message}
+        </span>
+        <button
+          className="text-button"
+          onClick={() => {
+            for (const { input } of saveErrors.values()) review.mutate(input);
+          }}
+          type="button"
+        >
+          <RotateCcw size={15} />
+          {t("review.retry")}
+        </button>
+      </div>
+    ) : null;
 
   function grade(grade: ReviewGrade, startedAt: number) {
     if (!card || answeredIds.current.has(card.userVocabularyId)) return;
@@ -173,16 +197,24 @@ export function ReviewSession({
     return (
       <main className="page review-session-shell">
         <header className="review-session-topbar">
-          <Link href="/review" className="text-link">Review</Link>
-          <span>{queueData.dueCount} remaining</span>
+          <Link href="/review" className="text-link">{t("nav.review")}</Link>
+          <span>{t("review.remaining", { count: formatNumber(locale, queueData.dueCount) })}</span>
         </header>
         {saveErrorNotice}
         <section className="panel optimistic-next-card" aria-live="polite">
           <div className="skeleton skeleton-kicker" />
           <div className="skeleton skeleton-title" />
           <div className="skeleton skeleton-card" />
-          <span>Loading the next review…</span>
-          {queue.isError ? <button className="button button-secondary" type="button" onClick={() => void queue.refetch()}>Retry loading</button> : null}
+          <span>{t("review.loadingNext")}</span>
+          {queue.isError ? (
+            <button
+              className="button button-secondary"
+              type="button"
+              onClick={() => void queue.refetch()}
+            >
+              {t("review.retryLoading")}
+            </button>
+          ) : null}
         </section>
       </main>
     );
@@ -193,13 +225,18 @@ export function ReviewSession({
       <main className="page review-session-shell">
         {saveErrorNotice}
         <section className="empty-state compact-empty">
-          <strong>{saveErrors.size > 0 ? "Reviews need saving" : "Review complete"}</strong>
+          <strong>
+            {saveErrors.size > 0 ? t("review.needSaving") : t("review.complete")}
+          </strong>
           <span className="muted">
-            {sessionStats.reviewed} reviewed · {sessionStats.again} marked Again
+            {t("review.sessionStats", {
+              reviewed: formatNumber(locale, sessionStats.reviewed),
+              again: formatNumber(locale, sessionStats.again),
+            })}
           </span>
           <div className="ia-empty-actions">
-            <Link href="/review" className="button button-primary">Back to Review</Link>
-            <Link href="/practice" className="button button-secondary">Practice</Link>
+            <Link href="/review" className="button button-primary">{t("review.back")}</Link>
+            <Link href="/practice" className="button button-secondary">{t("nav.practice")}</Link>
           </div>
         </section>
       </main>
@@ -209,9 +246,12 @@ export function ReviewSession({
   return (
     <main className="page review-session-shell">
       <header className="review-session-topbar">
-        <Link href="/review" className="text-link">Review</Link>
+        <Link href="/review" className="text-link">{t("nav.review")}</Link>
         <span>
-          {queueData.dueCount} remaining{pendingCount > 0 ? ` · ${pendingCount} saving` : ""}
+          {t("review.remaining", { count: formatNumber(locale, queueData.dueCount) })}
+          {pendingCount > 0
+            ? " · " + t("review.saving", { count: formatNumber(locale, pendingCount) })
+            : ""}
         </span>
       </header>
 
@@ -225,10 +265,7 @@ export function ReviewSession({
           key={card.userVocabularyId}
           transition={{ duration: reduceMotion ? 0 : 0.16, ease: "easeOut" }}
         >
-          <ReviewCard
-            card={card}
-            onGrade={grade}
-          />
+          <ReviewCard card={card} onGrade={grade} />
         </motion.div>
       </AnimatePresence>
     </main>

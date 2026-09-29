@@ -67,8 +67,6 @@ const routeLabelKeys: Record<string, MessageKey> = {
   Battles: "nav.battles",
   "Full progress": "nav.fullProgress",
   Settings: "nav.settings",
-  "AI Usage": "nav.aiUsage",
-  Home: "nav.home",
 };
 
 function localizedRouteLabel(t: Translator, label: string) {
@@ -198,7 +196,7 @@ export function AppNavigation({
       </header>
 
       <aside className="desktop-sidebar">
-        <Link href="/" className="brand sidebar-brand" aria-label={t("nav.brandWords")}>
+        <Link href="/vocabulary" className="brand sidebar-brand" aria-label={t("nav.brandWords")}>
           <span className="brand-mark">U</span>
           <span>U-Vocab</span>
         </Link>

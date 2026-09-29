@@ -1,5 +1,6 @@
 export const en = {
   "common.account": "Account",
+  "common.insights": "Insights",
   "common.learn": "Learn",
   "common.save": "Save",
   "common.saving": "Saving…",
@@ -36,6 +37,7 @@ export const en = {
   "nav.settings": "Settings",
   "nav.addWord": "Add word",
   "nav.brandHome": "U-Vocab home",
+  "nav.brandWords": "U-Vocab words",
   "nav.reviewDue": "Review, {count} due",
   "nav.reviewsDue": "{count} reviews due",
   "nav.myWords": "My words",

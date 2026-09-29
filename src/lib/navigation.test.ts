@@ -2,8 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { routeOwner, sectionForPath } from "./navigation";
 
-test("secondary Words routes map to Words", () => {
+test("root and secondary Words routes map to Words", () => {
+  assert.equal(sectionForPath("/"), "words");
   assert.equal(sectionForPath("/vocabulary/lexeme-1/teach"), "words");
+});
+
+test("Grammar is a first-class learning section, including nested routes", () => {
+  assert.equal(sectionForPath("/grammar"), "grammar");
+  assert.equal(sectionForPath("/grammar/konjunktiv-ii"), "grammar");
 });
 
 test("review maintenance routes map to Review", () => {
@@ -11,16 +17,18 @@ test("review maintenance routes map to Review", () => {
   assert.equal(sectionForPath("/rescue?step=1"), "review");
 });
 
-test("skill routes and battles map to Practice", () => {
+test("application-oriented skill routes and battles map to Practice", () => {
+  assert.equal(sectionForPath("/practice?drill=1"), "practice");
   assert.equal(sectionForPath("/writing/session-1"), "practice");
+  assert.equal(sectionForPath("/reading/session-1"), "practice");
   assert.equal(sectionForPath("/read/document-1"), "practice");
   assert.equal(sectionForPath("/stories/story-1"), "practice");
   assert.equal(sectionForPath("/conversation/session-1"), "practice");
   assert.equal(sectionForPath("/battles"), "practice");
 });
 
-test("progress belongs to Home while system routes have no learning owner", () => {
-  assert.equal(sectionForPath("/progress"), "home");
+test("Progress and system routes have no learning owner", () => {
+  assert.equal(sectionForPath("/progress"), null);
   assert.equal(sectionForPath("/settings"), null);
   assert.equal(sectionForPath("/usage"), null);
 });

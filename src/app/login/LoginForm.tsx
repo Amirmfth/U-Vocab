@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LockKeyhole } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { StatusNotice } from "@/components/status-notice";
+import { useTranslations } from "@/i18n/client";
 
 export function LoginForm({
   returnTo,
@@ -17,6 +18,7 @@ export function LoginForm({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const t = useTranslations();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,15 +44,15 @@ export function LoginForm({
         setNeedsVerification(emailNotVerified);
         setError(
           emailNotVerified
-            ? "Verify your email before signing in. We sent a new verification link."
-            : result.error.message || "Could not sign in.",
+            ? t("auth.verifyBeforeSignIn")
+            : result.error.message || t("auth.signInError"),
         );
         return;
       }
 
       window.location.replace(returnTo);
     } catch {
-      setError("Could not sign in. Check your connection and try again.");
+      setError(t("auth.signInConnectionError"));
     } finally {
       setPending(false);
     }
@@ -62,19 +64,17 @@ export function LoginForm({
         <LockKeyhole size={22} />
       </div>
       <div>
-        <p className="eyebrow">ACCOUNT</p>
-        <h1>Sign in to U-Vocab</h1>
-        <p className="muted">Use your U-Vocab email and password.</p>
+        <p className="eyebrow">{t("auth.account")}</p>
+        <h1>{t("auth.signInTitle")}</h1>
+        <p className="muted">{t("auth.signInHelp")}</p>
       </div>
 
       {passwordReset ? (
-        <StatusNotice tone="success">
-          Password updated. Sign in with your new password.
-        </StatusNotice>
+        <StatusNotice tone="success">{t("auth.passwordUpdated")}</StatusNotice>
       ) : null}
 
       <label className="field">
-        <span>Email</span>
+        <span>{t("auth.email")}</span>
         <input
           name="email"
           type="email"
@@ -85,7 +85,7 @@ export function LoginForm({
         />
       </label>
       <label className="field">
-        <span>Password</span>
+        <span>{t("auth.password")}</span>
         <input
           name="password"
           type="password"
@@ -107,19 +107,19 @@ export function LoginForm({
           }
           className="text-link"
         >
-          Resend verification email
+          {t("auth.resendVerification")}
         </Link>
       ) : null}
 
       <button className="button button-primary" type="submit" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+        {pending ? t("auth.signingIn") : t("auth.signIn")}
       </button>
 
       <Link
         href={"/forgot-password?returnTo=" + encodeURIComponent(returnTo)}
         className="text-link"
       >
-        Forgot password?
+        {t("auth.forgotPassword")}
       </Link>
     </form>
   );

@@ -7,9 +7,7 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { getServerTranslator } from "@/i18n/server";
 import { ConversationStartForm } from "./ConversationStartForm";
 
-export default async function ConversationPage({
-  searchParams,
-}: {
+export default async function ConversationPage({ searchParams }: {
   searchParams: Promise<{ mode?: string }>;
 }) {
   await connection();
@@ -31,9 +29,7 @@ export default async function ConversationPage({
         <h1>{t("conversation.title")}</h1>
       </section>
 
-      <ConversationStartForm
-        initialMode={params.mode === "MISSION" ? "MISSION" : "PRACTICE"}
-      />
+      <ConversationStartForm initialMode={params.mode === "MISSION" ? "MISSION" : "PRACTICE"} />
 
       {sessions.length ? (
         <section className="page-section">
@@ -46,9 +42,7 @@ export default async function ConversationPage({
                 key={session.id}
               >
                 <div>
-                  <strong className="learning-content" dir="auto">
-                    {session.title}
-                  </strong>
+                  <strong className="learning-content" dir="auto">{session.title}</strong>
                   <span>
                     {session.kind === "MISSION"
                       ? t("conversation.mission")

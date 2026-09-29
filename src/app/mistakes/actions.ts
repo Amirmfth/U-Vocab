@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { rebuildMistakeEmbeddings } from "@/lib/semantic/embeddings";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { getServerTranslator } from "@/i18n/server";
+import { formatNumber } from "@/i18n/format";
 
 export type MistakeActionState = {
   status: "idle" | "success" | "error";
@@ -17,15 +19,22 @@ export async function resolveMistake(
   formData: FormData,
 ): Promise<MistakeActionState> {
   const mistakeId = String(formData.get("mistakeId") ?? "");
+  const user = await getCurrentUser();
+  const { t } = await getServerTranslator(user);
 
   try {
-    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const course = await getCurrentCourse();
     const mistake = await db.mistake.findFirst({
-      where: { id: mistakeId, userId: user.id, userCourseId: course.id, resolvedAt: null },
+      where: {
+        id: mistakeId,
+        userId: user.id,
+        userCourseId: course.id,
+        resolvedAt: null,
+      },
       select: { lexemeId: true },
     });
     if (!mistake) {
-      return { status: "error", message: "Mistake not found." };
+      return { status: "error", message: t("mistakes.notFound") };
     }
 
     const updated = await db.mistake.updateMany({
@@ -39,7 +48,7 @@ export async function resolveMistake(
     });
 
     if (!updated.count) {
-      return { status: "error", message: "Mistake not found." };
+      return { status: "error", message: t("mistakes.notFound") };
     }
 
     revalidateUserDomains(
@@ -49,39 +58,50 @@ export async function resolveMistake(
       mistake.lexemeId ? [mistake.lexemeId] : [],
     );
     revalidatePath("/mistakes");
-    return { status: "success", message: "Marked resolved." };
+    return { status: "success", message: t("mistakes.resolved") };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not resolve this mistake.",
+      message:
+        error instanceof Error ? error.message : t("mistakes.resolveError"),
     };
   }
 }
 
-
 export async function refreshMistakeEmbeddings(
   _previous: MistakeActionState,
 ): Promise<MistakeActionState> {
+  const user = await getCurrentUser();
+  const { locale, t } = await getServerTranslator(user);
+
   try {
-    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
-    const result = await rebuildMistakeEmbeddings({ userId: user.id, userCourseId: course.id, limit: 30 });
+    const course = await getCurrentCourse();
+    const result = await rebuildMistakeEmbeddings({
+      userId: user.id,
+      userCourseId: course.id,
+      limit: 30,
+    });
     revalidateUserDomains(user.id, course.id, ["mistakes"]);
     revalidatePath("/mistakes");
+
     return {
       status: result.failed ? "error" : "success",
       message: result.failed
-        ? "Indexed " + result.completed + " mistake patterns; " + result.failed + " failed."
+        ? t("mistakes.indexedPartial", {
+            completed: formatNumber(locale, result.completed),
+            failed: formatNumber(locale, result.failed),
+          })
         : result.completed
-          ? "Indexed " + result.completed + " mistake patterns."
-          : "Mistake embeddings are already current.",
+          ? t("mistakes.indexed", {
+              completed: formatNumber(locale, result.completed),
+            })
+          : t("mistakes.current"),
     };
   } catch (error) {
     return {
       status: "error",
       message:
-        error instanceof Error
-          ? error.message
-          : "Could not refresh mistake embeddings.",
+        error instanceof Error ? error.message : t("mistakes.refreshError"),
     };
   }
 }

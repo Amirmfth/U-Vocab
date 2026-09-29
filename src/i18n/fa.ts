@@ -519,7 +519,7 @@ export const fa = {
   "word.grammarEyebrow": "گرامر",
   "word.structures": "ساختارهایی که این واژه تقویت می‌کند",
   "word.mastery": "تسلط",
-  "word.overallMastery": "{value}٪ تسلط کلی",
+  "word.overallMastery": "{percent} تسلط کلی",
   "word.recognition": "تشخیص",
   "word.meaningRecall": "یادآوری معنا",
   "word.production": "تولید",

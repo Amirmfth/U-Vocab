@@ -4,6 +4,8 @@ import type { PartOfSpeech } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
@@ -45,10 +47,14 @@ export async function createReadingDocument(
       }
 
       try {
-        const user = await perf.span("auth", () => getCurrentUser());
+        const [user, course] = await Promise.all([
+          perf.span("auth", () => getCurrentUser()),
+          perf.span("course", () => getCurrentCourse()),
+        ]);
+        const language = targetLanguageConfig(course.targetLanguage);
         const known = await perf.span("dbRead", () =>
           db.userVocabulary.findMany({
-            where: { userId: user.id },
+            where: { userCourseId: course.id },
             select: { lexeme: { select: { normalized: true } } },
           }),
         );
@@ -61,10 +67,11 @@ export async function createReadingDocument(
         const analysis = await perf.span("ai", () =>
           analyzeReadingText({
             userId: user.id,
+            userCourseId: course.id,
             text: excerpt,
             originalTextChars: content.length,
             candidates,
-            targetLevel: user.targetLevel,
+            targetLevel: course.targetLevel,
           }),
         );
 
@@ -72,12 +79,12 @@ export async function createReadingDocument(
           analysis.lexicalUnits,
         ).map((unit, position) => ({
             ...unit,
-            normalized: unit.lemma.toLocaleLowerCase("de-DE").trim(),
+            normalized: unit.lemma.toLocaleLowerCase(language.locale).trim(),
             position,
           }));
 
         const lookup = lexicalUnits.map((unit) => ({
-          language: "de",
+          language: language.code,
           normalized: unit.normalized,
           partOfSpeech: unit.partOfSpeech as PartOfSpeech,
         }));
@@ -118,7 +125,7 @@ export async function createReadingDocument(
                   data: missingUnits.map((unit) => ({
                     lemma: unit.lemma,
                     normalized: unit.normalized,
-                    language: "de",
+                    language: language.code,
                     partOfSpeech: unit.partOfSpeech as PartOfSpeech,
                     article: unit.article,
                     plural: unit.plural,
@@ -212,6 +219,7 @@ export async function createReadingDocument(
               const created = await tx.readingDocument.create({
                 data: {
                   userId: user.id,
+                  userCourseId: course.id,
                   title: title ?? analysis.title,
                   content,
                   level: analysis.estimatedLevel,
@@ -238,7 +246,7 @@ export async function createReadingDocument(
         );
 
         await perf.span("revalidation", async () => {
-          revalidateUserDomains(user.id, ["reading"]);
+          revalidateUserDomains(user.id, course.id, ["reading"]);
           revalidatePath("/read");
         });
 
@@ -274,12 +282,12 @@ export async function addReadingLexeme(
   const documentId = String(formData.get("documentId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const item = await db.readingItem.findFirst({
       where: {
         readingDocumentId: documentId,
         lexemeId,
-        readingDocument: { userId: user.id },
+        readingDocument: { userId: user.id, userCourseId: course.id },
       },
     });
 
@@ -292,13 +300,14 @@ export async function addReadingLexeme(
 
     await db.userVocabulary.upsert({
       where: {
-        userId_lexemeId: {
-          userId: user.id,
+        userCourseId_lexemeId: {
+          userCourseId: course.id,
           lexemeId,
         },
       },
       create: {
         userId: user.id,
+        userCourseId: course.id,
         lexemeId,
         nextReviewAt: new Date(),
       },
@@ -307,6 +316,7 @@ export async function addReadingLexeme(
 
     revalidateUserDomains(
       user.id,
+      course.id,
       ["home", "vocabulary", "review", "reading"],
       [lexemeId],
     );
@@ -332,9 +342,9 @@ export async function recordReadingEncounters(
   const documentId = String(formData.get("documentId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const document = await db.readingDocument.findFirst({
-      where: { id: documentId, userId: user.id },
+      where: { id: documentId, userId: user.id, userCourseId: course.id },
       select: {
         id: true,
         content: true,
@@ -352,6 +362,7 @@ export async function recordReadingEncounters(
     await db.encounter.createMany({
       data: document.items.map((item) => ({
         userId: user.id,
+        userCourseId: course.id,
         lexemeId: item.lexemeId,
         source: "reading",
         sourceRef: document.id,
@@ -362,6 +373,7 @@ export async function recordReadingEncounters(
 
     revalidateUserDomains(
       user.id,
+      course.id,
       ["vocabulary", "reading"],
       document.items.map((item) => item.lexemeId),
     );

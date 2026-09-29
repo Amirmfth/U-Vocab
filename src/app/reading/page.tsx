@@ -3,15 +3,18 @@ import Link from "next/link";
 import { ArrowRight, BookOpenText } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { ReadingForm } from "./ReadingForm";
 
 export default async function ReadingPage() {
   await connection();
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const language = targetLanguageConfig(course.targetLanguage);
   const [readings, vocabulary, grammar] = await Promise.all([
     db.story.findMany({
-      where: { userId: user.id },
+      where: { userCourseId: course.id },
       include: {
         _count: {
           select: {
@@ -34,10 +37,10 @@ export default async function ReadingPage() {
       take: 250,
     }),
     db.grammarConcept.findMany({
-      where: { active: true, language: "de" },
+      where: { active: true, language: language.code },
       include: {
         userProgress: {
-          where: { userId: user.id },
+          where: { userCourseId: course.id },
           take: 1,
         },
       },
@@ -49,12 +52,12 @@ export default async function ReadingPage() {
   return (
     <main className="page reading-hub generated-reading-hub">
       <section className="page-header compact practice-workbench-header">
-        <h1>Personalized German reading</h1>
+        <h1>Personalized {language.label} reading</h1>
       </section>
 
       <ReadingForm
-        currentLevel={user.currentLevel}
-        targetLevel={user.targetLevel}
+        currentLevel={course.currentLevel}
+        targetLevel={course.targetLevel}
         targets={vocabulary.map((item) => ({
           lexemeId: item.lexemeId,
           label: formatLexemeLabel(item.lexeme),

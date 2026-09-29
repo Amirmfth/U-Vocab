@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { ReadingViewer } from "./ReadingViewer";
 import { RecordEncountersForm } from "./RecordEncountersForm";
 
@@ -14,10 +15,10 @@ export default async function ReadingDocumentPage({
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
 
   const document = await db.readingDocument.findFirst({
-    where: { id, userId: user.id },
+    where: { id, userId: user.id, userCourseId: course.id },
     include: {
       items: {
         orderBy: { position: "asc" },
@@ -33,7 +34,7 @@ export default async function ReadingDocumentPage({
                 take: 6,
               },
               userStates: {
-                where: { userId: user.id },
+                where: { userCourseId: course.id },
                 take: 1,
               },
             },
@@ -106,7 +107,7 @@ export default async function ReadingDocumentPage({
         documentId={document.id}
         content={document.content}
         items={items}
-        translationPreference={user.preferredTranslation}
+        translationPreference={course.explanationLanguage}
       />
 
       <RecordEncountersForm documentId={document.id} />

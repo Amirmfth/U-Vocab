@@ -18,8 +18,8 @@ const queue: ReviewQueueData = {
       review: {
         family: "GERMAN_MEANING",
         exerciseType: "MEANING_RECALL",
-        front: { prompt: "Haus" },
-        back: { answer: "house", details: [] },
+        front: { prompt: "Haus", language: "de" },
+        back: { answer: "house", details: [], language: "en", detailsLanguage: "de" },
       },
     },
     {
@@ -30,8 +30,8 @@ const queue: ReviewQueueData = {
       review: {
         family: "GERMAN_MEANING",
         exerciseType: "MEANING_RECALL",
-        front: { prompt: "gehen" },
-        back: { answer: "go", details: [] },
+        front: { prompt: "gehen", language: "de" },
+        back: { answer: "go", details: [], language: "en", detailsLanguage: "de" },
       },
     },
   ],

@@ -51,6 +51,7 @@ function errorCategory(error: unknown) {
 export function createAIUsageRecorder(
   input: {
     userId: string;
+    userCourseId?: string | null;
     operation: string;
     model: string;
     provider?: string;
@@ -74,6 +75,7 @@ export function createAIUsageRecorder(
 
     await persistUsage({
       userId: input.userId,
+      userCourseId: input.userCourseId,
       operation: input.operation,
       model: input.model,
       provider: input.provider ?? AI_PROVIDER,

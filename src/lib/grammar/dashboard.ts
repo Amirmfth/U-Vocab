@@ -5,6 +5,7 @@ import type {
 } from "@prisma/client";
 import { db } from "@/lib/db";
 import { CEFR_RANK } from "@/lib/grammar/levels";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type GrammarConceptWithState = {
   id: string;
@@ -28,21 +29,18 @@ const PROGRESS_PRIORITY: Record<GrammarProgressStatus, number> = {
   STRONG: 4,
 };
 
-export async function getGrammarDashboard(userId: string) {
-  const [user, concepts] = await Promise.all([
-    db.user.findUniqueOrThrow({
-      where: { id: userId },
-      select: { currentLevel: true, targetLevel: true },
-    }),
-    db.grammarConcept.findMany({
-      where: { active: true, language: "de" },
+export async function getGrammarDashboard(userId: string, userCourseId: string) {
+  const course = await db.userCourse.findFirstOrThrow({
+    where: { id: userCourseId, userId },
+  });
+  const concepts = await db.grammarConcept.findMany({
+      where: { active: true, language: targetLanguageConfig(course.targetLanguage).code },
       include: {
-        userProgress: { where: { userId }, take: 1 },
+        userProgress: { where: { userCourseId }, take: 1 },
         prerequisites: { select: { prerequisiteId: true } },
       },
       orderBy: [{ order: "asc" }],
-    }),
-  ]);
+    });
 
   const statusById = new Map(
     concepts.map((concept) => [
@@ -72,7 +70,7 @@ export async function getGrammarDashboard(userId: string) {
     .filter((concept) => {
       const status = statusById.get(concept.id) ?? "UNASSESSED";
       if (status !== "UNASSESSED") return false;
-      if (CEFR_RANK[concept.introducedAt] > CEFR_RANK[user.targetLevel]) return false;
+      if (CEFR_RANK[concept.introducedAt] > CEFR_RANK[course.targetLevel]) return false;
       return concept.prerequisites.every((edge) => {
         const prerequisiteStatus = statusById.get(edge.prerequisiteId) ?? "UNASSESSED";
         return prerequisiteStatus === "ASSUMED" || prerequisiteStatus === "STRONG";
@@ -80,10 +78,10 @@ export async function getGrammarDashboard(userId: string) {
     })
     .sort((a, b) => {
       const aDistance = Math.abs(
-        CEFR_RANK[a.introducedAt] - CEFR_RANK[user.currentLevel],
+        CEFR_RANK[a.introducedAt] - CEFR_RANK[course.currentLevel],
       );
       const bDistance = Math.abs(
-        CEFR_RANK[b.introducedAt] - CEFR_RANK[user.currentLevel],
+        CEFR_RANK[b.introducedAt] - CEFR_RANK[course.currentLevel],
       );
       return aDistance - bDistance || a.order - b.order;
     })
@@ -113,8 +111,9 @@ export async function getGrammarDashboard(userId: string) {
   );
 
   return {
-    currentLevel: user.currentLevel,
-    targetLevel: user.targetLevel,
+    currentLevel: course.currentLevel,
+    targetLevel: course.targetLevel,
+    targetLanguage: course.targetLanguage,
     items,
     sortedItems,
     categories,

@@ -6,6 +6,7 @@ export async function recordMistakes(
   db: PrismaClient,
   input: {
     userId: string;
+    userCourseId: string;
     lexemeId: string;
     embed?: boolean;
     mistakes: Array<{
@@ -20,6 +21,7 @@ export async function recordMistakes(
 
   await recordMistakesBatch(db, {
     userId: input.userId,
+    userCourseId: input.userCourseId,
     mistakes: input.mistakes.map((mistake) => ({
       lexemeId: input.lexemeId,
       ...mistake,
@@ -30,7 +32,7 @@ export async function recordMistakes(
 
   const touched = await db.mistake.findMany({
     where: {
-      userId: input.userId,
+      userCourseId: input.userCourseId,
       lexemeId: input.lexemeId,
       resolvedAt: null,
       type: {
@@ -42,7 +44,7 @@ export async function recordMistakes(
 
   const embeddingResults = await Promise.allSettled(
     touched.map((mistake) =>
-      ensureMistakeEmbedding(mistake.id, input.userId, true),
+      ensureMistakeEmbedding(mistake.id, input.userId, input.userCourseId, true),
     ),
   );
 

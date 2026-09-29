@@ -22,17 +22,18 @@ function prepositionFrom(pattern: string) {
 
 export async function buildBattleQuestions(input: {
   userId: string;
+  userCourseId: string;
   game: BattleGame;
   count?: number;
 }) {
   const count = input.count ?? 8;
-  const [user, vocabulary] = await Promise.all([
-    db.user.findUnique({
-      where: { id: input.userId },
-      select: { preferredTranslation: true },
+  const [course, vocabulary] = await Promise.all([
+    db.userCourse.findFirst({
+      where: { id: input.userCourseId, userId: input.userId },
+      select: { explanationLanguage: true },
     }),
     db.userVocabulary.findMany({
-    where: { userId: input.userId },
+    where: { userCourseId: input.userCourseId },
     include: {
       lexeme: {
         include: {
@@ -55,7 +56,7 @@ export async function buildBattleQuestions(input: {
   ]);
 
   const preferredLanguage =
-    user?.preferredTranslation === "PERSIAN" ? "fa" : "en";
+    course?.explanationLanguage === "PERSIAN" ? "fa" : "en";
   const drafts: BattleQuestionDraft[] = [];
   const meaningPool = unique(
     vocabulary.flatMap((item) =>

@@ -2,14 +2,15 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, PenLine } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { WritingStartForm } from "./WritingStartForm";
 import { getCachedWritingIndex } from "@/lib/cached-data";
 
 
 export default async function WritingPage() {
   await connection();
-  const user = await getCurrentUser();
-  const sessions = await getCachedWritingIndex(user.id);
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const sessions = await getCachedWritingIndex(user.id, course.id);
 
   return (
     <main className="page writing-hub">
@@ -17,7 +18,7 @@ export default async function WritingPage() {
         <h1>Writing studio</h1>
       </section>
 
-      <WritingStartForm defaultLevel={user.currentLevel} />
+      <WritingStartForm defaultLevel={course.currentLevel} />
 
       {sessions.length ? (
         <section className="page-section">

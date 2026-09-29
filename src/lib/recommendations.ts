@@ -66,23 +66,24 @@ export function scoreRecommendation(input: {
   };
 }
 
-export async function prepareRecommendationEmbeddings(userId: string) {
-  return rebuildLexemeEmbeddings({ userId, limit: 30 });
+export async function prepareRecommendationEmbeddings(userId: string, userCourseId: string) {
+  return rebuildLexemeEmbeddings({ userId, userCourseId, limit: 30 });
 }
 
 export async function getVocabularyRecommendations(
   userId: string,
+  userCourseId: string,
   limit = 20,
 ): Promise<VocabularyRecommendation[]> {
-  const user = await db.user.findUnique({
-    where: { id: userId },
+  const course = await db.userCourse.findFirst({
+    where: { id: userCourseId, userId },
     select: { targetLevel: true },
   });
-  if (!user) return [];
+  if (!course) return [];
 
   const [known, dismissed, recentUnknownEncounters] = await Promise.all([
     db.userVocabulary.findMany({
-      where: { userId },
+      where: { userCourseId },
       include: {
         lexeme: {
           include: {
@@ -98,17 +99,17 @@ export async function getVocabularyRecommendations(
       orderBy: [{ production: "asc" }, { contextualUsage: "asc" }],
     }),
     db.recommendationFeedback.findMany({
-      where: { userId, action: "DISMISSED" },
+      where: { userCourseId, action: "DISMISSED" },
       select: { lexemeId: true },
     }),
     db.encounter.findMany({
       where: {
-        userId,
+        userCourseId,
         createdAt: {
           gte: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
         },
         lexeme: {
-          userStates: { none: { userId } },
+          userStates: { none: { userCourseId } },
         },
       },
       select: { lexemeId: true },
@@ -142,8 +143,8 @@ export async function getVocabularyRecommendations(
 
   const levelCandidates = await db.lexeme.findMany({
       where: {
-        userStates: { none: { userId } },
-        cefrLevel: user.targetLevel,
+        userStates: { none: { userCourseId } },
+        cefrLevel: course.targetLevel,
       },
       select: { id: true },
       take: 120,
@@ -171,7 +172,7 @@ export async function getVocabularyRecommendations(
         AND NOT EXISTS (
           SELECT 1
           FROM "UserVocabulary" uv
-          WHERE uv."userId" = ${userId}
+          WHERE uv."userCourseId" = ${userCourseId}
             AND uv."lexemeId" = candidate."id"
         )
       ORDER BY candidate."embedding" <=> anchor."embedding"
@@ -201,9 +202,9 @@ export async function getVocabularyRecommendations(
   const candidates = await db.lexeme.findMany({
     where: {
       id: { in: [...signalIds] },
-      userStates: { none: { userId } },
+      userStates: { none: { userCourseId } },
       recommendationFeedback: {
-        none: { userId, action: "DISMISSED" },
+        none: { userCourseId, action: "DISMISSED" },
       },
     },
     include: {
@@ -216,7 +217,7 @@ export async function getVocabularyRecommendations(
       const similarity = semanticSimilarities.get(candidate.id) ?? 0;
       const graphNeighbor = graphIds.has(candidate.id);
       const recentEncounter = encounteredIds.has(candidate.id);
-      const levelMatch = candidate.cefrLevel === user.targetLevel;
+      const levelMatch = candidate.cefrLevel === course.targetLevel;
       const semanticWeakLink = similarity >= 0.72;
 
       const ranked = scoreRecommendation({

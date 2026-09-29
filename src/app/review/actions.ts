@@ -2,6 +2,7 @@
 
 import type { ExerciseType } from "@prisma/client";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { applyReviewResult } from "@/lib/review-service";
 import type { ReviewGrade } from "@/lib/fsrs";
 import { revalidateUserDomains } from "@/lib/cache-tags";
@@ -19,9 +20,10 @@ async function persistReview(input: ReviewMutationInput) {
     throw new Error("Invalid review submission.");
   }
 
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const result = await applyReviewResult({
     userId: user.id,
+    userCourseId: course.id,
     userVocabularyId: input.userVocabularyId,
     grade: input.grade,
     exerciseType: input.exerciseType,
@@ -31,6 +33,7 @@ async function persistReview(input: ReviewMutationInput) {
 
   revalidateUserDomains(
     user.id,
+    course.id,
     ["home", "vocabulary", "review", "progress"],
     [result.item.lexemeId],
   );

@@ -10,6 +10,7 @@ import { PageTransition } from "@/components/page-transition";
 import { WebVitals } from "@/components/web-vitals";
 import { QueryProvider } from "@/components/query-provider";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { isAppAuthenticated } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Analytics } from "@vercel/analytics/next"
@@ -28,9 +29,10 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const authenticated = await isAppAuthenticated();
   const user = authenticated ? await getCurrentUser() : null;
-  const initialDueCount = user ? await db.userVocabulary.count({
+  const course = user ? await getCurrentCourse() : null;
+  const initialDueCount = course ? await db.userVocabulary.count({
     where: {
-      userId: user.id,
+      userCourseId: course.id,
       OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: new Date() } }],
     },
   }) : null;
@@ -42,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         {authenticated ? <WebVitals /> : null}
-        {user ? <AppNavigation translationPreference={user.preferredTranslation} initialDueCount={initialDueCount} /> : null}
+        {user && course ? <AppNavigation translationPreference={course.explanationLanguage} initialDueCount={initialDueCount} /> : null}
         <QueryProvider>
           <div
             id="main-content"

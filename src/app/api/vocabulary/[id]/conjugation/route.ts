@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
 import { isUnauthorizedError } from "@/lib/auth";
 
@@ -8,9 +9,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+    const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
     const result = await getVerbConjugationForUser({
       userId: user.id,
+      userCourseId: course.id,
       lexemeId: id,
     });
     if (result.status === "not_found") {

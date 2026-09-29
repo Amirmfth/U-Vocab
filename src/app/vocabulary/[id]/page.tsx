@@ -9,6 +9,7 @@ import {
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { formatRelativeReviewTime, toDate } from "@/lib/relative-time";
 import { startOperation } from "@/lib/performance";
@@ -135,18 +136,20 @@ function SecondaryWordSkeleton() {
 
 async function DeferredWordDetails({
   userId,
+  userCourseId,
   lexemeId,
   level,
   patterns,
   primaryState,
 }: {
   userId: string;
+  userCourseId: string;
   lexemeId: string;
   level: string;
   patterns: PrimaryWord["patterns"];
   primaryState: PrimaryWord["userStates"][number];
 }) {
-  const word = await getCachedWordSecondary(userId, lexemeId, level);
+  const word = await getCachedWordSecondary(userId, userCourseId, lexemeId, level);
   if (!word) return null;
 
   const state = word.userStates[0];
@@ -292,13 +295,14 @@ export default async function Word({
 }) {
   await connection();
   const perf = startOperation("page.word_detail");
-  const [{ id }, user] = await Promise.all([
+  const [{ id }, user, course] = await Promise.all([
     params,
     perf.span("auth", () => getCurrentUser()),
+    perf.span("course", () => getCurrentCourse()),
   ]);
 
   const word = await perf.span("dbRead", () =>
-    getCachedWordPrimary(user.id, id),
+    getCachedWordPrimary(user.id, course.id, id),
   );
 
   if (!word || word.userStates.length === 0) {
@@ -314,14 +318,14 @@ export default async function Word({
 
   return (
     <main className="page word-detail-page">
-      <WordLanguageProvider preference={user.preferredTranslation}>
+      <WordLanguageProvider preference={course.explanationLanguage}>
       <WordPageScrollReset wordId={word.id} />
       <section className="page-header word-identity-hero">
         <div className="word-detail-topline">
           <div className="word-meta">
             <span className="badge">{word.partOfSpeech}</span>
             <span className="badge">{state.state}</span>
-            <span className="badge">{user.targetLevel}</span>
+            <span className="badge">{course.targetLevel}</span>
           </div>
           <WordLanguageSwitch />
         </div>
@@ -347,14 +351,15 @@ export default async function Word({
           <Link href={"/practice?lexeme=" + word.id} className="button button-secondary" prefetch>
             <Brain size={17} /> Practice
           </Link>
-          {word.partOfSpeech === "VERB" ? <VerbConjugation lexemeId={word.id} /> : null}
+          {word.partOfSpeech === "VERB" ? <VerbConjugation lexemeId={word.id} userScope={course.id} /> : null}
       </nav>
 
       <Suspense fallback={<SecondaryWordSkeleton />}>
         <DeferredWordDetails
           userId={user.id}
+          userCourseId={course.id}
           lexemeId={word.id}
-          level={user.targetLevel}
+          level={course.targetLevel}
           patterns={word.patterns}
           primaryState={state}
         />

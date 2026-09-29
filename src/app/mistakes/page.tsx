@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { Brain, Layers3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { clusterOpenMistakes } from "@/lib/semantic/clusters";
 import { MistakeResolveButton } from "./MistakeResolveButton";
@@ -18,12 +19,13 @@ function clusterTitle(types: string[], count: number) {
 
 export default async function MistakesPage() {
   await connection();
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const [clusters, grammarMistakes] = await Promise.all([
-    clusterOpenMistakes(user.id),
+    clusterOpenMistakes(user.id, course.id),
     db.mistake.findMany({
       where: {
         userId: user.id,
+        userCourseId: course.id,
         resolvedAt: null,
         grammarConceptId: { not: null },
       },

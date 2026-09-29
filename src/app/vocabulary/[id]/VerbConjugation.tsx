@@ -20,12 +20,12 @@ async function fetchConjugation(lexemeId:string):Promise<ResponseShape>{
   return payload as ResponseShape;
 }
 
-export function VerbConjugation({ lexemeId }: { lexemeId: string }) {
+export function VerbConjugation({ lexemeId, userScope }: { lexemeId: string; userScope: string }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("present");
   const reduceMotion = useReducedMotion();
   const query = useQuery({
-    queryKey: queryKeys.word.conjugation(lexemeId),
+    queryKey: queryKeys.word.conjugation(userScope, lexemeId),
     queryFn: () => fetchConjugation(lexemeId),
     enabled: open,
     staleTime: Infinity,

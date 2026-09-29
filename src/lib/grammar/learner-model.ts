@@ -15,6 +15,7 @@ import {
 
 export type RecordGrammarEvidenceInput = {
   userId: string;
+  userCourseId: string;
   grammarConceptId: string;
   source: GrammarEvidenceSource;
   outcome: GrammarEvidenceOutcome;
@@ -29,14 +30,15 @@ export type RecordGrammarEvidenceInput = {
 
 export async function recomputeGrammarProgress(
   userId: string,
+  userCourseId: string,
   grammarConceptId: string,
 ) {
   const [existing, evidence] = await Promise.all([
     db.userGrammarProgress.findUnique({
-      where: { userId_grammarConceptId: { userId, grammarConceptId } },
+      where: { userCourseId_grammarConceptId: { userCourseId, grammarConceptId } },
     }),
     db.grammarEvidence.findMany({
-      where: { userId, grammarConceptId },
+      where: { userCourseId, grammarConceptId },
       select: {
         outcome: true,
         dimension: true,
@@ -52,6 +54,7 @@ export async function recomputeGrammarProgress(
   const lastAccepted = await db.grammarEvidence.findFirst({
     where: {
       userId,
+      userCourseId,
       grammarConceptId,
       accepted: true,
     },
@@ -66,9 +69,10 @@ export async function recomputeGrammarProgress(
       : (existing?.source ?? GrammarProgressSource.DECLARED_LEVEL);
 
   const progress = await db.userGrammarProgress.upsert({
-    where: { userId_grammarConceptId: { userId, grammarConceptId } },
+    where: { userCourseId_grammarConceptId: { userCourseId, grammarConceptId } },
     create: {
       userId,
+      userCourseId,
       grammarConceptId,
       status: nextStatus,
       source: nextSource,
@@ -93,6 +97,7 @@ export async function recomputeGrammarProgress(
     await db.grammarProgressTransition.create({
       data: {
         userId,
+        userCourseId,
         grammarConceptId,
         fromStatus: existing?.status ?? null,
         toStatus: nextStatus,
@@ -123,6 +128,7 @@ export async function recordGrammarEvidence(input: RecordGrammarEvidenceInput) {
     await db.grammarEvidence.create({
       data: {
         userId: input.userId,
+        userCourseId: input.userCourseId,
         grammarConceptId: input.grammarConceptId,
         source: input.source,
         outcome: input.outcome,
@@ -148,19 +154,20 @@ export async function recordGrammarEvidence(input: RecordGrammarEvidenceInput) {
     }
   }
 
-  return recomputeGrammarProgress(input.userId, input.grammarConceptId);
+  return recomputeGrammarProgress(input.userId, input.userCourseId, input.grammarConceptId);
 }
 
 export async function getGrammarEvidenceSummary(
   userId: string,
+  userCourseId: string,
   grammarConceptId: string,
 ) {
   const [progress, recentEvidence] = await Promise.all([
     db.userGrammarProgress.findUnique({
-      where: { userId_grammarConceptId: { userId, grammarConceptId } },
+      where: { userCourseId_grammarConceptId: { userCourseId, grammarConceptId } },
     }),
     db.grammarEvidence.findMany({
-      where: { userId, grammarConceptId },
+      where: { userCourseId, grammarConceptId },
       orderBy: { createdAt: "desc" },
       take: 8,
     }),

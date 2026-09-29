@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
 import { similarMistakePairs } from "./search";
 
-export async function clusterOpenMistakes(userId: string) {
+export async function clusterOpenMistakes(userId: string, userCourseId: string) {
   const mistakes = await db.mistake.findMany({
-    where: { userId, resolvedAt: null, grammarConceptId: null },
+    where: { userId, userCourseId, resolvedAt: null, grammarConceptId: null },
     include: { lexeme: true },
     orderBy: [{ occurrences: "desc" }, { lastOccurredAt: "desc" }],
     take: 100,
@@ -25,7 +25,7 @@ export async function clusterOpenMistakes(userId: string) {
     if (rootA !== rootB) parent.set(rootB, rootA);
   }
 
-  for (const pair of await similarMistakePairs({ userId })) {
+  for (const pair of await similarMistakePairs({ userId, userCourseId })) {
     unite(pair.leftId, pair.rightId);
   }
 

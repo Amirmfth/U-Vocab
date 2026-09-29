@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { cacheTags } from "@/lib/cache-tags";
 import { localDateKey } from "@/lib/progress";
 
-export function getCachedHomeStats(userId: string, timeZone: string) {
+export function getCachedHomeStats(userId: string, userCourseId: string, timeZone: string) {
   return unstable_cache(
     async () => {
       const now = new Date();
@@ -18,44 +18,44 @@ export function getCachedHomeStats(userId: string, timeZone: string) {
         recentReviews,
         recentAdded,
       ] = await Promise.all([
-        db.userVocabulary.count({ where: { userId } }),
+        db.userVocabulary.count({ where: { userCourseId } }),
         db.userVocabulary.count({
           where: {
-            userId,
+            userCourseId,
             OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
           },
         }),
         db.userVocabulary.count({
-          where: { userId, production: { lt: 0.4 } },
+          where: { userCourseId, production: { lt: 0.4 } },
         }),
-        db.mistake.count({ where: { userId, resolvedAt: null } }),
+        db.mistake.count({ where: { userCourseId, resolvedAt: null } }),
         db.writingSession.findFirst({
-          where: { userId, status: "ACTIVE" },
+          where: { userCourseId, status: "ACTIVE" },
           select: { id: true, createdAt: true, taskType: true },
           orderBy: { createdAt: "desc" },
         }),
         db.conversationSession.findFirst({
-          where: { userId, status: "ACTIVE" },
+          where: { userCourseId, status: "ACTIVE" },
           select: { id: true, updatedAt: true, kind: true },
           orderBy: { updatedAt: "desc" },
         }),
         db.attempt.findMany({
           where: {
-            userId,
+            userCourseId,
             createdAt: { gte: new Date(now.getTime() - 36 * 60 * 60 * 1000) },
           },
           select: { createdAt: true, durationMs: true },
         }),
         db.review.findMany({
           where: {
-            userVocabulary: { userId },
+            userVocabulary: { userCourseId },
             reviewedAt: { gte: new Date(now.getTime() - 36 * 60 * 60 * 1000) },
           },
           select: { reviewedAt: true },
         }),
         db.userVocabulary.findMany({
           where: {
-            userId,
+            userCourseId,
             addedAt: { gte: new Date(now.getTime() - 36 * 60 * 60 * 1000) },
           },
           select: { addedAt: true },
@@ -132,27 +132,27 @@ export function getCachedHomeStats(userId: string, timeZone: string) {
         },
       };
     },
-    ["home-stats", userId, timeZone],
+    ["home-stats", userCourseId, timeZone],
     {
       tags: [
-        cacheTags.home(userId),
-        cacheTags.vocabulary(userId),
-        cacheTags.review(userId),
-        cacheTags.mistakes(userId),
-        cacheTags.writing(userId),
-        cacheTags.conversation(userId),
-        cacheTags.progress(userId),
+        cacheTags.home(userCourseId),
+        cacheTags.vocabulary(userCourseId),
+        cacheTags.review(userCourseId),
+        cacheTags.mistakes(userCourseId),
+        cacheTags.writing(userCourseId),
+        cacheTags.conversation(userCourseId),
+        cacheTags.progress(userCourseId),
       ],
       revalidate: 60,
     },
   )();
 }
 
-export function getCachedVocabularyLibrary(userId: string) {
+export function getCachedVocabularyLibrary(userId: string, userCourseId: string) {
   return unstable_cache(
     async () =>
       db.userVocabulary.findMany({
-          where: { userId },
+          where: { userCourseId },
           include: {
             lexeme: {
               include: {
@@ -171,7 +171,7 @@ export function getCachedVocabularyLibrary(userId: string) {
                   },
                 },
                 encounters: {
-                  where: { userId },
+                  where: { userCourseId },
                   select: { createdAt: true },
                   orderBy: { createdAt: "desc" },
                   take: 1,
@@ -182,15 +182,15 @@ export function getCachedVocabularyLibrary(userId: string) {
           orderBy: { addedAt: "desc" },
           take: 500,
         }),
-    ["vocabulary-library", userId],
+    ["vocabulary-library", userCourseId],
     {
-      tags: [cacheTags.vocabulary(userId)],
+      tags: [cacheTags.vocabulary(userCourseId)],
       revalidate: 300,
     },
   )();
 }
 
-export function getCachedWordPrimary(userId: string, lexemeId: string) {
+export function getCachedWordPrimary(userId: string, userCourseId: string, lexemeId: string) {
   return unstable_cache(
     async () =>
       db.lexeme.findUnique({
@@ -199,17 +199,17 @@ export function getCachedWordPrimary(userId: string, lexemeId: string) {
           translations: true,
           patterns: true,
           userStates: {
-            where: { userId },
+            where: { userCourseId },
             take: 1,
           },
         },
       }),
-    ["word-primary", userId, lexemeId],
+    ["word-primary", userCourseId, lexemeId],
     {
       tags: [
-        cacheTags.word(lexemeId),
-        cacheTags.vocabulary(userId),
-        cacheTags.review(userId),
+        cacheTags.word(userCourseId, lexemeId),
+        cacheTags.vocabulary(userCourseId),
+        cacheTags.review(userCourseId),
       ],
       revalidate: 300,
     },
@@ -218,6 +218,7 @@ export function getCachedWordPrimary(userId: string, lexemeId: string) {
 
 export function getCachedWordSecondary(
   userId: string,
+  userCourseId: string,
   lexemeId: string,
   level: string,
 ) {
@@ -253,17 +254,17 @@ export function getCachedWordSecondary(
             take: 10,
           },
           encounters: {
-            where: { userId },
+            where: { userCourseId },
             orderBy: { createdAt: "desc" },
             take: 8,
           },
           mistakes: {
-            where: { userId },
+            where: { userCourseId },
             orderBy: { lastOccurredAt: "desc" },
             take: 8,
           },
           userStates: {
-            where: { userId },
+            where: { userCourseId },
             include: {
               reviews: {
                 orderBy: { reviewedAt: "desc" },
@@ -274,28 +275,28 @@ export function getCachedWordSecondary(
           },
         },
       }),
-    ["word-secondary", userId, lexemeId, level],
+    ["word-secondary", userCourseId, lexemeId, level],
     {
       tags: [
-        cacheTags.word(lexemeId),
-        cacheTags.review(userId),
-        cacheTags.mistakes(userId),
+        cacheTags.word(userCourseId, lexemeId),
+        cacheTags.review(userCourseId),
+        cacheTags.mistakes(userCourseId),
       ],
       revalidate: 300,
     },
   )();
 }
 
-export function getCachedReadingIndex(userId: string) {
+export function getCachedReadingIndex(userId: string, userCourseId: string) {
   return unstable_cache(
     async () =>
       db.readingDocument.findMany({
-        where: { userId },
+        where: { userCourseId },
         include: { _count: { select: { items: true } } },
         orderBy: { createdAt: "desc" },
         take: 30,
       }),
-    ["reading-index", userId],
+    ["reading-index", userCourseId],
     {
       tags: [cacheTags.reading(userId)],
       revalidate: 300,
@@ -303,17 +304,17 @@ export function getCachedReadingIndex(userId: string) {
   )();
 }
 
-export function getCachedWritingIndex(userId: string) {
+export function getCachedWritingIndex(userId: string, userCourseId: string) {
   return unstable_cache(
     async () =>
       db.writingSession.findMany({
-          where: { userId, parentId: null },
+          where: { userCourseId, parentId: null },
           orderBy: { createdAt: "desc" },
           take: 12,
         }),
-    ["writing-index", userId],
+    ["writing-index", userCourseId],
     {
-      tags: [cacheTags.writing(userId)],
+      tags: [cacheTags.writing(userCourseId)],
       revalidate: 300,
     },
   )();

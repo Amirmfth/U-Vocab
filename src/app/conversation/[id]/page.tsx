@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { conversationFinalEvaluationSchema } from "@/lib/ai/conversation-final-evaluator";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { ConversationChat } from "../ConversationChat";
 import {
@@ -23,9 +24,9 @@ export default async function ConversationSessionPage({
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
   const session = await db.conversationSession.findFirst({
-    where: { id, userId: user.id },
+    where: { id, userId: user.id, userCourseId: course.id },
     include: {
       messages: { orderBy: { createdAt: "asc" } },
       targets: {

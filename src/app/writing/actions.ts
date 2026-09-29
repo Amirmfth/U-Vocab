@@ -4,6 +4,8 @@ import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { generateWritingTask } from "@/lib/ai/writing-task";
 import { evaluateWriting } from "@/lib/ai/writing-evaluator";
 import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
@@ -38,10 +40,11 @@ export type WritingActionState = {
 
 async function selectGuidedTargets(input: {
   userId: string;
+  userCourseId: string;
   limit: number;
 }) {
   const weak = await db.userVocabulary.findMany({
-    where: { userId: input.userId },
+    where: { userCourseId: input.userCourseId },
     select: {
       lexemeId: true,
       lexeme: {
@@ -100,12 +103,16 @@ export async function createWritingSessionAction(
     },
     async (perf) => {
       try {
-        const user = await perf.span("auth", () => getCurrentUser());
+        const [user, course] = await Promise.all([
+          perf.span("auth", () => getCurrentUser()),
+          perf.span("course", () => getCurrentCourse()),
+        ]);
         const targets =
           mode === "GUIDED"
             ? await perf.span("dbRead", () =>
                 selectGuidedTargets({
                   userId: user.id,
+                  userCourseId: course.id,
                   limit: 6,
                 }),
               )
@@ -121,6 +128,7 @@ export async function createWritingSessionAction(
         const generated = await perf.span("ai", () =>
           generateWritingTask({
             userId: user.id,
+            userCourseId: course.id,
             mode,
             level,
             taskType,
@@ -145,6 +153,7 @@ export async function createWritingSessionAction(
           db.writingSession.create({
             data: {
               userId: user.id,
+              userCourseId: course.id,
               mode,
               level,
               taskType,
@@ -161,7 +170,7 @@ export async function createWritingSessionAction(
           }),
         );
 
-        revalidateUserDomains(user.id, ["writing"]);
+        revalidateUserDomains(user.id, course.id, ["writing"]);
 
         return {
           status: "success",
@@ -182,9 +191,9 @@ export async function createWritingSessionAction(
   );
 }
 
-async function detectKnownLexemes(userId: string, draft: string) {
+async function detectKnownLexemes(userCourseId: string, draft: string) {
   const vocabulary = await db.userVocabulary.findMany({
-    where: { userId },
+    where: { userCourseId },
     select: {
       lexemeId: true,
       lexeme: { select: { lemma: true } },
@@ -208,7 +217,7 @@ async function detectKnownLexemes(userId: string, draft: string) {
   return db.userVocabulary
     .findMany({
       where: {
-        userId,
+        userCourseId,
         lexemeId: { in: selected.map((item) => item.lexemeId) },
       },
       select: {
@@ -255,10 +264,13 @@ export async function evaluateWritingAction(
       }
 
       try {
-        const user = await perf.span("auth", () => getCurrentUser());
+        const [user, course] = await Promise.all([
+          perf.span("auth", () => getCurrentUser()),
+          perf.span("course", () => getCurrentCourse()),
+        ]);
         const session = await perf.span("dbRead", () =>
           db.writingSession.findFirst({
-            where: { id: sessionId, userId: user.id },
+            where: { id: sessionId, userId: user.id, userCourseId: course.id },
             select: {
               id: true,
               parentId: true,
@@ -287,7 +299,7 @@ export async function evaluateWritingAction(
         }
 
         const observed = await perf.span("dbRead", () =>
-          detectKnownLexemes(user.id, draft),
+          detectKnownLexemes(course.id, draft),
         );
         const requiredTargets = session.targets.map((target) => ({
           id: target.lexemeId,
@@ -301,7 +313,7 @@ export async function evaluateWritingAction(
         const parent = parentId
           ? await perf.span("dbRead", () =>
               db.writingSession.findFirst({
-                where: { id: parentId, userId: user.id },
+                where: { id: parentId, userId: user.id, userCourseId: course.id },
                 select: { draft: true, wordCount: true, evaluation: true },
               }),
             )
@@ -314,15 +326,15 @@ export async function evaluateWritingAction(
           db.grammarConcept.findMany({
             where: {
               active: true,
-              language: "de",
+              language: targetLanguageConfig(course.targetLanguage).code,
               introducedAt: {
                 in: (Object.keys(CEFR_RANK) as Array<keyof typeof CEFR_RANK>)
-                  .filter((level) => CEFR_RANK[level] <= CEFR_RANK[user.targetLevel]),
+                  .filter((level) => CEFR_RANK[level] <= CEFR_RANK[course.targetLevel]),
               },
             },
             include: {
               userProgress: {
-                where: { userId: user.id },
+                where: { userCourseId: course.id },
                 take: 1,
               },
             },
@@ -354,7 +366,8 @@ export async function evaluateWritingAction(
         const evaluation = await perf.span("ai", () =>
           evaluateWriting({
             userId: user.id,
-            evaluationLocale: evaluationLocaleForPreference(user.preferredTranslation),
+            userCourseId: course.id,
+            evaluationLocale: evaluationLocaleForPreference(course.explanationLanguage),
             level: session.level,
             mode: session.mode,
             taskType: session.taskType,
@@ -422,7 +435,7 @@ export async function evaluateWritingAction(
           ? await perf.span("dbRead", () =>
               db.userVocabulary.findMany({
                 where: {
-                  userId: user.id,
+                  userCourseId: course.id,
                   lexemeId: { in: usedLexemeIds },
                 },
                 select: {
@@ -449,6 +462,7 @@ export async function evaluateWritingAction(
           const userVocabulary = vocabularyByLexeme.get(item.id);
           attempts.push({
             userId: user.id,
+            userCourseId: course.id,
             userVocabularyId: userVocabulary?.id ?? null,
             exerciseType: "FREE_SENTENCE" as const,
             prompt: "Use vocabulary naturally in a German writing task.",
@@ -520,6 +534,7 @@ export async function evaluateWritingAction(
           await perf.span("dbWrite", () =>
             recordMistakesBatch(db, {
               userId: user.id,
+              userCourseId: course.id,
               mistakes: batchedMistakes,
             }),
           );
@@ -538,6 +553,7 @@ export async function evaluateWritingAction(
             if (observation.signal === "ERROR") {
               await recordGrammarMistake({
                 userId: user.id,
+                userCourseId: course.id,
                 grammarConceptId: observation.grammarConceptId,
                 type,
                 expected: observation.corrected ?? "",
@@ -547,6 +563,7 @@ export async function evaluateWritingAction(
             } else if (isRewriteCorrection) {
               await resolveGrammarMistakes({
                 userId: user.id,
+                userCourseId: course.id,
                 grammarConceptId: observation.grammarConceptId,
                 type,
               });
@@ -554,6 +571,7 @@ export async function evaluateWritingAction(
 
             await recordGrammarEvidence({
               userId: user.id,
+              userCourseId: course.id,
               grammarConceptId: observation.grammarConceptId,
               source: "WRITING",
               outcome: writingEvidenceOutcome(observation.signal),
@@ -588,6 +606,7 @@ export async function evaluateWritingAction(
         await perf.span("revalidation", async () => {
           revalidateUserDomains(
             user.id,
+            course.id,
             ["home", "vocabulary", "progress", "mistakes", "writing"],
             [...requiredIds],
           );
@@ -625,12 +644,16 @@ export async function createRewriteAction(
     { hasSessionId: Boolean(sessionId) },
     async (perf) => {
       try {
-        const user = await perf.span("auth", () => getCurrentUser());
+        const [user, course] = await Promise.all([
+          perf.span("auth", () => getCurrentUser()),
+          perf.span("course", () => getCurrentCourse()),
+        ]);
         const source = await perf.span("dbRead", () =>
           db.writingSession.findFirst({
             where: {
               id: sessionId,
               userId: user.id,
+              userCourseId: course.id,
               status: "EVALUATED",
             },
             include: { targets: { orderBy: { position: "asc" } } },
@@ -647,6 +670,7 @@ export async function createRewriteAction(
           db.writingSession.create({
             data: {
               userId: user.id,
+              userCourseId: course.id,
               parentId: source.parentId ?? source.id,
               mode: source.mode,
               level: source.level,
@@ -664,7 +688,7 @@ export async function createRewriteAction(
           }),
         );
 
-        revalidateUserDomains(user.id, ["writing"]);
+        revalidateUserDomains(user.id, course.id, ["writing"]);
 
         return {
           status: "success",

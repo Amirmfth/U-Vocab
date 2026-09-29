@@ -1,5 +1,7 @@
 import type { RelationType } from "@prisma/client";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { currentRetrievability } from "@/lib/fsrs";
 import { VocabularyScrollRestoration } from "./VocabularyScrollRestoration";
 import { connection } from "next/server";
@@ -26,7 +28,8 @@ export default async function Vocabulary({
   }>;
 }) {
   await connection();
-  const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
+  const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
+  const language = targetLanguageConfig(course.targetLanguage);
   const now = new Date();
   const recentCutoff = new Date(now);
   recentCutoff.setDate(recentCutoff.getDate() - 30);
@@ -42,9 +45,9 @@ export default async function Vocabulary({
     sort: query.sort ?? "RECENTLY_ADDED",
   };
 
-  const items = await getCachedVocabularyLibrary(user.id);
+  const items = await getCachedVocabularyLibrary(user.id, course.id);
 
-  const normalizedQuery = current.q.toLocaleLowerCase("de-DE");
+  const normalizedQuery = current.q.toLocaleLowerCase(language.locale);
 
   const filtered = items.filter((item) => {
     const word = item.lexeme;
@@ -192,7 +195,7 @@ export default async function Vocabulary({
     <main className="page vocabulary-page">
       <VocabularyScrollRestoration />
       <VocabularyDisplay
-        preferredTranslation={user.preferredTranslation}
+        preferredTranslation={course.explanationLanguage}
         rows={rows}
         total={items.length}
         current={current}

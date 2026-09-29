@@ -14,6 +14,7 @@ export async function recordMistakesBatch(
   db: PrismaClient,
   input: {
     userId: string;
+    userCourseId: string;
     mistakes: MistakeInput[];
   },
 ) {
@@ -35,7 +36,7 @@ export async function recordMistakesBatch(
 
   const existing = await db.mistake.findMany({
     where: {
-      userId: input.userId,
+      userCourseId: input.userCourseId,
       resolvedAt: null,
       lexemeId: { in: lexemeIds },
       type: { in: types },
@@ -76,6 +77,7 @@ export async function recordMistakesBatch(
     } else {
       creates.push({
         userId: input.userId,
+        userCourseId: input.userCourseId,
         lexemeId: mistake.lexemeId,
         type: mistake.type,
         expected: mistake.expected,

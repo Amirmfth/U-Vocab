@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { getReviewQueueData } from "@/lib/review-queue";
 import { isUnauthorizedError } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const excludeIds = new URL(request.url).searchParams.getAll("exclude");
     const queue = await getReviewQueueData({
       userId: user.id,
-      preferredTranslation: user.preferredTranslation,
+      userCourseId: course.id,
+      preferredTranslation: course.explanationLanguage,
       excludeIds,
     });
 

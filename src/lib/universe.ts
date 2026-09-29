@@ -34,6 +34,7 @@ function learnerState(
 
 export async function getUniverseBranch(input: {
   userId: string;
+  userCourseId: string;
   lexemeId: string;
   includeSemantic?: boolean;
 }) {
@@ -41,13 +42,13 @@ export async function getUniverseBranch(input: {
     where: { id: input.lexemeId },
     include: {
       translations: true,
-      userStates: { where: { userId: input.userId }, take: 1 },
+      userStates: { where: { userCourseId: input.userCourseId }, take: 1 },
       outgoing: {
         include: {
           target: {
             include: {
               translations: true,
-              userStates: { where: { userId: input.userId }, take: 1 },
+              userStates: { where: { userCourseId: input.userCourseId }, take: 1 },
             },
           },
         },
@@ -58,7 +59,7 @@ export async function getUniverseBranch(input: {
           source: {
             include: {
               translations: true,
-              userStates: { where: { userId: input.userId }, take: 1 },
+              userStates: { where: { userCourseId: input.userCourseId }, take: 1 },
             },
           },
         },
@@ -138,6 +139,7 @@ export async function getUniverseBranch(input: {
     try {
       const semantic = await findSimilarLexemes({
         userId: input.userId,
+        userCourseId: input.userCourseId,
         lexemeId: root.id,
         limit: 8,
       });
@@ -145,8 +147,8 @@ export async function getUniverseBranch(input: {
         if (nodes.has(item.lexeme.id) || item.similarity < 0.68) continue;
         const state = await db.userVocabulary.findUnique({
           where: {
-            userId_lexemeId: {
-              userId: input.userId,
+            userCourseId_lexemeId: {
+              userCourseId: input.userCourseId,
               lexemeId: item.lexeme.id,
             },
           },

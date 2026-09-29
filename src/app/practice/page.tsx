@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { buildExercise, eligibleExerciseTypes } from "@/lib/exercises/build";
 import { buildGrammarPracticeSession } from "@/lib/exercises/grammar-session";
 import { selectExerciseType } from "@/lib/exercises/select";
@@ -73,13 +74,15 @@ export default async function PracticePage({
   if(params.mixed==="1") redirect("/practice?drill=1");
   if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub/>;
 
-  const user=await getCurrentUser();
+  const [user,course]=await Promise.all([getCurrentUser(),getCurrentCourse()]);
 
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
       userId:user.id,
-      currentLevel:user.currentLevel,
-      targetLevel:user.targetLevel,
+      userCourseId:course.id,
+      targetLanguage:course.targetLanguage,
+      currentLevel:course.currentLevel,
+      targetLevel:course.targetLevel,
       slug:params.grammar==="1"?null:params.grammar,
       limit:6,
     });
@@ -105,7 +108,7 @@ export default async function PracticePage({
   }
   const [items,distractorItems]=await Promise.all([
     db.userVocabulary.findMany({
-    where:{ userId:user.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },
+    where:{ userCourseId:course.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },
     include:{
       lexeme:{
         include:{
@@ -113,7 +116,7 @@ export default async function PracticePage({
           translations:true,
           examples:true,
           mistakes:{
-            where:{ userId:user.id,resolvedAt:null },
+            where:{ userCourseId:course.id,resolvedAt:null },
             select:{ type:true },
           },
         },
@@ -128,7 +131,7 @@ export default async function PracticePage({
     take:params.lexeme?1:8,
   }),
     db.userVocabulary.findMany({
-      where:{ userId:user.id },
+      where:{ userCourseId:course.id },
       include:{
         lexeme:{
           include:{ patterns:true,translations:true,examples:true },
@@ -149,7 +152,7 @@ export default async function PracticePage({
     </main>;
   }
 
-  const optionLanguage=user.preferredTranslation==="PERSIAN"?"fa":"en";
+  const optionLanguage=course.explanationLanguage==="PERSIAN"?"fa":"en";
   const optionPools={
     meanings:distractorItems.flatMap((item)=>
       item.lexeme.translations
@@ -183,9 +186,9 @@ export default async function PracticePage({
     for(let position=0;position<count;position+=1){
       const preferred=selectExerciseType(snapshot,available,recent);
       const choice=params.lexeme
-        ? buildExercise(preferred,item.lexeme,user.preferredTranslation,optionPools)
+        ? buildExercise(preferred,item.lexeme,course.explanationLanguage,optionPools)
         : [preferred,...available.filter((type)=>type!==preferred)]
-          .map((type)=>buildExercise(type,item.lexeme,user.preferredTranslation,optionPools))
+          .map((type)=>buildExercise(type,item.lexeme,course.explanationLanguage,optionPools))
           .find((exercise)=>exercise.interaction==="choice"&&(exercise.options?.length??0)>=2);
       if(!choice) continue;
       recent.push(choice.type);
@@ -209,7 +212,7 @@ export default async function PracticePage({
   }
 
   if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
-    const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:items[0].lexemeId });
+    const conjugation=await getVerbConjugationForUser({ userId:user.id,userCourseId:course.id,lexemeId:items[0].lexemeId });
     if(conjugation.status==="ok"){
       const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
       if(form){

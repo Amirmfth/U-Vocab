@@ -4,6 +4,7 @@ import { ArrowLeft, Brain, BookOpenCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { isTranslationVisible } from "@/lib/translations";
 import { ReadingAssessment } from "./ReadingAssessment";
 import { ReadingText } from "./ReadingText";
@@ -23,9 +24,9 @@ export default async function ReadingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
   const reading = await db.story.findFirst({
-    where: { id, userId: user.id },
+    where: { id, userId: user.id, userCourseId: course.id },
     include: {
       targets: {
         orderBy: { position: "asc" },
@@ -69,7 +70,7 @@ export default async function ReadingDetailPage({
 
       <ReadingText
         content={reading.content}
-        preference={user.preferredTranslation}
+        preference={course.explanationLanguage}
         targets={reading.targets.map((target) => ({
           id: target.lexeme.id,
           lemma: target.lexeme.lemma,
@@ -159,7 +160,7 @@ export default async function ReadingDetailPage({
                   {target.lexeme.translations
                     .filter((translation) =>
                       isTranslationVisible(
-                        user.preferredTranslation,
+                        course.explanationLanguage,
                         translation.language,
                       ),
                     )
@@ -176,10 +177,10 @@ export default async function ReadingDetailPage({
 
       <section className="panel story-summary">
         <h2 className="section-title">Summary</h2>
-        {user.preferredTranslation !== "PERSIAN" && reading.englishSummary ? (
+        {course.explanationLanguage !== "PERSIAN" && reading.englishSummary ? (
           <p>{reading.englishSummary}</p>
         ) : null}
-        {user.preferredTranslation !== "ENGLISH" && reading.persianSummary ? (
+        {course.explanationLanguage !== "ENGLISH" && reading.persianSummary ? (
           <p className="rtl">{reading.persianSummary}</p>
         ) : null}
       </section>

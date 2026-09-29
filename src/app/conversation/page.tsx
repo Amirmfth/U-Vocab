@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { ConversationStartForm } from "./ConversationStartForm";
 
 
@@ -10,9 +11,9 @@ export default async function ConversationPage({ searchParams }: {
   searchParams: Promise<{ mode?: string }>;
 }) {
   await connection();
-  const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
+  const [user, course, params] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
   const sessions = await db.conversationSession.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, userCourseId: course.id },
     orderBy: { updatedAt: "desc" },
     take: 10,
   });

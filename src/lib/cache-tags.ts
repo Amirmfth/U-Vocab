@@ -1,17 +1,17 @@
 import { revalidateTag } from "next/cache";
 
 export const cacheTags = {
-  home: (userId: string) => `home:${userId}`,
-  vocabulary: (userId: string) => `vocabulary:${userId}`,
-  word: (lexemeId: string) => `word:${lexemeId}`,
-  review: (userId: string) => `review:${userId}`,
-  progress: (userId: string) => `progress:${userId}`,
-  mistakes: (userId: string) => `mistakes:${userId}`,
-  usage: (userId: string) => `usage:${userId}`,
-  recommendations: (userId: string) => `recommendations:${userId}`,
-  reading: (userId: string) => `reading:${userId}`,
-  writing: (userId: string) => `writing:${userId}`,
-  conversation: (userId: string) => `conversation:${userId}`,
+  home: (courseId: string) => `home:${courseId}`,
+  vocabulary: (courseId: string) => `vocabulary:${courseId}`,
+  word: (courseId: string, lexemeId: string) => `word:${courseId}:${lexemeId}`,
+  review: (courseId: string) => `review:${courseId}`,
+  progress: (courseId: string) => `progress:${courseId}`,
+  mistakes: (courseId: string) => `mistakes:${courseId}`,
+  usage: (courseId: string) => `usage:${courseId}`,
+  recommendations: (courseId: string) => `recommendations:${courseId}`,
+  reading: (courseId: string) => `reading:${courseId}`,
+  writing: (courseId: string) => `writing:${courseId}`,
+  conversation: (courseId: string) => `conversation:${courseId}`,
 };
 
 type UserDomain =
@@ -27,19 +27,17 @@ type UserDomain =
   | "conversation";
 
 export function revalidateUserDomains(
-  userId: string,
+  _userId: string,
+  userCourseId: string,
   domains: UserDomain[],
   wordIds: string[] = [],
 ) {
   const uniqueTags = new Set(
-    domains.map((domain) => cacheTags[domain](userId)),
+    domains.map((domain) => cacheTags[domain](userCourseId)),
   );
 
   for (const wordId of wordIds) {
-    if (wordId) uniqueTags.add(cacheTags.word(wordId));
+    if (wordId) uniqueTags.add(cacheTags.word(userCourseId, wordId));
   }
-
-  for (const tag of uniqueTags) {
-    revalidateTag(tag);
-  }
+  for (const tag of uniqueTags) revalidateTag(tag);
 }

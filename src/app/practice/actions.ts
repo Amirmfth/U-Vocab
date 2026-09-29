@@ -4,6 +4,7 @@ import type { ExerciseType, MistakeType } from "@prisma/client";
 import type { ExerciseInteraction } from "@/lib/exercises/types";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { buildExercise } from "@/lib/exercises/build";
 import { checkDeterministicAnswer } from "@/lib/exercises/check";
 import { applyMasteryDelta, practiceMasteryDelta } from "@/lib/exercises/mastery";
@@ -54,6 +55,7 @@ function durationFrom(startedAt:number) {
 
 async function submitGrammarAnswer(
   userId:string,
+  userCourseId:string,
   input:PracticeAnswerInput,
   answer:string,
 ):Promise<PracticeAnswerResult> {
@@ -83,7 +85,7 @@ async function submitGrammarAnswer(
 
   if(input.userVocabularyId){
     item=await db.userVocabulary.findFirst({
-      where:{ id:input.userVocabularyId,userId },
+      where:{ id:input.userVocabularyId,userCourseId },
       select:{
         id:true,
         lexemeId:true,
@@ -115,6 +117,7 @@ async function submitGrammarAnswer(
   const attempt=await db.attempt.create({
     data:{
       userId,
+      userCourseId,
       userVocabularyId:item?.id??null,
       grammarConceptId,
       exerciseType:exercise.type,
@@ -131,6 +134,7 @@ async function submitGrammarAnswer(
   if(evaluation.correct){
     await resolveGrammarMistakes({
       userId,
+      userCourseId,
       grammarConceptId,
       lexemeId:item?.lexemeId??null,
       type,
@@ -138,6 +142,7 @@ async function submitGrammarAnswer(
   }else{
     await recordGrammarMistake({
       userId,
+      userCourseId,
       grammarConceptId,
       lexemeId:item?.lexemeId??null,
       type,
@@ -149,6 +154,7 @@ async function submitGrammarAnswer(
 
   await recordGrammarEvidence({
     userId,
+    userCourseId,
     grammarConceptId,
     source:"PRACTICE",
     outcome:evaluation.correct?"SUCCESS":"ERROR",
@@ -167,6 +173,7 @@ async function submitGrammarAnswer(
 
   revalidateUserDomains(
     userId,
+    userCourseId,
     ["home","progress","mistakes"],
     item?.lexemeId?[item.lexemeId]:[],
   );
@@ -184,10 +191,13 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
   if(!answer) return { status:"error",message:"Enter an answer before continuing." };
 
   return instrumentOperation("practice.evaluate",{ exerciseType:input.exerciseType,requiresAI:false },async(perf)=>{
-    const user=await perf.span("auth",()=>getCurrentUser());
+    const [user,course]=await Promise.all([
+      perf.span("auth",()=>getCurrentUser()),
+      perf.span("course",()=>getCurrentCourse()),
+    ]);
 
     if(input.grammarConceptId){
-      return perf.span("grammar",()=>submitGrammarAnswer(user.id,input,answer));
+      return perf.span("grammar",()=>submitGrammarAnswer(user.id,course.id,input,answer));
     }
 
     if(!input.userVocabularyId) {
@@ -196,14 +206,14 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
     const userVocabularyId=input.userVocabularyId;
 
     const item=await perf.span("dbRead",()=>db.userVocabulary.findFirst({
-      where:{ id:userVocabularyId,userId:user.id },
+      where:{ id:userVocabularyId,userCourseId:course.id },
       include:{ lexeme:{ include:{ patterns:true,translations:true,examples:true } } },
     }));
     if(!item) return { status:"error",message:"Vocabulary item not found." };
 
-    let exercise=buildExercise(input.exerciseType,item.lexeme,user.preferredTranslation);
+    let exercise=buildExercise(input.exerciseType,item.lexeme,course.explanationLanguage);
     if(input.conjugation){
-      const conjugation=await getVerbConjugationForUser({ userId:user.id,lexemeId:item.lexemeId });
+      const conjugation=await getVerbConjugationForUser({ userId:user.id,userCourseId:course.id,lexemeId:item.lexemeId });
       if(conjugation.status!=="ok") return { status:"error",message:"Verb conjugation is unavailable." };
       const row=conjugation.data.indicative.present.forms.find((form)=>form.person===input.conjugation?.person);
       if(!row) return { status:"error",message:"Requested verb form is unavailable." };
@@ -226,6 +236,7 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
       await db.attempt.create({
         data:{
           userId:user.id,
+          userCourseId:course.id,
           userVocabularyId:item.id,
           exerciseType:exercise.type,
           prompt:exercise.prompt,
@@ -241,13 +252,14 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
       if(evaluation.correct){
         if(type!=="OTHER"){
           await db.mistake.updateMany({
-            where:{ userId:user.id,lexemeId:item.lexemeId,type,resolvedAt:null },
+            where:{ userCourseId:course.id,lexemeId:item.lexemeId,type,resolvedAt:null },
             data:{ resolvedAt:new Date() },
           });
         }
       }else{
         await recordMistakes(db,{
           userId:user.id,
+          userCourseId:course.id,
           lexemeId:item.lexemeId,
           mistakes:[{
             type,
@@ -261,7 +273,7 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
       await db.userVocabulary.update({ where:{ id:item.id },data:mastery });
     });
 
-    revalidateUserDomains(user.id,["home","vocabulary","progress","mistakes"],[item.lexemeId]);
+    revalidateUserDomains(user.id,course.id,["home","vocabulary","progress","mistakes"],[item.lexemeId]);
     return {
       status:"success",
       correct:evaluation.correct,

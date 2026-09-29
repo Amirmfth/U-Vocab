@@ -1,5 +1,6 @@
-import type { PartOfSpeech, PrismaClient } from "@prisma/client";
+import type { PartOfSpeech, PrismaClient, TargetLanguage } from "@prisma/client";
 import { syncDeterministicGrammarLinksForLexeme } from "@/lib/grammar/lexeme-links";
+import { targetLanguageConfig } from "@/lib/languages";
 import type {
   CandidateWithState,
   IngestionCandidate,
@@ -17,23 +18,26 @@ export function deduplicateCandidates(
 export async function attachIngestionState(
   db: PrismaClient,
   userId: string,
+  userCourseId: string,
+  targetLanguage: TargetLanguage,
   candidates: IngestionCandidate[],
 ): Promise<CandidateWithState[]> {
   const unique = deduplicateCandidates(candidates);
+  const language = targetLanguageConfig(targetLanguage).code;
 
   return Promise.all(
     unique.map(async (candidate) => {
       const existing = await db.lexeme.findUnique({
         where: {
           language_normalized_partOfSpeech: {
-            language: "de",
+            language,
             normalized: candidate.normalized,
             partOfSpeech: candidate.partOfSpeech,
           },
         },
         include: {
           userStates: {
-            where: { userId },
+            where: { userCourseId },
             select: { id: true, state: true },
             take: 1,
           },
@@ -54,12 +58,15 @@ export async function commitIngestionCandidates(
   db: PrismaClient,
   input: {
     userId: string;
+    userCourseId: string;
+    targetLanguage: TargetLanguage;
     sourceType: IngestionSourceType;
     sourceRef?: string | null;
     candidates: IngestionCandidate[];
   },
 ) {
   const unique = deduplicateCandidates(input.candidates);
+  const language = targetLanguageConfig(input.targetLanguage).code;
   const timeout = Math.min(120_000, Math.max(20_000, unique.length * 1_500));
 
   const ids = await db.$transaction(async (tx) => {
@@ -69,12 +76,13 @@ export async function commitIngestionCandidates(
       const lexeme = await tx.lexeme.upsert({
         where: {
           language_normalized_partOfSpeech: {
-            language: "de",
+            language,
             normalized: candidate.normalized,
             partOfSpeech: candidate.partOfSpeech as PartOfSpeech,
           },
         },
         create: {
+          language,
           lemma: candidate.lemma,
           normalized: candidate.normalized,
           partOfSpeech: candidate.partOfSpeech,
@@ -113,13 +121,14 @@ export async function commitIngestionCandidates(
 
       await tx.userVocabulary.upsert({
         where: {
-          userId_lexemeId: {
-            userId: input.userId,
+          userCourseId_lexemeId: {
+            userCourseId: input.userCourseId,
             lexemeId: lexeme.id,
           },
         },
         create: {
           userId: input.userId,
+          userCourseId: input.userCourseId,
           lexemeId: lexeme.id,
           nextReviewAt: new Date(),
         },
@@ -129,8 +138,8 @@ export async function commitIngestionCandidates(
       if (input.sourceRef) {
         await tx.encounter.upsert({
           where: {
-            userId_lexemeId_source_sourceRef: {
-              userId: input.userId,
+            userCourseId_lexemeId_source_sourceRef: {
+              userCourseId: input.userCourseId,
               lexemeId: lexeme.id,
               source: input.sourceType.toLocaleLowerCase("en-US"),
               sourceRef: input.sourceRef,
@@ -138,6 +147,7 @@ export async function commitIngestionCandidates(
           },
           create: {
             userId: input.userId,
+            userCourseId: input.userCourseId,
             lexemeId: lexeme.id,
             source: input.sourceType.toLocaleLowerCase("en-US"),
             sourceRef: input.sourceRef,

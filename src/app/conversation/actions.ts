@@ -5,6 +5,7 @@ import { generateConversationSetup } from "@/lib/ai/conversation-setup";
 import { evaluateConversationSession } from "@/lib/ai/conversation-final-evaluator";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { selectConversationTargets } from "@/lib/conversation/targets";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 
@@ -38,9 +39,10 @@ export async function createConversationSessionAction(
   );
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const targets = await selectConversationTargets({
       userId: user.id,
+      userCourseId: course.id,
       limit: targetCount,
     });
 
@@ -53,8 +55,9 @@ export async function createConversationSessionAction(
 
     const setup = await generateConversationSetup({
       userId: user.id,
+      userCourseId: course.id,
       kind,
-      level: user.currentLevel,
+      level: course.currentLevel,
       topic,
       tone,
       formality,
@@ -64,8 +67,9 @@ export async function createConversationSessionAction(
     const session = await db.conversationSession.create({
       data: {
         userId: user.id,
+        userCourseId: course.id,
         kind,
-        level: user.currentLevel,
+        level: course.currentLevel,
         title: setup.title,
         scenario: setup.scenario,
         aiRole: setup.aiRole,
@@ -114,11 +118,12 @@ export async function completeConversationAction(
   const sessionId = String(formData.get("sessionId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const session = await db.conversationSession.findFirst({
       where: {
         id: sessionId,
         userId: user.id,
+        userCourseId: course.id,
         status: "ACTIVE",
         turnInFlight: false,
       },
@@ -156,7 +161,8 @@ export async function completeConversationAction(
 
     const evaluation = await evaluateConversationSession({
       userId: user.id,
-      evaluationLocale: evaluationLocaleForPreference(user.preferredTranslation),
+      userCourseId: course.id,
+      evaluationLocale: evaluationLocaleForPreference(course.explanationLanguage),
       kind: session.kind,
       level: session.level,
       scenario: session.scenario,
@@ -174,7 +180,7 @@ export async function completeConversationAction(
       })),
     });
 
-    const evaluationLocale = evaluationLocaleForPreference(user.preferredTranslation);
+    const evaluationLocale = evaluationLocaleForPreference(course.explanationLanguage);
     const targetEvaluation = new Map(
       evaluation.targetResults.map((result) => [result.lexemeId, result]),
     );
@@ -216,6 +222,7 @@ export async function completeConversationAction(
         await tx.encounter.createMany({
           data: session.targets.map((target) => ({
             userId: user.id,
+            userCourseId: course.id,
             lexemeId: target.lexemeId,
             source: session.kind === "MISSION" ? "mission" : "conversation",
             sourceRef: session.id,
@@ -250,9 +257,9 @@ export async function replayConversationAction(
   const sessionId = String(formData.get("sessionId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
     const source = await db.conversationSession.findFirst({
-      where: { id: sessionId, userId: user.id },
+      where: { id: sessionId, userId: user.id, userCourseId: course.id },
       include: {
         targets: { orderBy: { position: "asc" } },
         messages: {
@@ -269,6 +276,7 @@ export async function replayConversationAction(
     const replay = await db.conversationSession.create({
       data: {
         userId: user.id,
+        userCourseId: course.id,
         kind: source.kind,
         level: source.level,
         title: source.title,

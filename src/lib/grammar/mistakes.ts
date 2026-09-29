@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 
 export async function recordGrammarMistake(input: {
   userId: string;
+  userCourseId: string;
   grammarConceptId: string;
   lexemeId?: string | null;
   type: MistakeType;
@@ -12,7 +13,7 @@ export async function recordGrammarMistake(input: {
 }) {
   const existing = await db.mistake.findFirst({
     where: {
-      userId: input.userId,
+      userCourseId: input.userCourseId,
       grammarConceptId: input.grammarConceptId,
       lexemeId: input.lexemeId ?? null,
       type: input.type,
@@ -37,6 +38,7 @@ export async function recordGrammarMistake(input: {
   return db.mistake.create({
     data: {
       userId: input.userId,
+      userCourseId: input.userCourseId,
       grammarConceptId: input.grammarConceptId,
       lexemeId: input.lexemeId ?? null,
       type: input.type,
@@ -49,13 +51,14 @@ export async function recordGrammarMistake(input: {
 
 export async function resolveGrammarMistakes(input: {
   userId: string;
+  userCourseId: string;
   grammarConceptId: string;
   type: MistakeType;
   lexemeId?: string | null;
 }) {
   return db.mistake.updateMany({
     where: {
-      userId: input.userId,
+      userCourseId: input.userCourseId,
       grammarConceptId: input.grammarConceptId,
       lexemeId: input.lexemeId ?? null,
       type: input.type,

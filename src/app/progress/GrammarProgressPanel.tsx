@@ -13,23 +13,25 @@ const STATUS_LABELS = {
 
 export async function GrammarProgressPanel({
   userId,
+  userCourseId,
   currentLevel,
   targetLevel,
 }: {
   userId: string;
+  userCourseId: string;
   currentLevel: CefrLevel;
   targetLevel: CefrLevel;
 }) {
   const [progress, mistakes, recentEvidence, transitions] = await Promise.all([
     db.userGrammarProgress.findMany({
-      where: { userId },
+      where: { userCourseId },
       include: { grammarConcept: true },
       orderBy: { grammarConcept: { order: "asc" } },
     }),
     db.mistake.groupBy({
       by: ["grammarConceptId"],
       where: {
-        userId,
+        userCourseId,
         resolvedAt: null,
         grammarConceptId: { not: null },
       },
@@ -46,7 +48,7 @@ export async function GrammarProgressPanel({
       take: 8,
     }),
     db.grammarProgressTransition.findMany({
-      where: { userId },
+      where: { userCourseId },
       include: {
         grammarConcept: {
           select: { title: true },

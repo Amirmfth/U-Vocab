@@ -8,6 +8,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { startOperation } from "@/lib/performance";
 import { connection } from "next/server";
 import { getCachedHomeStats } from "@/lib/cached-data";
@@ -20,15 +21,20 @@ import {
 export default async function Home() {
   await connection();
   const perf = startOperation("page.home");
-  const user = await perf.span("auth", () => getCurrentUser());
+  const [user, course] = await Promise.all([
+    perf.span("auth", () => getCurrentUser()),
+    perf.span("course", () => getCurrentCourse()),
+  ]);
   const [{ total, due, weakProduction, mistakes, recent, today }, grammarRecommendation] =
     await Promise.all([
-      perf.span("dbRead", () => getCachedHomeStats(user.id, user.timezone)),
+      perf.span("dbRead", () => getCachedHomeStats(user.id, course.id, user.timezone)),
       perf.span("grammarRecommendation", () =>
         getGrammarRecommendation(db, {
           userId: user.id,
-          currentLevel: user.currentLevel,
-          targetLevel: user.targetLevel,
+          userCourseId: course.id,
+          targetLanguage: course.targetLanguage,
+          currentLevel: course.currentLevel,
+          targetLevel: course.targetLevel,
         }),
       ),
     ]);

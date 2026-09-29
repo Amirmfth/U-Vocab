@@ -1,4 +1,4 @@
-import type { CefrLevel, PrismaClient, SessionActivity, SessionKind } from "@prisma/client";
+import type { CefrLevel, PrismaClient, SessionActivity, SessionKind, TargetLanguage } from "@prisma/client";
 import {
   getGrammarRecommendation,
   grammarRecommendationActionHref,
@@ -33,6 +33,8 @@ export async function buildSessionPlan(
   db: PrismaClient,
   input: {
     userId: string;
+    userCourseId: string;
+    targetLanguage: TargetLanguage;
     kind: SessionKind;
     minutes: number;
     currentLevel: CefrLevel;
@@ -43,7 +45,7 @@ export async function buildSessionPlan(
   const [due, weak, fresh, latestStory, latestReading] = await Promise.all([
     db.userVocabulary.findMany({
       where: {
-        userId: input.userId,
+        userCourseId: input.userCourseId,
         OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
       },
       include: { lexeme: true },
@@ -51,12 +53,12 @@ export async function buildSessionPlan(
       take: 8,
     }),
     db.userVocabulary.findMany({
-      where: { userId: input.userId },
+      where: { userCourseId: input.userCourseId },
       include: {
         lexeme: {
           include: {
             mistakes: {
-              where: { userId: input.userId, resolvedAt: null },
+              where: { userCourseId: input.userCourseId, resolvedAt: null },
               select: { occurrences: true },
             },
           },
@@ -66,18 +68,18 @@ export async function buildSessionPlan(
       take: 24,
     }),
     db.userVocabulary.findMany({
-      where: { userId: input.userId, state: { in: ["NEW", "LEARNING"] } },
+      where: { userCourseId: input.userCourseId, state: { in: ["NEW", "LEARNING"] } },
       include: { lexeme: true },
       orderBy: { addedAt: "desc" },
       take: 8,
     }),
     db.story.findFirst({
-      where: { userId: input.userId },
+      where: { userCourseId: input.userCourseId },
       orderBy: { createdAt: "desc" },
       select: { id: true, title: true },
     }),
     db.readingDocument.findFirst({
-      where: { userId: input.userId },
+      where: { userCourseId: input.userCourseId },
       orderBy: { createdAt: "desc" },
       select: { id: true, title: true },
     }),
@@ -85,6 +87,8 @@ export async function buildSessionPlan(
 
   const grammarRecommendation = await getGrammarRecommendation(db, {
     userId: input.userId,
+    userCourseId: input.userCourseId,
+    targetLanguage: input.targetLanguage,
     currentLevel: input.currentLevel,
     targetLevel: input.targetLevel,
   });

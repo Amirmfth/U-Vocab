@@ -31,10 +31,11 @@ test("equivalent vocabulary filters produce deterministic query keys", () => {
 });
 
 test("query domains stay hierarchical", () => {
-  assert.deepEqual(queryKeys.review.queue("user-a"), ["review", "user-a", "queue"]);
-  assert.deepEqual(queryKeys.word.detail("lexeme-1"), ["word", "lexeme-1"]);
-  assert.deepEqual(queryKeys.writing.session("session-1"), [
+  assert.deepEqual(queryKeys.review.queue("course-a"), ["review", "course-a", "queue"]);
+  assert.deepEqual(queryKeys.word.detail("course-a", "lexeme-1"), ["word", "course-a", "lexeme-1"]);
+  assert.deepEqual(queryKeys.writing.session("course-a", "session-1"), [
     "writing",
+    "course-a",
     "session-1",
   ]);
 });

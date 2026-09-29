@@ -11,6 +11,7 @@ import {
 
 export async function processConversationTurn(input: {
   userId: string;
+  userCourseId: string;
   sessionId: string;
   message: string;
 }) {
@@ -18,10 +19,11 @@ export async function processConversationTurn(input: {
     where: {
       id: input.sessionId,
       userId: input.userId,
+      userCourseId: input.userCourseId,
       status: "ACTIVE",
     },
     include: {
-      user: { select: { preferredTranslation: true } },
+      course: { select: { explanationLanguage: true } },
       targets: {
         include: {
           lexeme: { include: { patterns: true } },
@@ -34,7 +36,8 @@ export async function processConversationTurn(input: {
 
   const evaluation = await evaluateConversationTurn({
     userId: input.userId,
-    evaluationLocale: evaluationLocaleForPreference(session.user.preferredTranslation),
+    userCourseId: input.userCourseId,
+    evaluationLocale: evaluationLocaleForPreference(session.course.explanationLanguage),
     level: session.level,
     message: input.message,
     targets: session.targets.map((target) => ({
@@ -55,7 +58,7 @@ export async function processConversationTurn(input: {
   const vocabularyRows = usedLexemeIds.length
     ? await db.userVocabulary.findMany({
         where: {
-          userId: input.userId,
+          userCourseId: input.userCourseId,
           lexemeId: { in: usedLexemeIds },
         },
         select: {
@@ -82,6 +85,7 @@ export async function processConversationTurn(input: {
 
     attempts.push({
       userId: input.userId,
+      userCourseId: input.userCourseId,
       userVocabularyId: userVocabulary?.id ?? null,
       exerciseType: "FREE_SENTENCE" as const,
       prompt: "Use " + target.lexeme.lemma + " naturally in conversation.",
@@ -142,6 +146,7 @@ export async function processConversationTurn(input: {
   if (mistakes.length) {
     await recordMistakesBatch(db, {
       userId: input.userId,
+      userCourseId: input.userCourseId,
       mistakes,
     });
   }

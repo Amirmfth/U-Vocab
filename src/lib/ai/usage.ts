@@ -46,6 +46,7 @@ function sanitizeMetadata(
 
 export type AIUsageRecordInput = {
   userId: string;
+  userCourseId?: string | null;
   operation: string;
   model: string;
   provider?: string;
@@ -85,6 +86,7 @@ export async function recordAIUsage(input: AIUsageRecordInput) {
     await db.aiUsageEvent.create({
       data: {
         userId: input.userId,
+        userCourseId: input.userCourseId ?? undefined,
         operation: input.operation,
         provider,
         model: input.model,

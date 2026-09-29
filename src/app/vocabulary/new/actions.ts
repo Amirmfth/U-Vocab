@@ -7,6 +7,8 @@ import { analyzeReadingText } from "@/lib/ai/reading-analyzer";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { buildReadingExcerpt, rankReadingCandidates } from "@/lib/ai/preprocess";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { db } from "@/lib/db";
 import { startOperation } from "@/lib/performance";
 import {
@@ -61,7 +63,8 @@ export async function previewVocabularyText(
   }
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const language = targetLanguageConfig(course.targetLanguage);
     let candidates: IngestionCandidate[];
 
     if (isShortLexicalUnit(text)) {
@@ -69,7 +72,7 @@ export async function previewVocabularyText(
       candidates = [candidateFromLexicalAnalysis(analysis)];
     } else {
       const knownVocabulary = await db.userVocabulary.findMany({
-        where: { userId: user.id },
+        where: { userCourseId: course.id },
         select: { lexeme: { select: { normalized: true } } },
       });
       const knownLemmas = new Set(
@@ -79,14 +82,15 @@ export async function previewVocabularyText(
       const excerpt = buildReadingExcerpt(text, readingCandidates, 12_000);
       const analysis = await analyzeReadingText({
         userId: user.id,
+        userCourseId: course.id,
         text: excerpt,
         originalTextChars: text.length,
         candidates: readingCandidates,
-        targetLevel: user.targetLevel,
+        targetLevel: course.targetLevel,
       });
 
       candidates = analysis.lexicalUnits.map((item) => {
-        const normalized = item.lemma.toLocaleLowerCase("de-DE");
+        const normalized = item.lemma.toLocaleLowerCase(language.locale);
         return {
           key: normalized + ":" + item.partOfSpeech,
           sourceType: "PASTED_TEXT",
@@ -108,6 +112,8 @@ export async function previewVocabularyText(
     const withState = await attachIngestionState(
       db,
       user.id,
+      course.id,
+      course.targetLanguage,
       deduplicateCandidates(candidates),
     );
 
@@ -131,7 +137,10 @@ export async function addVocabularyItem(input: {
 }) {
   const perf = startOperation("vocabulary.add_item", { mode: input.word === undefined ? "preview" : "single_word" });
   try {
-    const user = await perf.span("auth", () => getCurrentUser());
+    const [user, course] = await Promise.all([
+      perf.span("auth", () => getCurrentUser()),
+      perf.span("course", () => getCurrentCourse()),
+    ]);
     let candidate = input.candidate;
     let sourceType: "PASTED_TEXT" | "CSV" = candidate?.sourceType === "CSV" ? "CSV" : "PASTED_TEXT";
 
@@ -146,13 +155,15 @@ export async function addVocabularyItem(input: {
     if (!candidate) throw new Error("No vocabulary item was provided.");
     const [lexemeId] = await perf.span("dbSave", () => commitIngestionCandidates(db, {
       userId: user.id,
+      userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       sourceType,
       sourceRef: `${sourceType.toLocaleLowerCase("en-US")}:${crypto.randomUUID()}`,
       candidates: [candidate],
     }));
     if (!input.deferRevalidation) {
       await perf.span("invalidate", async () => {
-        revalidateUserDomains(user.id, ["home", "vocabulary", "review", "progress"], [lexemeId]);
+        revalidateUserDomains(user.id, course.id, ["home", "vocabulary", "review", "progress"], [lexemeId]);
         revalidatePath("/vocabulary");
       });
     }
@@ -169,8 +180,8 @@ export async function addVocabularyItem(input: {
 
 export async function finishVocabularyImport(lexemeIds: string[]) {
   if (!lexemeIds.length) return;
-  const user = await getCurrentUser();
-  revalidateUserDomains(user.id, ["home", "vocabulary", "review", "progress"], lexemeIds);
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  revalidateUserDomains(user.id, course.id, ["home", "vocabulary", "review", "progress"], lexemeIds);
   revalidatePath("/vocabulary");
 }
 
@@ -180,10 +191,14 @@ export async function analyzeVocabularyBatch(words: string[]) {
     if (words.length < 1 || words.length > 8 || words.some((word) => !word.trim() || word.length > 300)) {
       throw new Error("Send 1–8 German words or phrases per batch.");
     }
-    const user = await perf.span("auth", () => getCurrentUser());
-    const normalized = words.map((word) => word.trim().toLocaleLowerCase("de-DE"));
+    const [user, course] = await Promise.all([
+      perf.span("auth", () => getCurrentUser()),
+      perf.span("course", () => getCurrentCourse()),
+    ]);
+    const language = targetLanguageConfig(course.targetLanguage);
+    const normalized = words.map((word) => word.trim().toLocaleLowerCase(language.locale));
     const existing = await perf.span("existingLookup", () => db.lexeme.findMany({
-      where: { language: "de", normalized: { in: normalized } },
+      where: { language: language.code, normalized: { in: normalized } },
       include: { translations: true, patterns: { take: 1 }, examples: { take: 1 } },
     }));
     const byNormalized = new Map<string, typeof existing>();

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { WritingEditor } from "./WritingEditor";
 import { RewriteButton } from "./RewriteButton";
@@ -20,9 +21,9 @@ export default async function WritingSessionPage({
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user] = await Promise.all([params, getCurrentUser()]);
+  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
   const session = await db.writingSession.findFirst({
-    where: { id, userId: user.id },
+    where: { id, userId: user.id, userCourseId: course.id },
     include: {
       targets: {
         include: { lexeme: true },
@@ -63,7 +64,7 @@ export default async function WritingSessionPage({
 
   const parent = session.parentId
     ? await db.writingSession.findFirst({
-        where: { id: session.parentId, userId: user.id },
+        where: { id: session.parentId, userId: user.id, userCourseId: course.id },
         select: { evaluation: true, draft: true, wordCount: true },
       })
     : null;
@@ -72,7 +73,7 @@ export default async function WritingSessionPage({
     : null;
   const rewrites = !session.parentId
     ? await db.writingSession.findMany({
-        where: { userId: user.id, parentId: session.id },
+        where: { userId: user.id, userCourseId: course.id, parentId: session.id },
         select: {
           id: true,
           status: true,

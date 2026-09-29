@@ -6,6 +6,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { getReviewQueueData } from "@/lib/review-queue";
 import { getRescueWords } from "@/lib/rescue";
@@ -40,26 +41,27 @@ export default async function ReviewPage({
   searchParams: Promise<{ start?: string }>;
 }) {
   await connection();
-  const [user, query] = await Promise.all([getCurrentUser(), searchParams]);
+  const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
   if (query.start === "1") {
     const initialQueue = await getReviewQueueData({
       userId: user.id,
-      preferredTranslation: user.preferredTranslation,
+      userCourseId: course.id,
+      preferredTranslation: course.explanationLanguage,
     });
 
-    return <ReviewSession initialData={initialQueue} userScope={user.id} />;
+    return <ReviewSession initialData={initialQueue} userScope={course.id} />;
   }
 
   const now = new Date();
   const [dueCount, mistakeCount, rescueWords] = await Promise.all([
     db.userVocabulary.count({
       where: {
-        userId: user.id,
+        userCourseId: course.id,
         OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
       },
     }),
-    db.mistake.count({ where: { userId: user.id, resolvedAt: null } }),
-    getRescueWords(user.id, Number.POSITIVE_INFINITY),
+    db.mistake.count({ where: { userCourseId: course.id, resolvedAt: null } }),
+    getRescueWords(user.id, course.id, Number.POSITIVE_INFINITY),
   ]);
   const rescueCount = rescueWords.length;
 

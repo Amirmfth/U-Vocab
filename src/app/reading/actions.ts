@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { generateReading } from "@/lib/ai/reading-generation";
 import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { revalidateUserDomains } from "@/lib/cache-tags";
@@ -33,8 +35,9 @@ export async function createGeneratedReading(
   }
 
   try {
-    const user = await getCurrentUser();
-    const level = stretch ? user.targetLevel : user.currentLevel;
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const language = targetLanguageConfig(course.targetLanguage);
+    const level = stretch ? course.targetLevel : course.currentLevel;
 
     const [selectedRows, candidateRows, grammarProgress, manualGrammar, recentGrammar] =
       await Promise.all([
@@ -42,7 +45,7 @@ export async function createGeneratedReading(
           ? db.lexeme.findMany({
               where: {
                 id: { in: selectedIds },
-                userStates: { some: { userId: user.id } },
+                userStates: { some: { userCourseId: course.id } },
               },
               select: {
                 id: true,
@@ -52,7 +55,7 @@ export async function createGeneratedReading(
             })
           : Promise.resolve([]),
         db.userVocabulary.findMany({
-          where: { userId: user.id, lexemeId: { notIn: selectedIds } },
+          where: { userCourseId: course.id, lexemeId: { notIn: selectedIds } },
           select: {
             lexemeId: true,
             lexeme: {
@@ -71,7 +74,7 @@ export async function createGeneratedReading(
         }),
         db.userGrammarProgress.findMany({
           where: {
-            userId: user.id,
+            userCourseId: course.id,
             status: { in: ["NEEDS_ATTENTION", "LEARNING"] },
           },
           include: { grammarConcept: true },
@@ -80,11 +83,11 @@ export async function createGeneratedReading(
         }),
         grammarFocusId
           ? db.grammarConcept.findFirst({
-              where: { id: grammarFocusId, active: true, language: "de" },
+              where: { id: grammarFocusId, active: true, language: language.code },
             })
           : Promise.resolve(null),
         db.storyGrammarTarget.findMany({
-          where: { story: { userId: user.id } },
+          where: { story: { userCourseId: course.id } },
           select: { grammarConceptId: true },
           orderBy: { story: { createdAt: "desc" } },
           take: 12,
@@ -141,7 +144,7 @@ export async function createGeneratedReading(
     const minimumTargets = READING_TARGETS_PER_LENGTH[length];
     const seenLemmas = new Set<string>();
     const targetPool = [...selectedTargets, ...candidateTargets].filter((item) => {
-      const lemma = item.lemma.toLocaleLowerCase("de-DE").trim();
+      const lemma = item.lemma.toLocaleLowerCase(language.locale).trim();
       if (!lemma || seenLemmas.has(lemma)) return false;
       seenLemmas.add(lemma);
       return true;
@@ -160,6 +163,7 @@ export async function createGeneratedReading(
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const draft = await generateReading({
         userId: user.id,
+        userCourseId: course.id,
         level,
         length,
         topic,
@@ -192,6 +196,7 @@ export async function createGeneratedReading(
     const story = await db.story.create({
       data: {
         userId: user.id,
+        userCourseId: course.id,
         title: generated.title,
         topic,
         level,
@@ -203,8 +208,8 @@ export async function createGeneratedReading(
         generationMeta: {
           product: "READING",
           stretch,
-          currentLevel: user.currentLevel,
-          targetLevel: user.targetLevel,
+          currentLevel: course.currentLevel,
+          targetLevel: course.targetLevel,
           requestedGrammarIds: [...grammarById.keys()],
           requiredTargetCount: minimumTargets,
           usedTargetCount: usedTargets.length,
@@ -227,7 +232,7 @@ export async function createGeneratedReading(
       },
     });
 
-    revalidateUserDomains(user.id, ["reading"]);
+    revalidateUserDomains(user.id, course.id, ["reading"]);
     revalidatePath("/reading");
 
     return {
@@ -267,9 +272,10 @@ export async function submitReadingAnswers(
   const readingId = String(formData.get("readingId") ?? "");
 
   try {
-    const user = await getCurrentUser();
+    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const language = targetLanguageConfig(course.targetLanguage);
     const story = await db.story.findFirst({
-      where: { id: readingId, userId: user.id },
+      where: { id: readingId, userId: user.id, userCourseId: course.id },
       include: {
         targets: { select: { lexemeId: true } },
       },
@@ -309,6 +315,7 @@ export async function submitReadingAnswers(
       await db.encounter.createMany({
         data: story.targets.map((target) => ({
           userId: user.id,
+          userCourseId: course.id,
           lexemeId: target.lexemeId,
           source: "reading",
           sourceRef: story.id,
@@ -326,7 +333,7 @@ export async function submitReadingAnswers(
           where: {
             id: { in: grammarIds },
             active: true,
-            language: "de",
+            language: language.code,
           },
           select: { id: true },
         })
@@ -337,6 +344,7 @@ export async function submitReadingAnswers(
       if (!validGrammarIds.has(evidence.grammarConceptId)) continue;
       await recordGrammarEvidence({
         userId: user.id,
+        userCourseId: course.id,
         grammarConceptId: evidence.grammarConceptId,
         source: "READING_COMPREHENSION",
         outcome: evidence.correct ? "SUCCESS" : "ERROR",
@@ -353,6 +361,7 @@ export async function submitReadingAnswers(
 
     revalidateUserDomains(
       user.id,
+      course.id,
       ["reading", "vocabulary", "progress"],
       story.targets.map((target) => target.lexemeId),
     );

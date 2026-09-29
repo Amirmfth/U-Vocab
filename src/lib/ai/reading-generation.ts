@@ -35,6 +35,7 @@ export type GeneratedReading = z.infer<typeof generatedReadingSchema>;
 
 export async function generateReading(input: {
   userId: string;
+  userCourseId: string;
   level: string;
   length: "SHORT" | "MEDIUM" | "LONG";
   minimumTargets: number;
@@ -56,6 +57,7 @@ export async function generateReading(input: {
   });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "reading_generation",
     model: route.model,
     metadata: {
@@ -80,7 +82,7 @@ export async function generateReading(input: {
           },
           {
             role: "user",
-            content: JSON.stringify({ ...input, userId: undefined }),
+            content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined }),
           },
         ],
         text: {

@@ -15,9 +15,9 @@ export type VerbConjugationResult =
   | { status:"not_verb" }
   | { status:"ok"; cache:"hit"|"miss"; data:VerbConjugation };
 
-export async function getVerbConjugationForUser(input:{ userId:string; lexemeId:string }):Promise<VerbConjugationResult> {
+export async function getVerbConjugationForUser(input:{ userId:string; userCourseId:string; lexemeId:string }):Promise<VerbConjugationResult> {
   const lexeme = await db.lexeme.findFirst({
-    where:{ id:input.lexemeId, userStates:{ some:{ userId:input.userId } } },
+    where:{ id:input.lexemeId, userStates:{ some:{ userCourseId:input.userCourseId } } },
     include:{ patterns:true, examples:{ take:4 } },
   });
   if (!lexeme) return { status:"not_found" };
@@ -44,6 +44,7 @@ export async function getVerbConjugationForUser(input:{ userId:string; lexemeId:
   const perf=startOperation("ai.verb_conjugation",{ model:route.model });
   const usage=createAIUsageRecorder({
     userId:input.userId,
+    userCourseId:input.userCourseId,
     operation:OPERATION,
     model:route.model,
     metadata:{ lexemeId:lexeme.id, lemma:lexeme.lemma },

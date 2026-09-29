@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import type { GrammarCategory } from "@prisma/client";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { db } from "@/lib/db";
 import {
   grammarStatusLabel,
@@ -67,10 +69,11 @@ export default async function GrammarConceptPage({
 }) {
   await connection();
   const { slug } = await params;
-  const user = await getCurrentUser();
+  const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const language = targetLanguageConfig(course.targetLanguage);
 
   const concept = await db.grammarConcept.findFirst({
-    where: { slug, language: "de", active: true },
+    where: { slug, language: language.code, active: true },
     include: {
       parent: { select: { slug: true, title: true } },
       children: {
@@ -92,11 +95,11 @@ export default async function GrammarConceptPage({
         take: 6,
       },
       userProgress: {
-        where: { userId: user.id },
+        where: { userCourseId: course.id },
         take: 1,
       },
       evidence: {
-        where: { userId: user.id },
+        where: { userCourseId: course.id },
         orderBy: { createdAt: "desc" },
         take: 6,
       },
@@ -108,6 +111,7 @@ export default async function GrammarConceptPage({
 
   const vocabulary = await getVocabularyForGrammarConcept(
     user.id,
+    course.id,
     concept.category,
     concept.id,
   );
@@ -116,7 +120,7 @@ export default async function GrammarConceptPage({
   const rules = stringArray(concept.rules);
   const examples = stringArray(concept.examples);
   const exceptions = stringArray(concept.exceptions);
-  const lessonLanguage = user.preferredTranslation === "PERSIAN" ? "fa" : "en";
+  const lessonLanguage = course.explanationLanguage === "PERSIAN" ? "fa" : "en";
   const selectedLesson = concept.lessons.find((item) => item.language === lessonLanguage)
     ?? concept.lessons.find((item) => item.language === "en");
   const lesson = selectedLesson
@@ -149,7 +153,7 @@ export default async function GrammarConceptPage({
           <TeachGrammarSheet
             grammarConceptId={concept.id}
             label={concept.title}
-            language={user.preferredTranslation === "PERSIAN" ? "fa" : "en"}
+            language={course.explanationLanguage === "PERSIAN" ? "fa" : "en"}
           />
           {status !== "STRONG" ? (
             <form action={startGrammarConceptAction}>

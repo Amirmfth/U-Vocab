@@ -1,35 +1,57 @@
 import { connection } from "next/server";
 import Link from "next/link";
-import {
-  Brain,
-  LifeBuoy,
-  TriangleAlert,
-} from "lucide-react";
+import { Brain, LifeBuoy, TriangleAlert } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { getReviewQueueData } from "@/lib/review-queue";
 import { getRescueWords } from "@/lib/rescue";
+import { getServerTranslator } from "@/i18n/server";
+import { formatNumber } from "@/i18n/format";
+import type { Translator } from "@/i18n/core";
+import type { UiLocale } from "@/i18n/config";
 import { ReviewSession } from "./ReviewSession";
 
 function ReviewModes({
   mistakes,
   rescueCount,
+  locale,
+  t,
 }: {
   mistakes: number;
   rescueCount: number;
+  locale: UiLocale;
+  t: Translator;
 }) {
   return (
-    <nav className="practice-lanes review-mode-grid" aria-label="Review modes">
+    <nav className="practice-lanes review-mode-grid" aria-label={t("review.modes")}>
       <Link href="/mistakes" className="practice-lane">
-        <span className="review-mode-count" aria-label={`${mistakes} unresolved mistakes`}>{mistakes}</span>
+        <span
+          className="review-mode-count"
+          aria-label={t.plural(
+            { one: "review.unresolvedMistakes.one", other: "review.unresolvedMistakes.other" },
+            mistakes,
+            { count: formatNumber(locale, mistakes) },
+          )}
+        >
+          {formatNumber(locale, mistakes)}
+        </span>
         <span className="practice-lane-icon"><TriangleAlert size={30} /></span>
-        <span className="practice-lane-copy"><strong>Mistakes</strong></span>
+        <span className="practice-lane-copy"><strong>{t("nav.mistakes")}</strong></span>
       </Link>
       <Link href="/rescue" className="practice-lane">
-        <span className="review-mode-count" aria-label={`${rescueCount} rescue words`}>{rescueCount}</span>
+        <span
+          className="review-mode-count"
+          aria-label={t.plural(
+            { one: "review.rescueWords.one", other: "review.rescueWords.other" },
+            rescueCount,
+            { count: formatNumber(locale, rescueCount) },
+          )}
+        >
+          {formatNumber(locale, rescueCount)}
+        </span>
         <span className="practice-lane-icon"><LifeBuoy size={30} /></span>
-        <span className="practice-lane-copy"><strong>Rescue</strong></span>
+        <span className="practice-lane-copy"><strong>{t("review.rescue")}</strong></span>
       </Link>
     </nav>
   );
@@ -41,7 +63,13 @@ export default async function ReviewPage({
   searchParams: Promise<{ start?: string }>;
 }) {
   await connection();
-  const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
+  const [user, course, query] = await Promise.all([
+    getCurrentUser(),
+    getCurrentCourse(),
+    searchParams,
+  ]);
+  const { locale, t } = await getServerTranslator(user);
+
   if (query.start === "1") {
     const initialQueue = await getReviewQueueData({
       userId: user.id,
@@ -66,30 +94,39 @@ export default async function ReviewPage({
   const rescueCount = rescueWords.length;
 
   return (
-      <main className="page review-landing review-page">
-        <section className="review-hero">
-          <div>
-            <h1>{dueCount ? dueCount + " due now" : "You're caught up"}</h1>
-            <p>
-              {dueCount
-                ? "Use active recall on vocabulary that FSRS says is due."
-                : "No retention reviews are due. Practice mistakes or weak skills instead."}
-            </p>
-          </div>
-          {dueCount ? (
-            <Link href="/review?start=1" className="button button-primary review-start">
-              <Brain size={18} />
-              Start review
-            </Link>
-          ) : (
-            <Link href="/rescue" className="button button-primary review-start">
-              <LifeBuoy size={18} />
-              Reinforce weak words
-            </Link>
-          )}
-        </section>
+    <main className="page review-landing review-page">
+      <section className="review-hero">
+        <div>
+          <h1>
+            {dueCount
+              ? t("review.dueNow", { count: formatNumber(locale, dueCount) })
+              : t("review.caughtUp")}
+          </h1>
+          <p>
+            {dueCount
+              ? t("review.dueDescription")
+              : t("review.clearDescription")}
+          </p>
+        </div>
+        {dueCount ? (
+          <Link href="/review?start=1" className="button button-primary review-start">
+            <Brain size={18} />
+            {t("review.start")}
+          </Link>
+        ) : (
+          <Link href="/rescue" className="button button-primary review-start">
+            <LifeBuoy size={18} />
+            {t("review.reinforceWeak")}
+          </Link>
+        )}
+      </section>
 
-        <ReviewModes mistakes={mistakeCount} rescueCount={rescueCount} />
-      </main>
+      <ReviewModes
+        mistakes={mistakeCount}
+        rescueCount={rescueCount}
+        locale={locale}
+        t={t}
+      />
+    </main>
   );
 }

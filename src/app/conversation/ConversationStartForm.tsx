@@ -6,6 +6,8 @@ import { MessageCircle, Target } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
 import { ActivitySelect } from "@/components/ui/activity-select";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
 import {
   createConversationSessionAction,
   type ConversationActionState,
@@ -20,6 +22,7 @@ export function ConversationStartForm({
 }) {
   const [kind, setKind] = useState(initialMode);
   const router = useRouter();
+  const { locale, t } = useI18n();
   const [state, action] = useActionState(
     createConversationSessionAction,
     initialState,
@@ -34,68 +37,123 @@ export function ConversationStartForm({
   return (
     <form action={action} className="panel conversation-start-form">
       <div className="field">
-        <label htmlFor="conversation-mode-trigger">Mode</label>
+        <label htmlFor="conversation-mode-trigger">{t("conversation.mode")}</label>
         <ActivitySelect
           id="conversation-mode"
           name="kind"
           defaultValue={initialMode}
-          onValueChange={(value) => setKind(value === "MISSION" ? "MISSION" : "PRACTICE")}
+          onValueChange={(value) =>
+            setKind(value === "MISSION" ? "MISSION" : "PRACTICE")
+          }
           options={[
-            { value: "PRACTICE", label: "Conversation", description: "Practice naturally with visible target words" },
-            { value: "MISSION", label: "Mission", description: "Achieve a role-play objective" },
+            {
+              value: "PRACTICE",
+              label: t("conversation.practiceMode"),
+              description: t("conversation.practiceDescription"),
+            },
+            {
+              value: "MISSION",
+              label: t("conversation.missionMode"),
+              description: t("conversation.missionDescription"),
+            },
           ]}
         />
       </div>
 
       <div className="field">
-        <label htmlFor={kind + "-topic"}>Situation or topic <span className="muted">(optional)</span></label>
+        <label htmlFor={kind + "-topic"}>
+          {t("conversation.topic")}{" "}
+          <span className="muted">({t("reading.optional")})</span>
+        </label>
         <input
           id={kind + "-topic"}
           name="topic"
-          placeholder={kind === "MISSION" ? "z. B. Arbeit, Wohnung, Reise" : "z. B. Alltag, Arbeit, Freizeit"}
+          dir="auto"
+          placeholder={
+            kind === "MISSION"
+              ? t("conversation.topicMissionPlaceholder")
+              : t("conversation.topicPracticePlaceholder")
+          }
         />
       </div>
 
       <div className="field">
-        <label htmlFor={kind + "-target-count"}>Target lexical units</label>
+        <label htmlFor={kind + "-target-count"}>
+          {t("conversation.targets")}
+        </label>
         <ActivitySelect
           id={kind + "-target-count"}
           name="targetCount"
           defaultValue="5"
-          options={[
-            { value: "3", label: "3 targets" },
-            { value: "5", label: "5 targets" },
-            { value: "7", label: "7 targets" },
-          ]}
+          options={[3, 5, 7].map((count) => ({
+            value: String(count),
+            label: t("conversation.targetCount", {
+              count: formatNumber(locale, count),
+            }),
+          }))}
         />
       </div>
 
       <div className="field">
-        <label htmlFor={kind + "-tone-trigger"}>Conversation tone</label>
+        <label htmlFor={kind + "-tone-trigger"}>{t("conversation.tone")}</label>
         <ActivitySelect
           id={kind + "-tone"}
           name="tone"
           defaultValue="FRIENDLY"
           options={[
-            { value: "FRIENDLY", label: "Friendly", description: "Warm and natural" },
-            { value: "PROFESSIONAL", label: "Professional", description: "Workplace-ready and composed" },
-            { value: "PLAYFUL", label: "Playful", description: "Lighter and more expressive" },
-            { value: "DIRECT", label: "Direct", description: "Concise and straightforward" },
-            { value: "SUPPORTIVE", label: "Supportive", description: "Patient and encouraging" },
+            {
+              value: "FRIENDLY",
+              label: t("conversation.friendly"),
+              description: t("conversation.friendlyHelp"),
+            },
+            {
+              value: "PROFESSIONAL",
+              label: t("conversation.professional"),
+              description: t("conversation.professionalHelp"),
+            },
+            {
+              value: "PLAYFUL",
+              label: t("conversation.playful"),
+              description: t("conversation.playfulHelp"),
+            },
+            {
+              value: "DIRECT",
+              label: t("conversation.direct"),
+              description: t("conversation.directHelp"),
+            },
+            {
+              value: "SUPPORTIVE",
+              label: t("conversation.supportive"),
+              description: t("conversation.supportiveHelp"),
+            },
           ]}
         />
       </div>
 
       <div className="field">
-        <label htmlFor={kind + "-formality-trigger"}>Formality</label>
+        <label htmlFor={kind + "-formality-trigger"}>
+          {t("conversation.formality")}
+        </label>
         <ActivitySelect
           id={kind + "-formality"}
           name="formality"
           defaultValue="NEUTRAL"
           options={[
-            { value: "CASUAL", label: "Casual · du", description: "Informal everyday German" },
-            { value: "NEUTRAL", label: "Contextual", description: "Use what naturally fits the situation" },
-            { value: "FORMAL", label: "Formal · Sie", description: "Polite and socially formal German" },
+            {
+              value: "CASUAL",
+              label: t("conversation.casual"),
+              description: t("conversation.casualHelp"),
+            },
+            {
+              value: "NEUTRAL",
+              label: t("conversation.contextual"),
+              description: t("conversation.contextualHelp"),
+            },
+            {
+              value: "FORMAL",
+              label: t("conversation.formal"),
+              description: t("conversation.formalHelp"),
+            },
           ]}
         />
       </div>
@@ -104,8 +162,8 @@ export function ConversationStartForm({
         <label className="conversation-toggle">
           <input type="checkbox" name="revealTargets" />
           <span>
-            <strong>Show target words during the mission</strong>
-            <small>Leave off for a more secret-objective style challenge.</small>
+            <strong>{t("conversation.showTargets")}</strong>
+            <small>{t("conversation.showTargetsHelp")}</small>
           </span>
         </label>
       ) : null}
@@ -114,9 +172,17 @@ export function ConversationStartForm({
         <StatusNotice tone="error">{state.message}</StatusNotice>
       ) : null}
 
-      <ActionButton pendingLabel={kind === "MISSION" ? "Creating mission…" : "Preparing conversation…"}>
+      <ActionButton
+        pendingLabel={
+          kind === "MISSION"
+            ? t("conversation.creatingMission")
+            : t("conversation.preparing")
+        }
+      >
         {kind === "MISSION" ? <Target size={18} /> : <MessageCircle size={18} />}
-        {kind === "MISSION" ? "Create mission" : "Start conversation"}
+        {kind === "MISSION"
+          ? t("conversation.createMission")
+          : t("conversation.start")}
       </ActionButton>
     </form>
   );

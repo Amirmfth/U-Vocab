@@ -614,6 +614,19 @@ export const en = {
   "word.verbClass.mixed": "mixed",
   "word.verbClass.irregular": "irregular",
 
+
+  "word.relation.word_family": "word family",
+  "word.relation.synonym": "synonym",
+  "word.relation.antonym": "antonym",
+  "word.relation.derived": "derived",
+  "word.relation.related": "related",
+  "word.relation.collocation": "collocation",
+  "word.relation.phrase": "phrase",
+  "word.rating.again": "again",
+  "word.rating.hard": "hard",
+  "word.rating.good": "good",
+  "word.rating.easy": "easy",
+
   "errors.genericTitle": "Something went wrong",
   "errors.genericBody": "U-Vocab hit an unexpected error.",
   "errors.tryAgain": "Try again",

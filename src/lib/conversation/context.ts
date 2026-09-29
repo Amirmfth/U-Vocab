@@ -2,11 +2,12 @@ import { db } from "@/lib/db";
 
 export async function buildConversationContext(input: {
   userId: string;
+  userCourseId: string;
   sessionId: string;
   messageLimit?: number;
 }) {
   const session = await db.conversationSession.findFirst({
-    where: { id: input.sessionId, userId: input.userId },
+    where: { id: input.sessionId, userCourseId: input.userCourseId },
     include: {
       targets: {
         include: {
@@ -18,7 +19,7 @@ export async function buildConversationContext(input: {
                   target: {
                     include: {
                       userStates: {
-                        where: { userId: input.userId },
+                        where: { userCourseId: input.userCourseId },
                         take: 1,
                       },
                     },
@@ -31,7 +32,7 @@ export async function buildConversationContext(input: {
                   source: {
                     include: {
                       userStates: {
-                        where: { userId: input.userId },
+                        where: { userCourseId: input.userCourseId },
                         take: 1,
                       },
                     },
@@ -48,10 +49,11 @@ export async function buildConversationContext(input: {
         orderBy: { createdAt: "desc" },
         take: input.messageLimit ?? 8,
       },
-      user: {
+      course: {
         select: {
           targetLevel: true,
-          preferredTranslation: true,
+          explanationLanguage: true,
+          targetLanguage: true,
         },
       },
     },
@@ -62,7 +64,7 @@ export async function buildConversationContext(input: {
   const targetIds = session.targets.map((target) => target.lexemeId);
   const mistakes = await db.mistake.findMany({
     where: {
-      userId: input.userId,
+      userCourseId: input.userCourseId,
       resolvedAt: null,
       lexemeId: { in: targetIds },
     },
@@ -99,8 +101,8 @@ export async function buildConversationContext(input: {
       formality: session.formality,
     },
     learner: {
-      level: session.user.targetLevel,
-      translationPreference: session.user.preferredTranslation,
+      level: session.course.targetLevel,
+      translationPreference: session.course.explanationLanguage,
     },
     targets: session.targets.map((target) => ({
       id: target.lexemeId,

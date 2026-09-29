@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 
 export async function selectConversationTargets(input: {
   userId: string;
+  userCourseId: string;
   limit?: number;
 }) {
   const limit = input.limit ?? 5;
@@ -14,7 +15,7 @@ export async function selectConversationTargets(input: {
   }>();
 
   const weak = await db.userVocabulary.findMany({
-    where: { userId: input.userId },
+    where: { userCourseId: input.userCourseId },
     include: { lexeme: { include: { patterns: true } } },
     orderBy: [
       { production: "asc" },

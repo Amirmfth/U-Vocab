@@ -10,6 +10,7 @@ import { processConversationTurn } from "@/lib/conversation/process-turn";
 import { buildTutorInstructions } from "@/lib/conversation/tutor-prompt";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentCourse } from "@/lib/current-course";
 import { isUnauthorizedError } from "@/lib/auth";
 import { startOperation } from "@/lib/performance";
 
@@ -22,8 +23,12 @@ export async function POST(
   const perf = startOperation("conversation.message");
   const { id } = await params;
   let user: Awaited<ReturnType<typeof getCurrentUser>>;
+  let course: Awaited<ReturnType<typeof getCurrentCourse>>;
   try {
-    user = await perf.span("auth", () => getCurrentUser());
+    [user, course] = await Promise.all([
+      perf.span("auth", () => getCurrentUser()),
+      perf.span("course", () => getCurrentCourse()),
+    ]);
   } catch (error) {
     if (isUnauthorizedError(error)) {
       perf.success({ httpStatus: 401, accepted: false });
@@ -56,6 +61,7 @@ export async function POST(
       where: {
         id,
         userId: user.id,
+        userCourseId: course.id,
         status: "ACTIVE",
         turnInFlight: false,
       },
@@ -110,6 +116,7 @@ export async function POST(
   });
   const tutorUsage = createAIUsageRecorder({
     userId: user.id,
+    userCourseId: course.id,
     operation: "conversation_tutor",
     model: tutorRoute.model,
     metadata: {
@@ -144,7 +151,7 @@ export async function POST(
   if (!stream) {
     await perf.span("dbWrite", () =>
       db.conversationSession.updateMany({
-        where: { id, userId: user.id },
+        where: { id, userId: user.id, userCourseId: course.id },
         data: { turnInFlight: false },
       }),
     );
@@ -212,7 +219,7 @@ export async function POST(
 
         await perf.span("dbWrite", () =>
           db.conversationSession.updateMany({
-            where: { id, userId: user.id },
+            where: { id, userId: user.id, userCourseId: course.id },
             data: { turnInFlight: false },
           }),
         );
@@ -235,7 +242,7 @@ export async function POST(
         perf.fail(error);
         await tutorUsage.failure(error, completedResponse);
         await db.conversationSession.updateMany({
-          where: { id, userId: user.id },
+          where: { id, userId: user.id, userCourseId: course.id },
           data: { turnInFlight: false },
         });
         controller.error(error);

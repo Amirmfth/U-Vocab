@@ -17,6 +17,7 @@ export type ConversationSetup = z.infer<typeof conversationSetupSchema>;
 
 export async function generateConversationSetup(input: {
   userId: string;
+  userCourseId: string;
   kind: "PRACTICE" | "MISSION";
   level: string;
   topic?: string | null;
@@ -33,6 +34,7 @@ export async function generateConversationSetup(input: {
   const perf = startOperation("ai.conversation_setup", { model: route.model });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "conversation_setup",
     model: route.model,
     metadata: { kind: input.kind, level: input.level, targetCount: input.targets.length, hasTopic: Boolean(input.topic) },
@@ -49,7 +51,7 @@ export async function generateConversationSetup(input: {
         },
         {
           role: "user",
-          content: JSON.stringify({ ...input, userId: undefined }),
+          content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined }),
         },
       ],
       text: {

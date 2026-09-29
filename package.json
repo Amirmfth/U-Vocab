@@ -21,6 +21,8 @@
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "@tanstack/react-query": "5.103.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "better-auth": "1.7.6",
     "framer-motion": "^13.4.0",
     "geist": "^1.7.2",

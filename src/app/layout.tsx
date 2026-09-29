@@ -12,6 +12,8 @@ import { QueryProvider } from "@/components/query-provider";
 import { getCurrentUser } from "@/lib/current-user";
 import { isAppAuthenticated } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
   title: { default: "U-Vocab", template: "%s · U-Vocab" },
@@ -50,6 +52,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <PageTransition>{children}</PageTransition>
           </div>
         </QueryProvider>
+        <Analytics/>
+        <SpeedInsights/>
       </body>
     </html>
   );

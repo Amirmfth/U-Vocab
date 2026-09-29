@@ -1,28 +1,128 @@
 "use client";
 
-import { useActionState } from "react";
+import { FormEvent, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
-import { ActionButton } from "@/components/action-button";
+import { authClient } from "@/lib/auth-client";
 import { StatusNotice } from "@/components/status-notice";
-import { login, type LoginState } from "./actions";
 
-const initialState: LoginState = { status: "idle" };
+export function LoginForm({
+  returnTo,
+  passwordReset,
+}: {
+  returnTo: string;
+  passwordReset: boolean;
+}) {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
-export function LoginForm({ returnTo }: { returnTo: string }) {
-  const [state, action] = useActionState(login, initialState);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending) return;
+
+    const form = new FormData(event.currentTarget);
+    const password = String(form.get("password") ?? "");
+
+    setPending(true);
+    setError(null);
+    setNeedsVerification(false);
+
+    try {
+      const result = await authClient.signIn.email({
+        email: email.trim(),
+        password,
+        rememberMe: true,
+        callbackURL: returnTo,
+      });
+
+      if (result.error) {
+        setNeedsVerification(result.error.status === 403);
+        setError(
+          result.error.status === 403
+            ? "Verify your email before signing in. We sent a new verification link."
+            : result.error.message || "Could not sign in.",
+        );
+        return;
+      }
+
+      router.replace(returnTo);
+      router.refresh();
+    } catch {
+      setError("Could not sign in. Check your connection and try again.");
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
-    <form action={action} className="panel login-card">
-      <input type="hidden" name="returnTo" value={returnTo} />
-      <div className="login-icon" aria-hidden="true"><LockKeyhole size={22} /></div>
-      <div>
-        <p className="eyebrow">PRIVATE APP</p>
-        <h1>Sign in to U-Vocab</h1>
-        <p className="muted">Use the shared credentials configured for this deployment.</p>
+    <form onSubmit={submit} className="panel login-card">
+      <div className="login-icon" aria-hidden="true">
+        <LockKeyhole size={22} />
       </div>
-      <label className="field"><span>Username</span><input name="username" autoComplete="username" required /></label>
-      <label className="field"><span>Password</span><input name="password" type="password" autoComplete="current-password" required /></label>
-      {state.status === "error" ? <StatusNotice tone="error">{state.message}</StatusNotice> : null}
-      <ActionButton pendingLabel="Signing in…">Sign in</ActionButton>
+      <div>
+        <p className="eyebrow">ACCOUNT</p>
+        <h1>Sign in to U-Vocab</h1>
+        <p className="muted">Use your U-Vocab email and password.</p>
+      </div>
+
+      {passwordReset ? (
+        <StatusNotice tone="success">
+          Password updated. Sign in with your new password.
+        </StatusNotice>
+      ) : null}
+
+      <label className="field">
+        <span>Email</span>
+        <input
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+      </label>
+      <label className="field">
+        <span>Password</span>
+        <input
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          minLength={10}
+          maxLength={128}
+        />
+      </label>
+
+      {error ? <StatusNotice tone="error">{error}</StatusNotice> : null}
+      {needsVerification && email ? (
+        <Link
+          href={
+            "/verify-email?email=" +
+            encodeURIComponent(email) +
+            "&returnTo=" +
+            encodeURIComponent(returnTo)
+          }
+          className="text-link"
+        >
+          Resend verification email
+        </Link>
+      ) : null}
+
+      <button className="button button-primary" type="submit" disabled={pending}>
+        {pending ? "Signing in…" : "Sign in"}
+      </button>
+
+      <Link
+        href={"/forgot-password?returnTo=" + encodeURIComponent(returnTo)}
+        className="text-link"
+      >
+        Forgot password?
+      </Link>
     </form>
   );
 }

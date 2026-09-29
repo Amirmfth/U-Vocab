@@ -1,9 +1,9 @@
 import { connection } from "next/server";
 import Link from "next/link";
-import { BarChart3, LogOut } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { SettingsForm } from "./SettingsForm";
-import { logout } from "./auth-actions";
+import { SignOutButton } from "./SignOutButton";
 
 export default async function SettingsPage() {
   await connection();
@@ -29,12 +29,10 @@ export default async function SettingsPage() {
       </section>
       <section className="panel account-links">
         <div>
-          <strong>Private session</strong>
-          <span className="muted">Clear this browser&apos;s signed U-Vocab session.</span>
+          <strong>Account session</strong>
+          <span className="muted">Sign out of this browser. Your learning data stays attached to your account.</span>
         </div>
-        <form action={logout}>
-          <button className="button button-secondary" type="submit"><LogOut size={17} /> Sign out</button>
-        </form>
+        <SignOutButton />
       </section>
     </main>
   );

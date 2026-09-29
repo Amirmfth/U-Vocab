@@ -1,7 +1,24 @@
+import Link from "next/link";
+import { safeReturnTo } from "@/lib/auth-routing";
 import { LoginForm } from "./LoginForm";
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ returnTo?: string }> }) {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string; reset?: string }>;
+}) {
   const params = await searchParams;
-  const returnTo = params.returnTo?.startsWith("/") && !params.returnTo.startsWith("//") ? params.returnTo : "/";
-  return <main className="login-page"><LoginForm returnTo={returnTo} /></main>;
+  const returnTo = safeReturnTo(params.returnTo);
+
+  return (
+    <main className="login-page">
+      <LoginForm returnTo={returnTo} passwordReset={params.reset === "1"} />
+      <p className="muted">
+        New to U-Vocab?{" "}
+        <Link href={"/signup?returnTo=" + encodeURIComponent(returnTo)}>
+          Create an account
+        </Link>
+      </p>
+    </main>
+  );
 }

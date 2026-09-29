@@ -616,6 +616,19 @@ export const fa = {
   "word.verbClass.mixed": "مختلط",
   "word.verbClass.irregular": "بی‌قاعده",
 
+
+  "word.relation.word_family": "خانواده واژه",
+  "word.relation.synonym": "هم‌معنی",
+  "word.relation.antonym": "متضاد",
+  "word.relation.derived": "مشتق",
+  "word.relation.related": "مرتبط",
+  "word.relation.collocation": "هم‌آیند",
+  "word.relation.phrase": "عبارت",
+  "word.rating.again": "دوباره",
+  "word.rating.hard": "سخت",
+  "word.rating.good": "خوب",
+  "word.rating.easy": "آسان",
+
   "errors.genericTitle": "مشکلی پیش آمد",
   "errors.genericBody": "U-Vocab با یک خطای غیرمنتظره روبه‌رو شد.",
   "errors.tryAgain": "تلاش دوباره",

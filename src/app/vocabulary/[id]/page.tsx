@@ -219,14 +219,9 @@ function WordMastery({
     <section className="panel word-detail-card word-mastery-section">
       <h2>{t("word.mastery")}</h2>
       <p className="muted">
-        <strong>{formatPercent(locale, overall)}</strong>{" "}
         {t("word.overallMastery", {
-          value: formatNumber(locale, Math.round(overall * 100)),
-        }).replace(
-          formatNumber(locale, Math.round(overall * 100)) +
-            (locale === "fa" ? "٪" : "%"),
-          "",
-        ).trim()}
+          percent: formatPercent(locale, overall),
+        })}
       </p>
       {scores.map(([label, value]) => {
         const score = Math.round(Number(value) * 100);

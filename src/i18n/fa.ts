@@ -2,6 +2,7 @@ import type { MessageKey } from "./en";
 
 export const fa = {
   "common.account": "حساب کاربری",
+  "common.insights": "بینش‌ها",
   "common.learn": "یادگیری",
   "common.save": "ذخیره",
   "common.saving": "در حال ذخیره…",
@@ -38,6 +39,7 @@ export const fa = {
   "nav.settings": "تنظیمات",
   "nav.addWord": "افزودن واژه",
   "nav.brandHome": "خانه U-Vocab",
+  "nav.brandWords": "واژه‌های U-Vocab",
   "nav.reviewDue": "مرور، {count} مورد آماده",
   "nav.reviewsDue": "{count} مرور آماده",
   "nav.myWords": "واژه‌های من",

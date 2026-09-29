@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { useTranslations } from "@/i18n/client";
 
 export function SignOutButton() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const t = useTranslations();
 
   return (
     <button
@@ -27,7 +29,7 @@ export function SignOutButton() {
       }}
     >
       <LogOut size={17} />
-      {pending ? "Signing out…" : "Sign out"}
+      {pending ? t("settings.signingOut") : t("settings.signOut")}
     </button>
   );
 }

@@ -2,10 +2,11 @@
 
 import { LoaderCircle } from "lucide-react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "@/i18n/client";
 
 export function ActionButton({
   children,
-  pendingLabel = "Working…",
+  pendingLabel,
   className = "",
   variant = "primary",
   disabled = false,
@@ -17,6 +18,7 @@ export function ActionButton({
   disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
+  const t = useTranslations();
 
   return (
     <button
@@ -29,7 +31,7 @@ export function ActionButton({
       {pending ? (
         <>
           <LoaderCircle className="spinner" size={18} aria-hidden="true" />
-          <span aria-live="polite">{pendingLabel}</span>
+          <span aria-live="polite">{pendingLabel ?? t("common.working")}</span>
         </>
       ) : (
         children

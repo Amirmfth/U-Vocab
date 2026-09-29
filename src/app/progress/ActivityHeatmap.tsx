@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { ActivityDay } from "@/lib/progress";
+import type { UiLocale } from "@/i18n/config";
+import { createTranslator } from "@/i18n/core";
+import { formatDate, formatNumber } from "@/i18n/format";
 
 function previousDateKey(key: string) {
   const date = new Date(key + "T12:00:00Z");
@@ -27,12 +30,15 @@ export function ActivityHeatmap({
   today,
   selectedDay,
   range,
+  locale,
 }: {
   days: ActivityDay[];
   today: string;
   selectedDay?: string;
   range: string;
+  locale: UiLocale;
 }) {
+  const t = createTranslator(locale);
   const lookup = new Map(days.map((day) => [day.date, day]));
   const keys: string[] = [];
   let key = today;
@@ -45,12 +51,22 @@ export function ActivityHeatmap({
 
   return (
     <div className="heatmap-scroll">
-      <div className="activity-heatmap" aria-label="365 days of vocabulary activity">
+      <div className="activity-heatmap" aria-label={t("progress.heatmapAria")}>
         {keys.map((date) => {
           const day = lookup.get(date);
           const count = day
-            ? day.reviewed + day.learned + day.produced + day.readingEncounters + day.mistakesCorrected
+            ? day.reviewed +
+              day.learned +
+              day.produced +
+              day.readingEncounters +
+              day.mistakesCorrected
             : 0;
+          const formattedDate = formatDate(
+            locale,
+            new Date(date + "T12:00:00Z"),
+            { dateStyle: "medium" },
+          );
+          const formattedCount = formatNumber(locale, count);
 
           return (
             <Link
@@ -61,8 +77,14 @@ export function ActivityHeatmap({
                 intensity(day) +
                 (selectedDay === date ? " is-selected" : "")
               }
-              aria-label={date + ": " + count + " learning activities"}
-              title={date + " · " + count + " activities"}
+              aria-label={t("progress.activities", {
+                date: formattedDate,
+                count: formattedCount,
+              })}
+              title={t("progress.activitiesTitle", {
+                date: formattedDate,
+                count: formattedCount,
+              })}
             />
           );
         })}

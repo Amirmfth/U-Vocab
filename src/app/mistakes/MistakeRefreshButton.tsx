@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Sparkles } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { useTranslations } from "@/i18n/client";
 import {
   refreshMistakeEmbeddings,
   type MistakeActionState,
@@ -16,13 +17,17 @@ export function MistakeRefreshButton() {
     refreshMistakeEmbeddings,
     initialState,
   );
+  const t = useTranslations();
 
   return (
     <div className="mistake-refresh">
       <form action={action}>
-        <ActionButton variant="secondary" pendingLabel="Indexing mistakes…">
+        <ActionButton
+          variant="secondary"
+          pendingLabel={t("mistakes.indexing")}
+        >
           <Sparkles size={16} />
-          Refresh semantic groups
+          {t("mistakes.refresh")}
         </ActionButton>
       </form>
       {state.status === "success" ? (

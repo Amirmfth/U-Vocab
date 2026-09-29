@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import { BookOpenCheck, RefreshCcw, X } from "lucide-react";
 import { generateQuickTeachAction } from "./actions";
 import { useWordLanguage } from "./WordLanguage";
+import { useTranslations } from "@/i18n/client";
 
 export function TeachWordSheet({ lexemeId, label }: {
   lexemeId: string;
@@ -22,6 +23,7 @@ export function TeachWordSheet({ lexemeId, label }: {
   const closeRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const t = useTranslations();
 
   const close = useCallback(() => {
     requestId.current += 1;
@@ -82,7 +84,7 @@ export function TeachWordSheet({ lexemeId, label }: {
       else setLesson(result.lesson);
     } catch (cause) {
       if (requestId.current !== id) return;
-      setError(cause instanceof Error ? cause.message : "Could not generate a lesson.");
+      setError(cause instanceof Error ? cause.message : t("word.lessonError"));
     } finally {
       if (requestId.current === id) setLoading(false);
     }
@@ -99,7 +101,7 @@ export function TeachWordSheet({ lexemeId, label }: {
           void generate();
         }}
       >
-        <BookOpenCheck size={18} /> Teach me this word
+        <BookOpenCheck size={18} /> {t("word.teach")}
       </button>
       <AnimatePresence onExitComplete={() => triggerRef.current?.focus()}>
       {open ? (
@@ -110,7 +112,7 @@ export function TeachWordSheet({ lexemeId, label }: {
           exit={{ opacity: 0 }}
           transition={{ duration: reduceMotion ? 0.12 : 0.2 }}
         >
-          <button className="teach-sheet-backdrop" type="button" aria-label="Close lesson" onClick={close} />
+          <button className="teach-sheet-backdrop" type="button" aria-label={t("word.closeLesson")} onClick={close} />
           <motion.section
             className="teach-sheet"
             role="dialog"
@@ -125,15 +127,15 @@ export function TeachWordSheet({ lexemeId, label }: {
             <div className="teach-sheet-handle" aria-hidden="true" />
             <header className="teach-sheet-header">
               <div>
-                <p className="eyebrow">QUICK LESSON</p>
-                <h2 id="teach-sheet-title" dir="ltr">{label}</h2>
+                <p className="eyebrow">{t("word.quickLesson")}</p>
+                <h2 id="teach-sheet-title" className="learning-content" lang="de" dir="ltr">{label}</h2>
               </div>
               <button className="icon-button" type="button" aria-label="Close lesson" ref={closeRef} onClick={close}>
                 <X size={18} />
               </button>
             </header>
             <div className="teach-sheet-content" aria-live="polite">
-              {loading ? <p className="muted" role="status">Generating a short lesson…</p> : null}
+              {loading ? <p className="muted" role="status">{t("word.generatingLesson")}</p> : null}
               {error ? <p className="optimistic-error" role="alert">{error}</p> : null}
               {lesson ? (
                 <div
@@ -154,7 +156,7 @@ export function TeachWordSheet({ lexemeId, label }: {
             </div>
             <div className="teach-sheet-footer">
               <button className="button button-secondary" type="button" disabled={loading} onClick={() => void generate()}>
-                <RefreshCcw size={17} /> Regenerate
+                <RefreshCcw size={17} /> {t("word.regenerate")}
               </button>
             </div>
           </motion.section>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { safeReturnTo } from "@/lib/auth-routing";
+import { getServerTranslator } from "@/i18n/server";
 import { SignupForm } from "./SignupForm";
 
 export default async function SignupPage({
@@ -9,14 +10,15 @@ export default async function SignupPage({
 }) {
   const params = await searchParams;
   const returnTo = safeReturnTo(params.returnTo);
+  const { t } = await getServerTranslator();
 
   return (
     <main className="login-page">
       <SignupForm returnTo={returnTo} />
       <p className="muted">
-        Already have an account?{" "}
+        {t("auth.alreadyHave")}{" "}
         <Link href={"/login?returnTo=" + encodeURIComponent(returnTo)}>
-          Sign in
+          {t("auth.signIn")}
         </Link>
       </p>
     </main>

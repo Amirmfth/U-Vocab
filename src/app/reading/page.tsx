@@ -6,12 +6,25 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
+import { getServerTranslator } from "@/i18n/server";
+import { formatNumber } from "@/i18n/format";
+import type { MessageKey } from "@/i18n/core";
 import { ReadingForm } from "./ReadingForm";
+
+const LENGTH_KEYS: Record<string, MessageKey> = {
+  SHORT: "reading.length.short",
+  MEDIUM: "reading.length.medium",
+  LONG: "reading.length.long",
+};
 
 export default async function ReadingPage() {
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const { locale, t } = await getServerTranslator(user);
   const language = targetLanguageConfig(course.targetLanguage);
+  const languageLabel =
+    course.targetLanguage === "GERMAN" ? t("common.german") : language.label;
+
   const [readings, vocabulary, grammar] = await Promise.all([
     db.story.findMany({
       where: { userCourseId: course.id },
@@ -52,12 +65,13 @@ export default async function ReadingPage() {
   return (
     <main className="page reading-hub generated-reading-hub">
       <section className="page-header compact practice-workbench-header">
-        <h1>Personalized {language.label} reading</h1>
+        <h1>{t("reading.title", { language: languageLabel })}</h1>
       </section>
 
       <ReadingForm
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
+        targetLanguage={language.code}
         targets={vocabulary.map((item) => ({
           lexemeId: item.lexemeId,
           label: formatLexemeLabel(item.lexeme),
@@ -77,7 +91,7 @@ export default async function ReadingPage() {
       />
 
       <section className="page-section">
-        <h2 className="section-title">Recent readings</h2>
+        <h2 className="section-title">{t("reading.recent")}</h2>
         {readings.length ? (
           <div className="collection-list">
             {readings.map((reading) => (
@@ -88,28 +102,39 @@ export default async function ReadingPage() {
                 prefetch
               >
                 <div>
-                  <strong>{reading.title}</strong>
+                  <strong className="learning-content" lang={language.code} dir="ltr">
+                    {reading.title}
+                  </strong>
                   <span>
-                    {reading.level} · {reading.length.toLowerCase()} ·{" "}
-                    {reading._count.targets} target words
+                    {reading.level} · {t(LENGTH_KEYS[reading.length] ?? "reading.length.medium")} ·{" "}
+                    {t("reading.targetWords", {
+                      count: formatNumber(locale, reading._count.targets),
+                    })}
                     {reading._count.grammarTargets
-                      ? " · " + reading._count.grammarTargets + " grammar notes"
+                      ? " · " +
+                        t("reading.grammarNotes", {
+                          count: formatNumber(locale, reading._count.grammarTargets),
+                        })
                       : ""}
                     {reading.completedAt
                       ? " · " +
-                        Math.round((reading.comprehensionScore ?? 0) * 100) +
-                        "% comprehension"
+                        t("reading.comprehension", {
+                          value: formatNumber(
+                            locale,
+                            Math.round((reading.comprehensionScore ?? 0) * 100),
+                          ),
+                        })
                       : ""}
                   </span>
                 </div>
-                <ArrowRight size={17} />
+                <ArrowRight className="rtl-mirror" size={17} />
               </Link>
             ))}
           </div>
         ) : (
           <div className="empty-state compact-empty">
             <BookOpenText size={22} />
-            <strong>No generated readings yet.</strong>
+            <strong>{t("reading.none")}</strong>
           </div>
         )}
       </section>

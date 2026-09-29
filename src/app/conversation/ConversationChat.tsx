@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bot, Send, UserRound } from "lucide-react";
+import { useTranslations } from "@/i18n/client";
 
 type ChatMessage = {
   id: string;
@@ -20,6 +21,7 @@ export function ConversationChat({
   tutorLabel: string;
 }) {
   const router = useRouter();
+  const t = useTranslations();
   const [messages, setMessages] = useState(initialMessages);
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -33,7 +35,10 @@ export function ConversationChat({
   }, [initialMessages, streaming]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: streaming ? "auto" : "smooth", block: "end" });
+    endRef.current?.scrollIntoView({
+      behavior: streaming ? "auto" : "smooth",
+      block: "end",
+    });
   }, [messages, streaming]);
 
   const canSend = useMemo(
@@ -68,7 +73,7 @@ export function ConversationChat({
 
       if (!response.ok || !response.body) {
         const payload = await response.json().catch(() => null);
-        throw new Error(payload?.error ?? "Could not send message.");
+        throw new Error(payload?.error ?? t("conversation.sendError"));
       }
 
       const reader = response.body.getReader();
@@ -96,7 +101,7 @@ export function ConversationChat({
       setError(
         actionError instanceof Error
           ? actionError.message
-          : "Could not continue the conversation.",
+          : t("conversation.continueError"),
       );
     } finally {
       setStreaming(false);
@@ -117,10 +122,9 @@ export function ConversationChat({
                 {isUser ? <UserRound size={17} /> : <Bot size={17} />}
               </div>
               <div className="conversation-bubble">
-                <span>{isUser ? "You" : tutorLabel}</span>
-                <p>
-                  {message.content ||
-                    (streaming && !isUser ? "…" : "")}
+                <span>{isUser ? t("conversation.you") : tutorLabel}</span>
+                <p className="learning-content" lang="de" dir="ltr">
+                  {message.content || (streaming && !isUser ? "…" : "")}
                 </p>
               </div>
             </article>
@@ -135,8 +139,11 @@ export function ConversationChat({
           rows={2}
           value={draft}
           disabled={streaming}
-          placeholder="Antworte auf Deutsch…"
-          aria-label="Your German reply"
+          placeholder={t("conversation.replyPlaceholder")}
+          aria-label={t("conversation.yourGermanReply")}
+          lang="de"
+          dir="ltr"
+          className="learning-content"
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
             if (
@@ -154,14 +161,12 @@ export function ConversationChat({
           className="conversation-send-button"
           disabled={!canSend}
           aria-busy={streaming}
-          aria-label={streaming ? "Tutor is replying" : "Send message"}
-          title={streaming ? "Tutor is replying…" : "Send · Enter"}
+          aria-label={streaming ? t("conversation.tutorReplying") : t("conversation.send")}
+          title={streaming ? t("conversation.tutorReplyingLong") : t("conversation.sendEnter")}
         >
-          <Send size={18} />
+          <Send className="rtl-mirror" size={18} />
         </button>
-        <span className="conversation-composer-hint">
-          Enter to send · Shift + Enter for a new line
-        </span>
+        <span className="conversation-composer-hint">{t("conversation.composerHint")}</span>
       </form>
 
       {error ? (

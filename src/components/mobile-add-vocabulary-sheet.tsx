@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { AddLexemeForm } from "@/app/vocabulary/new/AddLexemeForm";
+import { useTranslations } from "@/i18n/client";
 
 type TranslationPreference = "ENGLISH" | "PERSIAN" | "BOTH";
 
@@ -19,6 +20,7 @@ export function MobileAddVocabularySheet({
   const reduceMotion = useReducedMotion();
   const panelRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -72,9 +74,16 @@ export function MobileAddVocabularySheet({
   return (
     <AnimatePresence>
       {isOpen ? (
-        <motion.div key="mobile-add-sheet" id="mobile-add-sheet" className="mobile-add-sheet" role="dialog" aria-modal="true" aria-labelledby="mobile-add-sheet-title">
+        <motion.div
+          key="mobile-add-sheet"
+          id="mobile-add-sheet"
+          className="mobile-add-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-add-sheet-title"
+        >
           <motion.button
-            aria-label="Close add vocabulary"
+            aria-label={t("common.close")}
             className="mobile-add-sheet-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -96,9 +105,15 @@ export function MobileAddVocabularySheet({
             <div className="mobile-add-sheet-handle" aria-hidden="true" />
             <header className="mobile-add-sheet-header">
               <div>
-                <h2 id="mobile-add-sheet-title">Add vocabulary</h2>
+                <h2 id="mobile-add-sheet-title">{t("common.addVocabulary")}</h2>
               </div>
-              <button ref={closeButtonRef} className="icon-button" type="button" onClick={onClose} aria-label="Close">
+              <button
+                ref={closeButtonRef}
+                className="icon-button"
+                type="button"
+                onClick={onClose}
+                aria-label={t("common.close")}
+              >
                 <X size={20} />
               </button>
             </header>

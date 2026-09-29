@@ -196,6 +196,7 @@ export default async function Vocabulary({
       <VocabularyScrollRestoration />
       <VocabularyDisplay
         preferredTranslation={course.explanationLanguage}
+        targetLanguage={language.code}
         rows={rows}
         total={items.length}
         current={current}

@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { RotateCcw } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { useTranslations } from "@/i18n/client";
 import { createRewriteAction, type WritingActionState } from "../actions";
 
 const initialState: WritingActionState = { status: "idle" };
 
 export function RewriteButton({ sessionId }: { sessionId: string }) {
   const router = useRouter();
+  const t = useTranslations();
   const [state, action] = useActionState(createRewriteAction, initialState);
 
   useEffect(() => {
@@ -23,9 +25,12 @@ export function RewriteButton({ sessionId }: { sessionId: string }) {
     <div className="writing-rewrite">
       <form action={action}>
         <input type="hidden" name="sessionId" value={sessionId} />
-        <ActionButton variant="secondary" pendingLabel="Preparing rewrite…">
+        <ActionButton
+          variant="secondary"
+          pendingLabel={t("writing.rewrite.preparing")}
+        >
           <RotateCcw size={17} />
-          Rewrite this task
+          {t("writing.rewrite.button")}
         </ActionButton>
       </form>
       {state.status === "error" ? (

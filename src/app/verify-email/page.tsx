@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { safeReturnTo } from "@/lib/auth-routing";
+import { getServerTranslator } from "@/i18n/server";
 import { VerifyEmailForm } from "./VerifyEmailForm";
 
 export default async function VerifyEmailPage({
@@ -10,6 +11,7 @@ export default async function VerifyEmailPage({
   const params = await searchParams;
   const returnTo = safeReturnTo(params.returnTo);
   const email = params.email?.trim() ?? "";
+  const { t } = await getServerTranslator();
 
   return (
     <main className="login-page">
@@ -19,9 +21,9 @@ export default async function VerifyEmailPage({
         invalidToken={params.error === "invalid_token"}
       />
       <p className="muted">
-        Already verified?{" "}
+        {t("auth.alreadyVerified")}{" "}
         <Link href={"/login?returnTo=" + encodeURIComponent(returnTo)}>
-          Sign in
+          {t("auth.signIn")}
         </Link>
       </p>
     </main>

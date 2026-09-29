@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { safeReturnTo } from "@/lib/auth-routing";
+import { getServerTranslator } from "@/i18n/server";
 import { LoginForm } from "./LoginForm";
 
 export default async function LoginPage({
@@ -12,14 +13,15 @@ export default async function LoginPage({
   const params = await searchParams;
   const returnTo = safeReturnTo(params.returnTo);
   if (await getAuthSession()) redirect(returnTo);
+  const { t } = await getServerTranslator();
 
   return (
     <main className="login-page">
       <LoginForm returnTo={returnTo} passwordReset={params.reset === "1"} />
       <p className="muted">
-        New to U-Vocab?{" "}
+        {t("auth.newTo")}{" "}
         <Link href={"/signup?returnTo=" + encodeURIComponent(returnTo)}>
-          Create an account
+          {t("auth.createAccount")}
         </Link>
       </p>
     </main>

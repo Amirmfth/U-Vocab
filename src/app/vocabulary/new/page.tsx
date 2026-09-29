@@ -2,20 +2,19 @@ import { connection } from "next/server";
 import { AddLexemeForm } from "./AddLexemeForm";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
+import { getServerTranslator } from "@/i18n/server";
 
 export default async function NewWord() {
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const { t } = await getServerTranslator(user);
 
   return (
     <main className="page">
       <section className="page-header compact">
-        <p className="eyebrow">AI-ASSISTED ENTRY</p>
-        <h1>Add vocabulary</h1>
-        <p className="page-description">
-          Analyze German text or paste a comma-separated list of words. Choose
-          what to add to your vocabulary.
-        </p>
+        <p className="eyebrow">{t("vocab.add.eyebrow")}</p>
+        <h1>{t("vocab.add.title")}</h1>
+        <p className="page-description">{t("vocab.add.description")}</p>
       </section>
 
       <AddLexemeForm translationPreference={course.explanationLanguage} />

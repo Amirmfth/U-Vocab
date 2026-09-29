@@ -6,10 +6,16 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { buildActivityDays, localDateKey } from "@/lib/progress";
 import { currentRetrievability } from "@/lib/fsrs";
+import { getServerTranslator } from "@/i18n/server";
+import {
+  formatDate,
+  formatNumber,
+  formatPercent,
+} from "@/i18n/format";
+import type { MessageKey } from "@/i18n/core";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { TimezoneSync } from "./TimezoneSync";
 import { GrammarProgressPanel } from "./GrammarProgressPanel";
-
 
 const RANGE_DAYS: Record<string, number | null> = {
   "7": 7,
@@ -19,16 +25,43 @@ const RANGE_DAYS: Record<string, number | null> = {
   all: null,
 };
 
+const rangeLabelKeys: Record<string, MessageKey> = {
+  "7": "progress.range.7",
+  "30": "progress.range.30",
+  "90": "progress.range.90",
+  "365": "progress.range.365",
+  all: "progress.range.all",
+};
+
+const weaknessKeys: Record<string, MessageKey> = {
+  ARTICLE: "mistake.type.article",
+  CASE: "mistake.type.case",
+  PREPOSITION: "mistake.type.preposition",
+  REFLEXIVE: "mistake.type.reflexive",
+  COLLOCATION: "mistake.type.collocation",
+  ADJECTIVE_ENDING: "mistake.type.adjective_ending",
+  VERB_POSITION: "mistake.type.verb_position",
+  WORD_ORDER: "mistake.type.word_order",
+  TENSE: "mistake.type.tense",
+  CONJUGATION: "mistake.type.conjugation",
+  PRONOUN: "mistake.type.pronoun",
+  AGREEMENT: "mistake.type.agreement",
+  RELATIVE_CLAUSE: "mistake.type.relative_clause",
+  PASSIVE: "mistake.type.passive",
+  SUBJUNCTIVE: "mistake.type.subjunctive",
+  WORD_CHOICE: "mistake.type.word_choice",
+  WORD_FORM: "mistake.type.word_form",
+  SPELLING: "mistake.type.spelling",
+  OTHER: "mistake.type.other",
+  PRODUCTION: "progress.productionWeakness",
+};
+
 function rangeCutoff(range: string) {
   const days = RANGE_DAYS[range] ?? 30;
   if (days === null) return null;
   const date = new Date();
   date.setDate(date.getDate() - days);
   return date;
-}
-
-function percent(value: number) {
-  return Math.round(value * 100);
 }
 
 function minutes(ms: number) {
@@ -51,17 +84,29 @@ export default async function ProgressPage({
   searchParams: Promise<{ range?: string; day?: string }>;
 }) {
   await connection();
-  const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
+  const [user, course, query] = await Promise.all([
+    getCurrentUser(),
+    getCurrentCourse(),
+    searchParams,
+  ]);
+  const { locale, t } = await getServerTranslator(user);
   const range = query.range && query.range in RANGE_DAYS ? query.range : "30";
   const cutoff = rangeCutoff(range);
   const activityCutoff = new Date();
   activityCutoff.setDate(activityCutoff.getDate() - 366);
 
-  const metricAttemptWhere = cutoff ? { userCourseId: course.id, createdAt: { gte: cutoff } } : { userCourseId: course.id };
+  const metricAttemptWhere = cutoff
+    ? { userCourseId: course.id, createdAt: { gte: cutoff } }
+    : { userCourseId: course.id };
   const metricReviewWhere = cutoff
-    ? { userVocabulary: { userCourseId: course.id }, reviewedAt: { gte: cutoff } }
+    ? {
+        userVocabulary: { userCourseId: course.id },
+        reviewedAt: { gte: cutoff },
+      }
     : { userVocabulary: { userCourseId: course.id } };
-  const metricEncounterWhere = cutoff ? { userCourseId: course.id, createdAt: { gte: cutoff } } : { userCourseId: course.id };
+  const metricEncounterWhere = cutoff
+    ? { userCourseId: course.id, createdAt: { gte: cutoff } }
+    : { userCourseId: course.id };
 
   const [
     vocabulary,
@@ -147,10 +192,12 @@ export default async function ProgressPage({
   const developing = Math.max(0, vocabulary.length - active - passive);
 
   const averageRecognition = vocabulary.length
-    ? vocabulary.reduce((sum, item) => sum + item.recognition, 0) / vocabulary.length
+    ? vocabulary.reduce((sum, item) => sum + item.recognition, 0) /
+      vocabulary.length
     : 0;
   const averageProduction = vocabulary.length
-    ? vocabulary.reduce((sum, item) => sum + item.production, 0) / vocabulary.length
+    ? vocabulary.reduce((sum, item) => sum + item.production, 0) /
+      vocabulary.length
     : 0;
 
   const currentRetrievabilities = vocabulary
@@ -204,9 +251,13 @@ export default async function ProgressPage({
       (weaknessMap.get(mistake.type) ?? 0) + mistake.occurrences,
     );
   }
-  const lowProductionCount = vocabulary.filter((item) => item.production < 0.4).length;
+  const lowProductionCount = vocabulary.filter(
+    (item) => item.production < 0.4,
+  ).length;
   if (lowProductionCount) weaknessMap.set("PRODUCTION", lowProductionCount);
-  const weakAreas = Array.from(weaknessMap.entries()).sort((a, b) => b[1] - a[1]);
+  const weakAreas = Array.from(weaknessMap.entries()).sort(
+    (a, b) => b[1] - a[1],
+  );
 
   const activityDays = buildActivityDays({
     timeZone: user.timezone,
@@ -218,13 +269,16 @@ export default async function ProgressPage({
   });
   const today = localDateKey(now, user.timezone);
   const selectedDay = query.day ?? today;
-  const selectedActivity = activityDays.find((day) => day.date === selectedDay);
+  const selectedActivity = activityDays.find(
+    (day) => day.date === selectedDay,
+  );
 
   const monthKeys = lastMonthKeys(today);
   const monthlyTrend = monthKeys.map((month) => ({
     month,
     learned: vocabulary.filter(
-      (item) => localDateKey(item.addedAt, user.timezone).slice(0, 7) === month,
+      (item) =>
+        localDateKey(item.addedAt, user.timezone).slice(0, 7) === month,
     ).length,
     mastered: vocabulary.filter(
       (item) =>
@@ -242,51 +296,56 @@ export default async function ProgressPage({
       <TimezoneSync savedTimezone={user.timezone} />
 
       <section className="page-header compact">
-        <p className="eyebrow">PROGRESS</p>
-        <h1>Learning analytics</h1>
-        <p className="page-description">
-          Based on your actual reviews, attempts, encounters, and learner state.
-        </p>
+        <p className="eyebrow">{t("progress.eyebrow")}</p>
+        <h1>{t("progress.title")}</h1>
+        <p className="page-description">{t("progress.description")}</p>
       </section>
 
-      <nav className="range-tabs" aria-label="Analytics time range">
-        {[
-          ["7", "7d"],
-          ["30", "30d"],
-          ["90", "90d"],
-          ["365", "1y"],
-          ["all", "All"],
-        ].map(([value, label]) => (
+      <nav className="range-tabs" aria-label={t("progress.range")}>
+        {["7", "30", "90", "365", "all"].map((value) => (
           <Link
             key={value}
             href={"/progress?range=" + value}
             className={"range-tab " + (range === value ? "is-active" : "")}
           >
-            {label}
+            {t(rangeLabelKeys[value])}
           </Link>
         ))}
       </nav>
 
       <section className="progress-summary">
         <div>
-          <span>Vocabulary</span>
-          <strong>{vocabulary.length}</strong>
-          <small>{learnedInRange} added in range</small>
+          <span>{t("progress.vocabulary")}</span>
+          <strong>{formatNumber(locale, vocabulary.length)}</strong>
+          <small>
+            {t("progress.addedRange", {
+              count: formatNumber(locale, learnedInRange),
+            })}
+          </small>
         </div>
         <div>
-          <span>Active estimate</span>
-          <strong>{active}</strong>
-          <small>{passive} passive · {developing} developing</small>
+          <span>{t("progress.activeEstimate")}</span>
+          <strong>{formatNumber(locale, active)}</strong>
+          <small>
+            {t("progress.passiveDeveloping", {
+              passive: formatNumber(locale, passive),
+              developing: formatNumber(locale, developing),
+            })}
+          </small>
         </div>
         <div>
-          <span>Retention</span>
-          <strong>{percent(averageRetention)}%</strong>
-          <small>Current FSRS retrievability</small>
+          <span>{t("progress.retention")}</span>
+          <strong>{formatPercent(locale, averageRetention)}</strong>
+          <small>{t("progress.retrievability")}</small>
         </div>
         <div>
-          <span>Mastered</span>
-          <strong>{totalMastered}</strong>
-          <small>{masteredInRange} reached mastery in range</small>
+          <span>{t("progress.mastered")}</span>
+          <strong>{formatNumber(locale, totalMastered)}</strong>
+          <small>
+            {t("progress.masteredRange", {
+              count: formatNumber(locale, masteredInRange),
+            })}
+          </small>
         </div>
       </section>
 
@@ -295,70 +354,102 @@ export default async function ProgressPage({
         userCourseId={course.id}
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
+        locale={locale}
       />
 
       <section className="progress-grid">
         <article className="panel progress-panel">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">SKILL BALANCE</p>
-              <h2>Recognition vs production</h2>
+              <p className="eyebrow">{t("progress.skillBalance")}</p>
+              <h2>{t("progress.recognitionProduction")}</h2>
             </div>
             <TrendingUp size={19} />
           </div>
           <div className="progress-bars">
             <div>
-              <span>Recognition <b>{percent(averageRecognition)}%</b></span>
-              <div className="metric-bar"><span style={{ width: percent(averageRecognition) + "%" }} /></div>
+              <span>
+                {t("progress.recognition")}{" "}
+                <b>{formatPercent(locale, averageRecognition)}</b>
+              </span>
+              <div className="metric-bar">
+                <span
+                  style={{
+                    width: Math.round(averageRecognition * 100) + "%",
+                  }}
+                />
+              </div>
             </div>
             <div>
-              <span>Production <b>{percent(averageProduction)}%</b></span>
-              <div className="metric-bar"><span style={{ width: percent(averageProduction) + "%" }} /></div>
+              <span>
+                {t("progress.production")}{" "}
+                <b>{formatPercent(locale, averageProduction)}</b>
+              </span>
+              <div className="metric-bar">
+                <span
+                  style={{ width: Math.round(averageProduction * 100) + "%" }}
+                />
+              </div>
             </div>
           </div>
-          <p className="analytics-caveat">
-            Active/passive counts are estimates from mastery dimensions, not a language certification.
-          </p>
+          <p className="analytics-caveat">{t("progress.estimateCaveat")}</p>
         </article>
 
         <article className="panel progress-panel">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">WORKLOAD</p>
-              <h2>Review queue</h2>
+              <p className="eyebrow">{t("progress.workload")}</p>
+              <h2>{t("progress.reviewQueue")}</h2>
             </div>
             <Clock3 size={19} />
           </div>
           <div className="workload-numbers">
-            <div><strong>{dueNow}</strong><span>due now</span></div>
-            <div><strong>{dueWeek}</strong><span>next 7 days</span></div>
-            <div><strong>{metricReviews.length}</strong><span>reviews in range</span></div>
+            <div>
+              <strong>{formatNumber(locale, dueNow)}</strong>
+              <span>{t("progress.dueNow")}</span>
+            </div>
+            <div>
+              <strong>{formatNumber(locale, dueWeek)}</strong>
+              <span>{t("progress.next7Days")}</span>
+            </div>
+            <div>
+              <strong>{formatNumber(locale, metricReviews.length)}</strong>
+              <span>{t("progress.reviewsRange")}</span>
+            </div>
           </div>
           <p className="analytics-caveat">
-            {percent(reviewSuccess)}% of reviews in this range were graded Hard, Good, or Easy.
+            {t("progress.reviewSuccess", {
+              percent: formatPercent(locale, reviewSuccess),
+            })}
           </p>
         </article>
 
         <article className="panel progress-panel">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">TIME</p>
-              <h2>Active practice</h2>
+              <p className="eyebrow">{t("progress.time")}</p>
+              <h2>{t("progress.activePractice")}</h2>
             </div>
             <Flame size={19} />
           </div>
-          <p className="big-metric">{minutes(totalDurationMs)} min</p>
+          <p className="big-metric">
+            {t("progress.minutes", {
+              count: formatNumber(locale, minutes(totalDurationMs)),
+            })}
+          </p>
           <p className="analytics-caveat">
-            {percent(practiceAccuracy)}% attempt accuracy · {metricEncounters.length} contextual encounters in range.
-            Timing starts with the progress telemetry migration.
+            {t("progress.practiceAccuracy", {
+              percent: formatPercent(locale, practiceAccuracy),
+              count: formatNumber(locale, metricEncounters.length),
+            })}
           </p>
         </article>
 
         <article className="panel progress-panel">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">WEAK AREAS</p>
-              <h2>What needs work</h2>
+              <p className="eyebrow">{t("progress.weakAreas")}</p>
+              <h2>{t("progress.needsWork")}</h2>
             </div>
             <ShieldCheck size={19} />
           </div>
@@ -366,13 +457,17 @@ export default async function ProgressPage({
             <div className="weakness-list">
               {weakAreas.slice(0, 6).map(([type, count]) => (
                 <div key={type}>
-                  <span>{type.replaceAll("_", " ").toLowerCase()}</span>
-                  <strong>{count}</strong>
+                  <span>
+                    {weaknessKeys[type]
+                      ? t(weaknessKeys[type])
+                      : type.replaceAll("_", " ").toLowerCase()}
+                  </span>
+                  <strong>{formatNumber(locale, count)}</strong>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="muted">No unresolved weakness patterns.</p>
+            <p className="muted">{t("progress.noWeakness")}</p>
           )}
         </article>
       </section>
@@ -380,43 +475,62 @@ export default async function ProgressPage({
       <section className="panel progress-panel">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">GROWTH</p>
-            <h2>12-month learning trend</h2>
+            <p className="eyebrow">{t("progress.growth")}</p>
+            <h2>{t("progress.trend")}</h2>
           </div>
         </div>
-        <div className="trend-chart" aria-label="Words learned and mastered by month">
+        <div className="trend-chart" aria-label={t("progress.trendAria")}>
           {monthlyTrend.map((item) => (
             <div className="trend-month" key={item.month}>
               <div className="trend-bars">
                 <span
                   className="trend-bar learned"
-                  style={{ height: Math.max(3, (item.learned / maxTrend) * 100) + "%" }}
-                  title={item.learned + " learned"}
+                  style={{
+                    height:
+                      Math.max(3, (item.learned / maxTrend) * 100) + "%",
+                  }}
+                  title={t("progress.learnedTitle", {
+                    count: formatNumber(locale, item.learned),
+                  })}
                 />
                 <span
                   className="trend-bar mastered"
-                  style={{ height: Math.max(3, (item.mastered / maxTrend) * 100) + "%" }}
-                  title={item.mastered + " mastered"}
+                  style={{
+                    height:
+                      Math.max(3, (item.mastered / maxTrend) * 100) + "%",
+                  }}
+                  title={t("progress.masteredTitle", {
+                    count: formatNumber(locale, item.mastered),
+                  })}
                 />
               </div>
-              <small>{item.month.slice(5)}</small>
+              <small>
+                {formatDate(
+                  locale,
+                  new Date(item.month + "-01T12:00:00Z"),
+                  { month: "short" },
+                )}
+              </small>
             </div>
           ))}
         </div>
         <div className="trend-legend">
-          <span><i className="trend-key learned" /> added</span>
-          <span><i className="trend-key mastered" /> mastered</span>
+          <span>
+            <i className="trend-key learned" /> {t("progress.added")}
+          </span>
+          <span>
+            <i className="trend-key mastered" />{" "}
+            {t("progress.masteredLegend")}
+          </span>
         </div>
-        <p className="analytics-caveat">
-          Mastery transition history starts with the progress telemetry migration; older mastered items are included in current totals but cannot be backdated precisely.
-        </p>
+        <p className="analytics-caveat">{t("progress.trendCaveat")}</p>
       </section>
 
       <section className="panel heatmap-panel">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">ACTIVITY</p>
-            <h2>365 days</h2>
+            <p className="eyebrow">{t("progress.activity")}</p>
+            <h2>{t("progress.days365")}</h2>
           </div>
           <span className="muted">{user.timezone}</span>
         </div>
@@ -426,30 +540,75 @@ export default async function ProgressPage({
           today={today}
           selectedDay={selectedDay}
           range={range}
+          locale={locale}
         />
 
         <div className="day-detail">
           <div>
-            <strong>{selectedDay}</strong>
-            <span>{selectedActivity ? "Activity recorded" : "No activity"}</span>
+            <strong>
+              {formatDate(
+                locale,
+                new Date(selectedDay + "T12:00:00Z"),
+                { dateStyle: "medium" },
+              )}
+            </strong>
+            <span>
+              {selectedActivity
+                ? t("progress.activityRecorded")
+                : t("progress.noActivity")}
+            </span>
           </div>
           <div className="day-detail-metrics">
-            <span>{selectedActivity?.reviewed ?? 0} reviewed</span>
-            <span>{selectedActivity?.learned ?? 0} learned</span>
-            <span>{selectedActivity?.produced ?? 0} produced</span>
-            <span>{selectedActivity?.readingEncounters ?? 0} reading encounters</span>
-            <span>{selectedActivity?.mistakesCorrected ?? 0} mistakes corrected</span>
-            <span>{minutes(selectedActivity?.durationMs ?? 0)} min</span>
+            <span>
+              {t("progress.reviewed", {
+                count: formatNumber(locale, selectedActivity?.reviewed ?? 0),
+              })}
+            </span>
+            <span>
+              {t("progress.learned", {
+                count: formatNumber(locale, selectedActivity?.learned ?? 0),
+              })}
+            </span>
+            <span>
+              {t("progress.produced", {
+                count: formatNumber(locale, selectedActivity?.produced ?? 0),
+              })}
+            </span>
+            <span>
+              {t("progress.readingEncounters", {
+                count: formatNumber(
+                  locale,
+                  selectedActivity?.readingEncounters ?? 0,
+                ),
+              })}
+            </span>
+            <span>
+              {t("progress.mistakesCorrected", {
+                count: formatNumber(
+                  locale,
+                  selectedActivity?.mistakesCorrected ?? 0,
+                ),
+              })}
+            </span>
+            <span>
+              {t("progress.minutes", {
+                count: formatNumber(
+                  locale,
+                  minutes(selectedActivity?.durationMs ?? 0),
+                ),
+              })}
+            </span>
           </div>
         </div>
       </section>
 
       <section className="progress-actions">
         <Link href="/rescue" className="button button-primary">
-          Rescue weak words <ArrowRight size={17} />
+          {t("progress.rescueWeak")}{" "}
+          <ArrowRight className="rtl-mirror" size={17} />
         </Link>
         <Link href="/mistakes" className="button button-secondary">
-          Review mistakes
+          {t("progress.reviewMistakes")}
         </Link>
       </section>
     </main>

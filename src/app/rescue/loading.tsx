@@ -1,6 +1,11 @@
+"use client";
+
+import { useTranslations } from "@/i18n/client";
+
 export default function Loading() {
+  const t = useTranslations();
   return (
-    <main className="page core-loading" aria-busy="true" aria-label="Loading rescue words">
+    <main className="page core-loading" aria-busy="true" aria-label={t("loading.surface", { surface: t("loading.rescueWords") })}>
       <section className="page-header compact rescue-loading-header" aria-hidden="true">
         <div className="skeleton loading-rescue-back" />
         <div className="skeleton loading-rescue-title" />

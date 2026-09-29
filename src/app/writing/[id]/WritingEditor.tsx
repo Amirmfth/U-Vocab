@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Send } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
 import { evaluateWritingAction, type WritingActionState } from "../actions";
 
 const initialState: WritingActionState = { status: "idle" };
@@ -23,6 +25,7 @@ export function WritingEditor({
   targetWords: number;
 }) {
   const router = useRouter();
+  const { locale, t } = useI18n();
   const [draft, setDraft] = useState(initialDraft);
   const [state, action] = useActionState(evaluateWritingAction, initialState);
   const words = useMemo(() => countWords(draft), [draft]);
@@ -35,8 +38,8 @@ export function WritingEditor({
     <form action={action} className="writing-editor">
       <input type="hidden" name="sessionId" value={sessionId} />
       <div className="writing-editor-heading">
-        <label htmlFor="writing-draft">Your response</label>
-        <span>Write in German. You can revise freely before submitting.</span>
+        <label htmlFor="writing-draft">{t("writing.editor.response")}</label>
+        <span>{t("writing.editor.help")}</span>
       </div>
       <textarea
         id="writing-draft"
@@ -44,19 +47,30 @@ export function WritingEditor({
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         rows={18}
-        placeholder="Schreibe deinen Text auf Deutsch…"
+        placeholder={t("writing.editor.placeholder")}
         autoComplete="off"
         aria-describedby="writing-word-count"
+        lang="de"
+        dir="ltr"
       />
 
       <div className="writing-editor-footer">
-        <span id="writing-word-count" className={words < targetWords * 0.7 ? "is-under" : ""}>
-          {words} of about {targetWords} words
+        <span
+          id="writing-word-count"
+          className={words < targetWords * 0.7 ? "is-under" : ""}
+        >
+          {t("writing.editor.count", {
+            count: formatNumber(locale, words),
+            target: formatNumber(locale, targetWords),
+          })}
         </span>
 
-        <ActionButton pendingLabel="Evaluating writing…" disabled={words < 20}>
-          <Send size={17} />
-          Submit for evaluation
+        <ActionButton
+          pendingLabel={t("writing.editor.evaluating")}
+          disabled={words < 20}
+        >
+          <Send className="rtl-mirror" size={17} />
+          {t("writing.editor.submit")}
         </ActionButton>
       </div>
 

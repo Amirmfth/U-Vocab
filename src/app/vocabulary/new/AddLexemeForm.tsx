@@ -8,6 +8,8 @@ import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { parseWordList } from "@/lib/ingestion/word-list";
 import type { CandidateWithState } from "@/lib/ingestion/types";
 import { addVocabularyItem, analyzeVocabularyBatch, finishVocabularyImport, previewVocabularyText, type VocabularyPreviewState } from "./actions";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
 
 type RowStatus = { state: "loading" | "saved" | "error"; message?: string };
 type PreviewRow = { key: string; label: string; candidate?: CandidateWithState };
@@ -26,6 +28,7 @@ export function AddLexemeForm({ translationPreference }: {
   const fileRef = useRef<HTMLInputElement>(null);
   const csvWords = parseWordList(csvText);
   const textCandidates = preview.candidates ?? [];
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     setSelected(new Set((preview.candidates ?? []).filter((item) => !item.userVocabularyId).map((item) => `text:${item.key}`)));
@@ -76,7 +79,7 @@ export function AddLexemeForm({ translationPreference }: {
         } catch (error) {
           setRowStatus(key, {
             state: "error",
-            message: error instanceof Error ? error.message : "Could not add this word.",
+            message: error instanceof Error ? error.message : t("vocab.add.wordError"),
           });
           return null;
         }
@@ -94,7 +97,7 @@ export function AddLexemeForm({ translationPreference }: {
             try {
               analyzed = await analyzeVocabularyBatch(batch.map((job) => job.word));
             } catch {
-              analyzed = { status: "error", message: "Batch analysis failed." };
+              analyzed = { status: "error", message: t("vocab.add.batchError") };
             }
             const candidates = analyzed.status === "success"
               ? new Map(analyzed.results.map((result) => [result.index, result.candidate]))
@@ -133,7 +136,7 @@ export function AddLexemeForm({ translationPreference }: {
         }
       }
     })().catch((error) => {
-      setImportError(error instanceof Error ? error.message : "Could not finish the import. Saved words remain in your vocabulary.");
+      setImportError(error instanceof Error ? error.message : t("vocab.add.importError"));
     }).finally(() => setProcessing(false));
   }
 
@@ -144,36 +147,36 @@ export function AddLexemeForm({ translationPreference }: {
 
   return (
     <div className="import-workspace">
-      <div className="import-tabs" role="tablist" aria-label="Vocabulary input">
-        <button type="button" role="tab" aria-selected={tab === "text"} onClick={() => setTab("text")} disabled={processing}>Text</button>
-        <button type="button" role="tab" aria-selected={tab === "csv"} onClick={() => setTab("csv")} disabled={processing}>CSV</button>
+      <div className="import-tabs" role="tablist" aria-label={t("vocab.add.input")}>
+        <button type="button" role="tab" aria-selected={tab === "text"} onClick={() => setTab("text")} disabled={processing}>{t("vocab.add.text")}</button>
+        <button type="button" role="tab" aria-selected={tab === "csv"} onClick={() => setTab("csv")} disabled={processing}>{t("vocab.add.csv")}</button>
       </div>
 
       {tab === "text" ? (
         <form action={previewAction} className="form-panel">
           <div className="field">
-            <textarea id="text" name="text" placeholder="Paste a word, phrase, email, article, or transcript in German…" rows={8} autoComplete="off" required disabled={processing} />
+            <textarea id="text" name="text" placeholder={t("vocab.add.textPlaceholder")} lang="de" dir="ltr" rows={8} autoComplete="off" required disabled={processing} />
           </div>
           {preview.status === "error" ? <StatusNotice tone="error">{preview.message}</StatusNotice> : null}
-          <ActionButton pendingLabel="Analyzing text…" disabled={processing}><ScanText size={18} /> Analyze text</ActionButton>
+          <ActionButton pendingLabel={t("vocab.add.analyzing")} disabled={processing}><ScanText size={18} /> {t("vocab.add.analyze")}</ActionButton>
         </form>
       ) : (
         <div className="form-panel">
-          <textarea id="csv-words" value={csvText} onChange={(event) => updateCsv(event.target.value)} placeholder="Haus,gehen,sich erinnern,…" rows={6} disabled={processing} />
-          <input ref={fileRef} type="file" accept=".csv,text/csv,text/plain" className="import-file-input" aria-label="Upload CSV word list" onChange={async (event) => {
+          <textarea id="csv-words" value={csvText} onChange={(event) => updateCsv(event.target.value)} placeholder={t("vocab.add.csvPlaceholder")} lang="de" dir="ltr" rows={6} disabled={processing} />
+          <input ref={fileRef} type="file" accept=".csv,text/csv,text/plain" className="import-file-input" aria-label={t("vocab.add.uploadAria")} onChange={async (event) => {
             const file = event.target.files?.[0];
             if (file) updateCsv(await file.text());
             event.target.value = "";
           }} />
-          <button type="button" className="button button-secondary" onClick={() => fileRef.current?.click()} disabled={processing}><Upload size={17} /> Upload CSV file</button>
+          <button type="button" className="button button-secondary" onClick={() => fileRef.current?.click()} disabled={processing}><Upload size={17} /> {t("vocab.add.upload")}</button>
         </div>
       )}
 
       {rows.length > 0 ? (
         <section className="panel import-preview">
           <div className="import-preview-head">
-            <h2>{tab === "csv" ? `${rows.length} words` : preview.message}</h2>
-            <span className="muted">Select what to add</span>
+            <h2>{tab === "csv" ? t("vocab.add.words", { count: formatNumber(locale, rows.length) }) : preview.message}</h2>
+            <span className="muted">{t("vocab.add.select")}</span>
           </div>
           {importError ? <StatusNotice tone="error">{importError}</StatusNotice> : null}
           <div className="import-list">
@@ -181,25 +184,25 @@ export function AddLexemeForm({ translationPreference }: {
               const status = statuses[row.key];
               return (
                 <label className={`import-row${status?.state === "saved" ? " import-row--saved" : ""}`} key={row.key}>
-                  {status?.state === "loading" ? <LoaderCircle className="import-row-spinner" size={20} aria-label="Adding" />
-                    : status?.state === "saved" ? <Check className="import-row-check" size={20} aria-label="Added" />
+                  {status?.state === "loading" ? <LoaderCircle className="import-row-spinner" size={20} aria-label={t("vocab.add.adding")} />
+                    : status?.state === "saved" ? <Check className="import-row-check" size={20} aria-label={t("vocab.add.added")} />
                       : <input type="checkbox" checked={selected.has(row.key)} onChange={() => toggle(row.key)} disabled={processing} />}
                   <div className="import-row-copy">
                     <div className="word-meta">
-                      <strong>{row.label}</strong>
+                      <strong className="learning-content" lang="de" dir="ltr">{row.label}</strong>
                       {row.candidate ? (
                         <>
                           <span className="badge">{row.candidate.partOfSpeech}</span>
                           <span className="badge">{row.candidate.cefrLevel}</span>
-                          <span className="badge">{row.candidate.userVocabularyId ? "in vocabulary" : "new"}</span>
+                          <span className="badge">{row.candidate.userVocabularyId ? t("vocab.add.inVocabulary") : t("vocab.add.new")}</span>
                         </>
                       ) : null}
                     </div>
                     {row.candidate ? (
                       <>
-                        {translationPreference !== "PERSIAN" ? <span>{row.candidate.englishMeaning}</span> : null}
-                        {translationPreference !== "ENGLISH" ? <span className="rtl">{row.candidate.persianMeaning}</span> : null}
-                        {row.candidate.pattern ? <small>{row.candidate.pattern}</small> : null}
+                        {translationPreference !== "PERSIAN" ? <span className="learning-content" lang="en" dir="ltr">{row.candidate.englishMeaning}</span> : null}
+                        {translationPreference !== "ENGLISH" ? <span className="learning-content" lang="fa" dir="rtl">{row.candidate.persianMeaning}</span> : null}
+                        {row.candidate.pattern ? <small className="learning-content" lang="de" dir="ltr">{row.candidate.pattern}</small> : null}
                       </>
                     ) : null}
                     {status?.state === "error" ? <small className="optimistic-error">{status.message}</small> : null}
@@ -210,7 +213,11 @@ export function AddLexemeForm({ translationPreference }: {
           </div>
           <button className="button button-primary" type="button" onClick={addSelected} disabled={processing || remaining === 0}>
             {processing ? <LoaderCircle className="import-row-spinner" size={18} /> : <Check size={18} />}
-            {processing ? "Adding words…" : remaining ? `Add ${remaining} selected` : "All selected words added"}
+            {processing
+              ? t("vocab.add.addingWords")
+              : remaining
+                ? t("vocab.add.addSelected", { count: formatNumber(locale, remaining) })
+                : t("vocab.add.allAdded")}
           </button>
         </section>
       ) : null}

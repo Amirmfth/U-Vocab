@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, RotateCcw } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
+import { useTranslations } from "@/i18n/client";
 import {
   completeConversationAction,
   replayConversationAction,
@@ -16,6 +17,7 @@ const initialState: ConversationActionState = { status: "idle" };
 
 export function ConversationFinish({ sessionId }: { sessionId: string }) {
   const router = useRouter();
+  const t = useTranslations();
   const [state, action] = useActionState(
     completeConversationAction,
     initialState,
@@ -29,9 +31,9 @@ export function ConversationFinish({ sessionId }: { sessionId: string }) {
     <div className="conversation-finish">
       <form action={action}>
         <input type="hidden" name="sessionId" value={sessionId} />
-        <ActionButton pendingLabel="Evaluating session…">
+        <ActionButton pendingLabel={t("conversation.evaluating")}>
           <CheckCircle2 size={17} />
-          Finish & evaluate
+          {t("conversation.finish")}
         </ActionButton>
       </form>
       {state.status === "error" ? (
@@ -49,6 +51,7 @@ export function ConversationReplay({
   kind: "PRACTICE" | "MISSION";
 }) {
   const router = useRouter();
+  const t = useTranslations();
   const [state, action] = useActionState(
     replayConversationAction,
     initialState,
@@ -64,16 +67,13 @@ export function ConversationReplay({
     <div className="conversation-replay">
       <form action={action}>
         <input type="hidden" name="sessionId" value={sessionId} />
-        <ActionButton variant="secondary" pendingLabel="Preparing replay…">
+        <ActionButton variant="secondary" pendingLabel={t("conversation.preparingReplay")}>
           <RotateCcw size={17} />
-          Replay
+          {t("conversation.replay")}
         </ActionButton>
       </form>
-      <Link
-        href="/conversation"
-        className="button button-primary"
-      >
-        New {kind === "MISSION" ? "mission" : "conversation"}
+      <Link href="/conversation" className="button button-primary">
+        {kind === "MISSION" ? t("conversation.newMission") : t("conversation.newConversation")}
       </Link>
       {state.status === "error" ? (
         <StatusNotice tone="error">{state.message}</StatusNotice>

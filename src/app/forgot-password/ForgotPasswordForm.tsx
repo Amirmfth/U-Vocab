@@ -4,11 +4,13 @@ import { FormEvent, useState } from "react";
 import { KeyRound } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { StatusNotice } from "@/components/status-notice";
+import { useTranslations } from "@/i18n/client";
 
 export function ForgotPasswordForm({ returnTo }: { returnTo: string }) {
   const [pending, setPending] = useState(false);
   const [complete, setComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,12 +29,12 @@ export function ForgotPasswordForm({ returnTo }: { returnTo: string }) {
         redirectTo,
       });
       if (result.error) {
-        setError(result.error.message || "Could not request a password reset.");
+        setError(result.error.message || t("auth.resetRequestError"));
       } else {
         setComplete(true);
       }
     } catch {
-      setError("Could not request a password reset.");
+      setError(t("auth.resetRequestError"));
     } finally {
       setPending(false);
     }
@@ -44,22 +46,18 @@ export function ForgotPasswordForm({ returnTo }: { returnTo: string }) {
         <KeyRound size={22} />
       </div>
       <div>
-        <p className="eyebrow">PASSWORD RESET</p>
-        <h1>Reset your password</h1>
-        <p className="muted">
-          Enter your account email. We will send a reset link if an account can use password reset.
-        </p>
+        <p className="eyebrow">{t("auth.passwordResetEyebrow")}</p>
+        <h1>{t("auth.forgotTitle")}</h1>
+        <p className="muted">{t("auth.forgotLongHelp")}</p>
       </div>
 
       <label className="field">
-        <span>Email</span>
+        <span>{t("auth.email")}</span>
         <input name="email" type="email" autoComplete="email" required />
       </label>
 
       {complete ? (
-        <StatusNotice tone="success">
-          If the account exists, a password reset email has been sent.
-        </StatusNotice>
+        <StatusNotice tone="success">{t("auth.resetSent")}</StatusNotice>
       ) : null}
       {error ? <StatusNotice tone="error">{error}</StatusNotice> : null}
 
@@ -68,7 +66,11 @@ export function ForgotPasswordForm({ returnTo }: { returnTo: string }) {
         type="submit"
         disabled={pending || complete}
       >
-        {pending ? "Sending…" : complete ? "Email sent" : "Send reset link"}
+        {pending
+          ? t("auth.sendingReset")
+          : complete
+            ? t("auth.emailSent")
+            : t("auth.sendReset")}
       </button>
     </form>
   );

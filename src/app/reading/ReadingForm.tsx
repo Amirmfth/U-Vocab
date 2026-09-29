@@ -7,6 +7,8 @@ import { BookOpenText, Plus, Search, X } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
 import { ActivitySelect } from "@/components/ui/activity-select";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
 import {
   createGeneratedReading,
   type ReadingCreateState,
@@ -16,11 +18,17 @@ const initialState: ReadingCreateState = { status: "idle" };
 
 function ReadingGenerationPreview({ navigating }: { navigating: boolean }) {
   const { pending } = useFormStatus();
+  const t = useI18n().t;
   if (!pending && !navigating) return null;
 
   return (
-    <div className="reading-generation-preview" role="status" aria-live="polite" aria-label="Generating reading">
-      <strong>{pending ? "Generating your reading…" : "Opening your reading…"}</strong>
+    <div
+      className="reading-generation-preview"
+      role="status"
+      aria-live="polite"
+      aria-label={t("reading.generatingLabel")}
+    >
+      <strong>{pending ? t("reading.generating") : t("reading.opening")}</strong>
       <div className="skeleton loading-generated-title" aria-hidden="true" />
       <div className="loading-generated-paragraphs" aria-hidden="true">
         <div className="skeleton" /><div className="skeleton" /><div className="skeleton" />
@@ -36,21 +44,26 @@ type GrammarOption = { id: string; title: string; level: string; status: string 
 export function ReadingForm({
   currentLevel,
   targetLevel,
+  targetLanguage,
   targets,
   grammarOptions,
 }: {
   currentLevel: string;
   targetLevel: string;
+  targetLanguage: "de" | "fr" | "en";
   targets: TargetOption[];
   grammarOptions: GrammarOption[];
 }) {
   const router = useRouter();
   const [state, action] = useActionState(createGeneratedReading, initialState);
+  const { locale, t } = useI18n();
+
   useEffect(() => {
     if (state.status === "success" && state.readingId) {
       router.push(`/reading/${state.readingId}`);
     }
   }, [router, state]);
+
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedTargets = useMemo(
@@ -73,26 +86,26 @@ export function ReadingForm({
     <form action={action} className="panel story-form reading-generation-form">
       <div className="form-grid story-settings-grid">
         <div className="field">
-          <label htmlFor="reading-length-trigger">Length</label>
+          <label htmlFor="reading-length-trigger">{t("reading.length")}</label>
           <ActivitySelect
             defaultValue="MEDIUM"
             id="reading-length"
             name="length"
             options={[
-              { label: "Short · 5 target words", value: "SHORT" },
-              { label: "Medium · 10 target words", value: "MEDIUM" },
-              { label: "Long · 15 target words", value: "LONG" },
+              { label: t("reading.short"), value: "SHORT" },
+              { label: t("reading.medium"), value: "MEDIUM" },
+              { label: t("reading.long"), value: "LONG" },
             ]}
           />
         </div>
         <div className="field">
-          <label htmlFor="grammar-focus-trigger">Grammar focus</label>
+          <label htmlFor="grammar-focus-trigger">{t("reading.grammarFocus")}</label>
           <ActivitySelect
             defaultValue=""
             id="grammar-focus"
             name="grammarFocusId"
             options={[
-              { label: "Recommended automatically", value: "" },
+              { label: t("reading.recommendedAutomatically"), value: "" },
               ...grammarOptions.map((option) => ({
                 label: `${option.title} · ${option.level} · ${option.status.toLowerCase().replaceAll("_", " ")}`,
                 value: option.id,
@@ -104,12 +117,13 @@ export function ReadingForm({
 
       <div className="field">
         <label htmlFor="reading-topic">
-          Topic <span className="muted">(optional)</span>
+          {t("reading.topic")} <span className="muted">({t("reading.optional")})</span>
         </label>
         <input
           id="reading-topic"
           name="topic"
-          placeholder="Work, travel, daily life, culture…"
+          placeholder={t("reading.topicPlaceholder")}
+          dir="auto"
         />
       </div>
 
@@ -117,17 +131,15 @@ export function ReadingForm({
         <label className="reading-stretch-option">
           <input type="checkbox" name="stretch" />
           <span>
-            <strong>Stretch toward {targetLevel}</strong>
-            <small>
-              Default difficulty is your current level ({currentLevel}).
-            </small>
+            <strong>{t("reading.stretch", { level: targetLevel })}</strong>
+            <small>{t("reading.stretchHelp", { level: currentLevel })}</small>
           </span>
         </label>
       ) : null}
 
       <fieldset className="target-picker story-target-picker">
         <legend>
-          Vocabulary focus <span className="muted">· optional</span>
+          {t("reading.vocabFocus")} <span className="muted">· {t("reading.optional")}</span>
         </legend>
         {selectedIds.map((id) => (
           <input key={id} type="hidden" name="targetIds" value={id} />
@@ -136,10 +148,11 @@ export function ReadingForm({
         <div className="story-word-search">
           <Search size={18} aria-hidden="true" />
           <input
-            aria-label="Search your vocabulary"
+            aria-label={t("reading.searchVocabulary")}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Add words you want to meet in context…"
+            placeholder={t("reading.searchPlaceholder")}
+            dir="auto"
           />
         </div>
 
@@ -162,11 +175,13 @@ export function ReadingForm({
                   }
                 >
                   <span>
-                    <strong>{target.label}</strong>
+                    <strong className="learning-content" lang={targetLanguage} dir="ltr">
+                      {target.label}
+                    </strong>
                     <small>{target.state.toLowerCase()}</small>
                   </span>
                   <span className="story-result-action">
-                    {selected ? "Added" : <><Plus size={15} /> Add</>}
+                    {selected ? t("reading.added") : <><Plus size={15} /> {t("reading.add")}</>}
                   </span>
                 </button>
               );
@@ -178,10 +193,12 @@ export function ReadingForm({
           <div className="story-selected-targets">
             {selectedTargets.map((target) => (
               <span className="story-selected-target" key={target.lexemeId}>
-                {target.label}
+                <span className="learning-content" lang={targetLanguage} dir="ltr">
+                  {target.label}
+                </span>
                 <button
                   type="button"
-                  aria-label={`Remove ${target.label}`}
+                  aria-label={t("reading.remove", { word: target.label })}
                   onClick={() =>
                     setSelectedIds((current) =>
                       current.filter((id) => id !== target.lexemeId),
@@ -194,21 +211,24 @@ export function ReadingForm({
             ))}
           </div>
         ) : (
-          <p className="story-picker-hint">
-            Leave empty to let U-Vocab choose useful weak vocabulary.
-          </p>
+          <p className="story-picker-hint">{t("reading.autoTargets")}</p>
         )}
       </fieldset>
 
       {state.status === "error" ? (
         <StatusNotice tone="error">{state.message}</StatusNotice>
       ) : null}
-      <ReadingGenerationPreview navigating={state.status === "success" && Boolean(state.readingId)} />
 
-      <ActionButton pendingLabel="Generating reading…">
+      <ReadingGenerationPreview
+        navigating={state.status === "success" && Boolean(state.readingId)}
+      />
+
+      <ActionButton pendingLabel={t("reading.generatingShort")}>
         <BookOpenText size={18} />
-        Generate reading
+        {t("reading.generate")}
       </ActionButton>
+
+      <span className="sr-only">{formatNumber(locale, selectedIds.length)}</span>
     </form>
   );
 }

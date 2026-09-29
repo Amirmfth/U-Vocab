@@ -2,6 +2,7 @@
 
 import { ChevronUp } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { useTranslations } from "@/i18n/client";
 
 export type ActivitySelectOption = {
   label: string;
@@ -31,6 +32,7 @@ export function ActivitySelect({
   const rootRef = useRef<HTMLDivElement>(null);
   const listboxId = useId();
   const selected = options.find((option) => option.value === value) ?? options[0];
+  const t = useTranslations();
 
   useEffect(() => {
     function closeOnOutsidePointer(event: PointerEvent) {
@@ -73,7 +75,7 @@ export function ActivitySelect({
 
       <div className={isOpen ? "activity-select-menu is-open" : "activity-select-menu"}>
         <div className="activity-select-menu-inner">
-          <div aria-label="Options" id={listboxId} role="listbox">
+          <div aria-label={t("common.options")} id={listboxId} role="listbox">
             {options.map((option) => {
               const isSelected = option.value === selected.value;
               return (
@@ -93,7 +95,7 @@ export function ActivitySelect({
                     <span>{option.label}</span>
                     {option.description ? <small>{option.description}</small> : null}
                   </span>
-                  {isSelected ? <span className="activity-select-check">Selected</span> : null}
+                  {isSelected ? <span className="activity-select-check">{t("common.selected")}</span> : null}
                 </button>
               );
             })}

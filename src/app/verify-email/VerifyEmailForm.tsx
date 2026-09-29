@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { MailCheck } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { StatusNotice } from "@/components/status-notice";
+import { useTranslations } from "@/i18n/client";
 
 export function VerifyEmailForm({
   email: initialEmail,
@@ -18,6 +19,7 @@ export function VerifyEmailForm({
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(Boolean(initialEmail) && !invalidToken);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations();
 
   async function resend(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,12 +33,12 @@ export function VerifyEmailForm({
         callbackURL: returnTo,
       });
       if (result.error) {
-        setError(result.error.message || "Could not send the verification email.");
+        setError(result.error.message || t("auth.sendVerificationError"));
       } else {
         setSent(true);
       }
     } catch {
-      setError("Could not send the verification email.");
+      setError(t("auth.sendVerificationError"));
     } finally {
       setPending(false);
     }
@@ -48,26 +50,20 @@ export function VerifyEmailForm({
         <MailCheck size={22} />
       </div>
       <div>
-        <p className="eyebrow">VERIFY EMAIL</p>
-        <h1>Check your inbox</h1>
-        <p className="muted">
-          Open the U-Vocab verification link before signing in. Verification links expire after 24 hours.
-        </p>
+        <p className="eyebrow">{t("auth.verifyEyebrow")}</p>
+        <h1>{t("auth.checkInbox")}</h1>
+        <p className="muted">{t("auth.verifyLongHelp")}</p>
       </div>
 
       {invalidToken ? (
-        <StatusNotice tone="error">
-          That verification link is invalid or expired. Request a new one below.
-        </StatusNotice>
+        <StatusNotice tone="error">{t("auth.invalidVerification")}</StatusNotice>
       ) : null}
       {sent && !invalidToken ? (
-        <StatusNotice tone="success">
-          If the address can receive U-Vocab mail, a verification link has been sent.
-        </StatusNotice>
+        <StatusNotice tone="success">{t("auth.sentVerificationSafe")}</StatusNotice>
       ) : null}
 
       <label className="field">
-        <span>Email</span>
+        <span>{t("auth.email")}</span>
         <input
           type="email"
           required
@@ -79,7 +75,7 @@ export function VerifyEmailForm({
 
       {error ? <StatusNotice tone="error">{error}</StatusNotice> : null}
       <button className="button button-secondary" type="submit" disabled={pending}>
-        {pending ? "Sending…" : "Resend verification email"}
+        {pending ? t("auth.resending") : t("auth.resendVerification")}
       </button>
     </form>
   );

@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { RefreshCcw, Sparkles, X } from "lucide-react";
 import { generateGrammarQuickTeachAction } from "../actions";
+import { useTranslations } from "@/i18n/client";
 
 export function TeachGrammarSheet({
   grammarConceptId,
@@ -26,6 +27,7 @@ export function TeachGrammarSheet({
   const closeRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const t = useTranslations();
 
   const close = useCallback(() => {
     requestId.current += 1;
@@ -101,7 +103,7 @@ export function TeachGrammarSheet({
       setError(
         cause instanceof Error
           ? cause.message
-          : "Could not generate another explanation.",
+          : t("grammar.teach.error"),
       );
     } finally {
       if (requestId.current === id) setLoading(false);
@@ -120,7 +122,7 @@ export function TeachGrammarSheet({
         }}
       >
         <Sparkles size={18} />
-        Teach me more
+        {t("grammar.teach.button")}
       </button>
 
       <AnimatePresence onExitComplete={() => triggerRef.current?.focus()}>
@@ -135,7 +137,7 @@ export function TeachGrammarSheet({
             <button
               className="teach-sheet-backdrop"
               type="button"
-              aria-label="Close grammar explanation"
+              aria-label={t("grammar.teach.close")}
               onClick={close}
             />
             <motion.section
@@ -156,20 +158,20 @@ export function TeachGrammarSheet({
               <div className="teach-sheet-handle" aria-hidden="true" />
               <header className="teach-sheet-header">
                 <div>
-                  <p className="eyebrow">ANOTHER WAY TO LEARN IT</p>
-                  <h2 id="grammar-teach-sheet-title" dir="ltr">
+                  <p className="eyebrow">{t("grammar.teach.eyebrow")}</p>
+                  <h2 id="grammar-teach-sheet-title" className="learning-content" lang="en" dir="ltr">
                     {label}
                   </h2>
                   {angle ? (
                     <small className="muted">
-                      Approach: {angle.replaceAll("-", " ")}
+                      {t("grammar.teach.approach", { angle: angle.replaceAll("-", " ") })}
                     </small>
                   ) : null}
                 </div>
                 <button
                   className="icon-button"
                   type="button"
-                  aria-label="Close grammar explanation"
+                  aria-label={t("grammar.teach.close")}
                   ref={closeRef}
                   onClick={close}
                 >
@@ -180,7 +182,7 @@ export function TeachGrammarSheet({
               <div className="teach-sheet-content" aria-live="polite">
                 {loading ? (
                   <p className="muted" role="status">
-                    Finding a different way to explain this grammar…
+                    {t("grammar.teach.loading")}
                   </p>
                 ) : null}
                 {error ? (
@@ -211,7 +213,7 @@ export function TeachGrammarSheet({
                   onClick={() => void generate(angle)}
                 >
                   <RefreshCcw size={17} />
-                  Explain differently
+                  {t("grammar.teach.different")}
                 </button>
               </div>
             </motion.section>

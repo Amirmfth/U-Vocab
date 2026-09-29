@@ -1,0 +1,54 @@
+@font-face {
+  font-family: "IRANYekan";
+  src: url("/fonts/iranyekan/iranyekan-regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IRANYekan";
+  src: url("/fonts/iranyekan/iranyekan-medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IRANYekan";
+  src: url("/fonts/iranyekan/iranyekan-bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IRANYekan";
+  src: url("/fonts/iranyekan/iranyekan-extrabold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+
+:root {
+  --font-ui-ltr: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-ui-rtl: "IRANYekan", Tahoma, Arial, sans-serif;
+  --font-ui: var(--font-ui-ltr);
+}
+
+html[dir="rtl"] {
+  --font-ui: var(--font-ui-rtl);
+}
+
+body {
+  font-family: var(--font-ui);
+}
+
+.learning-content {
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
+html[dir="rtl"] .rtl-mirror {
+  transform: scaleX(-1);
+}

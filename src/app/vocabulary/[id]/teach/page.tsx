@@ -8,9 +8,20 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { buildExercise } from "@/lib/exercises/build";
+import { getServerTranslator } from "@/i18n/server";
+import type { MessageKey } from "@/i18n/core";
 import { PracticeForm } from "@/app/practice/PracticeForm";
 import { ScheduleReviewForm } from "./ScheduleReviewForm";
 
+const relationKeys: Record<string, MessageKey> = {
+  WORD_FAMILY: "word.relation.word_family",
+  SYNONYM: "word.relation.synonym",
+  ANTONYM: "word.relation.antonym",
+  DERIVED: "word.relation.derived",
+  RELATED: "word.relation.related",
+  COLLOCATION: "word.relation.collocation",
+  PHRASE: "word.relation.phrase",
+};
 
 export default async function TeachWordPage({
   params,
@@ -18,7 +29,12 @@ export default async function TeachWordPage({
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
+  const [{ id }, user, course] = await Promise.all([
+    params,
+    getCurrentUser(),
+    getCurrentCourse(),
+  ]);
+  const { t } = await getServerTranslator(user);
 
   const word = await db.lexeme.findFirst({
     where: {
@@ -57,22 +73,24 @@ export default async function TeachWordPage({
     <main className="page">
       <section className="page-header compact">
         <Link href={"/vocabulary/" + word.id} className="back-link">
-          <ArrowLeft size={16} />
-          Back to word
+          <ArrowLeft className="rtl-mirror" size={16} />
+          {t("word.lesson.back")}
         </Link>
-        <p className="eyebrow">GUIDED WORD LESSON · {course.targetLevel}</p>
-        <h1>{formatLexemeLabel(word)}</h1>
-        <p className="page-description">
-          Understand the lexical unit, see how it behaves, then produce it yourself.
+        <p className="eyebrow">
+          {t("word.lesson.eyebrow", { level: course.targetLevel })}
         </p>
+        <h1 className="learning-content" lang="de" dir="ltr">
+          {formatLexemeLabel(word)}
+        </h1>
+        <p className="page-description">{t("word.lesson.description")}</p>
       </section>
 
       <section className="lesson-grid">
         <article className="panel lesson-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">1 · MEANING</p>
-              <h2>What it means</h2>
+              <p className="eyebrow">{t("word.lesson.meaningStep")}</p>
+              <h2>{t("word.lesson.meaningTitle")}</h2>
             </div>
             <BookOpenCheck size={20} />
           </div>
@@ -80,19 +98,20 @@ export default async function TeachWordPage({
           {visibleTranslations.map((translation) => (
             <p
               key={translation.id}
-              className={translation.language === "fa" ? "rtl lesson-meaning" : "lesson-meaning"}
+              className="lesson-meaning learning-content"
+              lang={translation.language === "fa" ? "fa" : "en"}
+              dir={translation.language === "fa" ? "rtl" : "ltr"}
             >
               {translation.text}
             </p>
           ))}
-
         </article>
 
         <article className="panel lesson-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">2 · PATTERN</p>
-              <h2>How it behaves</h2>
+              <p className="eyebrow">{t("word.lesson.patternStep")}</p>
+              <h2>{t("word.lesson.patternTitle")}</h2>
             </div>
             <Brain size={20} />
           </div>
@@ -100,21 +119,26 @@ export default async function TeachWordPage({
           {word.patterns.length ? (
             word.patterns.map((pattern) => (
               <div className="lesson-pattern" key={pattern.id}>
-                <strong>{pattern.pattern}</strong>
-                {pattern.explanation ? <p className="muted">{pattern.explanation}</p> : null}
+                <strong className="learning-content" lang="de" dir="ltr">
+                  {pattern.pattern}
+                </strong>
+                {pattern.explanation ? (
+                  <p className="muted learning-content" lang="en" dir="ltr">
+                    {pattern.explanation}
+                  </p>
+                ) : null}
               </div>
             ))
           ) : (
-            <p className="muted">No structured grammar pattern is stored yet.</p>
+            <p className="muted">{t("word.lesson.noPattern")}</p>
           )}
-
         </article>
 
         <article className="panel lesson-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">3 · CONTEXT</p>
-              <h2>See it in use</h2>
+              <p className="eyebrow">{t("word.lesson.contextStep")}</p>
+              <h2>{t("word.lesson.contextTitle")}</h2>
             </div>
             <BookOpenCheck size={20} />
           </div>
@@ -122,12 +146,18 @@ export default async function TeachWordPage({
           <div className="lesson-examples">
             {word.examples.slice(0, 4).map((example) => (
               <div className="lesson-example" key={example.id}>
-                <strong>{example.german}</strong>
+                <strong className="learning-content" lang="de" dir="ltr">
+                  {example.german}
+                </strong>
                 {course.explanationLanguage !== "PERSIAN" && example.english ? (
-                  <span>{example.english}</span>
+                  <span className="learning-content" lang="en" dir="ltr">
+                    {example.english}
+                  </span>
                 ) : null}
                 {course.explanationLanguage !== "ENGLISH" && example.persian ? (
-                  <span className="rtl">{example.persian}</span>
+                  <span className="learning-content" lang="fa" dir="rtl">
+                    {example.persian}
+                  </span>
                 ) : null}
               </div>
             ))}
@@ -137,8 +167,8 @@ export default async function TeachWordPage({
         <article className="panel lesson-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">4 · CONNECTIONS</p>
-              <h2>Related vocabulary</h2>
+              <p className="eyebrow">{t("word.lesson.connectionsStep")}</p>
+              <h2>{t("word.lesson.connectionsTitle")}</h2>
             </div>
             <Network size={20} />
           </div>
@@ -151,13 +181,19 @@ export default async function TeachWordPage({
                   href={"/vocabulary/" + relation.target.id}
                   className="relation-chip"
                 >
-                  <span>{relation.target.lemma}</span>
-                  <small>{relation.type.replaceAll("_", " ")}</small>
+                  <span className="learning-content" lang="de" dir="ltr">
+                    {relation.target.lemma}
+                  </span>
+                  <small>
+                    {relationKeys[relation.type]
+                      ? t(relationKeys[relation.type])
+                      : relation.type.replaceAll("_", " ").toLowerCase()}
+                  </small>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="muted">Related vocabulary will appear here when available.</p>
+            <p className="muted">{t("word.lesson.noConnections")}</p>
           )}
         </article>
       </section>
@@ -165,26 +201,28 @@ export default async function TeachWordPage({
       <section className="lesson-production">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">5 · PRODUCE</p>
-            <h2>Make it active vocabulary</h2>
+            <p className="eyebrow">{t("word.lesson.produceStep")}</p>
+            <h2>{t("word.lesson.produceTitle")}</h2>
           </div>
           <Brain size={20} />
         </div>
-        <PracticeForm exercises={[{
-          id: `${item.id}:production`,
-          userVocabularyId: item.id,
-          lemma: word.lemma,
-          exercise: productionExercise,
-        }]} />
+        <PracticeForm
+          exercises={[
+            {
+              id: `${item.id}:production`,
+              userVocabularyId: item.id,
+              lemma: word.lemma,
+              exercise: productionExercise,
+            },
+          ]}
+        />
       </section>
 
       <section className="panel lesson-footer-actions">
         <div>
-          <p className="eyebrow">6 · RETAIN</p>
-          <h2>Bring it back later</h2>
-          <p className="muted">
-            Add this lexical unit to the due queue. FSRS will take over after the next review.
-          </p>
+          <p className="eyebrow">{t("word.lesson.retainStep")}</p>
+          <h2>{t("word.lesson.retainTitle")}</h2>
+          <p className="muted">{t("word.lesson.retainHelp")}</p>
         </div>
         <ScheduleReviewForm lexemeId={word.id} />
       </section>

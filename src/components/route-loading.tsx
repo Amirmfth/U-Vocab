@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "@/i18n/client";
+
 type LoadingVariant =
   | "home"
   | "words"
@@ -55,9 +59,11 @@ export function RouteLoading({
 }: {
   variant?: LoadingVariant;
 }) {
+  const t = useTranslations();
+  const loading = (surface: string) => t("loading.surface", { surface });
   if (variant === "home") {
     return (
-      <main className="page core-loading" aria-busy="true" aria-label="Loading Home">
+      <main className="page core-loading" aria-busy="true" aria-label={loading(t("nav.home"))}>
         <section className="home-focus loading-home-hero">
           <div className="skeleton skeleton-kicker" />
           <div className="skeleton loading-hero-title" />
@@ -79,7 +85,7 @@ export function RouteLoading({
 
   if (variant === "words") {
     return (
-      <main className="page core-loading vocabulary-page" aria-busy="true" aria-label="Loading Vocabulary">
+      <main className="page core-loading vocabulary-page" aria-busy="true" aria-label={loading(t("vocab.title"))}>
         <section className="page-header compact library-header" aria-hidden="true">
           <div className="skeleton loading-vocabulary-title" />
           <div className="skeleton loading-add-word" />
@@ -112,7 +118,7 @@ export function RouteLoading({
 
   if (variant === "word") {
     return (
-      <main className="page core-loading word-detail-page" aria-busy="true" aria-label="Loading word">
+      <main className="page core-loading word-detail-page" aria-busy="true" aria-label={loading(t("loading.word"))}>
         <section className="page-header word-identity-hero" aria-hidden="true">
           <div className="word-detail-topline">
             <div className="loading-word-badges">
@@ -144,7 +150,7 @@ export function RouteLoading({
 
   if (variant === "review") {
     return (
-      <main className="page core-loading review-landing review-page" aria-busy="true" aria-label="Loading Review">
+      <main className="page core-loading review-landing review-page" aria-busy="true" aria-label={loading(t("nav.review"))}>
         <section className="review-hero">
           <div className="skeleton-stack">
             <div className="skeleton loading-hero-title" />
@@ -167,7 +173,7 @@ export function RouteLoading({
 
   if (variant === "practice") {
     return (
-      <main className="page core-loading practice-hub" aria-busy="true" aria-label="Loading Practice">
+      <main className="page core-loading practice-hub" aria-busy="true" aria-label={loading(t("nav.practice"))}>
         <section className="practice-lanes" aria-hidden="true">
           {Array.from({ length: 5 }, (_, index) => (
             <div className={"practice-lane loading-mode-card" + (index === 0 ? " practice-lane-grammar" : "")} key={index}>
@@ -182,11 +188,11 @@ export function RouteLoading({
 
   if (variant === "writing") {
     return (
-      <main className="page core-loading writing-hub" aria-busy="true" aria-label="Loading Writing">
+      <main className="page core-loading writing-hub" aria-busy="true" aria-label={loading(t("nav.writing"))}>
         <section className="page-header compact practice-workbench-header" aria-hidden="true"><div className="skeleton loading-hub-title" /></section>
         <section className="panel writing-start-form loading-hub-form" aria-hidden="true">
-          <div className="writing-settings-row"><LoadingField name="Mode" /><LoadingField name="Level" /></div>
-          <div className="writing-settings-row"><LoadingField name="Writing type" /><LoadingField name="Target length" /></div>
+          <div className="writing-settings-row"><LoadingField name={t("writing.mode")} /><LoadingField name={t("writing.level")} /></div>
+          <div className="writing-settings-row"><LoadingField name={t("writing.type")} /><LoadingField name={t("writing.targetLength")} /></div>
           <div className="field writing-topic-field loading-field-group"><div className="skeleton loading-setting-label" /><div className="skeleton loading-setting-control" /></div>
           <div className="skeleton loading-form-submit" />
         </section>
@@ -197,11 +203,11 @@ export function RouteLoading({
 
   if (variant === "reading") {
     return (
-      <main className="page core-loading reading-hub generated-reading-hub" aria-busy="true" aria-label="Loading Reading">
+      <main className="page core-loading reading-hub generated-reading-hub" aria-busy="true" aria-label={loading(t("nav.reading"))}>
         <section className="page-header compact practice-workbench-header" aria-hidden="true"><div className="skeleton loading-hub-title wide" /></section>
         <section className="panel story-form reading-generation-form loading-hub-form" aria-hidden="true">
-          <div className="form-grid story-settings-grid"><LoadingField name="Length" /><LoadingField name="Grammar focus" /></div>
-          <LoadingField name="Topic" />
+          <div className="form-grid story-settings-grid"><LoadingField name={t("reading.length")} /><LoadingField name={t("reading.grammarFocus")} /></div>
+          <LoadingField name={t("reading.topic")} />
           <fieldset className="target-picker story-target-picker loading-target-picker">
             <legend><span className="skeleton loading-setting-label" /></legend>
             <div className="story-word-search skeleton loading-setting-control" />
@@ -216,14 +222,14 @@ export function RouteLoading({
 
   if (variant === "speaking") {
     return (
-      <main className="page core-loading" aria-busy="true" aria-label="Loading Speaking">
+      <main className="page core-loading" aria-busy="true" aria-label={loading(t("practice.speaking"))}>
         <section className="page-header compact" aria-hidden="true"><div className="skeleton loading-hub-title" /></section>
         <section className="panel conversation-start-form loading-hub-form" aria-hidden="true">
-          <LoadingField name="Mode" />
-          <LoadingField name="Situation or topic" />
-          <LoadingField name="Target lexical units" />
-          <LoadingField name="Conversation tone" />
-          <LoadingField name="Formality" />
+          <LoadingField name={t("writing.mode")} />
+          <LoadingField name={t("conversation.topic")} />
+          <LoadingField name={t("conversation.targets")} />
+          <LoadingField name={t("conversation.tone")} />
+          <LoadingField name={t("conversation.formality")} />
           <div className="skeleton loading-form-submit" />
         </section>
         <LoadingCollection />
@@ -233,7 +239,7 @@ export function RouteLoading({
 
   if (variant === "reading-detail") {
     return (
-      <main className="page core-loading generated-reading-page" aria-busy="true" aria-label="Loading reading">
+      <main className="page core-loading generated-reading-page" aria-busy="true" aria-label={loading(t("loading.readingDetail"))}>
         <section className="page-header compact reading-document-header" aria-hidden="true">
           <div className="skeleton loading-back-link" />
           <div className="loading-meta-badges"><div className="skeleton" /><div className="skeleton" /></div>
@@ -276,7 +282,7 @@ export function RouteLoading({
 
   if (variant === "conversation") {
     return (
-      <main className="page core-loading conversation-page" aria-busy="true" aria-label="Loading speaking session">
+      <main className="page core-loading conversation-page" aria-busy="true" aria-label={loading(t("loading.speakingSession"))}>
         <section className="page-header compact" aria-hidden="true">
           <div className="skeleton loading-back-link" />
           <div className="word-meta loading-meta-badges">{Array.from({ length: 5 }, (_, index) => <div className="skeleton" key={index} />)}</div>
@@ -301,7 +307,7 @@ export function RouteLoading({
 
   if (variant === "writing-session") {
     return (
-      <main className="page core-loading writing-session-page" aria-busy="true" aria-label="Loading writing task">
+      <main className="page core-loading writing-session-page" aria-busy="true" aria-label={loading(t("loading.writingTask"))}>
         <section className="page-header compact writing-session-header" aria-hidden="true">
           <div className="skeleton loading-back-link" />
           <div className="word-meta loading-meta-badges">{Array.from({ length: 3 }, (_, index) => <div className="skeleton" key={index} />)}</div>
@@ -318,7 +324,7 @@ export function RouteLoading({
   }
 
   return (
-    <main className="page core-loading" aria-busy="true" aria-label="Loading">
+    <main className="page core-loading" aria-busy="true" aria-label={t("common.loading")}>
       <HeaderSkeleton />
       <section className="stats-grid">
         <div className="skeleton skeleton-card" />

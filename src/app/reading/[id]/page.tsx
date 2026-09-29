@@ -6,6 +6,9 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { isTranslationVisible } from "@/lib/translations";
+import { getServerTranslator } from "@/i18n/server";
+import { formatPercent } from "@/i18n/format";
+import type { MessageKey } from "@/i18n/core";
 import { ReadingAssessment } from "./ReadingAssessment";
 import { ReadingText } from "./ReadingText";
 
@@ -18,13 +21,24 @@ type ReadingQuestion = {
   grammarConceptId: string | null;
 };
 
+const lengthKeys: Record<string, MessageKey> = {
+  SHORT: "reading.length.short",
+  MEDIUM: "reading.length.medium",
+  LONG: "reading.length.long",
+};
+
 export default async function ReadingDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   await connection();
-  const [{ id }, user, course] = await Promise.all([params, getCurrentUser(), getCurrentCourse()]);
+  const [{ id }, user, course] = await Promise.all([
+    params,
+    getCurrentUser(),
+    getCurrentCourse(),
+  ]);
+  const { locale, t } = await getServerTranslator(user);
   const reading = await db.story.findFirst({
     where: { id, userId: user.id, userCourseId: course.id },
     include: {
@@ -50,21 +64,30 @@ export default async function ReadingDetailPage({
     <main className="page generated-reading-page">
       <section className="page-header compact reading-document-header">
         <Link href="/reading" className="back-link">
-          <ArrowLeft size={16} />
-          Reading
+          <ArrowLeft className="rtl-mirror" size={16} />
+          {t("reading.detail.back")}
         </Link>
         <div className="word-meta">
           <span className="badge">{reading.level}</span>
-          <span className="badge">{reading.length.toLowerCase()}</span>
+          <span className="badge">
+            {t(lengthKeys[reading.length] ?? "reading.length.medium")}
+          </span>
           {reading.completedAt ? (
             <span className="badge">
-              {Math.round((reading.comprehensionScore ?? 0) * 100)}% comprehension
+              {t("reading.comprehension", { percent: formatPercent(
+                  locale,
+                  reading.comprehensionScore ?? 0,
+                ) })}
             </span>
           ) : null}
         </div>
-        <h1>{reading.title}</h1>
+        <h1 className="learning-content" lang="de" dir="ltr">
+          {reading.title}
+        </h1>
         {reading.topic ? (
-          <p className="page-description">{reading.topic}</p>
+          <p className="page-description learning-content" dir="auto">
+            {reading.topic}
+          </p>
         ) : null}
       </section>
 
@@ -88,28 +111,38 @@ export default async function ReadingDetailPage({
         <section className="panel reading-language-notes">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">OPTIONAL LANGUAGE NOTES</p>
-              <h2>Grammar in context</h2>
+              <p className="eyebrow">{t("reading.detail.notes")}</p>
+              <h2>{t("reading.detail.grammarContext")}</h2>
             </div>
             <Brain size={19} />
           </div>
-          <p className="muted">
-            Open these only when you want to inspect the language. They are not required to understand the text.
-          </p>
+          <p className="muted">{t("reading.detail.notesHelp")}</p>
           <div className="question-list">
             {reading.grammarTargets.map((target) => (
               <details className="question-item" key={target.id}>
                 <summary>
-                  <span className="badge">{target.grammarConcept.introducedAt}</span>
-                  {target.grammarConcept.title}
+                  <span className="badge">
+                    {target.grammarConcept.introducedAt}
+                  </span>
+                  <span className="learning-content" lang="en" dir="ltr">
+                    {target.grammarConcept.title}
+                  </span>
                 </summary>
-                {target.excerpt ? <blockquote>{target.excerpt}</blockquote> : null}
-                {target.explanation ? <p>{target.explanation}</p> : null}
+                {target.excerpt ? (
+                  <blockquote className="learning-content" lang="de" dir="ltr">
+                    {target.excerpt}
+                  </blockquote>
+                ) : null}
+                {target.explanation ? (
+                  <p className="learning-content" dir="auto">
+                    {target.explanation}
+                  </p>
+                ) : null}
                 <Link
                   className="text-link"
                   href={"/grammar/" + target.grammarConcept.slug}
                 >
-                  Learn this grammar
+                  {t("reading.detail.learnGrammar")}
                 </Link>
               </details>
             ))}
@@ -122,15 +155,15 @@ export default async function ReadingDetailPage({
       <section className="panel reading-language-summary">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">LANGUAGE IN THIS TEXT</p>
-            <h2>What you encountered</h2>
+            <p className="eyebrow">{t("reading.detail.languageText")}</p>
+            <h2>{t("reading.detail.encountered")}</h2>
           </div>
           <BookOpenCheck size={19} />
         </div>
 
         {reading.grammarTargets.length ? (
           <div className="reading-summary-group">
-            <strong>Grammar</strong>
+            <strong>{t("reading.detail.grammar")}</strong>
             <div className="relation-list">
               {reading.grammarTargets.map((target) => (
                 <Link
@@ -138,8 +171,14 @@ export default async function ReadingDetailPage({
                   href={"/grammar/" + target.grammarConcept.slug}
                   key={target.id}
                 >
-                  <span>{target.grammarConcept.title}</span>
-                  <small>{target.intentional ? "targeted" : "encountered"}</small>
+                  <span className="learning-content" lang="en" dir="ltr">
+                    {target.grammarConcept.title}
+                  </span>
+                  <small>
+                    {target.intentional
+                      ? t("reading.detail.targeted")
+                      : t("reading.detail.encounteredTag")}
+                  </small>
                 </Link>
               ))}
             </div>
@@ -148,7 +187,7 @@ export default async function ReadingDetailPage({
 
         {reading.targets.length ? (
           <div className="reading-summary-group">
-            <strong>Vocabulary</strong>
+            <strong>{t("reading.detail.vocabulary")}</strong>
             <div className="relation-list">
               {reading.targets.map((target) => (
                 <Link
@@ -156,7 +195,9 @@ export default async function ReadingDetailPage({
                   href={"/vocabulary/" + target.lexeme.id}
                   key={target.id}
                 >
-                  <span>{target.lexeme.lemma}</span>
+                  <span className="learning-content" lang="de" dir="ltr">
+                    {target.lexeme.lemma}
+                  </span>
                   {target.lexeme.translations
                     .filter((translation) =>
                       isTranslationVisible(
@@ -166,7 +207,14 @@ export default async function ReadingDetailPage({
                     )
                     .slice(0, 1)
                     .map((translation) => (
-                      <small key={translation.id}>{translation.text}</small>
+                      <small
+                        key={translation.id}
+                        className="learning-content"
+                        lang={translation.language === "fa" ? "fa" : "en"}
+                        dir={translation.language === "fa" ? "rtl" : "ltr"}
+                      >
+                        {translation.text}
+                      </small>
                     ))}
                 </Link>
               ))}
@@ -176,12 +224,16 @@ export default async function ReadingDetailPage({
       </section>
 
       <section className="panel story-summary">
-        <h2 className="section-title">Summary</h2>
+        <h2 className="section-title">{t("reading.detail.summary")}</h2>
         {course.explanationLanguage !== "PERSIAN" && reading.englishSummary ? (
-          <p>{reading.englishSummary}</p>
+          <p className="learning-content" lang="en" dir="ltr">
+            {reading.englishSummary}
+          </p>
         ) : null}
         {course.explanationLanguage !== "ENGLISH" && reading.persianSummary ? (
-          <p className="rtl">{reading.persianSummary}</p>
+          <p className="learning-content" lang="fa" dir="rtl">
+            {reading.persianSummary}
+          </p>
         ) : null}
       </section>
     </main>

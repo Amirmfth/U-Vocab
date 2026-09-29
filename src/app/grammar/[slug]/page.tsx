@@ -15,15 +15,65 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
 import { db } from "@/lib/db";
-import {
-  grammarStatusLabel,
-  type GrammarStatusCode,
-} from "@/lib/grammar/learner-policy";
+import type { GrammarStatusCode } from "@/lib/grammar/learner-policy";
 import { getVocabularyForGrammarConcept } from "@/lib/grammar/related-vocabulary";
 import { startGrammarConceptAction } from "../actions";
 import { grammarLessonSchema } from "@/lib/ai/grammar-lesson";
+import { getServerTranslator } from "@/i18n/server";
+import type { MessageKey, Translator } from "@/i18n/core";
 import { GrammarLessonContent } from "./GrammarLessonContent";
 import { TeachGrammarSheet } from "./TeachGrammarSheet";
+
+const categoryKeys: Record<GrammarCategory, MessageKey> = {
+  SENTENCE_STRUCTURE: "grammar.category.sentence_structure",
+  CASES: "grammar.category.cases",
+  VERBS: "grammar.category.verbs",
+  TENSES: "grammar.category.tenses",
+  ARTICLES: "grammar.category.articles",
+  ADJECTIVES: "grammar.category.adjectives",
+  PREPOSITIONS: "grammar.category.prepositions",
+  PRONOUNS: "grammar.category.pronouns",
+  CONJUNCTIONS: "grammar.category.conjunctions",
+  RELATIVE_CLAUSES: "grammar.category.relative_clauses",
+  NEGATION: "grammar.category.negation",
+  COMPARISON: "grammar.category.comparison",
+  PASSIVE: "grammar.category.passive",
+  SUBJUNCTIVE: "grammar.category.subjunctive",
+  INFINITIVE_CONSTRUCTIONS: "grammar.category.infinitive_constructions",
+  NOUNS: "grammar.category.nouns",
+  ADVERBS_PARTICLES: "grammar.category.adverbs_particles",
+  WORD_FORMATION: "grammar.category.word_formation",
+};
+
+const statusKeys: Record<GrammarStatusCode, MessageKey> = {
+  UNASSESSED: "grammar.status.unassessed",
+  ASSUMED: "grammar.status.assumed",
+  LEARNING: "grammar.status.learning",
+  STRONG: "grammar.status.strong",
+  NEEDS_ATTENTION: "grammar.status.needs_attention",
+};
+
+const grammarRelationKeys: Record<string, MessageKey> = {
+  EXEMPLIFIES: "word.grammarRelation.exemplifies",
+  GOVERNS: "word.grammarRelation.governs",
+  TRIGGERS: "word.grammarRelation.triggers",
+  COMMON_WITH: "word.grammarRelation.common_with",
+};
+
+const outcomeKeys: Record<string, MessageKey> = {
+  SUCCESS: "grammar.detail.outcome.success",
+  ERROR: "grammar.detail.outcome.error",
+  OPPORTUNITY: "grammar.detail.outcome.opportunity",
+  ENCOUNTER: "grammar.detail.outcome.encounter",
+};
+
+const evidenceSourceKeys: Record<string, MessageKey> = {
+  PRACTICE: "grammar.detail.source.practice",
+  WRITING: "grammar.detail.source.writing",
+  READING_COMPREHENSION: "grammar.detail.source.reading_comprehension",
+  CONVERSATION: "grammar.detail.source.conversation",
+  MANUAL: "grammar.detail.source.manual",
+};
 
 function stringArray(value: unknown): string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string")
@@ -31,35 +81,31 @@ function stringArray(value: unknown): string[] {
     : [];
 }
 
-function categoryLabel(category: GrammarCategory) {
-  return category.replaceAll("_", " ").toLowerCase();
-}
-
-function watchFor(category: GrammarCategory) {
+function watchForKey(category: GrammarCategory): MessageKey {
   switch (category) {
     case "CASES":
-      return "Check what controls the case: the verb, preposition, or role of the noun phrase. Do not choose an ending from meaning alone.";
+      return "grammar.detail.watch.cases";
     case "PREPOSITIONS":
-      return "Learn the preposition together with its case or lexical pattern. Similar English translations can hide different German government.";
+      return "grammar.detail.watch.prepositions";
     case "SENTENCE_STRUCTURE":
     case "CONJUNCTIONS":
     case "RELATIVE_CLAUSES":
-      return "Track the finite verb first. Many word-order mistakes come from applying main-clause order inside a dependent clause.";
+      return "grammar.detail.watch.wordOrder";
     case "ADJECTIVES":
-      return "Determine article type, gender/number, and case before choosing the adjective ending.";
+      return "grammar.detail.watch.adjectives";
     case "TENSES":
     case "VERBS":
-      return "Separate the verb's lexical form from the tense or clause pattern that determines its surface form.";
+      return "grammar.detail.watch.verbs";
     default:
-      return "Focus on the structural cue that triggers this pattern, then compare it with the nearest contrasting form.";
+      return "grammar.detail.watch.default";
   }
 }
 
-function dimensionLabel(score: number) {
-  if (score >= 0.8) return "strong evidence";
-  if (score >= 0.55) return "developing";
-  if (score > 0) return "needs work";
-  return "not demonstrated";
+function dimensionLabel(t: Translator, score: number) {
+  if (score >= 0.8) return t("grammar.detail.evidenceStrong");
+  if (score >= 0.55) return t("grammar.detail.evidenceDeveloping");
+  if (score > 0) return t("grammar.detail.evidenceNeedsWork");
+  return t("grammar.detail.evidenceNone");
 }
 
 export default async function GrammarConceptPage({
@@ -70,6 +116,7 @@ export default async function GrammarConceptPage({
   await connection();
   const { slug } = await params;
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const { locale, t } = await getServerTranslator(user);
   const language = targetLanguageConfig(course.targetLanguage);
 
   const concept = await db.grammarConcept.findFirst({
@@ -120,9 +167,11 @@ export default async function GrammarConceptPage({
   const rules = stringArray(concept.rules);
   const examples = stringArray(concept.examples);
   const exceptions = stringArray(concept.exceptions);
-  const lessonLanguage = course.explanationLanguage === "PERSIAN" ? "fa" : "en";
-  const selectedLesson = concept.lessons.find((item) => item.language === lessonLanguage)
-    ?? concept.lessons.find((item) => item.language === "en");
+  const lessonLanguage =
+    course.explanationLanguage === "PERSIAN" ? "fa" : "en";
+  const selectedLesson =
+    concept.lessons.find((item) => item.language === lessonLanguage) ??
+    concept.lessons.find((item) => item.language === "en");
   const lesson = selectedLesson
     ? grammarLessonSchema.safeParse(selectedLesson)
     : null;
@@ -131,23 +180,29 @@ export default async function GrammarConceptPage({
   return (
     <main className="page grammar-detail">
       <Link href="/grammar" className="back-link">
-        <ArrowLeft size={16} />
-        Grammar
+        <ArrowLeft className="rtl-mirror" size={16} />
+        {t("grammar.detail.back")}
       </Link>
 
       <section className="grammar-detail-hero">
         <div className="word-meta">
           <span className={"grammar-state grammar-state-" + status.toLowerCase()}>
-            {grammarStatusLabel(status)}
+            {t(statusKeys[status])}
           </span>
           <span className="badge">{concept.introducedAt}</span>
           {concept.expectedBy && concept.expectedBy !== concept.introducedAt ? (
-            <span className="badge">expected by {concept.expectedBy}</span>
+            <span className="badge">
+              {t("grammar.detail.expectedBy", { level: concept.expectedBy })}
+            </span>
           ) : null}
         </div>
-        <p className="eyebrow">{categoryLabel(concept.category)}</p>
-        <h1>{concept.title}</h1>
-        <p className="page-description">{concept.shortDescription}</p>
+        <p className="eyebrow">{t(categoryKeys[concept.category])}</p>
+        <h1 className="learning-content" lang="en" dir="ltr">
+          {concept.title}
+        </h1>
+        <p className="page-description learning-content" lang="en" dir="ltr">
+          {concept.shortDescription}
+        </p>
 
         <div className="grammar-detail-actions">
           <TeachGrammarSheet
@@ -161,13 +216,18 @@ export default async function GrammarConceptPage({
               <input type="hidden" name="slug" value={concept.slug} />
               <button className="button button-primary" type="submit">
                 <BookOpenCheck size={17} />
-                {status === "LEARNING" ? "Continue learning" : "Start learning"}
+                {status === "LEARNING"
+                  ? t("grammar.detail.continue")
+                  : t("grammar.detail.start")}
               </button>
             </form>
           ) : null}
-          <Link href={"/practice?grammar=" + concept.slug} className="button button-secondary">
+          <Link
+            href={"/practice?grammar=" + concept.slug}
+            className="button button-secondary"
+          >
             <Brain size={17} />
-            Open Practice
+            {t("grammar.detail.openPractice")}
           </Link>
         </div>
       </section>
@@ -176,53 +236,64 @@ export default async function GrammarConceptPage({
         <section className="panel grammar-profile-card">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">YOUR PROFILE</p>
-              <h2>{progress.source === "DECLARED_LEVEL" ? "Assumed from your level" : "Based on learning evidence"}</h2>
+              <p className="eyebrow">{t("grammar.detail.profile")}</p>
+              <h2>
+                {progress.source === "DECLARED_LEVEL"
+                  ? t("grammar.detail.assumedFromLevel")
+                  : t("grammar.detail.basedOnEvidence")}
+              </h2>
             </div>
             <Sparkles size={19} />
           </div>
           {progress.evidenceCount > 0 ? (
             <div className="grammar-dimensions">
               <div>
-                <span>Understanding</span>
-                <strong>{dimensionLabel(progress.understanding)}</strong>
+                <span>{t("grammar.detail.understanding")}</span>
+                <strong>{dimensionLabel(t, progress.understanding)}</strong>
               </div>
               <div>
-                <span>Controlled production</span>
-                <strong>{dimensionLabel(progress.controlledProduction)}</strong>
+                <span>{t("grammar.detail.controlledProduction")}</span>
+                <strong>
+                  {dimensionLabel(t, progress.controlledProduction)}
+                </strong>
               </div>
               <div>
-                <span>Free production</span>
-                <strong>{dimensionLabel(progress.freeProduction)}</strong>
+                <span>{t("grammar.detail.freeProduction")}</span>
+                <strong>{dimensionLabel(t, progress.freeProduction)}</strong>
               </div>
             </div>
           ) : (
-            <p className="muted">
-              No behavioral evidence yet. U-Vocab will distinguish demonstrated
-              knowledge from level-based assumptions as you practice and use German.
-            </p>
+            <p className="muted">{t("grammar.detail.noEvidence")}</p>
           )}
         </section>
       ) : null}
 
       <section className="panel grammar-canonical-reference">
-        <p className="eyebrow">CANONICAL REFERENCE</p>
-        <h2>The curriculum definition</h2>
-        <p>{concept.explanation || concept.shortDescription}</p>
+        <p className="eyebrow">{t("grammar.detail.canonical")}</p>
+        <h2>{t("grammar.detail.curriculumDefinition")}</h2>
+        <p className="learning-content" lang="en" dir="ltr">
+          {concept.explanation || concept.shortDescription}
+        </p>
         {rules.length ? (
           <details>
-            <summary>Canonical rules</summary>
+            <summary>{t("grammar.detail.canonicalRules")}</summary>
             <ol className="grammar-rule-list">
-              {rules.map((rule) => <li key={rule}>{rule}</li>)}
+              {rules.map((rule) => (
+                <li key={rule} className="learning-content" dir="auto">
+                  {rule}
+                </li>
+              ))}
             </ol>
           </details>
         ) : null}
         {examples.length ? (
           <details>
-            <summary>Canonical examples</summary>
+            <summary>{t("grammar.detail.canonicalExamples")}</summary>
             <div className="grammar-example-list">
               {examples.map((example) => (
-                <div className="grammar-example" key={example}>{example}</div>
+                <div className="grammar-example learning-content" dir="auto" key={example}>
+                  {example}
+                </div>
               ))}
             </div>
           </details>
@@ -230,32 +301,41 @@ export default async function GrammarConceptPage({
       </section>
 
       {richLesson ? (
-        <GrammarLessonContent lesson={richLesson} language={selectedLesson?.language === "fa" ? "fa" : "en"} />
+        <GrammarLessonContent
+          lesson={richLesson}
+          language={selectedLesson?.language === "fa" ? "fa" : "en"}
+          uiLocale={locale}
+        />
       ) : (
         <>
           <div className="grammar-detail-grid">
             <section className="panel grammar-teaching-card">
-              <p className="eyebrow">WHY IT MATTERS</p>
-              <h2>{concept.title}</h2>
-              <p>{concept.explanation || concept.shortDescription}</p>
+              <p className="eyebrow">{t("grammar.detail.whyMatters")}</p>
+              <h2 className="learning-content" lang="en" dir="ltr">
+                {concept.title}
+              </h2>
+              <p className="learning-content" lang="en" dir="ltr">
+                {concept.explanation || concept.shortDescription}
+              </p>
             </section>
             {rules.length ? (
               <section className="panel grammar-teaching-card">
-                <p className="eyebrow">THE PATTERN</p>
-                <h2>Rules</h2>
+                <p className="eyebrow">{t("grammar.detail.pattern")}</p>
+                <h2>{t("grammar.detail.rules")}</h2>
                 <ol className="grammar-rule-list">
-                  {rules.map((rule) => <li key={rule}>{rule}</li>)}
+                  {rules.map((rule) => (
+                    <li key={rule} className="learning-content" dir="auto">
+                      {rule}
+                    </li>
+                  ))}
                 </ol>
               </section>
             ) : null}
           </div>
           <section className="panel grammar-lesson-missing">
-            <p className="eyebrow">FULL LESSON</p>
-            <h2>Rich lesson data has not been generated yet</h2>
-            <p className="muted">
-              Run the grammar lesson backfill to populate the complete lesson for this concept.
-              “Teach me more” is still available above for an on-demand explanation.
-            </p>
+            <p className="eyebrow">{t("grammar.detail.fullLesson")}</p>
+            <h2>{t("grammar.detail.lessonMissing")}</h2>
+            <p className="muted">{t("grammar.detail.lessonMissingHelp")}</p>
           </section>
         </>
       )}
@@ -263,12 +343,16 @@ export default async function GrammarConceptPage({
       <section className="panel grammar-watch-card">
         <CircleAlert size={20} />
         <div>
-          <p className="eyebrow">QUICK WARNING</p>
-          <h2>Common source of mistakes</h2>
-          <p>{watchFor(concept.category)}</p>
+          <p className="eyebrow">{t("grammar.detail.quickWarning")}</p>
+          <h2>{t("grammar.detail.commonMistakes")}</h2>
+          <p>{t(watchForKey(concept.category))}</p>
           {!richLesson && exceptions.length ? (
             <ul>
-              {exceptions.map((exception) => <li key={exception}>{exception}</li>)}
+              {exceptions.map((exception) => (
+                <li key={exception} className="learning-content" dir="auto">
+                  {exception}
+                </li>
+              ))}
             </ul>
           ) : null}
         </div>
@@ -278,28 +362,45 @@ export default async function GrammarConceptPage({
         <section className="page-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">CONNECTIONS</p>
-              <h2>Where this fits</h2>
+              <p className="eyebrow">{t("grammar.detail.connections")}</p>
+              <h2>{t("grammar.detail.whereFits")}</h2>
             </div>
             <Layers3 size={19} />
           </div>
           <div className="grammar-connection-list">
             {concept.parent ? (
               <Link href={"/grammar/" + concept.parent.slug}>
-                <span>Parent concept</span>
-                <strong>{concept.parent.title}</strong>
+                <span>{t("grammar.detail.parent")}</span>
+                <strong className="learning-content" lang="en" dir="ltr">
+                  {concept.parent.title}
+                </strong>
               </Link>
             ) : null}
             {concept.prerequisites.map(({ prerequisite }) => (
-              <Link href={"/grammar/" + prerequisite.slug} key={prerequisite.slug}>
-                <span>Prerequisite · {prerequisite.introducedAt}</span>
-                <strong>{prerequisite.title}</strong>
+              <Link
+                href={"/grammar/" + prerequisite.slug}
+                key={prerequisite.slug}
+              >
+                <span>
+                  {t("grammar.detail.prerequisite", {
+                    level: prerequisite.introducedAt,
+                  })}
+                </span>
+                <strong className="learning-content" lang="en" dir="ltr">
+                  {prerequisite.title}
+                </strong>
               </Link>
             ))}
             {concept.children.map((child) => (
               <Link href={"/grammar/" + child.slug} key={child.slug}>
-                <span>Builds into · {child.introducedAt}</span>
-                <strong>{child.title}</strong>
+                <span>
+                  {t("grammar.detail.buildsInto", {
+                    level: child.introducedAt,
+                  })}
+                </span>
+                <strong className="learning-content" lang="en" dir="ltr">
+                  {child.title}
+                </strong>
               </Link>
             ))}
           </div>
@@ -310,26 +411,34 @@ export default async function GrammarConceptPage({
         <section className="page-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">YOUR VOCABULARY</p>
-              <h2>Reuse words you already have</h2>
+              <p className="eyebrow">{t("grammar.detail.yourVocabulary")}</p>
+              <h2>{t("grammar.detail.reuseWords")}</h2>
             </div>
           </div>
           <p className="muted grammar-vocab-note">
-            These are words from your own vocabulary that are explicitly linked to this grammar concept.
+            {t("grammar.detail.vocabHelp")}
           </p>
           <div className="grammar-vocab-grid">
             {vocabulary.map((item) => (
               <Link href={"/vocabulary/" + item.lexeme.id} key={item.id}>
-                <strong>
+                <strong className="learning-content" lang="de" dir="ltr">
                   {item.lexeme.article ? item.lexeme.article + " " : ""}
                   {item.lexeme.lemma}
                 </strong>
                 {item.pattern ? (
-                  <span>{item.pattern}</span>
+                  <span className="learning-content" lang="de" dir="ltr">
+                    {item.pattern}
+                  </span>
                 ) : item.lexeme.patterns[0] ? (
-                  <span>{item.lexeme.patterns[0].pattern}</span>
+                  <span className="learning-content" lang="de" dir="ltr">
+                    {item.lexeme.patterns[0].pattern}
+                  </span>
                 ) : (
-                  <span>{item.relationType.replaceAll("_", " ").toLowerCase()}</span>
+                  <span>
+                    {grammarRelationKeys[item.relationType]
+                      ? t(grammarRelationKeys[item.relationType])
+                      : item.relationType.replaceAll("_", " ").toLowerCase()}
+                  </span>
                 )}
               </Link>
             ))}
@@ -341,20 +450,37 @@ export default async function GrammarConceptPage({
         <details className="grammar-evidence-disclosure">
           <summary>
             <span>
-              <strong>Why U-Vocab thinks this</strong>
-              <small>Recent evidence behind your grammar status</small>
+              <strong>{t("grammar.detail.evidenceWhy")}</strong>
+              <small>{t("grammar.detail.evidenceHelp")}</small>
             </span>
           </summary>
           <div className="grammar-evidence-list">
             {concept.evidence.map((item) => (
               <div key={item.id}>
                 <div>
-                  <strong>{item.outcome.replaceAll("_", " ").toLowerCase()}</strong>
-                  <span>{item.source.replaceAll("_", " ").toLowerCase()}</span>
+                  <strong>
+                    {outcomeKeys[item.outcome]
+                      ? t(outcomeKeys[item.outcome])
+                      : item.outcome.toLowerCase()}
+                  </strong>
+                  <span>
+                    {evidenceSourceKeys[item.source]
+                      ? t(evidenceSourceKeys[item.source])
+                      : item.source.toLowerCase()}
+                  </span>
                 </div>
                 <small>
-                  {item.accepted ? "counted toward your profile" : "stored, not counted"}
-                  {item.excerpt ? " · " + item.excerpt : ""}
+                  {item.accepted
+                    ? t("grammar.detail.counted")
+                    : t("grammar.detail.notCounted")}
+                  {item.excerpt ? (
+                    <>
+                      {" · "}
+                      <span className="learning-content" dir="auto">
+                        {item.excerpt}
+                      </span>
+                    </>
+                  ) : null}
                 </small>
               </div>
             ))}
@@ -364,11 +490,13 @@ export default async function GrammarConceptPage({
 
       {concept.outgoingRelations.length ? (
         <section className="grammar-related">
-          <p className="eyebrow">RELATED</p>
+          <p className="eyebrow">{t("grammar.detail.related")}</p>
           {concept.outgoingRelations.map((relation) => (
             <Link href={"/grammar/" + relation.target.slug} key={relation.id}>
-              {relation.target.title}
-              <ArrowRight size={15} />
+              <span className="learning-content" lang="en" dir="ltr">
+                {relation.target.title}
+              </span>
+              <ArrowRight className="rtl-mirror" size={15} />
             </Link>
           ))}
         </section>

@@ -1,0 +1,4 @@
+CREATE TYPE "UiLocale" AS ENUM ('EN', 'FA');
+
+ALTER TABLE "User"
+ADD COLUMN "uiLocale" "UiLocale" NOT NULL DEFAULT 'EN';

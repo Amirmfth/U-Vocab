@@ -399,7 +399,7 @@ export const en = {
   "reading.none": "No generated readings yet.",
   "reading.targetWords": "{count} target words",
   "reading.grammarNotes": "{count} grammar notes",
-  "reading.comprehension": "{value}% comprehension",
+  "reading.comprehension": "{percent} comprehension",
   "reading.generatingLabel": "Generating reading",
   "reading.generating": "Generating your reading…",
   "reading.opening": "Opening your reading…",
@@ -1032,6 +1032,12 @@ export const en = {
   "format.hoursAgo.other": "{count} hours ago",
   "format.daysAgo.one": "{count} day ago",
   "format.daysAgo.other": "{count} days ago",
+  "format.inMinutes.one": "in {count} minute",
+  "format.inMinutes.other": "in {count} minutes",
+  "format.inHours.one": "in {count} hour",
+  "format.inHours.other": "in {count} hours",
+  "format.inDays.one": "in {count} day",
+  "format.inDays.other": "in {count} days",
 } as const;
 
 export type MessageKey = keyof typeof en;

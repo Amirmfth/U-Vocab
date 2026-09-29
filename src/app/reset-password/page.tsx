@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { safeReturnTo } from "@/lib/auth-routing";
+import { getServerTranslator } from "@/i18n/server";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export default async function ResetPasswordPage({
@@ -9,6 +10,7 @@ export default async function ResetPasswordPage({
 }) {
   const params = await searchParams;
   const returnTo = safeReturnTo(params.returnTo);
+  const { t } = await getServerTranslator();
 
   return (
     <main className="login-page">
@@ -19,7 +21,7 @@ export default async function ResetPasswordPage({
       />
       <p className="muted">
         <Link href={"/forgot-password?returnTo=" + encodeURIComponent(returnTo)}>
-          Request another reset link
+          {t("auth.requestAnotherReset")}
         </Link>
       </p>
     </main>

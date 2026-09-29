@@ -55,7 +55,7 @@ test("Practice hub contains application modes and not Grammar", () => {
     PRACTICE_HUB_DESTINATIONS.map((destination) => destination.href),
     ["/practice?drill=1", "/writing", "/reading", "/conversation"],
   );
-  assert.equal(PRACTICE_HUB_DESTINATIONS.some((destination) => destination.href === "/grammar"), false);
+  assert.equal(PRACTICE_HUB_DESTINATIONS.map((destination) => String(destination.href)).includes("/grammar"), false);
 });
 
 test("review remains a primary section so its due badge owner is stable", () => {

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import type { UiLocale as PrismaUiLocale } from "@prisma/client";
 import { createTranslator } from "./core";
+import { UI_LOCALE_COOKIE } from "./preference";
 import {
   DEFAULT_UI_LOCALE,
   isUiLocale,
@@ -8,7 +9,6 @@ import {
   type UiLocale,
 } from "./config";
 
-export const UI_LOCALE_COOKIE = "u-vocab-ui-locale";
 
 export async function resolveUiLocale(
   user?: { uiLocale: PrismaUiLocale | null } | null,

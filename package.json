@@ -19,7 +19,6 @@
     "auth:bootstrap": "tsx scripts/bootstrap-existing-auth-user.ts"
   },
   "dependencies": {
-    "@better-auth/prisma-adapter": "1.7.6",
     "@prisma/client": "^6.16.2",
     "@tanstack/react-query": "5.103.2",
     "better-auth": "1.7.6",

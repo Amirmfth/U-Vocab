@@ -92,6 +92,7 @@ export async function POST(
     const evaluation = await perf.span("aiEvaluation", () =>
       processConversationTurn({
         userId: user.id,
+        userCourseId: course.id,
         sessionId: id,
         message,
       }),
@@ -104,6 +105,7 @@ export async function POST(
   const context = await perf.span("context", () =>
     buildConversationContext({
       userId: user.id,
+      userCourseId: course.id,
       sessionId: id,
     }),
   );

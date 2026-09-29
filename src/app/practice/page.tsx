@@ -74,7 +74,7 @@ export default async function PracticePage({
   if(params.mixed==="1") redirect("/practice?drill=1");
   if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub/>;
 
-  const user=await getCurrentUser();
+  const [user,course]=await Promise.all([getCurrentUser(),getCurrentCourse()]);
 
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
@@ -106,7 +106,7 @@ export default async function PracticePage({
   }
   const [items,distractorItems]=await Promise.all([
     db.userVocabulary.findMany({
-    where:{ userId:user.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },
+    where:{ userCourseId:course.id,...(params.lexeme?{ lexemeId:params.lexeme }:{}) },
     include:{
       lexeme:{
         include:{
@@ -114,7 +114,7 @@ export default async function PracticePage({
           translations:true,
           examples:true,
           mistakes:{
-            where:{ userId:user.id,resolvedAt:null },
+            where:{ userCourseId:course.id,resolvedAt:null },
             select:{ type:true },
           },
         },
@@ -129,7 +129,7 @@ export default async function PracticePage({
     take:params.lexeme?1:8,
   }),
     db.userVocabulary.findMany({
-      where:{ userId:user.id },
+      where:{ userCourseId:course.id },
       include:{
         lexeme:{
           include:{ patterns:true,translations:true,examples:true },

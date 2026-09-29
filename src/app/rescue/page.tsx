@@ -20,7 +20,7 @@ export default async function RescuePage({
   await connection();
   const [user, course, query] = await Promise.all([getCurrentUser(), getCurrentCourse(), searchParams]);
   const requestedIds = Array.from(new Set(query.ids?.split(",").filter(Boolean) ?? [])).slice(0, 20);
-  const ranked = await getRescueWords(user.id, 100, requestedIds);
+  const ranked = await getRescueWords(user.id, course.id, 100, requestedIds);
 
   if (!query.ids) {
     const top = ranked.slice(0, 20);

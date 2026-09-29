@@ -27,6 +27,7 @@ export async function submitRescueReview(input: RescueReviewInput) {
       : null;
     const result = await applyReviewResult({
       userId: user.id,
+      userCourseId: course.id,
       userVocabularyId: input.userVocabularyId,
       grade: input.grade,
       exerciseType: input.exerciseType,
@@ -37,6 +38,7 @@ export async function submitRescueReview(input: RescueReviewInput) {
 
     revalidateUserDomains(
       user.id,
+      course.id,
       ["home", "vocabulary", "review", "progress"],
       [result.item.lexemeId],
     );

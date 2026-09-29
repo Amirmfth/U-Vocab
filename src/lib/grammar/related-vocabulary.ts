@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
  */
 export async function getVocabularyForGrammarConcept(
   userId: string,
+  userCourseId: string,
   _category: GrammarCategory,
   grammarConceptId?: string,
 ) {
@@ -17,7 +18,7 @@ export async function getVocabularyForGrammarConcept(
     where: {
       grammarConceptId,
       confidence: { gte: 0.65 },
-      lexeme: { userStates: { some: { userId } } },
+      lexeme: { userStates: { some: { userCourseId } } },
     },
     include: {
       lexeme: {
@@ -28,7 +29,7 @@ export async function getVocabularyForGrammarConcept(
           partOfSpeech: true,
           patterns: { take: 2, select: { pattern: true } },
           userStates: {
-            where: { userId },
+            where: { userCourseId },
             take: 1,
             select: {
               id: true,

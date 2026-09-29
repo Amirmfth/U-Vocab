@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 
 const REASONS = new Set([
   "WEAKNESS",
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
 
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const concept = await db.grammarConcept.findFirst({
-    where: { id: conceptId, active: true, language: "de" },
+    where: { id: conceptId, active: true, language: targetLanguageConfig(course.targetLanguage).code },
     select: { id: true, slug: true },
   });
 
@@ -37,6 +38,7 @@ export async function GET(request: Request) {
   await db.grammarRecommendationEvent.create({
     data: {
       userId: user.id,
+      userCourseId: course.id,
       grammarConceptId: concept.id,
       surface,
       reason,

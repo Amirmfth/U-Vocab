@@ -172,6 +172,7 @@ export async function scheduleTeachReviewAction(
 
     revalidateUserDomains(
       user.id,
+      course.id,
       ["home", "vocabulary", "review", "progress"],
       [lexemeId],
     );

@@ -56,7 +56,6 @@ export async function createConversationSessionAction(
     const setup = await generateConversationSetup({
       userId: user.id,
       userCourseId: course.id,
-      userCourseId: course.id,
       kind,
       level: course.currentLevel,
       topic,

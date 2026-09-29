@@ -136,6 +136,7 @@ function SecondaryWordSkeleton() {
 
 async function DeferredWordDetails({
   userId,
+  userCourseId,
   lexemeId,
   level,
   patterns,

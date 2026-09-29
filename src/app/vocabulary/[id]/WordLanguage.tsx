@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { TranslationLanguage } from "@prisma/client";
+import { useTranslations } from "@/i18n/client";
 
 type WordLanguage = "ENGLISH" | "PERSIAN";
 
@@ -36,21 +37,22 @@ export function WordLanguageProvider({
 
 export function WordLanguageSwitch() {
   const context = useContext(WordLanguageContext);
+  const t = useTranslations();
   if (!context) throw new Error("Word language control is missing.");
   return (
-      <div className="translation-switch" aria-label="Translation language">
-        {(["ENGLISH", "PERSIAN"] as const).map((mode) => (
-          <button
-            type="button"
-            key={mode}
-            className={context.language === mode ? "is-active" : ""}
-            aria-pressed={context.language === mode}
-            onClick={() => context.setLanguage(mode)}
-          >
-            {mode === "ENGLISH" ? "EN" : "FA"}
-          </button>
-        ))}
-      </div>
+    <div className="translation-switch" aria-label={t("word.translationLanguage")}>
+      {(["ENGLISH", "PERSIAN"] as const).map((mode) => (
+        <button
+          type="button"
+          key={mode}
+          className={context.language === mode ? "is-active" : ""}
+          aria-pressed={context.language === mode}
+          onClick={() => context.setLanguage(mode)}
+        >
+          {mode === "ENGLISH" ? "EN" : "FA"}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -62,23 +64,35 @@ export function WordMeaning({
   const language = useWordLanguage() === "PERSIAN" ? "fa" : "en";
   return (
     <>
-      {translations.filter((translation) => translation.language === language).map((translation) => (
-        <p
-          key={translation.id}
-          className={`word-hero-meaning word-hero-meaning--${language}`}
-          dir={language === "fa" ? "rtl" : "ltr"}
-          lang={language}
-        >
-          {translation.text}
-        </p>
-      ))}
+      {translations
+        .filter((translation) => translation.language === language)
+        .map((translation) => (
+          <p
+            key={translation.id}
+            className={"word-hero-meaning word-hero-meaning--" + language + " learning-content"}
+            dir={language === "fa" ? "rtl" : "ltr"}
+            lang={language}
+          >
+            {translation.text}
+          </p>
+        ))}
     </>
   );
 }
 
-export function WordExampleMeaning({ english, persian }: { english: string | null; persian: string | null }) {
+export function WordExampleMeaning({
+  english,
+  persian,
+}: {
+  english: string | null;
+  persian: string | null;
+}) {
   const language = useWordLanguage();
   return language === "PERSIAN"
-    ? persian ? <p className="rtl muted" lang="fa" dir="rtl">{persian}</p> : null
-    : english ? <p className="muted" lang="en">{english}</p> : null;
+    ? persian
+      ? <p className="muted learning-content" lang="fa" dir="rtl">{persian}</p>
+      : null
+    : english
+      ? <p className="muted learning-content" lang="en" dir="ltr">{english}</p>
+      : null;
 }

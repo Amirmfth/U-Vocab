@@ -1,5 +1,6 @@
-import type { PartOfSpeech, PrismaClient } from "@prisma/client";
+import type { PartOfSpeech, PrismaClient, TargetLanguage } from "@prisma/client";
 import { syncDeterministicGrammarLinksForLexeme } from "@/lib/grammar/lexeme-links";
+import { targetLanguageConfig } from "@/lib/languages";
 import type {
   CandidateWithState,
   IngestionCandidate,
@@ -18,16 +19,18 @@ export async function attachIngestionState(
   db: PrismaClient,
   userId: string,
   userCourseId: string,
+  targetLanguage: TargetLanguage,
   candidates: IngestionCandidate[],
 ): Promise<CandidateWithState[]> {
   const unique = deduplicateCandidates(candidates);
+  const language = targetLanguageConfig(targetLanguage).code;
 
   return Promise.all(
     unique.map(async (candidate) => {
       const existing = await db.lexeme.findUnique({
         where: {
           language_normalized_partOfSpeech: {
-            language: "de",
+            language,
             normalized: candidate.normalized,
             partOfSpeech: candidate.partOfSpeech,
           },
@@ -56,12 +59,14 @@ export async function commitIngestionCandidates(
   input: {
     userId: string;
     userCourseId: string;
+    targetLanguage: TargetLanguage;
     sourceType: IngestionSourceType;
     sourceRef?: string | null;
     candidates: IngestionCandidate[];
   },
 ) {
   const unique = deduplicateCandidates(input.candidates);
+  const language = targetLanguageConfig(input.targetLanguage).code;
   const timeout = Math.min(120_000, Math.max(20_000, unique.length * 1_500));
 
   const ids = await db.$transaction(async (tx) => {
@@ -71,12 +76,13 @@ export async function commitIngestionCandidates(
       const lexeme = await tx.lexeme.upsert({
         where: {
           language_normalized_partOfSpeech: {
-            language: "de",
+            language,
             normalized: candidate.normalized,
             partOfSpeech: candidate.partOfSpeech as PartOfSpeech,
           },
         },
         create: {
+          language,
           lemma: candidate.lemma,
           normalized: candidate.normalized,
           partOfSpeech: candidate.partOfSpeech,

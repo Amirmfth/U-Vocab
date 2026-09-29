@@ -113,6 +113,7 @@ export async function previewVocabularyText(
       db,
       user.id,
       course.id,
+      course.targetLanguage,
       deduplicateCandidates(candidates),
     );
 
@@ -155,6 +156,7 @@ export async function addVocabularyItem(input: {
     const [lexemeId] = await perf.span("dbSave", () => commitIngestionCandidates(db, {
       userId: user.id,
       userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       sourceType,
       sourceRef: `${sourceType.toLocaleLowerCase("en-US")}:${crypto.randomUUID()}`,
       candidates: [candidate],

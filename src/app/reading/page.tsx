@@ -117,12 +117,10 @@ export default async function ReadingPage() {
                       : ""}
                     {reading.completedAt
                       ? " · " +
-                        t("reading.comprehension", {
-                          value: formatPercent(
+                        t("reading.comprehension", { percent: formatPercent(
                             locale,
                             reading.comprehensionScore ?? 0,
-                          ).replace("%", "").replace("٪", ""),
-                        })
+                          ) })
                       : ""}
                   </span>
                 </div>

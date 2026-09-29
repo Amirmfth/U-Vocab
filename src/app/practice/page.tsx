@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import {
   BookOpenText,
   MessageCircle,
-  GraduationCap,
   PenLine,
   Plus,
   Sparkles,
@@ -27,13 +26,6 @@ function PracticeHub({ t }: { t: Translator }) {
     <main className="page practice-hub">
 
       <nav className="practice-lanes" aria-label={t("practice.skills")}>
-        <Link href="/grammar" className="practice-lane practice-lane-grammar">
-          <span className="practice-lane-icon"><GraduationCap size={30} /></span>
-          <span className="practice-lane-copy">
-            <strong>{t("nav.grammar")}</strong>
-          </span>
-        </Link>
-
         <Link href="/practice?drill=1" className="practice-lane">
           <span className="practice-lane-icon"><Sparkles size={30} /></span>
           <span className="practice-lane-copy">

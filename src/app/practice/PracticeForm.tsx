@@ -8,6 +8,8 @@ import type { ExerciseDefinition } from "@/lib/exercises/types";
 import { checkDeterministicAnswer } from "@/lib/exercises/check";
 import { StatusNotice } from "@/components/status-notice";
 import { submitPracticeAnswer, type PracticeAnswerResult } from "./actions";
+import { useI18n } from "@/i18n/client";
+import { formatNumber } from "@/i18n/format";
 
 export type PracticeSessionExercise={
   id:string;
@@ -31,6 +33,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   const reduceMotion=useReducedMotion();
   const startedAt=useRef(Date.now());
   const current=queue[index];
+  const { locale, t }=useI18n();
 
   useEffect(()=>{
     if(result?.status!=="success") return;
@@ -78,7 +81,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           window.location.assign("/login?returnTo="+encodeURIComponent(window.location.pathname+window.location.search));
           return;
         }
-        setSaveError("Your feedback was shown, but this attempt could not be saved.");
+        setSaveError(t("practice.saveError"));
     });
   }
 
@@ -86,13 +89,13 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
     const correct=history.filter((item)=>item.correct).length;
     const skills=[...new Set(history.map((item)=>item.skill))];
     return <section className="panel practice-complete">
-      <p className="eyebrow">SESSION COMPLETE</p>
-      <h1>{correct} of {history.length} correct</h1>
-      <p className="muted">Practiced {skills.join(", ")||"vocabulary"} with missed items reinforced once.</p>
+      <p className="eyebrow">{t("practice.sessionComplete")}</p>
+      <h1>{t("practice.correctCount",{ correct:formatNumber(locale,correct),total:formatNumber(locale,history.length) })}</h1>
+      <p className="muted">{t("practice.practiced",{ skills:skills.join(", ")||t("practice.vocabulary").toLowerCase() })}</p>
       <div className="ia-empty-actions">
-        <Link className="button button-primary" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> Practice another set</Link>
-        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary" href="/grammar">Back to Grammar</Link>:<Link className="button button-secondary" href="/review">Review due cards</Link>}
-        <Link className="text-link" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?"Back to Practice":"Back to words"}</Link>
+        <Link className="button button-primary" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> {t("practice.anotherSet")}</Link>
+        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary" href="/grammar">{t("practice.backGrammar")}</Link>:<Link className="button button-secondary" href="/review">{t("practice.reviewDue")}</Link>}
+        <Link className="text-link" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?t("practice.back"):t("practice.backWords")}</Link>
       </div>
     </section>;
   }
@@ -102,7 +105,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
 
   return <div className="practice-session-stage">
     <div className="practice-progress">
-      <span>{Math.min(index+1,queue.length)} / {queue.length}</span>
+      <span>{formatNumber(locale,Math.min(index+1,queue.length))} / {formatNumber(locale,queue.length)}</span>
       <div className="metric-bar"><span style={{ width:progress+"%" }}/></div>
     </div>
 
@@ -117,13 +120,13 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
       >
         <div className="learning-card-head">
           <span className="exercise-type">{current.exercise.type.replaceAll("_"," ").toLowerCase()}</span>
-          <span className="muted">{current.lemma}{current.retry?" · retry":""}</span>
+          <span className="muted learning-content" lang="de" dir="ltr">{current.lemma}{current.retry?" · "+t("practice.retryLabel"):""}</span>
         </div>
 
-        <h1 className="learning-prompt">{current.exercise.prompt}</h1>
+        <h1 className="learning-prompt learning-content" dir="auto">{current.exercise.prompt}</h1>
 
         {current.exercise.interaction==="choice"?(
-          <div className="practice-choice-grid" role="group" aria-label="Answer choices">
+          <div className="practice-choice-grid" role="group" aria-label={t("practice.answerChoices")}>
             {current.exercise.options?.map((option)=>{
               const isExpected=success&&option===current.exercise.expected;
               const isSelected=selected===option;
@@ -140,7 +143,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
                 disabled={success}
                 onClick={()=>submit(option)}
               >
-                <span>{option}</span>
+                <span className="learning-content" dir="auto">{option}</span>
                 {isExpected?<CheckCircle2 size={18}/>:isWrong?<XCircle size={18}/>:null}
               </button>;
             })}
@@ -148,11 +151,11 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
         ):(
           <form onSubmit={(event)=>{ event.preventDefault();submit(answer); }}>
             <div className="field">
-              <label htmlFor="practice-answer">Your answer</label>
-              <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={success} autoFocus autoComplete="off"/>
+              <label htmlFor="practice-answer">{t("practice.yourAnswer")}</label>
+              <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={success} autoFocus autoComplete="off" dir="auto"/>
             </div>
             <button className="button button-primary" type="submit" disabled={success||!answer.trim()}>
-              <Check size={18}/>Check answer
+              <Check size={18}/>{t("practice.checkAnswer")}
             </button>
           </form>
         )}
@@ -163,8 +166,8 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           <div className={"practice-instant-feedback "+(result.correct?"is-correct":"is-wrong")} role="status">
             {result.correct?<CheckCircle2 size={18}/>:<XCircle size={18}/>}
             <span>
-              <strong>{result.correct?"Correct":"Not quite"}</strong>
-              {!result.correct?<small>Correct answer: {result.expected}</small>:<small>Next question…</small>}
+              <strong>{result.correct?t("practice.correct"):t("practice.notQuite")}</strong>
+              {!result.correct?<small className="learning-content" dir="auto">{t("practice.correctAnswer",{ answer:result.expected })}</small>:<small>{t("practice.nextQuestion")}</small>}
             </span>
           </div>
         ):null}

@@ -10,8 +10,11 @@ import { isValidCefrLevel, targetLevelIsValid } from "@/lib/grammar/levels";
 import { syncDeclaredLevelGrammarAssumptions } from "@/lib/grammar/progress";
 import { targetLanguageConfig } from "@/lib/languages";
 import { createTranslator } from "@/i18n/core";
-import { isUiLocale, uiLocaleToDb, type UiLocale } from "@/i18n/config";
-import { getServerTranslator, UI_LOCALE_COOKIE } from "@/i18n/server";
+import { getServerTranslator } from "@/i18n/server";
+import {
+  parseUiLocalePreference,
+  UI_LOCALE_COOKIE,
+} from "@/i18n/preference";
 
 export type SettingsState = {
   status: "idle" | "success" | "error";
@@ -26,21 +29,21 @@ export async function updateUiLocale(
   const current = await getServerTranslator(user);
   const value = String(formData.get("uiLocale"));
 
-  if (!isUiLocale(value)) {
+  const preference = parseUiLocalePreference(value);
+  if (!preference) {
     return { status: "error", message: current.t("settings.chooseUiLanguage") };
   }
 
-  const locale = value as UiLocale;
-  const nextT = createTranslator(locale);
+  const nextT = createTranslator(preference.locale);
 
   try {
     await db.user.update({
       where: { id: user.id },
-      data: { uiLocale: uiLocaleToDb(locale) },
+      data: { uiLocale: preference.dbLocale },
     });
 
     const cookieStore = await cookies();
-    cookieStore.set(UI_LOCALE_COOKIE, locale, {
+    cookieStore.set(UI_LOCALE_COOKIE, preference.cookieLocale, {
       httpOnly: false,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",

@@ -1,6 +1,11 @@
+"use client";
+
+import { useTranslations } from "@/i18n/client";
+
 export default function Loading() {
+  const t = useTranslations();
   return (
-    <main className="page core-loading" aria-busy="true" aria-label="Loading recurring weaknesses">
+    <main className="page core-loading" aria-busy="true" aria-label={t("loading.surface", { surface: t("loading.recurringWeaknesses") })}>
       <section className="page-header compact" aria-hidden="true">
         <div className="skeleton loading-mistakes-title" />
         <div className="skeleton loading-mistakes-count" />

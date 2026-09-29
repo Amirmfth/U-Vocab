@@ -1,6 +1,7 @@
 "use server";
 
 import { CefrLevel, TranslationLanguage } from "@prisma/client";
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
@@ -8,28 +9,80 @@ import { db } from "@/lib/db";
 import { isValidCefrLevel, targetLevelIsValid } from "@/lib/grammar/levels";
 import { syncDeclaredLevelGrammarAssumptions } from "@/lib/grammar/progress";
 import { targetLanguageConfig } from "@/lib/languages";
+import { createTranslator } from "@/i18n/core";
+import { isUiLocale, uiLocaleToDb, type UiLocale } from "@/i18n/config";
+import { getServerTranslator, UI_LOCALE_COOKIE } from "@/i18n/server";
 
 export type SettingsState = {
   status: "idle" | "success" | "error";
   message?: string;
 };
 
+export async function updateUiLocale(
+  _previous: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const user = await getCurrentUser();
+  const current = await getServerTranslator(user);
+  const value = String(formData.get("uiLocale"));
+
+  if (!isUiLocale(value)) {
+    return { status: "error", message: current.t("settings.chooseUiLanguage") };
+  }
+
+  const locale = value as UiLocale;
+  const nextT = createTranslator(locale);
+
+  try {
+    await db.user.update({
+      where: { id: user.id },
+      data: { uiLocale: uiLocaleToDb(locale) },
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set(UI_LOCALE_COOKIE, locale, {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+
+    revalidatePath("/", "layout");
+
+    return {
+      status: "success",
+      message: nextT("settings.interfaceSaved"),
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : current.t("settings.interfaceSaveError"),
+    };
+  }
+}
+
 export async function updateTranslationPreference(
   _previous: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
+  const user = await getCurrentUser();
+  const { t } = await getServerTranslator(user);
   const value = String(formData.get("translation"));
   const currentLevel = String(formData.get("currentLevel"));
   const targetLevel = String(formData.get("targetLevel"));
 
   if (!["ENGLISH", "PERSIAN", "BOTH"].includes(value)) {
-    return { status: "error", message: "Choose a valid translation language." };
+    return { status: "error", message: t("settings.chooseTranslation") };
   }
   if (!isValidCefrLevel(currentLevel)) {
-    return { status: "error", message: "Choose a valid current level." };
+    return { status: "error", message: t("settings.chooseCurrentLevel") };
   }
   if (!isValidCefrLevel(targetLevel)) {
-    return { status: "error", message: "Choose a valid CEFR target level." };
+    return { status: "error", message: t("settings.chooseTargetLevel") };
   }
 
   const current = currentLevel as CefrLevel;
@@ -37,12 +90,12 @@ export async function updateTranslationPreference(
   if (!targetLevelIsValid(current, target)) {
     return {
       status: "error",
-      message: "Target level must be the same as or higher than your current level.",
+      message: t("settings.targetBelowCurrent"),
     };
   }
 
   try {
-    const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const course = await getCurrentCourse();
     await db.userCourse.update({
       where: { id: course.id },
       data: {
@@ -63,14 +116,22 @@ export async function updateTranslationPreference(
       revalidatePath(path);
     }
 
+    const targetLabel =
+      course.targetLanguage === "GERMAN"
+        ? t("common.german")
+        : targetLanguageConfig(course.targetLanguage).label;
+
     return {
       status: "success",
-      message: `${targetLanguageConfig(course.targetLanguage).label} learning preferences saved.`,
+      message: t("settings.coursePreferencesSaved", { language: targetLabel }),
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not save settings.",
+      message:
+        error instanceof Error
+          ? error.message
+          : t("settings.preferencesSaveError"),
     };
   }
 }

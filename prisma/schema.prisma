@@ -36,6 +36,11 @@ enum TranslationLanguage {
   BOTH
 }
 
+enum UiLocale {
+  EN
+  FA
+}
+
 enum TargetLanguage {
   GERMAN
   FRENCH
@@ -277,6 +282,7 @@ model User {
   emailVerified        Boolean             @default(false)
   image                String?
   timezone             String              @default("UTC")
+  uiLocale             UiLocale            @default(EN)
   activeCourseId       String?             @unique
   activeCourse         UserCourse?         @relation("ActiveCourse", fields: [activeCourseId], references: [id], onDelete: SetNull)
   courses              UserCourse[]        @relation("UserCourses")

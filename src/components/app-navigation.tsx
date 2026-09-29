@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import {
   LEARNING_SECTIONS,
+  PRIMARY_LEARNING_SECTIONS,
   routeOwner,
   sectionForPath,
   type LearningSection,
@@ -29,17 +30,18 @@ const MobileAddVocabularySheet = dynamic(
   { ssr: false },
 );
 
-const primary: Array<{
-  section: LearningSection;
-  href: string;
-  labelKey: MessageKey;
-  icon: LucideIcon;
-}> = [
-  { section: "words", href: LEARNING_SECTIONS.words.href, labelKey: "nav.words", icon: BookOpen },
-  { section: "grammar", href: LEARNING_SECTIONS.grammar.href, labelKey: "nav.grammar", icon: GraduationCap },
-  { section: "review", href: LEARNING_SECTIONS.review.href, labelKey: "nav.review", icon: Brain },
-  { section: "practice", href: LEARNING_SECTIONS.practice.href, labelKey: "nav.practice", icon: Sparkles },
-];
+const primaryMeta: Record<LearningSection, { labelKey: MessageKey; icon: LucideIcon }> = {
+  words: { labelKey: "nav.words", icon: BookOpen },
+  grammar: { labelKey: "nav.grammar", icon: GraduationCap },
+  review: { labelKey: "nav.review", icon: Brain },
+  practice: { labelKey: "nav.practice", icon: Sparkles },
+};
+
+const primary = PRIMARY_LEARNING_SECTIONS.map((section) => ({
+  section,
+  href: LEARNING_SECTIONS[section].href,
+  ...primaryMeta[section],
+}));
 
 const insights: Array<{ href: string; labelKey: MessageKey; icon: LucideIcon }> = [
   { href: "/progress", labelKey: "nav.fullProgress", icon: BarChart3 },

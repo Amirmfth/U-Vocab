@@ -10,6 +10,7 @@ import { processConversationTurn } from "@/lib/conversation/process-turn";
 import { buildTutorInstructions } from "@/lib/conversation/tutor-prompt";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { isUnauthorizedError } from "@/lib/auth";
 import { startOperation } from "@/lib/performance";
 
 export const runtime = "nodejs";
@@ -19,10 +20,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const perf = startOperation("conversation.message");
-  const [{ id }, user] = await Promise.all([
-    params,
-    perf.span("auth", () => getCurrentUser()),
-  ]);
+  const { id } = await params;
+  let user: Awaited<ReturnType<typeof getCurrentUser>>;
+  try {
+    user = await perf.span("auth", () => getCurrentUser());
+  } catch (error) {
+    if (isUnauthorizedError(error)) {
+      perf.success({ httpStatus: 401, accepted: false });
+      return Response.json({ error: "Unauthorized." }, { status: 401 });
+    }
+    perf.fail(error);
+    return Response.json({ error: "Could not authenticate request." }, { status: 500 });
+  }
   const body = (await request.json()) as { message?: string };
   const message = body.message?.trim();
 

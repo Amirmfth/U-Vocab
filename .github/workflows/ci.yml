@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/u_vocab_ci
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/u_vocab_ci
+      OPENAI_API_KEY: test-key
+      BETTER_AUTH_SECRET: ci-only-better-auth-secret-0123456789-abcdefghijklmnopqrstuvwxyz
+      BETTER_AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build

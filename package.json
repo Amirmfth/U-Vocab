@@ -15,11 +15,15 @@
     "semantic:benchmark": "tsx scripts/benchmark-semantic-search.ts",
     "db:seed-grammar": "tsx scripts/seed-grammar-curriculum.ts",
     "db:backfill-grammar-links": "tsx scripts/backfill-lexeme-grammar.ts",
-    "db:backfill-grammar-lessons": "tsx scripts/backfill-grammar-lessons.ts"
+    "db:backfill-grammar-lessons": "tsx scripts/backfill-grammar-lessons.ts",
+    "auth:bootstrap": "tsx scripts/bootstrap-existing-auth-user.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "@tanstack/react-query": "5.103.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "better-auth": "1.7.6",
     "framer-motion": "^13.4.0",
     "geist": "^1.7.2",
     "lucide-react": "^1.48.0",

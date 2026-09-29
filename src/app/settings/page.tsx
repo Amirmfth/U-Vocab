@@ -4,37 +4,56 @@ import { BarChart3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
+import { getServerTranslator } from "@/i18n/server";
+import { uiLocaleFromDb } from "@/i18n/config";
 import { SettingsForm } from "./SettingsForm";
+import { UiLocaleForm } from "./UiLocaleForm";
 import { SignOutButton } from "./SignOutButton";
 
 export default async function SettingsPage() {
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const { t } = await getServerTranslator(user);
   const language = targetLanguageConfig(course.targetLanguage);
+  const languageLabel =
+    course.targetLanguage === "GERMAN" ? t("common.german") : language.label;
 
   return (
     <main className="page">
       <section className="page-header compact">
-        <p className="eyebrow">ACCOUNT</p>
-        <h1>Settings</h1>
-        <p className="page-description">Active course: {language.label} · {course.currentLevel} → {course.targetLevel}</p>
+        <p className="eyebrow">{t("settings.eyebrow")}</p>
+        <h1>{t("settings.title")}</h1>
+        <p className="page-description">
+          {t("settings.activeCourse", {
+            language: languageLabel,
+            current: course.currentLevel,
+            target: course.targetLevel,
+          })}
+        </p>
       </section>
+
+      <UiLocaleForm locale={uiLocaleFromDb(user.uiLocale)} />
+
       <SettingsForm
         preference={course.explanationLanguage}
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
       />
+
       <section className="panel account-links">
         <div>
-          <strong>AI operations</strong>
-          <span className="muted">Review model usage, tokens, latency, and recorded cost.</span>
+          <strong>{t("settings.aiOperations")}</strong>
+          <span className="muted">{t("settings.aiOperationsHelp")}</span>
         </div>
-        <Link href="/usage" className="button button-secondary"><BarChart3 size={17} /> AI Usage</Link>
+        <Link href="/usage" className="button button-secondary">
+          <BarChart3 size={17} /> {t("nav.aiUsage")}
+        </Link>
       </section>
+
       <section className="panel account-links">
         <div>
-          <strong>Account session</strong>
-          <span className="muted">Sign out of this browser. Your learning data stays attached to your account.</span>
+          <strong>{t("settings.accountSession")}</strong>
+          <span className="muted">{t("settings.accountSessionHelp")}</span>
         </div>
         <SignOutButton />
       </section>

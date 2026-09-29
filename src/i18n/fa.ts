@@ -482,6 +482,11 @@ export const fa = {
   "conversation.newMission": "ماموریت جدید",
   "conversation.newConversation": "مکالمه جدید",
 
+
+  "reading.length.short": "کوتاه",
+  "reading.length.medium": "متوسط",
+  "reading.length.long": "بلند",
+
   "errors.genericTitle": "مشکلی پیش آمد",
   "errors.genericBody": "U-Vocab با یک خطای غیرمنتظره روبه‌رو شد.",
   "errors.tryAgain": "تلاش دوباره",

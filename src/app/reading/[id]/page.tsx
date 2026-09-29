@@ -74,14 +74,10 @@ export default async function ReadingDetailPage({
           </span>
           {reading.completedAt ? (
             <span className="badge">
-              {t("reading.comprehension", {
-                value: formatPercent(
+              {t("reading.comprehension", { percent: formatPercent(
                   locale,
                   reading.comprehensionScore ?? 0,
-                )
-                  .replace("%", "")
-                  .replace("٪", ""),
-              })}
+                ) })}
             </span>
           ) : null}
         </div>

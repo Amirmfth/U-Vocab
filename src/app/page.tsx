@@ -13,6 +13,9 @@ import { startOperation } from "@/lib/performance";
 import { connection } from "next/server";
 import { getCachedHomeStats } from "@/lib/cached-data";
 import { db } from "@/lib/db";
+import { getServerTranslator } from "@/i18n/server";
+import { formatNumber } from "@/i18n/format";
+import { LearningText } from "@/i18n/learning-content";
 import {
   getGrammarRecommendation,
   grammarRecommendationActionHref,
@@ -25,6 +28,7 @@ export default async function Home() {
     perf.span("auth", () => getCurrentUser()),
     perf.span("course", () => getCurrentCourse()),
   ]);
+  const { locale, t } = await getServerTranslator(user);
   const [{ total, due, weakProduction, mistakes, recent, today }, grammarRecommendation] =
     await Promise.all([
       perf.span("dbRead", () => getCachedHomeStats(user.id, course.id, user.timezone)),
@@ -56,36 +60,38 @@ export default async function Home() {
           : "/practice";
   const nextLabel =
     due > 0
-      ? "Start review"
+      ? t("home.startReview")
       : mistakes > 0
-        ? "Fix mistakes"
+        ? t("home.fixMistakes")
         : weakProduction > 0
-          ? "Rescue weak words"
-          : "Choose practice";
+          ? t("home.rescueWeak")
+          : t("home.choosePractice");
+
+  const dueLabel = t.plural(
+    { one: "home.wordsDue.one", other: "home.wordsDue.other" },
+    due,
+    { count: formatNumber(locale, due) },
+  );
 
   return (
     <main className="page">
       <section className="home-focus">
-        <p className="home-kicker">Today</p>
-        <h1>
-          {due > 0
-            ? due + " " + (due === 1 ? "word" : "words") + " due"
-            : "You're caught up"}
-        </h1>
+        <p className="home-kicker">{t("home.today")}</p>
+        <h1>{due > 0 ? dueLabel : t("home.caughtUp")}</h1>
         <p className="page-description">
           {due > 0
-            ? "Clear your review queue first, then move into skill practice."
+            ? t("home.descDue")
             : mistakes > 0
-              ? "Your review queue is clear. A few recurring mistakes are ready for attention."
-              : "Your review queue is clear. Continue with the area that needs the most use."}
+              ? t("home.descMistakes")
+              : t("home.descClear")}
         </p>
         <div className="hero-actions">
           <Link className="button button-primary" href={nextHref}>
             {nextLabel}
-            <ArrowRight size={18} />
+            <ArrowRight className="rtl-mirror" size={18} />
           </Link>
           <Link className="button button-secondary" href="/vocabulary/new">
-            <Plus size={18} /> Add word
+            <Plus size={18} /> {t("nav.addWord")}
           </Link>
         </div>
       </section>
@@ -93,12 +99,12 @@ export default async function Home() {
       {recent ? (
         <section className="panel home-continue">
           <div>
-            <p className="eyebrow">CONTINUE</p>
+            <p className="eyebrow">{t("home.continue")}</p>
             <h2>{recent.label}</h2>
             <p className="muted">{recent.detail}</p>
           </div>
           <Link href={recent.href} className="button button-secondary">
-            Continue <ArrowRight size={17} />
+            {t("common.continue")} <ArrowRight className="rtl-mirror" size={17} />
           </Link>
         </section>
       ) : null}
@@ -106,106 +112,123 @@ export default async function Home() {
       {grammarRecommendation ? (
         <section className="panel home-continue">
           <div>
-            <p className="eyebrow">GRAMMAR · {grammarRecommendation.reasonCode.replaceAll("_", " ")}</p>
-            <h2>{grammarRecommendation.title}</h2>
+            <p className="eyebrow">
+              {t("home.grammar")} · {grammarRecommendation.reasonCode.replaceAll("_", " ")}
+            </p>
+            <LearningText language="en" className="block">
+              <h2>{grammarRecommendation.title}</h2>
+            </LearningText>
             <p className="muted">
               {grammarRecommendation.level} · {grammarRecommendation.reason}
             </p>
           </div>
           <div className="button-row">
-            <Link href={grammarRecommendationActionHref({
+            <Link
+              href={grammarRecommendationActionHref({
                 conceptId: grammarRecommendation.conceptId,
                 reasonCode: grammarRecommendation.reasonCode,
                 surface: "home",
                 action: "learn",
-              })} className="button button-secondary">
-              Learn
+              })}
+              className="button button-secondary"
+            >
+              {t("home.learn")}
             </Link>
-            <Link href={grammarRecommendationActionHref({
+            <Link
+              href={grammarRecommendationActionHref({
                 conceptId: grammarRecommendation.conceptId,
                 reasonCode: grammarRecommendation.reasonCode,
                 surface: "home",
                 action: "practice",
-              })} className="button button-primary">
-              Practice <ArrowRight size={17} />
+              })}
+              className="button button-primary"
+            >
+              {t("nav.practice")} <ArrowRight className="rtl-mirror" size={17} />
             </Link>
           </div>
         </section>
       ) : null}
 
-      <section className="home-today-activity" aria-label="Today's activity">
-        <div><strong>{today.minutes}</strong><span>minutes</span></div>
-        <div><strong>{today.reviews}</strong><span>reviewed</span></div>
-        <div><strong>{today.added}</strong><span>added</span></div>
+      <section className="home-today-activity" aria-label={t("home.activity")}>
+        <div><strong>{formatNumber(locale, today.minutes)}</strong><span>{t("home.minutes")}</span></div>
+        <div><strong>{formatNumber(locale, today.reviews)}</strong><span>{t("home.reviewed")}</span></div>
+        <div><strong>{formatNumber(locale, today.added)}</strong><span>{t("home.added")}</span></div>
       </section>
 
-      <section className="home-metrics" aria-label="Learning status">
+      <section className="home-metrics" aria-label={t("home.learningStatus")}>
         <Link href="/vocabulary">
-          <strong>{total}</strong>
-          <span>words</span>
+          <strong>{formatNumber(locale, total)}</strong>
+          <span>{t("home.words")}</span>
         </Link>
         <Link href="/vocabulary?status=WEAK">
-          <strong>{weakProduction}</strong>
-          <span>weak production</span>
+          <strong>{formatNumber(locale, weakProduction)}</strong>
+          <span>{t("home.weakProduction")}</span>
         </Link>
         <Link href="/mistakes">
-          <strong>{mistakes}</strong>
-          <span>open mistakes</span>
+          <strong>{formatNumber(locale, mistakes)}</strong>
+          <span>{t("home.openMistakes")}</span>
         </Link>
       </section>
 
-      <section className="home-next-grid" aria-label="Next learning actions">
+      <section className="home-next-grid" aria-label={t("home.nextActions")}>
         <Link href="/review" className="panel home-next-card">
           <div className="ia-card-icon"><Brain size={19} /></div>
           <div>
-            <p className="eyebrow">MAINTAIN</p>
-            <h2>Review</h2>
+            <p className="eyebrow">{t("home.maintain")}</p>
+            <h2>{t("nav.review")}</h2>
             <p>
               {due > 0
-                ? due + " due now. Keep recall stable before adding more load."
-                : "No reviews due. Mistakes and rescue modes are still available."}
+                ? t("home.dueNow", { count: formatNumber(locale, due) })
+                : t("home.noReviews")}
             </p>
           </div>
-          <span className="ia-card-link">Open Review <ArrowRight size={16} /></span>
+          <span className="ia-card-link">
+            {t("home.openReview")} <ArrowRight className="rtl-mirror" size={16} />
+          </span>
         </Link>
 
         <Link href="/practice" className="panel home-next-card">
           <div className="ia-card-icon"><Sparkles size={19} /></div>
           <div>
-            <p className="eyebrow">APPLY</p>
-            <h2>Practice</h2>
-            <p>Move into Writing, Reading, Speaking, or a quick vocabulary drill.</p>
+            <p className="eyebrow">{t("home.apply")}</p>
+            <h2>{t("nav.practice")}</h2>
+            <p>{t("home.practiceDescription")}</p>
           </div>
-          <span className="ia-card-link">Choose a skill <ArrowRight size={16} /></span>
+          <span className="ia-card-link">
+            {t("home.chooseSkill")} <ArrowRight className="rtl-mirror" size={16} />
+          </span>
         </Link>
 
         {mistakes > 0 ? (
           <Link href="/mistakes" className="panel home-next-card">
             <div className="ia-card-icon"><TriangleAlert size={19} /></div>
             <div>
-              <p className="eyebrow">RECOMMENDED</p>
-              <h2>Clean up mistakes</h2>
+              <p className="eyebrow">{t("home.recommended")}</p>
+              <h2>{t("home.cleanMistakes")}</h2>
               <p>
-                {mistakes} unresolved mistake{mistakes === 1 ? "" : "s"} can be
-                reinforced now.
+                {t.plural(
+                  { one: "home.mistakesReady.one", other: "home.mistakesReady.other" },
+                  mistakes,
+                  { count: formatNumber(locale, mistakes) },
+                )}
               </p>
             </div>
-            <span className="ia-card-link">Review mistakes <ArrowRight size={16} /></span>
+            <span className="ia-card-link">
+              {t("home.reviewMistakes")} <ArrowRight className="rtl-mirror" size={16} />
+            </span>
           </Link>
         ) : null}
       </section>
 
       <section className="panel home-progress-callout">
         <div>
-          <p className="eyebrow">PROGRESS</p>
-          <h2>See the full learning picture</h2>
-          <p className="muted">
-            Review retention, activity, skill balance, workload, and topic coverage.
-          </p>
+          <p className="eyebrow">{t("home.progress")}</p>
+          <h2>{t("home.fullPicture")}</h2>
+          <p className="muted">{t("home.progressDescription")}</p>
         </div>
         <Link href="/progress" className="button button-secondary">
           <TrendingUp size={17} />
-          View full progress
+          {t("home.viewProgress")}
         </Link>
       </section>
     </main>

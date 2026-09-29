@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { safeReturnTo } from "@/lib/auth-routing";
+import { getServerTranslator } from "@/i18n/server";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
 export default async function ForgotPasswordPage({
@@ -9,13 +10,14 @@ export default async function ForgotPasswordPage({
 }) {
   const params = await searchParams;
   const returnTo = safeReturnTo(params.returnTo);
+  const { t } = await getServerTranslator();
 
   return (
     <main className="login-page">
       <ForgotPasswordForm returnTo={returnTo} />
       <p className="muted">
         <Link href={"/login?returnTo=" + encodeURIComponent(returnTo)}>
-          Back to sign in
+          {t("auth.backToSignIn")}
         </Link>
       </p>
     </main>

@@ -16,6 +16,8 @@ import type { MessageKey } from "@/i18n/core";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { TimezoneSync } from "./TimezoneSync";
 import { GrammarProgressPanel } from "./GrammarProgressPanel";
+import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
+import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
 const RANGE_DAYS: Record<string, number | null> = {
   "7": 7,
@@ -294,6 +296,14 @@ export default async function ProgressPage({
   return (
     <main className="page">
       <TimezoneSync savedTimezone={user.timezone} />
+      <PersistedFirstUseGuide
+        userId={user.id}
+        guide={FIRST_USE_GUIDES.progress}
+        title={t("guidance.progress.title")}
+        description={t("guidance.progress.body")}
+        items={[t("guidance.progress.item1")]}
+        dismissLabel={t("guidance.dismiss")}
+      />
 
       <section className="page-header compact">
         <p className="eyebrow">{t("progress.eyebrow")}</p>

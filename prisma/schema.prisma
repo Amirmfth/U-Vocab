@@ -451,7 +451,7 @@ model QuotaUsageEvent {
   user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   course         UserCourse? @relation(fields: [userCourseId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, operationKey, sourceRef])
+  @@unique([userId, operationKey, periodKey, sourceRef])
   @@index([userId, operationKey, periodStart, periodEnd])
   @@index([userCourseId, operationKey, periodStart])
 }

@@ -56,6 +56,7 @@ export function ReadingForm({
 }) {
   const router = useRouter();
   const [state, action] = useActionState(createGeneratedReading, initialState);
+  const [requestId] = useState(() => crypto.randomUUID());
   const { locale, t } = useI18n();
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export function ReadingForm({
 
   return (
     <form action={action} className="panel story-form reading-generation-form">
+      <input type="hidden" name="requestId" value={requestId} />
       <div className="form-grid story-settings-grid">
         <div className="field">
           <label htmlFor="reading-length-trigger">{t("reading.length")}</label>

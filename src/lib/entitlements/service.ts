@@ -136,9 +136,10 @@ export async function consumeQuota(input: {
         async (tx) => {
           const existing = await tx.quotaUsageEvent.findUnique({
             where: {
-              userId_operationKey_sourceRef: {
+              userId_operationKey_periodKey_sourceRef: {
                 userId: input.userId,
                 operationKey: input.key,
+                periodKey: period.periodKey,
                 sourceRef: input.sourceRef,
               },
             },

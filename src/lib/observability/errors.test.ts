@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { QuotaExceededError } from "@/lib/entitlements/errors";
-import { UnauthorizedError } from "@/lib/auth";
 import { isExpectedOperationalError } from "./errors";
 
 test("expected domain outcomes are excluded from fatal Sentry reporting", () => {
@@ -16,7 +15,9 @@ test("expected domain outcomes are excluded from fatal Sentry reporting", () => 
     ),
     true,
   );
-  assert.equal(isExpectedOperationalError(new UnauthorizedError()), true);
+  const unauthorized = new Error("Unauthorized");
+  unauthorized.name = "UnauthorizedError";
+  assert.equal(isExpectedOperationalError(unauthorized), true);
 
   const validation = new Error("Invalid review submission.");
   assert.equal(isExpectedOperationalError(validation), true);

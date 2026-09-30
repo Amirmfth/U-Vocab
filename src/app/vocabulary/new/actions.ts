@@ -13,7 +13,9 @@ import { lexiconAdapter } from "@/lib/lexicon/normalization";
 import { AI_PROVIDER } from "@/lib/ai/client";
 import { aiRoute } from "@/lib/ai/routing";
 import { promptVersionFor } from "@/lib/ai/prompt-versions";
-import { consumeQuota } from "@/lib/entitlements/service";
+import { checkQuota, consumeQuota } from "@/lib/entitlements/service";
+import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
+import { QuotaExceededError } from "@/lib/entitlements/errors";
 import { entitlementErrorMessage } from "@/lib/entitlements/errors";
 import { db } from "@/lib/db";
 import { startOperation } from "@/lib/performance";
@@ -101,6 +103,21 @@ export async function previewVocabularyText(
       if (existing.candidate) {
         candidates = [existing.candidate];
       } else {
+        const quota = await checkQuota({
+          userId: user.id,
+          userCourseId: course.id,
+          timeZone: user.timezone,
+          key: "vocabulary_addition_daily",
+        });
+        if (!quota.allowed) {
+          throw new QuotaExceededError(
+            "vocabulary_addition_daily",
+            quota.limit,
+            quota.used,
+            quota.resetAt,
+          );
+        }
+        await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
         const analysis = await analyzeGermanLexeme(text, user.id);
         candidates = [candidateFromLexicalAnalysis(analysis, {
           rawSurface: text,
@@ -119,6 +136,21 @@ export async function previewVocabularyText(
       );
       const readingCandidates = rankReadingCandidates(text, knownLemmas, 30);
       const excerpt = buildReadingExcerpt(text, readingCandidates, 12_000);
+      const quota = await checkQuota({
+        userId: user.id,
+        userCourseId: course.id,
+        timeZone: user.timezone,
+        key: "vocabulary_addition_daily",
+      });
+      if (!quota.allowed) {
+        throw new QuotaExceededError(
+          "vocabulary_addition_daily",
+          quota.limit,
+          quota.used,
+          quota.resetAt,
+        );
+      }
+      await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
       const analysis = await analyzeReadingText({
         userId: user.id,
         userCourseId: course.id,
@@ -210,6 +242,25 @@ export async function addVocabularyItem(input: {
         resolutionSource = existing.source;
       } else {
         resolutionSource = existing.source === "ambiguous" ? "ambiguous" : "ai_generation";
+        const quota = await perf.span("quotaCheck", () =>
+          checkQuota({
+            userId: user.id,
+            userCourseId: course.id,
+            timeZone: user.timezone,
+            key: "vocabulary_addition_daily",
+          }),
+        );
+        if (!quota.allowed) {
+          throw new QuotaExceededError(
+            "vocabulary_addition_daily",
+            quota.limit,
+            quota.used,
+            quota.resetAt,
+          );
+        }
+        await perf.span("spendSafety", () =>
+          assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
+        );
         const analysis = await perf.span("ai", () => analyzeGermanLexeme(word, user.id));
         candidate = candidateFromLexicalAnalysis(analysis, {
           rawSurface: word,
@@ -334,6 +385,26 @@ export async function analyzeVocabularyBatch(words: string[]) {
     });
 
     if (missing.length) {
+      const quota = await perf.span("quotaCheck", () =>
+        checkQuota({
+          userId: user.id,
+          userCourseId: course.id,
+          timeZone: user.timezone,
+          key: "vocabulary_addition_daily",
+          amount: missing.length,
+        }),
+      );
+      if (!quota.allowed) {
+        throw new QuotaExceededError(
+          "vocabulary_addition_daily",
+          quota.limit,
+          quota.used,
+          quota.resetAt,
+        );
+      }
+      await perf.span("spendSafety", () =>
+        assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
+      );
       async function analyzeChunk(chunk: typeof missing): Promise<void> {
         try {
           const analyzed = await analyzeGermanLexemeBatch(

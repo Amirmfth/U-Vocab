@@ -305,6 +305,10 @@ export async function evaluateWritingAction(
           return { status: "error", message: "Writing session not found." };
         }
 
+        await perf.span("spendSafety", () =>
+          assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
+        );
+
         await perf.span("quota", () =>
           consumeQuota({
             userId: user.id,
@@ -313,10 +317,6 @@ export async function evaluateWritingAction(
             key: "writing_evaluation_monthly",
             sourceRef: "writing-evaluation:" + session.id,
           }),
-        );
-
-        await perf.span("spendSafety", () =>
-          assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
         );
 
         const observed = await perf.span("dbRead", () =>

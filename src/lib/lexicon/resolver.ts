@@ -1,5 +1,6 @@
 import type { PartOfSpeech, Prisma, PrismaClient, TargetLanguage } from "@prisma/client";
 import { lexiconAdapter } from "./normalization";
+import { classifyLexemeIds } from "./canonical";
 import type { IngestionCandidate, IngestionSourceType } from "@/lib/ingestion/types";
 
 type DbLike = PrismaClient | Prisma.TransactionClient;
@@ -65,18 +66,22 @@ export async function resolveExistingLexeme(
     take: 3,
   });
 
-  if (canonical.length === 1) {
+  const canonicalResolution = classifyLexemeIds(canonical.map((item) => item.id));
+  if (canonicalResolution.kind === "unique") {
+    const match = canonical.find((item) => item.id === canonicalResolution.id)!;
     return {
       source: "canonical_hit",
-      lexeme: canonical[0],
+      lexeme: match,
       candidate: {
-        ...candidateFromLexeme(canonical[0], input.sourceType),
+        ...candidateFromLexeme(match, input.sourceType),
         surface: normalized.surface,
         resolutionSource: "canonical_hit",
       },
     };
   }
-  if (canonical.length > 1) return { source: "ambiguous", lexeme: null, candidate: null };
+  if (canonicalResolution.kind === "ambiguous") {
+    return { source: "ambiguous", lexeme: null, candidate: null };
+  }
 
   const aliases = await db.lexemeAlias.findMany({
     where: {
@@ -89,12 +94,17 @@ export async function resolveExistingLexeme(
     take: 3,
   });
 
-  if (aliases.length !== 1) {
-    return { source: aliases.length > 1 ? "ambiguous" : "miss", lexeme: null, candidate: null };
+  const aliasResolution = classifyLexemeIds(aliases.map((item) => item.lexemeId));
+  if (aliasResolution.kind !== "unique") {
+    return {
+      source: aliasResolution.kind === "ambiguous" ? "ambiguous" : "miss",
+      lexeme: null,
+      candidate: null,
+    };
   }
 
   const lexeme = await db.lexeme.findUnique({
-    where: { id: aliases[0].lexemeId },
+    where: { id: aliasResolution.id },
     include: LEXEME_INCLUDE,
   });
   if (!lexeme) return { source: "miss", lexeme: null, candidate: null };

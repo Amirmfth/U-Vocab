@@ -11,6 +11,7 @@ import { syncDeterministicGrammarLinksForLexeme } from "@/lib/grammar/lexeme-lin
 import { targetLanguageConfig } from "@/lib/languages";
 import { lexiconAdapter } from "@/lib/lexicon/normalization";
 import { resolveExistingLexeme } from "@/lib/lexicon/resolver";
+import { safeCanonicalFill } from "@/lib/lexicon/canonical";
 import type {
   CandidateWithState,
   IngestionCandidate,
@@ -181,14 +182,7 @@ export async function commitIngestionCandidates(
       }
 
       const current = await tx.lexeme.findUniqueOrThrow({ where: { id: lexeme.id } });
-      const safeFill: {
-        article?: string;
-        plural?: string;
-        cefrLevel?: string;
-      } = {};
-      if (!current.article && candidate.article) safeFill.article = candidate.article;
-      if (!current.plural && candidate.plural) safeFill.plural = candidate.plural;
-      if (!current.cefrLevel && candidate.cefrLevel) safeFill.cefrLevel = candidate.cefrLevel;
+      const safeFill = safeCanonicalFill(current, candidate);
       if (Object.keys(safeFill).length) {
         await tx.lexeme.update({
           where: { id: lexeme.id },

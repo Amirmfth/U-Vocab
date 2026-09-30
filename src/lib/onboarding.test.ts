@@ -8,8 +8,7 @@ import {
   onboardingComplete,
 } from "./onboarding";
 import { ENABLED_TARGET_LANGUAGES } from "./languages";
-import { FIRST_USE_GUIDES } from "./first-use-guidance";
-import { guideStateShouldShow } from "./guide-visibility";
+import { FIRST_USE_GUIDES, guideStateShouldShow } from "./first-use-guidance";
 import { targetLevelIsValid } from "./grammar/levels";
 
 test("new accounts are incomplete while migrated current-version accounts bypass onboarding", () => {

@@ -13,6 +13,8 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { isUnauthorizedError } from "@/lib/auth";
 import { startOperation } from "@/lib/performance";
+import { consumeQuota } from "@/lib/entitlements/service";
+import { EntitlementError } from "@/lib/entitlements/errors";
 
 export const runtime = "nodejs";
 
@@ -37,12 +39,17 @@ export async function POST(
     perf.fail(error);
     return Response.json({ error: "Could not authenticate request." }, { status: 500 });
   }
-  const body = (await request.json()) as { message?: string };
+  const body = (await request.json()) as { message?: string; requestId?: string };
   const message = body.message?.trim();
+  const requestId = body.requestId?.trim();
 
   if (!message) {
     perf.success({ httpStatus: 400, accepted: false });
     return Response.json({ error: "Message is required." }, { status: 400 });
+  }
+  if (!requestId || requestId.length > 120) {
+    perf.success({ httpStatus: 400, accepted: false });
+    return Response.json({ error: "A request ID is required." }, { status: 400 });
   }
   if (message.length > 4000) {
     perf.success({
@@ -74,6 +81,32 @@ export async function POST(
       { error: "Conversation is busy, completed, or not found." },
       { status: 409 },
     );
+  }
+
+  try {
+    await perf.span("quota", () =>
+      consumeQuota({
+        userId: user.id,
+        userCourseId: course.id,
+        timeZone: user.timezone,
+        key: "conversation_turn_monthly",
+        sourceRef: "conversation-turn:" + id + ":" + requestId,
+      }),
+    );
+  } catch (error) {
+    await db.conversationSession.updateMany({
+      where: { id, userId: user.id, userCourseId: course.id },
+      data: { turnInFlight: false },
+    });
+    if (error instanceof EntitlementError) {
+      perf.success({ httpStatus: 429, accepted: false, entitlementCode: error.code });
+      return Response.json(
+        { error: "You have reached this plan allowance.", code: error.code },
+        { status: 429 },
+      );
+    }
+    perf.fail(error);
+    return Response.json({ error: "Could not check allowance." }, { status: 500 });
   }
 
   await perf.span("dbWrite", () =>

@@ -13,6 +13,8 @@ import { lexiconAdapter } from "@/lib/lexicon/normalization";
 import { AI_PROVIDER } from "@/lib/ai/client";
 import { aiRoute } from "@/lib/ai/routing";
 import { promptVersionFor } from "@/lib/ai/prompt-versions";
+import { consumeQuota } from "@/lib/entitlements/service";
+import { entitlementErrorMessage } from "@/lib/entitlements/errors";
 import { db } from "@/lib/db";
 import { startOperation } from "@/lib/performance";
 import {
@@ -220,6 +222,43 @@ export async function addVocabularyItem(input: {
     }
 
     if (!candidate) throw new Error("No vocabulary item was provided.");
+
+    const ownershipResolution = await perf.span("quotaLookup", () =>
+      resolveExistingLexeme(db, {
+        targetLanguage: course.targetLanguage,
+        rawInput: candidate!.lemma,
+        partOfSpeech: candidate!.partOfSpeech,
+        sourceType,
+      }),
+    );
+    const owned = ownershipResolution.lexeme
+      ? await db.userVocabulary.findUnique({
+          where: {
+            userCourseId_lexemeId: {
+              userCourseId: course.id,
+              lexemeId: ownershipResolution.lexeme.id,
+            },
+          },
+          select: { id: true },
+        })
+      : null;
+
+    if (!owned) {
+      const quotaIdentity =
+        ownershipResolution.lexeme?.id ??
+        [course.targetLanguage, candidate.normalized, candidate.partOfSpeech].join(":");
+      await perf.span("quota", () =>
+        consumeQuota({
+          userId: user.id,
+          userCourseId: course.id,
+          timeZone: user.timezone,
+          key: "vocabulary_addition_daily",
+          sourceRef: "vocabulary:" + course.id + ":" + quotaIdentity,
+          metadata: { resolutionSource: candidate.resolutionSource ?? null },
+        }),
+      );
+    }
+
     const [lexemeId] = await perf.span("dbSave", () => commitIngestionCandidates(db, {
       userId: user.id,
       userCourseId: course.id,
@@ -240,7 +279,9 @@ export async function addVocabularyItem(input: {
     perf.fail(error);
     return {
       status: "error" as const,
-      message: error instanceof Error ? error.message : "Could not add this word.",
+      message:
+        entitlementErrorMessage(error) ??
+        (error instanceof Error ? error.message : "Could not add this word."),
     };
   }
 }

@@ -275,6 +275,29 @@ enum LexemeGrammarLinkSource {
   MANUAL
 }
 
+enum LexemeAliasKind {
+  USER_INPUT
+  ARTICLE_VARIANT
+  SPELLING_VARIANT
+  INFLECTED_FORM
+  IMPORTED
+  GENERATED
+}
+
+enum LexemeDataSource {
+  CURATED
+  IMPORTED
+  AI_GENERATED
+  USER_CONFIRMED
+}
+
+enum LexemeReviewState {
+  UNREVIEWED
+  ACCEPTED
+  FLAGGED
+  CURATED
+}
+
 model User {
   id                   String              @id @default(cuid())
   name                 String              @default("")
@@ -617,6 +640,9 @@ model Lexeme {
   cefrLevel    String?
   notes        String?
   translations Translation[]
+  senses       LexemeSense[]
+  aliases      LexemeAlias[]
+  provenance   LexemeProvenance[]
   examples     Example[]
   patterns     LexicalPattern[]
   userStates   UserVocabulary[]
@@ -641,20 +667,78 @@ model Lexeme {
   embeddingModel String?
   embeddingVersion Int?
   embeddedAt     DateTime?
+  canonicalUpdatedAt DateTime   @default(now())
   updatedAt    DateTime         @updatedAt
 
   @@unique([language, normalized, partOfSpeech])
   @@index([lemma])
 }
 
+model LexemeSense {
+  id          String              @id @default(cuid())
+  lexemeId    String
+  key         String              @default("default")
+  gloss       String?
+  source      LexemeDataSource    @default(IMPORTED)
+  reviewState LexemeReviewState   @default(UNREVIEWED)
+  confidence  Float?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  lexeme      Lexeme              @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  translations Translation[]
+  provenance  LexemeProvenance[]
+
+  @@unique([lexemeId, key])
+  @@index([lexemeId, reviewState])
+}
+
+model LexemeAlias {
+  id                String           @id @default(cuid())
+  lexemeId          String
+  language          String
+  surface           String
+  normalizedSurface String
+  kind              LexemeAliasKind
+  source            LexemeDataSource @default(IMPORTED)
+  createdAt         DateTime         @default(now())
+  lexeme            Lexeme           @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+
+  @@unique([language, normalizedSurface, lexemeId])
+  @@index([language, normalizedSurface])
+  @@index([lexemeId, kind])
+}
+
+model LexemeProvenance {
+  id             String            @id @default(cuid())
+  lexemeId       String
+  senseId        String?
+  source         LexemeDataSource
+  provider       String?
+  model          String?
+  promptVersion  String?
+  contentVersion String?
+  confidence     Float?
+  reviewState    LexemeReviewState @default(UNREVIEWED)
+  createdAt      DateTime          @default(now())
+  lexeme         Lexeme            @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  sense          LexemeSense?      @relation(fields: [senseId], references: [id], onDelete: SetNull)
+
+  @@index([lexemeId, createdAt])
+  @@index([senseId])
+  @@index([source, reviewState])
+}
+
 model Translation {
   id       String @id @default(cuid())
   lexemeId String
+  senseId  String?
   language String
   text     String
   lexeme   Lexeme @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  sense    LexemeSense? @relation(fields: [senseId], references: [id], onDelete: SetNull)
 
   @@index([lexemeId, language])
+  @@index([senseId, language])
 }
 
 model LexicalPattern {

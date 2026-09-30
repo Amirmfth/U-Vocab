@@ -8,7 +8,11 @@ import { revalidateUserDomains } from "@/lib/cache-tags";
 import { buildReadingExcerpt, rankReadingCandidates } from "@/lib/ai/preprocess";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
-import { targetLanguageConfig } from "@/lib/languages";
+import { resolveExistingLexeme } from "@/lib/lexicon/resolver";
+import { lexiconAdapter } from "@/lib/lexicon/normalization";
+import { AI_PROVIDER } from "@/lib/ai/client";
+import { aiRoute } from "@/lib/ai/routing";
+import { promptVersionFor } from "@/lib/ai/prompt-versions";
 import { db } from "@/lib/db";
 import { startOperation } from "@/lib/performance";
 import {
@@ -29,11 +33,22 @@ export type VocabularyPreviewState = {
 
 function candidateFromLexicalAnalysis(
   analysis: Awaited<ReturnType<typeof analyzeGermanLexeme>>,
+  input: {
+    rawSurface: string;
+    sourceType: IngestionCandidate["sourceType"];
+    targetLanguage: Parameters<typeof lexiconAdapter>[0];
+    operation: "lexical_analysis" | "lexical_batch_analysis";
+  },
 ): IngestionCandidate {
-  const normalized = analysis.lemma.toLocaleLowerCase("de-DE");
+  const normalized = lexiconAdapter(input.targetLanguage).normalizeCanonical(
+    analysis.lemma,
+    analysis.partOfSpeech,
+  );
+  const route = aiRoute(input.operation);
   return {
     key: normalized + ":" + analysis.partOfSpeech,
-    sourceType: "PASTED_TEXT",
+    sourceType: input.sourceType,
+    surface: input.rawSurface,
     lemma: analysis.lemma,
     normalized,
     partOfSpeech: analysis.partOfSpeech,
@@ -45,6 +60,15 @@ function candidateFromLexicalAnalysis(
     pattern: analysis.patterns[0]?.pattern ?? null,
     patternExplanation: analysis.patterns[0]?.explanation ?? null,
     example: analysis.examples[0]?.german ?? null,
+    resolutionSource: "ai_generation",
+    provenance: {
+      source: "AI_GENERATED",
+      provider: AI_PROVIDER,
+      model: route.model,
+      promptVersion: promptVersionFor(input.operation),
+      contentVersion: "lexical-v1",
+      reviewState: "UNREVIEWED",
+    },
   };
 }
 
@@ -64,12 +88,25 @@ export async function previewVocabularyText(
 
   try {
     const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
-    const language = targetLanguageConfig(course.targetLanguage);
     let candidates: IngestionCandidate[];
 
     if (isShortLexicalUnit(text)) {
-      const analysis = await analyzeGermanLexeme(text, user.id);
-      candidates = [candidateFromLexicalAnalysis(analysis)];
+      const existing = await resolveExistingLexeme(db, {
+        targetLanguage: course.targetLanguage,
+        rawInput: text,
+        sourceType: "PASTED_TEXT",
+      });
+      if (existing.candidate) {
+        candidates = [existing.candidate];
+      } else {
+        const analysis = await analyzeGermanLexeme(text, user.id);
+        candidates = [candidateFromLexicalAnalysis(analysis, {
+          rawSurface: text,
+          sourceType: "PASTED_TEXT",
+          targetLanguage: course.targetLanguage,
+          operation: "lexical_analysis",
+        })];
+      }
     } else {
       const knownVocabulary = await db.userVocabulary.findMany({
         where: { userCourseId: course.id },
@@ -90,10 +127,14 @@ export async function previewVocabularyText(
       });
 
       candidates = analysis.lexicalUnits.map((item) => {
-        const normalized = item.lemma.toLocaleLowerCase(language.locale);
+        const normalized = lexiconAdapter(course.targetLanguage).normalizeCanonical(
+          item.lemma,
+          item.partOfSpeech,
+        );
         return {
           key: normalized + ":" + item.partOfSpeech,
           sourceType: "PASTED_TEXT",
+          surface: item.lemma,
           lemma: item.lemma,
           normalized,
           partOfSpeech: item.partOfSpeech,
@@ -105,6 +146,15 @@ export async function previewVocabularyText(
           pattern: item.pattern,
           patternExplanation: item.patternExplanation,
           example: item.example,
+          resolutionSource: "ai_generation",
+          provenance: {
+            source: "AI_GENERATED",
+            provider: AI_PROVIDER,
+            model: aiRoute("reading_analysis").model,
+            promptVersion: promptVersionFor("reading_analysis"),
+            contentVersion: "reading-lexical-v1",
+            reviewState: "UNREVIEWED",
+          },
         };
       });
     }
@@ -142,13 +192,30 @@ export async function addVocabularyItem(input: {
       perf.span("course", () => getCurrentCourse()),
     ]);
     let candidate = input.candidate;
+    let resolutionSource = candidate?.resolutionSource ?? "preview_candidate";
     let sourceType: "PASTED_TEXT" | "CSV" = candidate?.sourceType === "CSV" ? "CSV" : "PASTED_TEXT";
 
     if (input.word !== undefined) {
       const word = input.word.trim();
       if (!word || word.length > 300) throw new Error("Enter one German word or phrase per item.");
-      const analysis = await perf.span("ai", () => analyzeGermanLexeme(word, user.id));
-      candidate = { ...candidateFromLexicalAnalysis(analysis), sourceType: "CSV" };
+      const existing = await perf.span("lexiconLookup", () => resolveExistingLexeme(db, {
+        targetLanguage: course.targetLanguage,
+        rawInput: word,
+        sourceType: "CSV",
+      }));
+      if (existing.candidate) {
+        candidate = existing.candidate;
+        resolutionSource = existing.source;
+      } else {
+        resolutionSource = existing.source === "ambiguous" ? "ambiguous" : "ai_generation";
+        const analysis = await perf.span("ai", () => analyzeGermanLexeme(word, user.id));
+        candidate = candidateFromLexicalAnalysis(analysis, {
+          rawSurface: word,
+          sourceType: "CSV",
+          targetLanguage: course.targetLanguage,
+          operation: "lexical_analysis",
+        });
+      }
       sourceType = "CSV";
     }
 
@@ -167,7 +234,7 @@ export async function addVocabularyItem(input: {
         revalidatePath("/vocabulary");
       });
     }
-    perf.success();
+    perf.success({ resolutionSource });
     return { status: "success" as const, lexemeId };
   } catch (error) {
     perf.fail(error);
@@ -188,75 +255,86 @@ export async function finishVocabularyImport(lexemeIds: string[]) {
 export async function analyzeVocabularyBatch(words: string[]) {
   const perf = startOperation("vocabulary.analyze_batch", { wordCount: words.length });
   try {
-    if (words.length < 1 || words.length > 8 || words.some((word) => !word.trim() || word.length > 300)) {
+    if (
+      words.length < 1 ||
+      words.length > 8 ||
+      words.some((word) => !word.trim() || word.length > 300)
+    ) {
       throw new Error("Send 1–8 German words or phrases per batch.");
     }
+
     const [user, course] = await Promise.all([
       perf.span("auth", () => getCurrentUser()),
       perf.span("course", () => getCurrentCourse()),
     ]);
-    const language = targetLanguageConfig(course.targetLanguage);
-    const normalized = words.map((word) => word.trim().toLocaleLowerCase(language.locale));
-    const existing = await perf.span("existingLookup", () => db.lexeme.findMany({
-      where: { language: language.code, normalized: { in: normalized } },
-      include: { translations: true, patterns: { take: 1 }, examples: { take: 1 } },
-    }));
-    const byNormalized = new Map<string, typeof existing>();
-    for (const lexeme of existing) {
-      const group = byNormalized.get(lexeme.normalized) ?? [];
-      group.push(lexeme);
-      byNormalized.set(lexeme.normalized, group);
-    }
 
     const results: Array<{ index: number; candidate: IngestionCandidate }> = [];
-    const missing: Array<{ index: number; word: string }> = [];
-    words.forEach((word, index) => {
-      const matches = byNormalized.get(normalized[index]) ?? [];
-      const match = matches.length === 1 ? matches[0] : null;
-      const english = match?.translations.find((translation) => translation.language === "en")?.text;
-      const persian = match?.translations.find((translation) => translation.language === "fa")?.text;
-      if (match && english && persian) {
-        results.push({ index, candidate: {
-          key: `${match.normalized}:${match.partOfSpeech}`,
-          sourceType: "CSV",
-          lemma: match.lemma,
-          normalized: match.normalized,
-          partOfSpeech: match.partOfSpeech,
-          article: match.article,
-          plural: match.plural,
-          cefrLevel: match.cefrLevel && ["A1", "A2", "B1", "B2", "C1", "C2"].includes(match.cefrLevel)
-            ? match.cefrLevel as IngestionCandidate["cefrLevel"]
-            : null,
-          englishMeaning: english,
-          persianMeaning: persian,
-          pattern: match.patterns[0]?.pattern ?? null,
-          patternExplanation: match.patterns[0]?.explanation ?? null,
-          example: match.examples[0]?.german ?? null,
-        } });
-      } else {
-        missing.push({ index, word });
-      }
+    const missing: Array<{ index: number; word: string; resolutionSource: "miss" | "ambiguous" }> = [];
+
+    await perf.span("lexiconLookup", async () => {
+      await Promise.all(
+        words.map(async (word, index) => {
+          const resolution = await resolveExistingLexeme(db, {
+            targetLanguage: course.targetLanguage,
+            rawInput: word,
+            sourceType: "CSV",
+          });
+          if (resolution.candidate) {
+            results.push({ index, candidate: resolution.candidate });
+          } else {
+            missing.push({
+              index,
+              word,
+              resolutionSource: resolution.source,
+            });
+          }
+        }),
+      );
     });
 
     if (missing.length) {
       async function analyzeChunk(chunk: typeof missing): Promise<void> {
         try {
-          const analyzed = await analyzeGermanLexemeBatch(chunk.map((item) => item.word), user.id);
+          const analyzed = await analyzeGermanLexemeBatch(
+            chunk.map((item) => item.word),
+            user.id,
+          );
           for (const item of analyzed) {
-            results.push({ index: chunk[item.index].index, candidate: { ...candidateFromLexicalAnalysis(item.analysis), sourceType: "CSV" } });
+            const source = chunk[item.index];
+            results.push({
+              index: source.index,
+              candidate: candidateFromLexicalAnalysis(item.analysis, {
+                rawSurface: source.word,
+                sourceType: "CSV",
+                targetLanguage: course.targetLanguage,
+                operation: "lexical_batch_analysis",
+              }),
+            });
           }
         } catch {
           if (chunk.length === 1) return;
           const middle = Math.ceil(chunk.length / 2);
-          await Promise.all([analyzeChunk(chunk.slice(0, middle)), analyzeChunk(chunk.slice(middle))]);
+          await Promise.all([
+            analyzeChunk(chunk.slice(0, middle)),
+            analyzeChunk(chunk.slice(middle)),
+          ]);
         }
       }
       await perf.span("ai", () => analyzeChunk(missing));
     }
-    perf.success({ existingCount: words.length - missing.length, analyzedCount: results.length - (words.length - missing.length) });
+
+    results.sort((a, b) => a.index - b.index);
+    perf.success({
+      canonicalOrAliasHits: words.length - missing.length,
+      aiAnalyzed: results.length - (words.length - missing.length),
+      ambiguousBeforeAi: missing.filter((item) => item.resolutionSource === "ambiguous").length,
+    });
     return { status: "success" as const, results };
   } catch (error) {
     perf.fail(error);
-    return { status: "error" as const, message: error instanceof Error ? error.message : "Could not analyze this batch." };
+    return {
+      status: "error" as const,
+      message: error instanceof Error ? error.message : "Could not analyze this batch.",
+    };
   }
 }

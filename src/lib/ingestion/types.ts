@@ -13,6 +13,7 @@ export type IngestionCandidate = {
   key: string;
   sourceType: IngestionSourceType;
   sourceRef?: string | null;
+  surface?: string | null;
   lemma: string;
   normalized: string;
   partOfSpeech: PartOfSpeech;
@@ -24,6 +25,16 @@ export type IngestionCandidate = {
   pattern?: string | null;
   patternExplanation?: string | null;
   example?: string | null;
+  resolutionSource?: "canonical_hit" | "alias_hit" | "ai_generation" | "ambiguous";
+  provenance?: {
+    source: "CURATED" | "IMPORTED" | "AI_GENERATED" | "USER_CONFIRMED";
+    provider?: string | null;
+    model?: string | null;
+    promptVersion?: string | null;
+    contentVersion?: string | null;
+    confidence?: number | null;
+    reviewState?: "UNREVIEWED" | "ACCEPTED" | "FLAGGED" | "CURATED";
+  };
 };
 
 export type CandidateWithState = IngestionCandidate & {

@@ -5,7 +5,7 @@ import { Check, LoaderCircle, ScanText, Upload } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { StatusNotice } from "@/components/status-notice";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
-import { parseWordList } from "@/lib/ingestion/word-list";
+import { germanWordListKey, parseWordList } from "@/lib/ingestion/word-list";
 import type { CandidateWithState } from "@/lib/ingestion/types";
 import { addVocabularyItem, analyzeVocabularyBatch, finishVocabularyImport, previewVocabularyText, type VocabularyPreviewState } from "./actions";
 import { useI18n } from "@/i18n/client";
@@ -37,8 +37,8 @@ export function AddLexemeForm({ translationPreference }: {
 
   function updateCsv(value: string) {
     const words = parseWordList(value);
-    const previousKeys = new Set(parseWordList(csvText).map((word) => `csv:${word.toLocaleLowerCase("de-DE")}`));
-    const keys = words.map((word) => `csv:${word.toLocaleLowerCase("de-DE")}`);
+    const previousKeys = new Set(parseWordList(csvText).map((word) => `csv:${germanWordListKey(word)}`));
+    const keys = words.map((word) => `csv:${germanWordListKey(word)}`);
     setCsvText(value);
     setSelected((current) => new Set(keys.filter((key) => !previousKeys.has(key) || current.has(key))));
     setStatuses((current) => Object.fromEntries(keys.filter((key) => current[key]).map((key) => [key, current[key]])));
@@ -59,7 +59,7 @@ export function AddLexemeForm({ translationPreference }: {
 
   function addSelected() {
     if (processing) return;
-    const csvJobs = csvWords.map((word) => ({ key: `csv:${word.toLocaleLowerCase("de-DE")}`, word }))
+    const csvJobs = csvWords.map((word) => ({ key: `csv:${germanWordListKey(word)}`, word }))
       .filter((job) => selected.has(job.key) && statuses[job.key]?.state !== "saved");
     const textJobs = textCandidates.map((candidate) => ({ key: `text:${candidate.key}`, candidate }))
       .filter((job) => selected.has(job.key) && statuses[job.key]?.state !== "saved");
@@ -141,7 +141,7 @@ export function AddLexemeForm({ translationPreference }: {
   }
 
   const rows: PreviewRow[] = tab === "csv"
-    ? csvWords.map((word) => ({ key: `csv:${word.toLocaleLowerCase("de-DE")}`, label: word }))
+    ? csvWords.map((word) => ({ key: `csv:${germanWordListKey(word)}`, label: word }))
     : textCandidates.map((candidate) => ({ key: `text:${candidate.key}`, label: formatLexemeLabel(candidate), candidate }));
   const remaining = rows.filter((row) => selected.has(row.key) && statuses[row.key]?.state !== "saved").length;
 

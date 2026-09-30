@@ -1,6 +1,17 @@
-import type { PartOfSpeech, PrismaClient, TargetLanguage } from "@prisma/client";
+import type {
+  LexemeAliasKind,
+  LexemeDataSource,
+  LexemeReviewState,
+  PartOfSpeech,
+  Prisma,
+  PrismaClient,
+  TargetLanguage,
+} from "@prisma/client";
 import { syncDeterministicGrammarLinksForLexeme } from "@/lib/grammar/lexeme-links";
 import { targetLanguageConfig } from "@/lib/languages";
+import { lexiconAdapter } from "@/lib/lexicon/normalization";
+import { resolveExistingLexeme } from "@/lib/lexicon/resolver";
+import { safeCanonicalFill } from "@/lib/lexicon/canonical";
 import type {
   CandidateWithState,
   IngestionCandidate,
@@ -15,6 +26,46 @@ export function deduplicateCandidates(
   );
 }
 
+function aliasKindFor(
+  candidate: IngestionCandidate,
+  normalizedSurface: string,
+  canonicalNormalized: string,
+): LexemeAliasKind {
+  if (
+    candidate.partOfSpeech === "NOUN" &&
+    /^(der|die|das)\s+/u.test(normalizedSurface)
+  ) {
+    return "ARTICLE_VARIANT";
+  }
+  if (normalizedSurface !== canonicalNormalized) return "USER_INPUT";
+  return candidate.provenance?.source === "AI_GENERATED" ? "GENERATED" : "IMPORTED";
+}
+
+async function ensureAlias(
+  tx: Prisma.TransactionClient,
+  input: {
+    lexemeId: string;
+    language: string;
+    surface: string;
+    normalizedSurface: string;
+    kind: LexemeAliasKind;
+    source: LexemeDataSource;
+  },
+) {
+  if (!input.normalizedSurface) return;
+  await tx.lexemeAlias.upsert({
+    where: {
+      language_normalizedSurface_lexemeId: {
+        language: input.language,
+        normalizedSurface: input.normalizedSurface,
+        lexemeId: input.lexemeId,
+      },
+    },
+    create: input,
+    update: {},
+  });
+}
+
 export async function attachIngestionState(
   db: PrismaClient,
   userId: string,
@@ -23,29 +74,38 @@ export async function attachIngestionState(
   candidates: IngestionCandidate[],
 ): Promise<CandidateWithState[]> {
   const unique = deduplicateCandidates(candidates);
-  const language = targetLanguageConfig(targetLanguage).code;
 
   return Promise.all(
     unique.map(async (candidate) => {
-      const existing = await db.lexeme.findUnique({
-        where: {
-          language_normalized_partOfSpeech: {
-            language,
-            normalized: candidate.normalized,
-            partOfSpeech: candidate.partOfSpeech,
-          },
-        },
-        include: {
-          userStates: {
-            where: { userCourseId },
-            select: { id: true, state: true },
-            take: 1,
-          },
-        },
+      const resolution = await resolveExistingLexeme(db, {
+        targetLanguage,
+        rawInput: candidate.surface ?? candidate.lemma,
+        partOfSpeech: candidate.partOfSpeech,
+        sourceType: candidate.sourceType,
       });
+      const existing = resolution.lexeme
+        ? await db.lexeme.findUnique({
+            where: { id: resolution.lexeme.id },
+            include: {
+              userStates: {
+                where: { userCourseId },
+                select: { id: true, state: true },
+                take: 1,
+              },
+            },
+          })
+        : null;
 
       return {
         ...candidate,
+        normalized:
+          resolution.lexeme?.normalized ??
+          lexiconAdapter(targetLanguage).normalizeCanonical(
+            candidate.lemma,
+            candidate.partOfSpeech,
+          ),
+        resolutionSource:
+          resolution.source === "miss" ? candidate.resolutionSource : resolution.source,
         existingLexemeId: existing?.id ?? null,
         userVocabularyId: existing?.userStates[0]?.id ?? null,
         state: existing?.userStates[0]?.state ?? null,
@@ -66,6 +126,7 @@ export async function commitIngestionCandidates(
   },
 ) {
   const unique = deduplicateCandidates(input.candidates);
+  const adapter = lexiconAdapter(input.targetLanguage);
   const language = targetLanguageConfig(input.targetLanguage).code;
   const timeout = Math.min(120_000, Math.max(20_000, unique.length * 1_500));
 
@@ -73,51 +134,194 @@ export async function commitIngestionCandidates(
     const ids: string[] = [];
 
     for (const candidate of unique) {
-      const lexeme = await tx.lexeme.upsert({
-        where: {
-          language_normalized_partOfSpeech: {
+      const canonicalNormalized = adapter.normalizeCanonical(
+        candidate.lemma,
+        candidate.partOfSpeech,
+      );
+      const surface = candidate.surface ?? candidate.lemma;
+      const normalizedInput = adapter.normalizeInput(surface);
+
+      const existingResolution = await resolveExistingLexeme(tx, {
+        targetLanguage: input.targetLanguage,
+        rawInput: surface,
+        partOfSpeech: candidate.partOfSpeech,
+        sourceType: input.sourceType,
+      });
+
+      let lexeme =
+        existingResolution.source === "canonical_hit" ||
+        existingResolution.source === "alias_hit"
+          ? existingResolution.lexeme
+          : null;
+
+      if (!lexeme) {
+        lexeme = await tx.lexeme.upsert({
+          where: {
+            language_normalized_partOfSpeech: {
+              language,
+              normalized: canonicalNormalized,
+              partOfSpeech: candidate.partOfSpeech as PartOfSpeech,
+            },
+          },
+          create: {
             language,
-            normalized: candidate.normalized,
-            partOfSpeech: candidate.partOfSpeech as PartOfSpeech,
+            lemma: candidate.lemma.trim(),
+            normalized: canonicalNormalized,
+            partOfSpeech: candidate.partOfSpeech,
+            article: candidate.article ?? null,
+            plural: candidate.plural ?? null,
+            cefrLevel: candidate.cefrLevel ?? null,
           },
-        },
+          update: {},
+          include: {
+            translations: true,
+            patterns: { take: 1 },
+            examples: { take: 1 },
+          },
+        });
+      }
+
+      const current = await tx.lexeme.findUniqueOrThrow({ where: { id: lexeme.id } });
+      const safeFill = safeCanonicalFill(current, candidate);
+      if (Object.keys(safeFill).length) {
+        await tx.lexeme.update({
+          where: { id: lexeme.id },
+          data: { ...safeFill, canonicalUpdatedAt: new Date() },
+        });
+      }
+
+      const provenanceSource =
+        (candidate.provenance?.source ?? "IMPORTED") as LexemeDataSource;
+      const reviewState =
+        (candidate.provenance?.reviewState ??
+          (provenanceSource === "AI_GENERATED" ? "UNREVIEWED" : "ACCEPTED")) as LexemeReviewState;
+
+      const sense = await tx.lexemeSense.upsert({
+        where: { lexemeId_key: { lexemeId: lexeme.id, key: "default" } },
         create: {
-          language,
-          lemma: candidate.lemma,
-          normalized: candidate.normalized,
-          partOfSpeech: candidate.partOfSpeech,
-          article: candidate.article ?? null,
-          plural: candidate.plural ?? null,
-          cefrLevel: candidate.cefrLevel ?? null,
-          translations: {
-            create: [
-              ...(candidate.englishMeaning
-                ? [{ language: "en", text: candidate.englishMeaning }]
-                : []),
-              ...(candidate.persianMeaning
-                ? [{ language: "fa", text: candidate.persianMeaning }]
-                : []),
-            ],
-          },
-          patterns: candidate.pattern
-            ? {
-                create: [{
-                  pattern: candidate.pattern,
-                  explanation: candidate.patternExplanation ?? null,
-                }],
-              }
-            : undefined,
-          examples: candidate.example
-            ? {
-                create: [{
-                  german: candidate.example,
-                  generatedByAi: true,
-                }],
-              }
-            : undefined,
+          lexemeId: lexeme.id,
+          key: "default",
+          source: provenanceSource,
+          reviewState,
+          confidence: candidate.provenance?.confidence ?? null,
         },
         update: {},
       });
+
+      for (const translation of [
+        candidate.englishMeaning
+          ? { language: "en", text: candidate.englishMeaning }
+          : null,
+        candidate.persianMeaning
+          ? { language: "fa", text: candidate.persianMeaning }
+          : null,
+      ].filter((item): item is { language: string; text: string } => Boolean(item))) {
+        const existingTranslation = await tx.translation.findFirst({
+          where: { lexemeId: lexeme.id, language: translation.language },
+          select: { id: true, senseId: true },
+        });
+        if (!existingTranslation) {
+          await tx.translation.create({
+            data: {
+              lexemeId: lexeme.id,
+              senseId: sense.id,
+              language: translation.language,
+              text: translation.text,
+            },
+          });
+        } else if (!existingTranslation.senseId) {
+          await tx.translation.update({
+            where: { id: existingTranslation.id },
+            data: { senseId: sense.id },
+          });
+        }
+      }
+
+      if (candidate.pattern) {
+        const existingPattern = await tx.lexicalPattern.findFirst({
+          where: { lexemeId: lexeme.id, pattern: candidate.pattern },
+          select: { id: true },
+        });
+        if (!existingPattern) {
+          await tx.lexicalPattern.create({
+            data: {
+              lexemeId: lexeme.id,
+              pattern: candidate.pattern,
+              explanation: candidate.patternExplanation ?? null,
+            },
+          });
+        }
+      }
+
+      if (candidate.example) {
+        const existingExample = await tx.example.findFirst({
+          where: { lexemeId: lexeme.id, german: candidate.example },
+          select: { id: true },
+        });
+        if (!existingExample) {
+          await tx.example.create({
+            data: {
+              lexemeId: lexeme.id,
+              german: candidate.example,
+              generatedByAi: provenanceSource === "AI_GENERATED",
+            },
+          });
+        }
+      }
+
+      const aliasSource =
+        provenanceSource === "AI_GENERATED" ? "AI_GENERATED" : "USER_CONFIRMED";
+      await ensureAlias(tx, {
+        lexemeId: lexeme.id,
+        language,
+        surface: normalizedInput.surface,
+        normalizedSurface: normalizedInput.normalizedLookup,
+        kind: aliasKindFor(
+          candidate,
+          normalizedInput.normalizedLookup,
+          canonicalNormalized,
+        ),
+        source: aliasSource,
+      });
+
+      const canonicalSurface = adapter.normalizeInput(candidate.lemma);
+      await ensureAlias(tx, {
+        lexemeId: lexeme.id,
+        language,
+        surface: candidate.lemma.trim(),
+        normalizedSurface: canonicalSurface.normalizedLookup,
+        kind: canonicalSurface.normalizedLookup === canonicalNormalized ? "GENERATED" : "USER_INPUT",
+        source: provenanceSource,
+      });
+
+      if (candidate.article && candidate.partOfSpeech === "NOUN") {
+        const articleSurface = candidate.article.trim() + " " + candidate.lemma.trim();
+        const articleNormalized = adapter.normalizeInput(articleSurface);
+        await ensureAlias(tx, {
+          lexemeId: lexeme.id,
+          language,
+          surface: articleSurface,
+          normalizedSurface: articleNormalized.normalizedLookup,
+          kind: "ARTICLE_VARIANT",
+          source: provenanceSource,
+        });
+      }
+
+      if (candidate.provenance) {
+        await tx.lexemeProvenance.create({
+          data: {
+            lexemeId: lexeme.id,
+            senseId: sense.id,
+            source: provenanceSource,
+            provider: candidate.provenance.provider ?? null,
+            model: candidate.provenance.model ?? null,
+            promptVersion: candidate.provenance.promptVersion ?? null,
+            contentVersion: candidate.provenance.contentVersion ?? null,
+            confidence: candidate.provenance.confidence ?? null,
+            reviewState,
+          },
+        });
+      }
 
       await tx.userVocabulary.upsert({
         where: {
@@ -161,9 +365,6 @@ export async function commitIngestionCandidates(
 
     return ids;
   }, {
-    // Each candidate creates or links several dependent records. Scale the
-    // transaction window for pasted-text batches instead of using Prisma's
-    // five-second default.
     maxWait: 10_000,
     timeout,
   });

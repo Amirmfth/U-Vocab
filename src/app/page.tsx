@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/current-user";
 import { AUTHENTICATED_ROOT_DESTINATION } from "@/lib/navigation";
+import { onboardingComplete } from "@/lib/onboarding";
 
 export default async function Home() {
-  await getCurrentUser();
-  redirect(AUTHENTICATED_ROOT_DESTINATION);
+  const user = await getCurrentUser();
+  redirect(onboardingComplete(user) ? AUTHENTICATED_ROOT_DESTINATION : "/onboarding");
 }

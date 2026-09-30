@@ -9,6 +9,7 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { selectConversationTargets } from "@/lib/conversation/targets";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
+import { recordProductEvent } from "@/lib/product-events";
 
 export type ConversationActionState = {
   status: "idle" | "success" | "error";
@@ -93,6 +94,12 @@ export async function createConversationSessionAction(
           },
         },
       },
+    });
+
+    await recordProductEvent("conversation_started", {
+      kind,
+      level: course.currentLevel,
+      targetCount: targets.length,
     });
 
     revalidatePath("/conversation");
@@ -234,6 +241,12 @@ export async function completeConversationAction(
           skipDuplicates: true,
         });
       }
+    });
+
+    await recordProductEvent("conversation_completed", {
+      kind: session.kind,
+      turnCount: session.messages.filter((message) => message.role === "USER").length,
+      overallScore: typeof normalizedEvaluation.overall === "number" ? normalizedEvaluation.overall : null,
     });
 
     revalidatePath("/conversation/" + session.id);

@@ -3,6 +3,7 @@ import type {
   LexemeDataSource,
   LexemeReviewState,
   PartOfSpeech,
+  Prisma,
   PrismaClient,
   TargetLanguage,
 } from "@prisma/client";
@@ -40,7 +41,7 @@ function aliasKindFor(
 }
 
 async function ensureAlias(
-  tx: Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0],
+  tx: Prisma.TransactionClient,
   input: {
     lexemeId: string;
     language: string;

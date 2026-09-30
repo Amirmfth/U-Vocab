@@ -85,6 +85,24 @@ export async function POST(
   }
 
   try {
+    await perf.span("spendSafety", () =>
+      assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
+    );
+  } catch (error) {
+    await db.conversationSession.updateMany({
+      where: { id, userId: user.id, userCourseId: course.id },
+      data: { turnInFlight: false },
+    });
+    if (error instanceof EntitlementError) {
+      return Response.json(
+        { error: "This action is temporarily unavailable.", code: error.code },
+        { status: 429 },
+      );
+    }
+    throw error;
+  }
+
+  try {
     await perf.span("quota", () =>
       consumeQuota({
         userId: user.id,
@@ -108,24 +126,6 @@ export async function POST(
     }
     perf.fail(error);
     return Response.json({ error: "Could not check allowance." }, { status: 500 });
-  }
-
-  try {
-    await perf.span("spendSafety", () =>
-      assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
-    );
-  } catch (error) {
-    await db.conversationSession.updateMany({
-      where: { id, userId: user.id, userCourseId: course.id },
-      data: { turnInFlight: false },
-    });
-    if (error instanceof EntitlementError) {
-      return Response.json(
-        { error: "This action is temporarily unavailable.", code: error.code },
-        { status: 429 },
-      );
-    }
-    throw error;
   }
 
   await perf.span("dbWrite", () =>

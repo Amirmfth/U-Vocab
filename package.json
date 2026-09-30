@@ -17,7 +17,8 @@
     "db:backfill-grammar-links": "tsx scripts/backfill-lexeme-grammar.ts",
     "db:backfill-grammar-lessons": "tsx scripts/backfill-grammar-lessons.ts",
     "auth:bootstrap": "tsx scripts/bootstrap-existing-auth-user.ts",
-    "lexicon:maintain": "tsx scripts/maintain-lexicon.ts"
+    "lexicon:maintain": "tsx scripts/maintain-lexicon.ts",
+    "entitlement:grant-pro": "tsx scripts/grant-pro.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

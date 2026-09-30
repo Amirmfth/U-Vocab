@@ -11,6 +11,8 @@ import { formatNumber } from "@/i18n/format";
 import type { Translator } from "@/i18n/core";
 import type { UiLocale } from "@/i18n/config";
 import { ReviewSession } from "./ReviewSession";
+import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
+import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
 function ReviewModes({
   mistakes,
@@ -95,6 +97,14 @@ export default async function ReviewPage({
 
   return (
     <main className="page review-landing review-page">
+      <PersistedFirstUseGuide
+        userId={user.id}
+        guide={FIRST_USE_GUIDES.review}
+        title={t("guidance.review.title")}
+        description={t("guidance.review.body")}
+        items={[t("guidance.review.item1"), t("guidance.review.item2")]}
+        dismissLabel={t("guidance.dismiss")}
+      />
       <section className="review-hero">
         <div>
           <h1>

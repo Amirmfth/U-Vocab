@@ -6,20 +6,28 @@ import { recordProductEvent } from "@/lib/product-events";
 
 export async function markGuideSeen(guideId: string, version: number) {
   const user = await getCurrentUser();
-  await db.userGuideState.upsert({
+  const current = await db.userGuideState.findUnique({
     where: { userId_guideId: { userId: user.id, guideId } },
-    create: {
-      userId: user.id,
-      guideId,
-      version,
-      seenAt: new Date(),
-    },
-    update: {
-      version,
-      seenAt: new Date(),
-      ...(version > 1 ? { dismissedAt: null } : {}),
-    },
   });
+  if (!current) {
+    await db.userGuideState.create({
+      data: {
+        userId: user.id,
+        guideId,
+        version,
+        seenAt: new Date(),
+      },
+    });
+  } else {
+    await db.userGuideState.update({
+      where: { id: current.id },
+      data: {
+        version,
+        seenAt: new Date(),
+        dismissedAt: current.version < version ? null : current.dismissedAt,
+      },
+    });
+  }
   await recordProductEvent("first_use_guide_seen", { guideId, version });
 }
 

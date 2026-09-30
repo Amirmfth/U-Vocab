@@ -3,7 +3,8 @@ import type { EntitlementFeature, QuotaKey } from "./config";
 export type EntitlementErrorCode =
   | "QUOTA_EXCEEDED"
   | "PRO_REQUIRED"
-  | "SUBSCRIPTION_INACTIVE";
+  | "SUBSCRIPTION_INACTIVE"
+  | "USAGE_SAFETY_LIMIT";
 
 export class EntitlementError extends Error {
   constructor(
@@ -44,5 +45,7 @@ export function entitlementErrorMessage(error: unknown) {
     ? "You have reached this plan allowance."
     : error.code === "PRO_REQUIRED"
       ? "This feature requires Pro."
-      : "Your subscription is not active.";
+      : error.code === "USAGE_SAFETY_LIMIT"
+        ? "This action is temporarily unavailable."
+        : "Your subscription is not active.";
 }

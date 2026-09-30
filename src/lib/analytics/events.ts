@@ -1,4 +1,5 @@
 export type ProductEventMap = {
+  observability_smoke_test: { surface: "server"; release: string };
   signup_completed: { method: "email" | "other" };
   onboarding_started: { version: number; step: number };
   onboarding_step_completed: { version: number; step: number };
@@ -61,6 +62,7 @@ export type ProductEventMap = {
 export type ProductEventName = keyof ProductEventMap;
 
 export const PRODUCT_EVENT_NAMES = new Set<ProductEventName>([
+  "observability_smoke_test",
   "signup_completed",
   "onboarding_started",
   "onboarding_step_completed",

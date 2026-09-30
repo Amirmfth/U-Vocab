@@ -7,3 +7,10 @@ export const FIRST_USE_GUIDES = {
 } as const;
 
 export type FirstUseGuide = (typeof FIRST_USE_GUIDES)[keyof typeof FIRST_USE_GUIDES];
+
+export function guideStateShouldShow(
+  state: { version: number; dismissedAt: Date | null } | null,
+  version: number,
+) {
+  return !state || state.version < version || !state.dismissedAt;
+}

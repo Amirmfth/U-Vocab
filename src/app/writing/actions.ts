@@ -20,6 +20,8 @@ import { detectLexemePresence, detectRepeatedWords } from "@/lib/ai/preprocess";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 import { CEFR_RANK } from "@/lib/grammar/levels";
 import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
+import { consumeQuota } from "@/lib/entitlements/service";
+import { entitlementErrorMessage } from "@/lib/entitlements/errors";
 import {
   recordGrammarMistake,
   resolveGrammarMistakes,
@@ -270,7 +272,7 @@ export async function evaluateWritingAction(
         ]);
         const session = await perf.span("dbRead", () =>
           db.writingSession.findFirst({
-            where: { id: sessionId, userId: user.id, userCourseId: course.id },
+            where: { id: sessionId, userId: user.id, userCourseId: course.id, status: "ACTIVE" },
             select: {
               id: true,
               parentId: true,
@@ -297,6 +299,16 @@ export async function evaluateWritingAction(
         if (!session) {
           return { status: "error", message: "Writing session not found." };
         }
+
+        await perf.span("quota", () =>
+          consumeQuota({
+            userId: user.id,
+            userCourseId: course.id,
+            timeZone: user.timezone,
+            key: "writing_evaluation_monthly",
+            sourceRef: "writing-evaluation:" + session.id,
+          }),
+        );
 
         const observed = await perf.span("dbRead", () =>
           detectKnownLexemes(course.id, draft),
@@ -624,9 +636,10 @@ export async function evaluateWritingAction(
         return {
           status: "error",
           message:
-            error instanceof Error
+            entitlementErrorMessage(error) ??
+            (error instanceof Error
               ? error.message
-              : "Could not evaluate writing.",
+              : "Could not evaluate writing."),
         };
       }
     },

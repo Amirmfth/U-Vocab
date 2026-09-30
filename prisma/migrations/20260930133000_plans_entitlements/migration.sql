@@ -63,8 +63,8 @@ ON "EntitlementGrant"("userId", "startsAt", "endsAt");
 CREATE INDEX "EntitlementGrant_userId_revokedAt_idx"
 ON "EntitlementGrant"("userId", "revokedAt");
 
-CREATE UNIQUE INDEX "QuotaUsageEvent_userId_operationKey_sourceRef_key"
-ON "QuotaUsageEvent"("userId", "operationKey", "sourceRef");
+CREATE UNIQUE INDEX "QuotaUsageEvent_userId_operationKey_periodKey_sourceRef_key"
+ON "QuotaUsageEvent"("userId", "operationKey", "periodKey", "sourceRef");
 
 CREATE INDEX "QuotaUsageEvent_userId_operationKey_periodStart_periodEnd_idx"
 ON "QuotaUsageEvent"("userId", "operationKey", "periodStart", "periodEnd");

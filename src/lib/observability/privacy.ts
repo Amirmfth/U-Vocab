@@ -62,7 +62,7 @@ export function sanitizeTelemetryValue(
 
 export function scrubSentryEvent<T extends {
   user?: Record<string, unknown> | null;
-  request?: { data?: unknown; cookies?: unknown; headers?: unknown } | null;
+  request?: { data?: unknown; cookies?: unknown; headers?: unknown; url?: string } | null;
   contexts?: Record<string, unknown> | null;
   extra?: Record<string, unknown> | null;
   breadcrumbs?: Array<{ data?: Record<string, unknown>; message?: string }> | null;
@@ -76,6 +76,16 @@ export function scrubSentryEvent<T extends {
   if (event.request) {
     delete event.request.data;
     delete event.request.cookies;
+    if (event.request.url) {
+      try {
+        const parsed = new URL(event.request.url);
+        parsed.search = "";
+        parsed.hash = "";
+        event.request.url = parsed.toString();
+      } catch {
+        event.request.url = event.request.url.split("?")[0].split("#")[0];
+      }
+    }
     if (event.request.headers && typeof event.request.headers === "object") {
       event.request.headers = sanitizeTelemetryValue(
         event.request.headers,
@@ -92,7 +102,7 @@ export function scrubSentryEvent<T extends {
   if (event.breadcrumbs) {
     event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => ({
       ...breadcrumb,
-      message: breadcrumb.message?.slice(0, 160),
+      message: undefined,
       data: breadcrumb.data
         ? (sanitizeTelemetryValue(breadcrumb.data) as Record<string, unknown>)
         : undefined,

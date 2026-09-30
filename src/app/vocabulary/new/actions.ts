@@ -8,7 +8,6 @@ import { revalidateUserDomains } from "@/lib/cache-tags";
 import { buildReadingExcerpt, rankReadingCandidates } from "@/lib/ai/preprocess";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
-import { targetLanguageConfig } from "@/lib/languages";
 import { resolveExistingLexeme } from "@/lib/lexicon/resolver";
 import { lexiconAdapter } from "@/lib/lexicon/normalization";
 import { AI_PROVIDER } from "@/lib/ai/client";
@@ -89,7 +88,6 @@ export async function previewVocabularyText(
 
   try {
     const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
-    const language = targetLanguageConfig(course.targetLanguage);
     let candidates: IngestionCandidate[];
 
     if (isShortLexicalUnit(text)) {

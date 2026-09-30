@@ -23,6 +23,7 @@ import { getServerTranslator } from "@/i18n/server";
 import type { MessageKey, Translator } from "@/i18n/core";
 import { GrammarLessonContent } from "./GrammarLessonContent";
 import { TeachGrammarSheet } from "./TeachGrammarSheet";
+import { recordProductEvent } from "@/lib/product-events";
 
 const categoryKeys: Record<GrammarCategory, MessageKey> = {
   SENTENCE_STRUCTURE: "grammar.category.sentence_structure",
@@ -155,6 +156,11 @@ export default async function GrammarConceptPage({
   });
 
   if (!concept) notFound();
+
+  await recordProductEvent("grammar_lesson_opened", {
+    grammarConceptId: concept.id,
+    cefrLevel: concept.introducedAt,
+  });
 
   const vocabulary = await getVocabularyForGrammarConcept(
     user.id,

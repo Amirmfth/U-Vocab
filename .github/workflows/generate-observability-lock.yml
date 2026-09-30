@@ -1,0 +1,28 @@
+name: Generate observability lock
+
+on:
+  push:
+    branches:
+      - feat/issue-101-observability
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/generate-observability-lock.yml
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - uses: actions/upload-artifact@v4
+        with:
+          name: observability-package-lock
+          path: package-lock.json

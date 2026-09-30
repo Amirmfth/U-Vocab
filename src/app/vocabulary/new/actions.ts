@@ -192,6 +192,7 @@ export async function addVocabularyItem(input: {
       perf.span("course", () => getCurrentCourse()),
     ]);
     let candidate = input.candidate;
+    let resolutionSource = candidate?.resolutionSource ?? "preview_candidate";
     let sourceType: "PASTED_TEXT" | "CSV" = candidate?.sourceType === "CSV" ? "CSV" : "PASTED_TEXT";
 
     if (input.word !== undefined) {
@@ -204,7 +205,9 @@ export async function addVocabularyItem(input: {
       }));
       if (existing.candidate) {
         candidate = existing.candidate;
+        resolutionSource = existing.source;
       } else {
+        resolutionSource = existing.source === "ambiguous" ? "ambiguous" : "ai_generation";
         const analysis = await perf.span("ai", () => analyzeGermanLexeme(word, user.id));
         candidate = candidateFromLexicalAnalysis(analysis, {
           rawSurface: word,
@@ -231,7 +234,7 @@ export async function addVocabularyItem(input: {
         revalidatePath("/vocabulary");
       });
     }
-    perf.success();
+    perf.success({ resolutionSource });
     return { status: "success" as const, lexemeId };
   } catch (error) {
     perf.fail(error);

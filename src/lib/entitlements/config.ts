@@ -129,4 +129,8 @@ export const PROVIDER_SPEND_SAFETY = {
     0.25,
     Number(process.env.MAX_PROVIDER_COST_USD_PER_USER_DAY ?? "10") || 10,
   ),
+  maxProviderCostUsdGlobalPerDay: Math.max(
+    1,
+    Number(process.env.MAX_PROVIDER_COST_USD_GLOBAL_DAY ?? "250") || 250,
+  ),
 };

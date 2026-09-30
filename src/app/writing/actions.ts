@@ -22,6 +22,7 @@ import { CEFR_RANK } from "@/lib/grammar/levels";
 import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { consumeQuota } from "@/lib/entitlements/service";
 import { entitlementErrorMessage } from "@/lib/entitlements/errors";
+import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 import {
   recordGrammarMistake,
   resolveGrammarMistakes,
@@ -126,6 +127,10 @@ export async function createWritingSessionAction(
             message: "Add more vocabulary before using Guided vocabulary mode.",
           };
         }
+
+        await perf.span("spendSafety", () =>
+          assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
+        );
 
         const generated = await perf.span("ai", () =>
           generateWritingTask({
@@ -308,6 +313,10 @@ export async function evaluateWritingAction(
             key: "writing_evaluation_monthly",
             sourceRef: "writing-evaluation:" + session.id,
           }),
+        );
+
+        await perf.span("spendSafety", () =>
+          assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
         );
 
         const observed = await perf.span("dbRead", () =>

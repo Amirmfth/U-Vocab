@@ -1,11 +1,9 @@
-import type { User } from "@prisma/client";
-
 export const ONBOARDING_VERSION = 1;
 export const ONBOARDING_FIRST_ACTION = "/vocabulary/new";
 export const ONBOARDING_STEP_COUNT = 7;
 
 export function onboardingComplete(
-  user: Pick<User, "onboardingCompletedAt" | "onboardingVersion">,
+  user: { onboardingCompletedAt: Date | null; onboardingVersion: number },
 ) {
   return Boolean(
     user.onboardingCompletedAt &&

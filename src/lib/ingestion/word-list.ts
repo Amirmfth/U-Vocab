@@ -1,5 +1,10 @@
 import { lexiconAdapter } from "@/lib/lexicon/normalization";
 
+export function germanWordListKey(word: string) {
+  const normalized = lexiconAdapter("GERMAN").normalizeInput(word);
+  return normalized.articleVariant ?? normalized.normalizedLookup;
+}
+
 export function parseWordList(input: string) {
   const words: string[] = [];
   let value = "";
@@ -23,12 +28,11 @@ export function parseWordList(input: string) {
   }
   words.push(value.trim());
 
-  const adapter = lexiconAdapter("GERMAN");
   return Array.from(
     new Map(
       words
         .filter(Boolean)
-        .map((word) => [adapter.normalizeInput(word).normalizedLookup, word]),
+        .map((word) => [germanWordListKey(word), word]),
     ).values(),
   );
 }

@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { getServerTranslator } from "@/i18n/server";
 import { ConversationStartForm } from "./ConversationStartForm";
+import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
+import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
 export default async function ConversationPage({ searchParams }: {
   searchParams: Promise<{ mode?: string }>;
@@ -25,6 +27,14 @@ export default async function ConversationPage({ searchParams }: {
 
   return (
     <main className="page">
+      <PersistedFirstUseGuide
+        userId={user.id}
+        guide={FIRST_USE_GUIDES.conversation}
+        title={t("guidance.conversation.title")}
+        description={t("guidance.conversation.body")}
+        items={[t("guidance.conversation.item1")]}
+        dismissLabel={t("guidance.dismiss")}
+      />
       <section className="page-header compact">
         <h1>{t("conversation.title")}</h1>
       </section>

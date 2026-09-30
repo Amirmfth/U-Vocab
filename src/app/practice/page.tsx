@@ -21,10 +21,20 @@ import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { getServerTranslator } from "@/i18n/server";
 import type { Translator } from "@/i18n/core";
 import { PRACTICE_HUB_DESTINATIONS } from "@/lib/practice-hub";
+import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
+import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
-function PracticeHub({ t }: { t: Translator }) {
+function PracticeHub({ t, userId }: { t: Translator; userId: string }) {
   return (
     <main className="page practice-hub">
+      <PersistedFirstUseGuide
+        userId={userId}
+        guide={FIRST_USE_GUIDES.practice}
+        title={t("guidance.practice.title")}
+        description={t("guidance.practice.body")}
+        items={[t("guidance.practice.item1"), t("guidance.practice.item2")]}
+        dismissLabel={t("guidance.dismiss")}
+      />
 
       <nav className="practice-lanes" aria-label={t("practice.skills")}>
         {PRACTICE_HUB_DESTINATIONS.map((destination) => {
@@ -60,7 +70,7 @@ export default async function PracticePage({
   const user=await getCurrentUser();
   const { t }=await getServerTranslator(user);
   if(params.mixed==="1") redirect("/practice?drill=1");
-  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub t={t}/>;
+  if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub t={t} userId={user.id}/>;
 
   const course=await getCurrentCourse();
 

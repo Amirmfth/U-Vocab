@@ -16,6 +16,8 @@ import { CEFR_LEVELS } from "@/lib/grammar/levels";
 import { getServerTranslator } from "@/i18n/server";
 import { formatNumber } from "@/i18n/format";
 import type { MessageKey, Translator } from "@/i18n/core";
+import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
+import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
 const CATEGORY_LABEL_KEYS: Record<GrammarCategory, MessageKey> = {
   SENTENCE_STRUCTURE: "grammar.category.sentence_structure",
@@ -101,6 +103,14 @@ export default async function GrammarPage({
 
   return (
     <main className="page grammar-hub">
+      <PersistedFirstUseGuide
+        userId={user.id}
+        guide={FIRST_USE_GUIDES.grammar}
+        title={t("guidance.grammar.title")}
+        description={t("guidance.grammar.body")}
+        items={[t("guidance.grammar.item1")]}
+        dismissLabel={t("guidance.dismiss")}
+      />
       <section className="grammar-hero">
         <div>
           <p className="eyebrow">{t("grammar.eyebrow")}</p>

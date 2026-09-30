@@ -205,7 +205,7 @@ export function VocabularyFilters({
 
       <div className="vocabulary-controls-row">
         <div className="translation-switch" aria-label={t("vocab.translationLanguage")}>
-          {([["ENGLISH", "EN"], ["PERSIAN", "FA"], ["BOTH", "EN+FA"]] as const).map(
+          {([["ENGLISH", "EN"], ["PERSIAN", "FA"]] as const).map(
             ([mode, label]) => (
               <button
                 type="button"

@@ -8,9 +8,9 @@ export function QuotaRemaining({
   remaining,
 }: {
   label: string;
-  used: number;
-  limit: number;
-  remaining: number;
+  used: number | string;
+  limit: number | string;
+  remaining: number | string;
 }) {
   return (
     <div className="quota-remaining">

@@ -1,3 +1,7 @@
+import * as Sentry from "@sentry/nextjs";
+import { observabilityConfig } from "@/lib/observability/config";
+import { reportUnexpectedError } from "@/lib/observability/errors";
+
 type MetadataValue = string | number | boolean | null | undefined;
 export type PerformanceMetadata = Record<string, MetadataValue>;
 
@@ -66,6 +70,16 @@ export function startOperation(
   async function span<T>(name: string, work: () => Promise<T>): Promise<T> {
     const spanStartedAt = clockNow();
     try {
+      if (observabilityConfig.sentry.enabled) {
+        return await Sentry.startSpan(
+          {
+            name: operation + ":" + name,
+            op: "u-vocab." + name,
+            attributes: sanitizePerformanceMetadata(metadata),
+          },
+          work,
+        );
+      }
       return await work();
     } finally {
       spans[name] = roundMs((spans[name] ?? 0) + clockNow() - spanStartedAt);
@@ -105,6 +119,11 @@ export function startOperation(
 
     const serialized = JSON.stringify(payload);
     if (status === "error") {
+      reportUnexpectedError(error, {
+        operation,
+        requestId,
+        durationMs: payload.durationMs,
+      });
       console.error(serialized);
     } else {
       console.info(serialized);

@@ -160,6 +160,8 @@ export async function createGeneratedReading(
       };
     }
 
+    await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
+
     await consumeQuota({
       userId: user.id,
       userCourseId: course.id,
@@ -168,8 +170,6 @@ export async function createGeneratedReading(
       sourceRef: "reading:" + (requestId || crypto.randomUUID()),
       metadata: { length, stretch },
     });
-
-    await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
 
     const selectedSet = new Set(selectedTargets.map((item) => item.lexemeId));
     const generationPool = targetPool.slice(0, Math.max(minimumTargets * 2, 20));

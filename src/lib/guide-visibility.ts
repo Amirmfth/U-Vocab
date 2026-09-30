@@ -1,11 +1,5 @@
 import { db } from "@/lib/db";
-
-export function guideStateShouldShow(
-  state: { version: number; dismissedAt: Date | null } | null,
-  version: number,
-) {
-  return !state || state.version < version || !state.dismissedAt;
-}
+import { guideStateShouldShow } from "@/lib/first-use-guidance";
 
 export async function shouldShowGuide(
   userId: string,

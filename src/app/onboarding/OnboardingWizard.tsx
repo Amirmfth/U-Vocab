@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useI18n } from "@/i18n/client";
+import type { MessageKey } from "@/i18n/core";
 import type { UiLocale } from "@/i18n/config";
 import { CEFR_LEVELS, CEFR_RANK } from "@/lib/grammar/levels";
 import { ONBOARDING_STEP_COUNT } from "@/lib/onboarding";
@@ -34,7 +35,7 @@ import {
   setOnboardingStep,
 } from "./actions";
 
-const levelKeys: Record<CefrLevel, string> = {
+const levelKeys: Record<CefrLevel, MessageKey> = {
   A1: "onboarding.level.a1",
   A2: "onboarding.level.a2",
   B1: "onboarding.level.b1",
@@ -102,7 +103,7 @@ export function OnboardingWizard({
     run(() => setOnboardingStep(step - 1));
   }
 
-  const nextIcon = locale === "fa" ? ArrowLeft : ArrowRight;
+  const NextIcon = locale === "fa" ? ArrowLeft : ArrowRight;
 
   return (
     <main className="onboarding-page">
@@ -148,7 +149,7 @@ export function OnboardingWizard({
                 })
               }
             >
-              {t("common.continue")} {nextIcon({ size: 18 })}
+              {t("common.continue")} <NextIcon size={18} />
             </button>
           </div>
         ) : null}
@@ -203,7 +204,7 @@ export function OnboardingWizard({
                   aria-pressed={selectedCurrent === level}
                 >
                   <strong>{level}</strong>
-                  <span>{t(levelKeys[level] as never)}</span>
+                  <span>{t(levelKeys[level])}</span>
                 </button>
               ))}
             </div>
@@ -233,7 +234,7 @@ export function OnboardingWizard({
                   aria-pressed={selectedTarget === level}
                 >
                   <strong>{level}</strong>
-                  <span>{t(levelKeys[level] as never)}</span>
+                  <span>{t(levelKeys[level])}</span>
                 </button>
               ))}
             </div>

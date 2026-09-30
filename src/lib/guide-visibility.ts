@@ -1,5 +1,12 @@
 import { db } from "@/lib/db";
 
+export function guideStateShouldShow(
+  state: { version: number; dismissedAt: Date | null } | null,
+  version: number,
+) {
+  return !state || state.version < version || !state.dismissedAt;
+}
+
 export async function shouldShowGuide(
   userId: string,
   guideId: string,
@@ -10,5 +17,5 @@ export async function shouldShowGuide(
     select: { version: true, dismissedAt: true },
   });
 
-  return !state || state.version < version || !state.dismissedAt;
+  return guideStateShouldShow(state, version);
 }

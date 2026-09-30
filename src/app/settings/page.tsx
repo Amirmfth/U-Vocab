@@ -9,11 +9,21 @@ import { uiLocaleFromDb } from "@/i18n/config";
 import { SettingsForm } from "./SettingsForm";
 import { UiLocaleForm } from "./UiLocaleForm";
 import { SignOutButton } from "./SignOutButton";
+import { getEffectivePlan, getQuotaSummary } from "@/lib/entitlements/service";
+import { PlanStatusCard } from "./PlanStatusCard";
 
 export default async function SettingsPage() {
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
-  const { t } = await getServerTranslator(user);
+  const { locale, t } = await getServerTranslator(user);
+  const [plan, quotas] = await Promise.all([
+    getEffectivePlan(user.id),
+    getQuotaSummary({
+      userId: user.id,
+      userCourseId: course.id,
+      timeZone: user.timezone,
+    }),
+  ]);
   const language = targetLanguageConfig(course.targetLanguage);
   const languageLabel =
     course.targetLanguage === "GERMAN" ? t("common.german") : language.label;
@@ -31,6 +41,8 @@ export default async function SettingsPage() {
           })}
         </p>
       </section>
+
+      <PlanStatusCard plan={plan} quotas={quotas} locale={locale} t={t} />
 
       <UiLocaleForm locale={uiLocaleFromDb(user.uiLocale)} />
 

@@ -5180,3 +5180,73 @@ summary {
     transition: none;
   }
 }
+
+
+/* Plans, quotas, and paywall primitives */
+.plan-status-card,
+.locked-feature,
+.limit-reached {
+  display: grid;
+  gap: 1rem;
+}
+
+.quota-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.quota-remaining {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.quota-remaining > span,
+.quota-remaining > small {
+  color: var(--muted);
+}
+
+.quota-remaining > strong {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.locked-feature,
+.limit-reached {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.locked-feature p,
+.limit-reached p {
+  margin: 0.25rem 0 0;
+}
+
+@media (max-width: 640px) {
+  .quota-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .locked-feature,
+  .limit-reached {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .locked-feature .button,
+  .limit-reached .button {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+  }
+}

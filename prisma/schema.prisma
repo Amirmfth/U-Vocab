@@ -298,6 +298,27 @@ enum LexemeReviewState {
   CURATED
 }
 
+enum Plan {
+  FREE
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  GRACE
+  CANCELED
+  EXPIRED
+  REVOKED
+}
+
+enum EntitlementGrantSource {
+  ADMIN
+  SUPPORT
+  PROMO
+  TEST
+  MIGRATION
+}
+
 model User {
   id                   String              @id @default(cuid())
   name                 String              @default("")
@@ -334,6 +355,9 @@ model User {
   grammarTransitions     GrammarProgressTransition[]
   grammarRecommendationEvents GrammarRecommendationEvent[]
   guideStates          UserGuideState[]
+  subscriptions        Subscription[]
+  entitlementGrants    EntitlementGrant[]
+  quotaUsage           QuotaUsageEvent[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 }
@@ -368,9 +392,68 @@ model UserCourse {
   grammarEvidence       GrammarEvidence[]
   grammarTransitions    GrammarProgressTransition[]
   grammarRecommendationEvents GrammarRecommendationEvent[]
+  quotaUsage            QuotaUsageEvent[]
 
   @@unique([userId, targetLanguage])
   @@index([userId, status])
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  userId                 String
+  plan                   Plan               @default(PRO)
+  provider               String
+  providerCustomerId     String?
+  providerSubscriptionId String
+  status                 SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  cancelAtPeriodEnd      Boolean            @default(false)
+  providerMetadata       Json?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerSubscriptionId])
+  @@index([userId, status, currentPeriodEnd])
+  @@index([provider, providerCustomerId])
+}
+
+model EntitlementGrant {
+  id          String                 @id @default(cuid())
+  userId      String
+  plan        Plan                   @default(PRO)
+  source      EntitlementGrantSource
+  reason      String?
+  startsAt    DateTime               @default(now())
+  endsAt      DateTime?
+  createdBy   String?
+  createdAt   DateTime               @default(now())
+  revokedAt   DateTime?
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startsAt, endsAt])
+  @@index([userId, revokedAt])
+}
+
+model QuotaUsageEvent {
+  id             String     @id @default(cuid())
+  userId         String
+  userCourseId   String?
+  operationKey   String
+  amount         Int        @default(1)
+  periodKey      String
+  periodStart    DateTime
+  periodEnd      DateTime
+  sourceRef      String
+  metadata       Json?
+  createdAt      DateTime   @default(now())
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course         UserCourse? @relation(fields: [userCourseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, operationKey, periodKey, sourceRef])
+  @@index([userId, operationKey, periodStart, periodEnd])
+  @@index([userCourseId, operationKey, periodStart])
 }
 
 model UserGuideState {

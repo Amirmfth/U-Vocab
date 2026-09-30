@@ -10,6 +10,9 @@ import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { scoreReadingAssessment } from "@/lib/reading/assessment";
 import { containsReadingTarget, READING_TARGETS_PER_LENGTH } from "@/lib/reading/targets";
+import { consumeQuota } from "@/lib/entitlements/service";
+import { entitlementErrorMessage } from "@/lib/entitlements/errors";
+import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -29,6 +32,7 @@ export async function createGeneratedReading(
   const stretch = String(formData.get("stretch") ?? "") === "on";
   const selectedIds = formData.getAll("targetIds").map(String);
   const grammarFocusId = String(formData.get("grammarFocusId") ?? "").trim();
+  const requestId = String(formData.get("requestId") ?? "").trim();
 
   if (!["SHORT", "MEDIUM", "LONG"].includes(length)) {
     return { status: "error", message: "Choose a valid reading length." };
@@ -156,6 +160,17 @@ export async function createGeneratedReading(
       };
     }
 
+    await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
+
+    await consumeQuota({
+      userId: user.id,
+      userCourseId: course.id,
+      timeZone: user.timezone,
+      key: "reading_generation_monthly",
+      sourceRef: "reading:" + (requestId || crypto.randomUUID()),
+      metadata: { length, stretch },
+    });
+
     const selectedSet = new Set(selectedTargets.map((item) => item.lexemeId));
     const generationPool = targetPool.slice(0, Math.max(minimumTargets * 2, 20));
     let generated: Awaited<ReturnType<typeof generateReading>> | null = null;
@@ -244,7 +259,8 @@ export async function createGeneratedReading(
     return {
       status: "error",
       message:
-        error instanceof Error ? error.message : "Could not generate reading.",
+        entitlementErrorMessage(error) ??
+        (error instanceof Error ? error.message : "Could not generate reading."),
     };
   }
 }

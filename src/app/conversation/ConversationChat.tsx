@@ -65,10 +65,11 @@ export function ConversationChat({
     ]);
 
     try {
+      const requestId = crypto.randomUUID();
       const response = await fetch("/api/conversation/" + sessionId + "/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, requestId }),
       });
 
       if (!response.ok || !response.body) {

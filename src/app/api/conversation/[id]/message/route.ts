@@ -15,6 +15,7 @@ import { isUnauthorizedError } from "@/lib/auth";
 import { startOperation } from "@/lib/performance";
 import { consumeQuota } from "@/lib/entitlements/service";
 import { EntitlementError } from "@/lib/entitlements/errors";
+import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 
 export const runtime = "nodejs";
 
@@ -107,6 +108,24 @@ export async function POST(
     }
     perf.fail(error);
     return Response.json({ error: "Could not check allowance." }, { status: 500 });
+  }
+
+  try {
+    await perf.span("spendSafety", () =>
+      assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone }),
+    );
+  } catch (error) {
+    await db.conversationSession.updateMany({
+      where: { id, userId: user.id, userCourseId: course.id },
+      data: { turnInFlight: false },
+    });
+    if (error instanceof EntitlementError) {
+      return Response.json(
+        { error: "This action is temporarily unavailable.", code: error.code },
+        { status: 429 },
+      );
+    }
+    throw error;
   }
 
   await perf.span("dbWrite", () =>

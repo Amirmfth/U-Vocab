@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { selectConversationTargets } from "@/lib/conversation/targets";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
+import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 
 export type ConversationActionState = {
   status: "idle" | "success" | "error";
@@ -53,6 +54,7 @@ export async function createConversationSessionAction(
       };
     }
 
+    await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
     const setup = await generateConversationSetup({
       userId: user.id,
       userCourseId: course.id,
@@ -159,6 +161,7 @@ export async function completeConversationAction(
       return { status: "error", message: "Active conversation not found." };
     }
 
+    await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
     const evaluation = await evaluateConversationSession({
       userId: user.id,
       userCourseId: course.id,

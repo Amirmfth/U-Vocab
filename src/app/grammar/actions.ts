@@ -7,6 +7,7 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { generateGrammarQuickTeach } from "@/lib/ai/grammar-quick-teach";
 import { recordProductEvent } from "@/lib/product-events";
+import { reportUnexpectedError } from "@/lib/observability/errors";
 
 export async function startGrammarConceptAction(formData: FormData) {
   const grammarConceptId = String(formData.get("grammarConceptId") ?? "");
@@ -164,6 +165,7 @@ export async function generateGrammarQuickTeachAction(
       angle,
     };
   } catch (error) {
+    reportUnexpectedError(error, { operation: "grammar.quick_teach" });
     return {
       status: "error" as const,
       message:

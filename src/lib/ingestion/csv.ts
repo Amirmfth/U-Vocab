@@ -1,5 +1,6 @@
 import type { PartOfSpeech } from "@prisma/client";
 import type { IngestionAdapter, IngestionCandidate } from "./types";
+import { lexiconAdapter } from "@/lib/lexicon/normalization";
 
 function parseCsvLine(line: string) {
   const values: string[] = [];
@@ -74,11 +75,12 @@ export const csvAdapter: IngestionAdapter<string> = {
       if (!lemma) continue;
 
       const partOfSpeech = asPartOfSpeech(values[posIndex] ?? "OTHER");
-      const normalized = lemma.toLocaleLowerCase("de-DE");
+      const normalized = lexiconAdapter("GERMAN").normalizeCanonical(lemma, partOfSpeech);
 
       candidates.push({
         key: normalized + ":" + partOfSpeech,
         sourceType: "CSV",
+        surface: lemma,
         lemma,
         normalized,
         partOfSpeech,
@@ -92,6 +94,7 @@ export const csvAdapter: IngestionAdapter<string> = {
         englishMeaning: englishIndex >= 0 ? values[englishIndex] ?? "" : "",
         persianMeaning: persianIndex >= 0 ? values[persianIndex] ?? "" : "",
         pattern: patternIndex >= 0 ? values[patternIndex] || null : null,
+        provenance: { source: "IMPORTED", reviewState: "ACCEPTED" },
       });
     }
 

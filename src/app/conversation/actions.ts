@@ -10,6 +10,7 @@ import { selectConversationTargets } from "@/lib/conversation/targets";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
 import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 import { recordProductEvent } from "@/lib/product-events";
+import { reportUnexpectedError } from "@/lib/observability/errors";
 
 export type ConversationActionState = {
   status: "idle" | "success" | "error";
@@ -110,6 +111,7 @@ export async function createConversationSessionAction(
       sessionId: session.id,
     };
   } catch (error) {
+    reportUnexpectedError(error, { operation: "conversation.action" });
     return {
       status: "error",
       message:
@@ -258,6 +260,7 @@ export async function completeConversationAction(
       sessionId: session.id,
     };
   } catch (error) {
+    reportUnexpectedError(error, { operation: "conversation.action" });
     return {
       status: "error",
       message:
@@ -326,6 +329,7 @@ export async function replayConversationAction(
       sessionId: replay.id,
     };
   } catch (error) {
+    reportUnexpectedError(error, { operation: "conversation.action" });
     return {
       status: "error",
       message:

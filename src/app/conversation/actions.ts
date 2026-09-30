@@ -248,7 +248,7 @@ export async function completeConversationAction(
     await recordProductEvent("conversation_completed", {
       kind: session.kind,
       turnCount: session.messages.filter((message) => message.role === "USER").length,
-      overallScore: typeof normalizedEvaluation.overall === "number" ? normalizedEvaluation.overall : null,
+      overallScore: normalizedEvaluation.overallScore,
     });
 
     revalidatePath("/conversation/" + session.id);

@@ -24,6 +24,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-observability-package-lock
+          path: package-lock.json
       - run: npm ci
       - run: npm test
       - run: npm run typecheck

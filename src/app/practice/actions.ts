@@ -22,6 +22,7 @@ import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { instrumentOperation } from "@/lib/performance";
 import { revalidateUserDomains } from "@/lib/cache-tags";
 import { getVerbConjugationForUser } from "@/lib/ai/verb-conjugation";
+import { recordProductEvent } from "@/lib/product-events";
 
 export type PracticeAnswerInput={
   userVocabularyId?:string|null;
@@ -169,6 +170,12 @@ async function submitGrammarAnswer(
       variant:grammarVariant,
       ...(item?.lexemeId ? { linkedLexemeId:item.lexemeId } : {}),
     },
+  });
+
+  await recordProductEvent("grammar_practice_completed", {
+    grammarConceptId,
+    exerciseType: exercise.type,
+    correct: evaluation.correct,
   });
 
   revalidateUserDomains(

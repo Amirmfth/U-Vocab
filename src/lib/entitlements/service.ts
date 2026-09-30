@@ -7,6 +7,7 @@ import {
 } from "./config";
 import { ProRequiredError, QuotaExceededError } from "./errors";
 import { quotaPeriodFor } from "./periods";
+import { quotaAllows, resolveEffectivePlanRecords } from "./policy";
 
 export type EffectivePlan = {
   plan: Plan;
@@ -19,52 +20,33 @@ export async function getEffectivePlan(
   userId: string,
   now = new Date(),
 ): Promise<EffectivePlan> {
-  const subscription = await db.subscription.findFirst({
-    where: {
-      userId,
-      plan: "PRO",
-      status: { in: ["ACTIVE", "GRACE"] },
-      currentPeriodStart: { lte: now },
-      currentPeriodEnd: { gt: now },
-    },
-    orderBy: { currentPeriodEnd: "desc" },
-  });
+  const [subscriptions, grants] = await Promise.all([
+    db.subscription.findMany({
+      where: { userId, plan: "PRO" },
+      select: {
+        plan: true,
+        status: true,
+        currentPeriodStart: true,
+        currentPeriodEnd: true,
+        cancelAtPeriodEnd: true,
+      },
+      orderBy: { currentPeriodEnd: "desc" },
+      take: 6,
+    }),
+    db.entitlementGrant.findMany({
+      where: { userId, plan: "PRO" },
+      select: {
+        plan: true,
+        startsAt: true,
+        endsAt: true,
+        revokedAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+    }),
+  ]);
 
-  if (subscription) {
-    return {
-      plan: "PRO",
-      source: "subscription",
-      validUntil: subscription.currentPeriodEnd,
-      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-    };
-  }
-
-  const grant = await db.entitlementGrant.findFirst({
-    where: {
-      userId,
-      plan: "PRO",
-      revokedAt: null,
-      startsAt: { lte: now },
-      OR: [{ endsAt: null }, { endsAt: { gt: now } }],
-    },
-    orderBy: [{ endsAt: "desc" }, { createdAt: "desc" }],
-  });
-
-  if (grant) {
-    return {
-      plan: "PRO",
-      source: "grant",
-      validUntil: grant.endsAt,
-      cancelAtPeriodEnd: false,
-    };
-  }
-
-  return {
-    plan: "FREE",
-    source: "free",
-    validUntil: null,
-    cancelAtPeriodEnd: false,
-  };
+  return resolveEffectivePlanRecords({ now, subscriptions, grants });
 }
 
 export async function getEntitlements(userId: string, now = new Date()) {
@@ -119,7 +101,7 @@ export async function checkQuota(input: {
     limit: definition.limit,
     used,
     remaining: Math.max(0, definition.limit - used),
-    allowed: used + amount <= definition.limit,
+    allowed: quotaAllows(used, amount, definition.limit),
     resetAt: period.end,
     periodKey: period.periodKey,
   };
@@ -199,7 +181,7 @@ export async function consumeQuota(input: {
           });
 
           const used = aggregate._sum.amount ?? 0;
-          if (used + amount > definition.limit) {
+          if (!quotaAllows(used, amount, definition.limit)) {
             throw new QuotaExceededError(input.key, definition.limit, used, period.end);
           }
 

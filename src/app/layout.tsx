@@ -22,6 +22,8 @@ import { onboardingComplete } from "@/lib/onboarding";
 import { db } from "@/lib/db";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ObservabilityIdentity } from "@/components/observability-identity";
+import { getEffectivePlan } from "@/lib/entitlements/service";
 
 export const metadata = {
   title: { default: "U-Vocab", template: "%s · U-Vocab" },
@@ -37,6 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const authenticated = await isAppAuthenticated();
   const user = authenticated ? await getCurrentUser() : null;
   const course = user ? await getCurrentCourse() : null;
+  const effectivePlan = user ? await getEffectivePlan(user.id) : null;
   const onboardingDone = user ? onboardingComplete(user) : true;
   const locale = await resolveUiLocale(user);
   const documentAttributes = localeDocumentAttributes(locale);
@@ -61,6 +64,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </a>
           {authenticated ? <WebVitals /> : null}
           {user ? <OnboardingGuard complete={onboardingDone} /> : null}
+          {user ? (
+            <ObservabilityIdentity
+              userId={user.id}
+              courseId={course?.id ?? null}
+              plan={effectivePlan?.plan ?? "FREE"}
+              uiLocale={locale}
+              targetLanguage={course?.targetLanguage ?? null}
+            />
+          ) : null}
           {user && course && onboardingDone ? (
             <AppNavigation
               translationPreference={course.explanationLanguage}

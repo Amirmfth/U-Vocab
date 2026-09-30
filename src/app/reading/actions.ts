@@ -12,6 +12,7 @@ import { scoreReadingAssessment } from "@/lib/reading/assessment";
 import { containsReadingTarget, READING_TARGETS_PER_LENGTH } from "@/lib/reading/targets";
 import { consumeQuota } from "@/lib/entitlements/service";
 import { entitlementErrorMessage } from "@/lib/entitlements/errors";
+import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 
 export type ReadingCreateState = {
   status: "idle" | "success" | "error";
@@ -167,6 +168,8 @@ export async function createGeneratedReading(
       sourceRef: "reading:" + (requestId || crypto.randomUUID()),
       metadata: { length, stretch },
     });
+
+    await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
 
     const selectedSet = new Set(selectedTargets.map((item) => item.lexemeId));
     const generationPool = targetPool.slice(0, Math.max(minimumTargets * 2, 20));

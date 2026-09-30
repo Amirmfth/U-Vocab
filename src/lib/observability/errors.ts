@@ -1,12 +1,11 @@
 import * as Sentry from "@sentry/nextjs";
 import { EntitlementError } from "@/lib/entitlements/errors";
-import { UnauthorizedError } from "@/lib/auth";
 import { observabilityConfig } from "./config";
 import { sanitizeTelemetryValue } from "./privacy";
 
 export function isExpectedOperationalError(error: unknown) {
   if (error instanceof EntitlementError) return true;
-  if (error instanceof UnauthorizedError) return true;
+  if (error instanceof Error && error.name === "UnauthorizedError") return true;
   if (error instanceof Error && error.name === "ZodError") return true;
 
   const message =

@@ -31,7 +31,7 @@ export async function updateLexemeAsAdmin(lexemeId: string, patch: LexemePatch) 
     const lemma = patch.lemma?.trim() || before.lemma;
     const partOfSpeech = patch.partOfSpeech ?? before.partOfSpeech;
     const adapter = lexiconAdapter("GERMAN");
-    const normalized = adapter.normalizeCanonical(lemma, partOfSpeech).normalizedCanonical;
+    const normalized = adapter.normalizeCanonical(lemma, partOfSpeech);
 
     const after = await tx.lexeme.update({
       where: { id: lexemeId },
@@ -94,7 +94,7 @@ export async function addLexemeAliasAsAdmin(input: {
     const lexeme = await tx.lexeme.findUnique({ where: { id: input.lexemeId } });
     if (!lexeme) throw new Error("Lexeme not found.");
     const adapter = lexiconAdapter("GERMAN");
-    const normalizedSurface = adapter.normalize(surface).normalizedLookup;
+    const normalizedSurface = adapter.normalizeInput(surface).normalizedLookup;
     const collision = await tx.lexemeAlias.findFirst({
       where: {
         language: lexeme.language,
@@ -303,19 +303,29 @@ export async function mergeLexemesAsAdmin(sourceLexemeId: string, targetLexemeId
       ["LexemeInsight", "level", null],
     ] as const;
     for (const [table, ownerColumn, secondColumn] of uniqueTables) {
-      const extra = secondColumn
-        ? Prisma.raw(` AND s."${secondColumn}" = t."${secondColumn}"`)
-        : Prisma.empty;
+      const tableSql = Prisma.raw('"' + table + '"');
+      const ownerSql = Prisma.raw('"' + ownerColumn + '"');
+      if (secondColumn) {
+        const secondSql = Prisma.raw('"' + secondColumn + '"');
+        await tx.$executeRaw(Prisma.sql`
+          DELETE FROM ${tableSql} s
+          USING ${tableSql} t
+          WHERE s."lexemeId" = ${source.id}
+            AND t."lexemeId" = ${target.id}
+            AND s.${ownerSql} = t.${ownerSql}
+            AND s.${secondSql} = t.${secondSql}
+        `);
+      } else {
+        await tx.$executeRaw(Prisma.sql`
+          DELETE FROM ${tableSql} s
+          USING ${tableSql} t
+          WHERE s."lexemeId" = ${source.id}
+            AND t."lexemeId" = ${target.id}
+            AND s.${ownerSql} = t.${ownerSql}
+        `);
+      }
       await tx.$executeRaw(Prisma.sql`
-        DELETE FROM ${Prisma.raw('"' + table + '"')} s
-        USING ${Prisma.raw('"' + table + '"')} t
-        WHERE s."lexemeId" = ${source.id}
-          AND t."lexemeId" = ${target.id}
-          AND s.${Prisma.raw('"' + ownerColumn + '"')} = t.${Prisma.raw('"' + ownerColumn + '"')}
-          ${extra}
-      `);
-      await tx.$executeRaw(Prisma.sql`
-        UPDATE ${Prisma.raw('"' + table + '"')}
+        UPDATE ${tableSql}
         SET "lexemeId" = ${target.id}
         WHERE "lexemeId" = ${source.id}
       `);

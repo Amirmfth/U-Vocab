@@ -58,6 +58,7 @@ export default async function AdminDashboardPage() {
           AND g."revokedAt" IS NULL
           AND g."startsAt" <= ${now}
           AND (g."endsAt" IS NULL OR g."endsAt" > ${now}
+          )
       ) THEN 'PRO' ELSE 'FREE' END AS plan, COUNT(*)::bigint AS count
       FROM "User" u GROUP BY plan
     `,

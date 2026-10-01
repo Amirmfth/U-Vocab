@@ -18,7 +18,8 @@
     "db:backfill-grammar-lessons": "tsx scripts/backfill-grammar-lessons.ts",
     "auth:bootstrap": "tsx scripts/bootstrap-existing-auth-user.ts",
     "lexicon:maintain": "tsx scripts/maintain-lexicon.ts",
-    "entitlement:grant-pro": "tsx scripts/grant-pro.ts"
+    "entitlement:grant-pro": "tsx scripts/grant-pro.ts",
+    "admin:promote": "tsx scripts/promote-admin.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

@@ -19,6 +19,7 @@ import { QuotaExceededError } from "@/lib/entitlements/errors";
 import { entitlementErrorMessage } from "@/lib/entitlements/errors";
 import { db } from "@/lib/db";
 import { startOperation } from "@/lib/performance";
+import { recordProductEvent } from "@/lib/product-events";
 import {
   attachIngestionState,
   commitIngestionCandidates,
@@ -227,6 +228,10 @@ export async function addVocabularyItem(input: {
     ]);
     let candidate = input.candidate;
     let resolutionSource = candidate?.resolutionSource ?? "preview_candidate";
+    await recordProductEvent("vocabulary_add_started", {
+      source: input.word !== undefined ? "manual" : candidate?.sourceType === "CSV" ? "csv" : "paste",
+      itemCount: 1,
+    });
     let sourceType: "PASTED_TEXT" | "CSV" = candidate?.sourceType === "CSV" ? "CSV" : "PASTED_TEXT";
 
     if (input.word !== undefined) {
@@ -318,6 +323,25 @@ export async function addVocabularyItem(input: {
       sourceRef: `${sourceType.toLocaleLowerCase("en-US")}:${crypto.randomUUID()}`,
       candidates: [candidate],
     }));
+    await recordProductEvent("vocabulary_added", {
+      source: sourceType === "CSV" ? "csv" : "paste",
+      resolution:
+        resolutionSource === "canonical_hit" ||
+        resolutionSource === "alias_hit" ||
+        resolutionSource === "ai_generation" ||
+        resolutionSource === "ambiguous"
+          ? resolutionSource
+          : "unknown",
+      partOfSpeech: candidate.partOfSpeech,
+      cefrLevel: candidate.cefrLevel ?? null,
+    });
+    if (ownershipResolution.source === "canonical_hit" || ownershipResolution.source === "alias_hit") {
+      await recordProductEvent("vocabulary_duplicate_resolved", {
+        resolution: ownershipResolution.source,
+        alreadyOwned: Boolean(owned),
+      });
+    }
+
     if (!input.deferRevalidation) {
       await perf.span("invalidate", async () => {
         revalidateUserDomains(user.id, course.id, ["home", "vocabulary", "review", "progress"], [lexemeId]);

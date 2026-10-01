@@ -22,6 +22,7 @@ import { CEFR_RANK } from "@/lib/grammar/levels";
 import { recordGrammarEvidence } from "@/lib/grammar/learner-model";
 import { consumeQuota } from "@/lib/entitlements/service";
 import { entitlementErrorMessage } from "@/lib/entitlements/errors";
+import { recordProductEvent } from "@/lib/product-events";
 import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 import {
   recordGrammarMistake,
@@ -176,6 +177,12 @@ export async function createWritingSessionAction(
             },
           }),
         );
+
+        await recordProductEvent("writing_started", {
+          mode,
+          level,
+          targetWords,
+        });
 
         revalidateUserDomains(user.id, course.id, ["writing"]);
 
@@ -622,6 +629,13 @@ export async function evaluateWritingAction(
               },
             });
           }
+        });
+
+        await recordProductEvent("writing_completed", {
+          mode: session.mode,
+          level: session.level,
+          wordCount: countWords(draft),
+          overallScore: typeof evaluation.overall === "number" ? evaluation.overall : null,
         });
 
         await perf.span("revalidation", async () => {

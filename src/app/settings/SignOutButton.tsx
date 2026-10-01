@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useTranslations } from "@/i18n/client";
+import { resetObservabilityIdentity } from "@/components/observability-identity";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export function SignOutButton() {
         if (pending) return;
         setPending(true);
         try {
+          resetObservabilityIdentity();
           await authClient.signOut();
           router.replace("/login");
           router.refresh();

@@ -12,6 +12,8 @@ import { scoreReadingAssessment } from "@/lib/reading/assessment";
 import { containsReadingTarget, READING_TARGETS_PER_LENGTH } from "@/lib/reading/targets";
 import { consumeQuota } from "@/lib/entitlements/service";
 import { entitlementErrorMessage } from "@/lib/entitlements/errors";
+import { recordProductEvent } from "@/lib/product-events";
+import { reportUnexpectedError } from "@/lib/observability/errors";
 import { assertProviderSpendSafety } from "@/lib/entitlements/spend-safety";
 
 export type ReadingCreateState = {
@@ -160,6 +162,12 @@ export async function createGeneratedReading(
       };
     }
 
+    await recordProductEvent("reading_started", {
+      level,
+      length,
+      targetCount: minimumTargets,
+    });
+
     await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
 
     await consumeQuota({
@@ -247,6 +255,12 @@ export async function createGeneratedReading(
       },
     });
 
+    await recordProductEvent("reading_completed", {
+      level,
+      length,
+      comprehensionScore: null,
+    });
+
     revalidateUserDomains(user.id, course.id, ["reading"]);
     revalidatePath("/reading");
 
@@ -256,6 +270,7 @@ export async function createGeneratedReading(
       readingId: story.id,
     };
   } catch (error) {
+    reportUnexpectedError(error, { operation: "reading.generate" });
     return {
       status: "error",
       message:

@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { db } from "@/lib/db";
 import { generateGrammarQuickTeach } from "@/lib/ai/grammar-quick-teach";
+import { recordProductEvent } from "@/lib/product-events";
+import { reportUnexpectedError } from "@/lib/observability/errors";
 
 export async function startGrammarConceptAction(formData: FormData) {
   const grammarConceptId = String(formData.get("grammarConceptId") ?? "");
@@ -15,7 +17,7 @@ export async function startGrammarConceptAction(formData: FormData) {
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const concept = await db.grammarConcept.findFirst({
     where: { id: grammarConceptId, slug, active: true },
-    select: { id: true },
+    select: { id: true, introducedAt: true },
   });
   if (!concept) return;
 
@@ -51,6 +53,11 @@ export async function startGrammarConceptAction(formData: FormData) {
           ? GrammarProgressSource.EVIDENCE
           : GrammarProgressSource.MANUAL,
     },
+  });
+
+  await recordProductEvent("grammar_practice_started", {
+    grammarConceptId: concept.id,
+    exerciseType: "concept_learning",
   });
 
   revalidatePath("/grammar");
@@ -158,6 +165,7 @@ export async function generateGrammarQuickTeachAction(
       angle,
     };
   } catch (error) {
+    reportUnexpectedError(error, { operation: "grammar.quick_teach" });
     return {
       status: "error" as const,
       message:

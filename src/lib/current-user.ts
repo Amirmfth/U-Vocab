@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { requireAppAuth, UnauthorizedError } from "@/lib/auth";
@@ -9,5 +10,7 @@ export const getCurrentUser = cache(async function getCurrentUser() {
   });
 
   if (!user) throw new UnauthorizedError();
+  Sentry.setUser({ id: user.id });
+  Sentry.setTag("ui_locale", user.uiLocale.toLowerCase());
   return user;
 });

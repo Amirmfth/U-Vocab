@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { cache } from "react";
 import type { User, UserCourse } from "@prisma/client";
 import { db } from "@/lib/db";
@@ -63,7 +64,10 @@ async function resolveCourseForUser(user: User): Promise<UserCourse> {
 
 export const getCurrentCourse = cache(async function getCurrentCourse() {
   const user = await getCurrentUser();
-  return resolveCourseForUser(user);
+  const course = await resolveCourseForUser(user);
+  Sentry.setTag("course_id", course.id);
+  Sentry.setTag("target_language", course.targetLanguage);
+  return course;
 });
 
 export async function requireOwnedCourse(courseId: string) {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RotateCcw } from "lucide-react";
@@ -21,6 +21,7 @@ import {
   type ReviewMutationInput,
 } from "./actions";
 import { ReviewCard } from "./ReviewCard";
+import { captureProductEvent } from "@/lib/analytics/client";
 
 async function fetchReviewQueue(
   excludeIds: ReadonlySet<string>,
@@ -63,6 +64,16 @@ export function ReviewSession({
   const [saveErrors, setSaveErrors] = useState<
     Map<string, { input: ReviewMutationInput; message: string }>
   >(new Map());
+
+  const completionCaptured = useRef(false);
+
+  useEffect(() => {
+    captureProductEvent("review_session_started", {
+      dueCount: initialData.dueCount,
+      mode: "standard",
+    });
+  }, [initialData.dueCount]);
+
 
   const queue = useQuery({
     queryKey: queueKey,
@@ -156,6 +167,24 @@ export function ReviewSession({
 
   const queueData = queue.data ?? initialData;
   const card = queueData.cards[0];
+
+  useEffect(() => {
+    if (
+      completionCaptured.current ||
+      card ||
+      pendingCount > 0 ||
+      queue.isFetching ||
+      queueData.dueCount > 0 ||
+      sessionStats.reviewed < 1
+    ) {
+      return;
+    }
+    completionCaptured.current = true;
+    captureProductEvent("review_session_completed", {
+      answeredCount: sessionStats.reviewed,
+      durationMs: null,
+    });
+  }, [card, pendingCount, queue.isFetching, queueData.dueCount, sessionStats.reviewed]);
   const saveErrorNotice =
     saveErrors.size > 0 ? (
       <div className="optimistic-error" role="alert">

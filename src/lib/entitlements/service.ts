@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { Prisma, type Plan } from "@prisma/client";
 import { db } from "@/lib/db";
 import {
@@ -46,7 +47,9 @@ export async function getEffectivePlan(
     }),
   ]);
 
-  return resolveEffectivePlanRecords({ now, subscriptions, grants });
+  const effective = resolveEffectivePlanRecords({ now, subscriptions, grants });
+  Sentry.setTag("plan", effective.plan);
+  return effective;
 }
 
 export async function getEntitlements(userId: string, now = new Date()) {

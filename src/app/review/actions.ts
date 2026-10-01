@@ -6,6 +6,7 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { applyReviewResult } from "@/lib/review-service";
 import type { ReviewGrade } from "@/lib/fsrs";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { recordProductEvent } from "@/lib/product-events";
 
 function safeDuration(startedAt: number) {
   if (!Number.isFinite(startedAt) || startedAt <= 0) return null;
@@ -37,6 +38,11 @@ async function persistReview(input: ReviewMutationInput) {
     ["home", "vocabulary", "review", "progress"],
     [result.item.lexemeId],
   );
+
+  await recordProductEvent("review_answered", {
+    rating: input.grade,
+    durationMs: safeDuration(input.startedAt),
+  });
 
   return result;
 }

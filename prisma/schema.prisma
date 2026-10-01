@@ -298,6 +298,11 @@ enum LexemeReviewState {
   CURATED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 enum Plan {
   FREE
   PRO
@@ -327,6 +332,7 @@ model User {
   image                String?
   timezone             String              @default("UTC")
   uiLocale             UiLocale            @default(EN)
+  role                 UserRole            @default(USER)
   onboardingCompletedAt DateTime?
   onboardingVersion    Int                 @default(0)
   onboardingStep       Int                 @default(1)
@@ -360,6 +366,25 @@ model User {
   quotaUsage           QuotaUsageEvent[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
+
+  @@index([role, createdAt])
+  @@index([createdAt])
+}
+
+model AdminAuditLog {
+  id            String   @id @default(cuid())
+  adminUserId   String
+  action        String
+  targetType    String
+  targetId      String
+  requestId     String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([adminUserId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([action, createdAt])
+  @@index([createdAt])
 }
 
 model UserCourse {
@@ -1035,6 +1060,10 @@ model AiUsageEvent {
   course             UserCourse?    @relation(fields: [userCourseId], references: [id], onDelete: SetNull)
 
   @@index([userCourseId, createdAt])
+  @@index([operation, createdAt])
+  @@index([model, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
   @@index([userId, operation, createdAt])
   @@index([userId, model, createdAt])
   @@index([userId, status, createdAt])

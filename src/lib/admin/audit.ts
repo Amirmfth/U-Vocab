@@ -21,11 +21,11 @@ const SENSITIVE_KEYS = new Set([
   "token",
 ]);
 
-function sanitizeAuditValue(value: unknown, depth = 0): Prisma.InputJsonValue {
+function sanitizeAuditValue(value: unknown, depth = 0): Prisma.InputJsonValue | undefined {
   if (depth > 4) return "[truncated]";
-  if (value === null) return Prisma.JsonNull;
+  if (value === null || value === undefined) return undefined;
   if (Array.isArray(value)) {
-    return value.slice(0, 30).map((item) => sanitizeAuditValue(item, depth + 1));
+    return value.slice(0, 30).map((item) => sanitizeAuditValue(item, depth + 1)).filter((item): item is Prisma.InputJsonValue => item !== undefined);
   }
   if (typeof value === "object") {
     const input = value as Record<string, unknown>;
@@ -41,13 +41,13 @@ function sanitizeAuditValue(value: unknown, depth = 0): Prisma.InputJsonValue {
       ) {
         continue;
       }
-      output[key] = sanitizeAuditValue(item, depth + 1);
+      const sanitized = sanitizeAuditValue(item, depth + 1);
+      if (sanitized !== undefined) output[key] = sanitized;
     }
     return output;
   }
   if (typeof value === "string") return value.slice(0, 240);
   if (typeof value === "number" || typeof value === "boolean") return value;
-  if (value === undefined) return Prisma.JsonNull;
   return String(value).slice(0, 240);
 }
 

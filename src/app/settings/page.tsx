@@ -1,6 +1,4 @@
 import { connection } from "next/server";
-import Link from "next/link";
-import { BarChart3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
@@ -51,16 +49,6 @@ export default async function SettingsPage() {
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
       />
-
-      <section className="panel account-links">
-        <div>
-          <strong>{t("settings.aiOperations")}</strong>
-          <span className="muted">{t("settings.aiOperationsHelp")}</span>
-        </div>
-        <Link href="/usage" className="button button-secondary">
-          <BarChart3 size={17} /> {t("nav.aiUsage")}
-        </Link>
-      </section>
 
       <section className="panel account-links">
         <div>

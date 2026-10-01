@@ -23,7 +23,7 @@ const SENSITIVE_KEYS = new Set([
 
 function sanitizeAuditValue(value: unknown, depth = 0): Prisma.InputJsonValue {
   if (depth > 4) return "[truncated]";
-  if (value === null) return null;
+  if (value === null) return Prisma.JsonNull;
   if (Array.isArray(value)) {
     return value.slice(0, 30).map((item) => sanitizeAuditValue(item, depth + 1));
   }
@@ -47,7 +47,7 @@ function sanitizeAuditValue(value: unknown, depth = 0): Prisma.InputJsonValue {
   }
   if (typeof value === "string") return value.slice(0, 240);
   if (typeof value === "number" || typeof value === "boolean") return value;
-  if (value === undefined) return null;
+  if (value === undefined) return Prisma.JsonNull;
   return String(value).slice(0, 240);
 }
 

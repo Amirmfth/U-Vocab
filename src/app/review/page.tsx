@@ -13,6 +13,7 @@ import type { UiLocale } from "@/i18n/config";
 import { ReviewSession } from "./ReviewSession";
 import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
 import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
+import { sendProductEventForUser } from "@/lib/analytics/server";
 
 function ReviewModes({
   mistakes,
@@ -71,6 +72,10 @@ export default async function ReviewPage({
     searchParams,
   ]);
   const { locale, t } = await getServerTranslator(user);
+
+  if (query.notification === "review_reminder") {
+    await sendProductEventForUser(user.id, "review_notification_opened", { source: "push" });
+  }
 
   if (query.start === "1") {
     const initialQueue = await getReviewQueueData({

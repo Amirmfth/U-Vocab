@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import type { ProductEventMap, ProductEventName } from "./events";
 import { validateProductEventProperties } from "./events";
 
-async function sendProductEvent<N extends ProductEventName>(
+export async function sendProductEventForUser<N extends ProductEventName>(
   userId: string,
   name: N,
   properties: ProductEventMap[N],
@@ -46,8 +46,8 @@ export async function recordProductEvent<N extends ProductEventName>(
   }
 
   try {
-    after(() => sendProductEvent(userId, name, properties));
+    after(() => sendProductEventForUser(userId, name, properties));
   } catch {
-    void sendProductEvent(userId, name, properties);
+    void sendProductEventForUser(userId, name, properties);
   }
 }

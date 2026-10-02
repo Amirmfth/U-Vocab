@@ -123,4 +123,53 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+
+self.addEventListener("push", (event) => {
+  let payload: {
+    type?: string;
+    title?: string;
+    body?: string;
+    dueCount?: number;
+    url?: string;
+  } = {};
+  try {
+    payload = event.data?.json() ?? {};
+  } catch {
+    payload = {};
+  }
+
+  if (payload.type !== "review_reminder") return;
+  const url = payload.url === "/review" ? "/review" : "/review";
+  const title = typeof payload.title === "string" ? payload.title.slice(0, 80) : "U-Vocab review";
+  const body = typeof payload.body === "string" ? payload.body.slice(0, 180) : "Words are ready for review.";
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: "/pwa/icon-192.png",
+      badge: "/pwa/icon-192.png",
+      tag: "uvocab-review-reminder",
+      renotify: false,
+      data: { url, type: "review_reminder" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  if (event.notification.data?.type !== "review_reminder") return;
+  event.notification.close();
+  const targetPath = "/review?notification=review_reminder";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clients) => {
+      for (const client of clients) {
+        const url = new URL(client.url);
+        if (url.origin !== self.location.origin) continue;
+        await client.navigate(targetPath);
+        return client.focus();
+      }
+      return self.clients.openWindow?.(targetPath);
+    }),
+  );
+});
+
 serwist.addEventListeners();

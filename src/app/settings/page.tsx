@@ -9,17 +9,27 @@ import { UiLocaleForm } from "./UiLocaleForm";
 import { SignOutButton } from "./SignOutButton";
 import { getEffectivePlan, getQuotaSummary } from "@/lib/entitlements/service";
 import { PlanStatusCard } from "./PlanStatusCard";
+import { ReviewReminderSettings } from "./ReviewReminderSettings";
+import { db } from "@/lib/db";
+import { minuteToTimeValue } from "@/lib/notifications/time";
+import { publicVapidKey, webPushConfigured } from "@/lib/notifications/config";
 
 export default async function SettingsPage() {
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const { locale, t } = await getServerTranslator(user);
-  const [plan, quotas] = await Promise.all([
+  const [plan, quotas, notificationPreference, activePushDevices] = await Promise.all([
     getEffectivePlan(user.id),
     getQuotaSummary({
       userId: user.id,
       userCourseId: course.id,
       timeZone: user.timezone,
+    }),
+    db.reviewNotificationPreference.findUnique({
+      where: { userCourseId: course.id },
+    }),
+    db.webPushSubscription.count({
+      where: { userId: user.id, status: "ACTIVE" },
     }),
   ]);
   const language = targetLanguageConfig(course.targetLanguage);
@@ -41,6 +51,16 @@ export default async function SettingsPage() {
       </section>
 
       <PlanStatusCard plan={plan} quotas={quotas} locale={locale} t={t} />
+
+      <ReviewReminderSettings
+        configured={webPushConfigured()}
+        publicKey={publicVapidKey()}
+        initialEnabled={notificationPreference?.enabled ?? false}
+        initialReminderTime={minuteToTimeValue(notificationPreference?.reminderMinuteOfDay ?? 1080)}
+        initialMinimumDueCount={notificationPreference?.minimumDueCount ?? 1}
+        initialTimeZone={user.timezone || "UTC"}
+        activeDeviceCount={activePushDevices}
+      />
 
       <UiLocaleForm locale={uiLocaleFromDb(user.uiLocale)} />
 

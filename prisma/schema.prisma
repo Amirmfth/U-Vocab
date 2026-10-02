@@ -336,6 +336,7 @@ enum NotificationType {
 
 enum NotificationDeliveryStatus {
   PENDING
+  PROCESSING
   SENT
   FAILED_TRANSIENT
   FAILED_PERMANENT

@@ -149,7 +149,6 @@ self.addEventListener("push", (event) => {
       icon: "/pwa/icon-192.png",
       badge: "/pwa/icon-192.png",
       tag: "uvocab-review-reminder",
-      renotify: false,
       data: { url, type: "review_reminder" },
     }),
   );

@@ -1,7 +1,7 @@
 -- CreateEnum
 CREATE TYPE "PushSubscriptionStatus" AS ENUM ('ACTIVE', 'DISABLED', 'INVALID');
 CREATE TYPE "NotificationType" AS ENUM ('REVIEW_REMINDER');
-CREATE TYPE "NotificationDeliveryStatus" AS ENUM ('PENDING', 'SENT', 'FAILED_TRANSIENT', 'FAILED_PERMANENT', 'SKIPPED');
+CREATE TYPE "NotificationDeliveryStatus" AS ENUM ('PENDING', 'PROCESSING', 'SENT', 'FAILED_TRANSIENT', 'FAILED_PERMANENT', 'SKIPPED');
 
 -- CreateTable
 CREATE TABLE "WebPushSubscription" (

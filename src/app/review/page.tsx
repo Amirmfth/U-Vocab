@@ -63,7 +63,7 @@ function ReviewModes({
 export default async function ReviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ start?: string }>;
+  searchParams: Promise<{ start?: string; notification?: string }>;
 }) {
   await connection();
   const [user, course, query] = await Promise.all([

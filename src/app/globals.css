@@ -5399,3 +5399,80 @@ summary {
   .admin-table-head, .admin-table-row { min-width: 850px; }
   .admin-topbar { align-items: flex-start; }
 }
+
+/* PWA lifecycle */
+.pwa-connectivity {
+  position: fixed;
+  z-index: 80;
+  top: max(10px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(17,17,20,.96);
+  color: var(--text-soft);
+  box-shadow: var(--shadow);
+  font-size: .78rem;
+}
+.pwa-update,
+.pwa-install {
+  position: fixed;
+  z-index: 90;
+  inset: auto 12px calc(86px + env(safe-area-inset-bottom)) 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 620px;
+  margin-inline: auto;
+  padding: 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  background: rgba(17,17,20,.98);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+.pwa-update > div,
+.pwa-install > div:first-child {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.pwa-update span,
+.pwa-install span {
+  color: var(--text-soft);
+  font-size: .78rem;
+  line-height: 1.4;
+}
+.pwa-update .button,
+.pwa-install .button {
+  width: auto;
+  min-width: 124px;
+}
+.pwa-install-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .pwa-update,
+  .pwa-install {
+    inset-inline: auto 24px;
+    bottom: 24px;
+    width: min(520px, calc(100vw - 48px));
+    margin: 0;
+  }
+}
+@media (max-width: 560px) {
+  .pwa-update,
+  .pwa-install {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pwa-install-actions .button { flex: 1; }
+}

@@ -1,4 +1,7 @@
 export type ProductEventMap = {
+  pwa_install_prompt_available: { surface: "app" };
+  pwa_install_prompt_result: { surface: "app"; outcome: "accepted" | "dismissed" };
+  pwa_installed: { surface: "browser" };
   observability_smoke_test: { surface: "server"; release: string };
   signup_completed: { method: "email" | "other" };
   onboarding_started: { version: number; step: number };
@@ -62,6 +65,9 @@ export type ProductEventMap = {
 export type ProductEventName = keyof ProductEventMap;
 
 export const PRODUCT_EVENT_NAMES = new Set<ProductEventName>([
+  "pwa_install_prompt_available",
+  "pwa_install_prompt_result",
+  "pwa_installed",
   "observability_smoke_test",
   "signup_completed",
   "onboarding_started",

@@ -55,6 +55,16 @@ export const en = {
 
   "layout.skipToContent": "Skip to content",
 
+  "pwa.offlineBanner": "You’re offline. Network-dependent actions are unavailable.",
+  "pwa.updateTitle": "Update available",
+  "pwa.updateBody": "A new U-Vocab version is ready.",
+  "pwa.updateUnsaved": "Finish or save your current form before updating.",
+  "pwa.updateAction": "Update now",
+  "pwa.installTitle": "Install U-Vocab",
+  "pwa.installBody": "Launch U-Vocab like an app from your device.",
+  "pwa.installAction": "Install",
+  "pwa.installDismiss": "Dismiss install suggestion",
+
   "onboarding.progress": "Onboarding progress: step {step} of {total}",
   "onboarding.step": "Step {step} of {total}",
   "onboarding.error": "Could not save this step. Try again.",

@@ -57,6 +57,16 @@ export const fa = {
 
   "layout.skipToContent": "پرش به محتوای اصلی",
 
+  "pwa.offlineBanner": "آفلاین هستید. قابلیت‌های وابسته به اینترنت در دسترس نیستند.",
+  "pwa.updateTitle": "به‌روزرسانی آماده است",
+  "pwa.updateBody": "نسخهٔ جدید U-Vocab آمادهٔ استفاده است.",
+  "pwa.updateUnsaved": "پیش از به‌روزرسانی، فرم فعلی را ذخیره یا کامل کنید.",
+  "pwa.updateAction": "به‌روزرسانی",
+  "pwa.installTitle": "نصب U-Vocab",
+  "pwa.installBody": "U-Vocab را مانند یک برنامه از دستگاه خود اجرا کنید.",
+  "pwa.installAction": "نصب",
+  "pwa.installDismiss": "بستن پیشنهاد نصب",
+
   "onboarding.progress": "پیشرفت راه‌اندازی: مرحله {step} از {total}",
   "onboarding.step": "مرحله {step} از {total}",
   "onboarding.error": "ذخیره این مرحله ممکن نشد. دوباره تلاش کنید.",

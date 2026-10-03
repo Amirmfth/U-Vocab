@@ -44,18 +44,18 @@ jobs:
           const fs = require("fs");
           const p = "/tmp/twa-manifest.json";
           const m = JSON.parse(fs.readFileSync(p, "utf8"));
-          m.iconUrl = "http://127.0.0.1:8765/icon-512.png";
-          m.maskableIconUrl = "http://127.0.0.1:8765/maskable-512.png";
+          m.iconUrl = "http://127.0.0.1:8765/icon-512.svg";
+          m.maskableIconUrl = "http://127.0.0.1:8765/maskable-512.svg";
           delete m.monochromeIconUrl;
           fs.writeFileSync(p, JSON.stringify(m, null, 2));
           NODE
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            if curl --fail --silent http://127.0.0.1:8765/icon-512.png >/dev/null; then
+            if curl --fail --silent http://127.0.0.1:8765/icon-512.svg >/dev/null; then
               break
             fi
             sleep 0.5
           done
-          curl --fail --silent http://127.0.0.1:8765/icon-512.png >/dev/null
+          curl --fail --silent http://127.0.0.1:8765/icon-512.svg >/dev/null
           timeout 180 npx bubblewrap update --manifest=/tmp/twa-manifest.json --skipVersionUpgrade
       - name: Commit generated project and lockfile
         run: |

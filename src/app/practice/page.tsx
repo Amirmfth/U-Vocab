@@ -1,14 +1,10 @@
 import { connection } from "next/server";
+import { Suspense } from "react";
 import type { ExerciseType } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  BookOpenText,
-  MessageCircle,
-  PenLine,
-  Plus,
-  Sparkles,
-} from "lucide-react";
+import { Plus } from "lucide-react";
+import { AnimatedAppIcon, type AnimatedAppIconName } from "@/components/animated-app-icon";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
@@ -38,17 +34,19 @@ function PracticeHub({ t, userId }: { t: Translator; userId: string }) {
 
       <nav className="practice-lanes" aria-label={t("practice.skills")}>
         {PRACTICE_HUB_DESTINATIONS.map((destination) => {
-          const Icon =
+          const icon: AnimatedAppIconName =
             destination.href === "/writing"
-              ? PenLine
+              ? "writing"
               : destination.href === "/reading"
-                ? BookOpenText
+                ? "reading"
                 : destination.href === "/conversation"
-                  ? MessageCircle
-                  : Sparkles;
+                  ? "conversation"
+                  : "drill";
           return (
             <Link key={destination.href} href={destination.href} className="practice-lane">
-              <span className="practice-lane-icon"><Icon size={30} /></span>
+              <span className="practice-lane-icon">
+                <AnimatedAppIcon name={icon} size={36} />
+              </span>
               <span className="practice-lane-copy">
                 <strong>{t(destination.labelKey)}</strong>
               </span>
@@ -72,11 +70,24 @@ export default async function PracticePage({
   if(params.mixed==="1") redirect("/practice?drill=1");
   if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub t={t} userId={user.id}/>;
 
+  return <Suspense key={JSON.stringify(params)} fallback={<main className="page focus-page" aria-busy="true">
+    <div className="focus-meta"><Link href="/practice">{t("nav.practice")}</Link></div>
+    <div className="skeleton loading-home-hero" aria-label={t("loading.surface", { surface: t("nav.practice") })} />
+  </main>}>
+    <PracticeSession params={params} userId={user.id} t={t} />
+  </Suspense>;
+}
+
+async function PracticeSession({ params, userId, t }: {
+  params: { lexeme?: string; drill?: string; grammar?: string; mixed?: string };
+  userId: string;
+  t: Translator;
+}) {
   const course=await getCurrentCourse();
 
   if(params.grammar){
     const grammarExercises=await buildGrammarPracticeSession({
-      userId:user.id,
+      userId,
       userCourseId:course.id,
       targetLanguage:course.targetLanguage,
       currentLevel:course.currentLevel,
@@ -210,7 +221,7 @@ export default async function PracticePage({
   }
 
   if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
-    const conjugation=await getVerbConjugationForUser({ userId:user.id,userCourseId:course.id,lexemeId:items[0].lexemeId });
+    const conjugation=await getVerbConjugationForUser({ userId,userCourseId:course.id,lexemeId:items[0].lexemeId });
     if(conjugation.status==="ok"){
       const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
       if(form){

@@ -577,7 +577,7 @@ body {
 
 .review-session-shell .grade-grid {
   position: sticky;
-  bottom: calc(78px + env(safe-area-inset-bottom));
+  bottom: calc(96px + env(safe-area-inset-bottom));
   z-index: 4;
   padding: 7px;
   border: 1px solid var(--border);
@@ -714,7 +714,7 @@ body {
 
 .writing-editor-footer {
   position: sticky;
-  bottom: calc(78px + env(safe-area-inset-bottom));
+  bottom: calc(96px + env(safe-area-inset-bottom));
   z-index: 4;
   padding: 9px;
   border: 1px solid var(--border);

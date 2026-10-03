@@ -4,16 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  BarChart3,
-  BookOpen,
-  Brain,
-  GraduationCap,
-  Plus,
-  Settings,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
+import { AnimatedAppIcon, type AnimatedAppIconName } from "@/components/animated-app-icon";
 import {
   LEARNING_SECTIONS,
   PRIMARY_LEARNING_SECTIONS,
@@ -30,11 +21,11 @@ const MobileAddVocabularySheet = dynamic(
   { ssr: false },
 );
 
-const primaryMeta: Record<LearningSection, { labelKey: MessageKey; icon: LucideIcon }> = {
-  words: { labelKey: "nav.words", icon: BookOpen },
-  grammar: { labelKey: "nav.grammar", icon: GraduationCap },
-  review: { labelKey: "nav.review", icon: Brain },
-  practice: { labelKey: "nav.practice", icon: Sparkles },
+const primaryMeta: Record<LearningSection, { labelKey: MessageKey; icon: AnimatedAppIconName }> = {
+  words: { labelKey: "nav.words", icon: "words" },
+  grammar: { labelKey: "nav.grammar", icon: "grammar" },
+  review: { labelKey: "nav.review", icon: "review" },
+  practice: { labelKey: "nav.practice", icon: "practice" },
 };
 
 const primary = PRIMARY_LEARNING_SECTIONS.map((section) => ({
@@ -43,12 +34,12 @@ const primary = PRIMARY_LEARNING_SECTIONS.map((section) => ({
   ...primaryMeta[section],
 }));
 
-const insights: Array<{ href: string; labelKey: MessageKey; icon: LucideIcon }> = [
-  { href: "/progress", labelKey: "nav.fullProgress", icon: BarChart3 },
+const insights: Array<{ href: string; labelKey: MessageKey; icon: AnimatedAppIconName }> = [
+  { href: "/progress", labelKey: "nav.fullProgress", icon: "progress" },
 ];
 
-const system: Array<{ href: string; labelKey: MessageKey; icon: LucideIcon }> = [
-  { href: "/settings", labelKey: "nav.settings", icon: Settings },
+const system: Array<{ href: string; labelKey: MessageKey; icon: AnimatedAppIconName }> = [
+  { href: "/settings", labelKey: "nav.settings", icon: "settings" },
 ];
 
 const routeLabelKeys: Record<string, MessageKey> = {
@@ -79,14 +70,14 @@ function NavLink({
   section,
   href,
   label,
-  Icon,
+  icon,
   dueCount,
 }: {
   pathname: string;
   section: LearningSection;
   href: string;
   label: string;
-  Icon: LucideIcon;
+  icon: AnimatedAppIconName;
   dueCount?: number | null;
 }) {
   const isActive = sectionForPath(pathname) === section;
@@ -104,7 +95,7 @@ function NavLink({
           : undefined
       }
     >
-      <Icon size={18} />
+      <AnimatedAppIcon name={icon} size={18} />
       <span>{label}</span>
       {section === "review" && dueCount ? (
         <span
@@ -187,10 +178,10 @@ export function AppNavigation({
               setIsAddSheetOpen(true);
             }}
           >
-            <Plus size={20} />
+            <AnimatedAppIcon name="add" size={20} />
           </button>
           <Link href="/settings" className="icon-button" aria-label={t("nav.settings")}>
-            <Settings size={19} />
+            <AnimatedAppIcon name="settings" size={19} />
           </Link>
         </div>
       </header>
@@ -210,7 +201,7 @@ export function AppNavigation({
               section={item.section}
               href={item.href}
               label={t(item.labelKey)}
-              Icon={item.icon}
+              icon={item.icon}
               dueCount={item.section === "review" ? dueCount : null}
             />
           ))}
@@ -219,7 +210,6 @@ export function AppNavigation({
         <div className="sidebar-secondary">
           <p className="nav-eyebrow">{t("common.insights")}</p>
           {insights.map((item) => {
-            const Icon = item.icon;
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -229,14 +219,13 @@ export function AppNavigation({
                 className={"nav-link " + (isActive ? "is-active" : "")}
                 aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
-                <Icon size={18} />
+                <AnimatedAppIcon name={item.icon} size={18} />
                 <span>{t(item.labelKey)}</span>
               </Link>
             );
           })}
           <p className="nav-eyebrow">{t("common.account")}</p>
           {system.map((item) => {
-            const Icon = item.icon;
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -246,13 +235,13 @@ export function AppNavigation({
                 className={"nav-link " + (isActive ? "is-active" : "")}
                 aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
-                <Icon size={18} />
+                <AnimatedAppIcon name={item.icon} size={18} />
                 <span>{t(item.labelKey)}</span>
               </Link>
             );
           })}
           <Link href="/vocabulary/new" className="sidebar-add">
-            <Plus size={18} />
+            <AnimatedAppIcon name="add" size={18} />
             {t("nav.addWord")}
           </Link>
         </div>
@@ -284,7 +273,6 @@ export function AppNavigation({
 
       <nav className="mobile-bottom-nav" aria-label={t("nav.mobile")}>
         {primary.map((item) => {
-          const Icon = item.icon;
           const isActive = sectionForPath(pathname) === item.section;
           const formattedDueCount = dueCount ? formatNumber(locale, dueCount) : null;
           return (
@@ -295,7 +283,7 @@ export function AppNavigation({
               aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
             >
               <span className="mobile-nav-icon">
-                <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                <AnimatedAppIcon name={item.icon} size={25} />
                 {item.section === "review" && dueCount ? (
                   <span
                     className="review-nav-badge"

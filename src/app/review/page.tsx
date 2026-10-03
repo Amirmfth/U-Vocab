@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { Suspense } from "react";
 import Link from "next/link";
 import { Brain, LifeBuoy, TriangleAlert } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -78,27 +79,10 @@ export default async function ReviewPage({
   }
 
   if (query.start === "1") {
-    const initialQueue = await getReviewQueueData({
-      userId: user.id,
-      userCourseId: course.id,
-      preferredTranslation: course.explanationLanguage,
-    });
-
-    return <ReviewSession initialData={initialQueue} userScope={course.id} />;
+    return <Suspense fallback={<main className="page review-page"><div className="skeleton loading-home-hero" aria-label={t("loading.surface", { surface: t("nav.review") })} /></main>}>
+      <ReviewSessionContent userId={user.id} courseId={course.id} preferredTranslation={course.explanationLanguage} />
+    </Suspense>;
   }
-
-  const now = new Date();
-  const [dueCount, mistakeCount, rescueWords] = await Promise.all([
-    db.userVocabulary.count({
-      where: {
-        userCourseId: course.id,
-        OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
-      },
-    }),
-    db.mistake.count({ where: { userCourseId: course.id, resolvedAt: null } }),
-    getRescueWords(user.id, course.id, Number.POSITIVE_INFINITY),
-  ]);
-  const rescueCount = rescueWords.length;
 
   return (
     <main className="page review-landing review-page">
@@ -110,6 +94,53 @@ export default async function ReviewPage({
         items={[t("guidance.review.item1"), t("guidance.review.item2")]}
         dismissLabel={t("guidance.dismiss")}
       />
+      <Suspense fallback={<ReviewLandingLoading label={t("loading.surface", { surface: t("nav.review") })} />}>
+        <ReviewLandingContent userId={user.id} courseId={course.id} locale={locale} t={t} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function ReviewSessionContent({ userId, courseId, preferredTranslation }: {
+  userId: string;
+  courseId: string;
+  preferredTranslation: "ENGLISH" | "PERSIAN" | "BOTH";
+}) {
+  const initialQueue = await getReviewQueueData({ userId, userCourseId: courseId, preferredTranslation });
+  return <ReviewSession initialData={initialQueue} userScope={courseId} />;
+}
+
+function ReviewLandingLoading({ label }: { label: string }) {
+  return <div aria-busy="true" aria-label={label}>
+    <div className="skeleton loading-home-hero" />
+    <div className="practice-lanes review-mode-grid">
+      <div className="skeleton loading-mode-card" /><div className="skeleton loading-mode-card" />
+    </div>
+  </div>;
+}
+
+async function ReviewLandingContent({ userId, courseId, locale, t }: {
+  userId: string;
+  courseId: string;
+  locale: UiLocale;
+  t: Translator;
+}) {
+
+  const now = new Date();
+  const [dueCount, mistakeCount, rescueWords] = await Promise.all([
+    db.userVocabulary.count({
+      where: {
+        userCourseId: courseId,
+        OR: [{ nextReviewAt: null }, { nextReviewAt: { lte: now } }],
+      },
+    }),
+    db.mistake.count({ where: { userCourseId: courseId, resolvedAt: null } }),
+    getRescueWords(userId, courseId, Number.POSITIVE_INFINITY),
+  ]);
+  const rescueCount = rescueWords.length;
+
+  return (
+    <>
       <section className="review-hero">
         <div>
           <h1>
@@ -142,6 +173,6 @@ export default async function ReviewPage({
         locale={locale}
         t={t}
       />
-    </main>
+    </>
   );
 }

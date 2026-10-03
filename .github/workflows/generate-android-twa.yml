@@ -35,7 +35,22 @@ jobs:
           mkdir -p "$HOME/.bubblewrap"
           printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
       - name: Generate Android project
-        run: npx bubblewrap update --manifest=android/twa-manifest.json --skipVersionUpgrade
+        run: |
+          cp android/twa-manifest.json /tmp/twa-manifest.json
+          python3 -m http.server 8765 --directory android/assets >/tmp/uvocab-twa-assets.log 2>&1 &
+          ASSET_SERVER_PID=$!
+          trap 'kill "$ASSET_SERVER_PID" 2>/dev/null || true' EXIT
+          node - <<'NODE'
+          const fs = require("fs");
+          const p = "/tmp/twa-manifest.json";
+          const m = JSON.parse(fs.readFileSync(p, "utf8"));
+          m.iconUrl = "http://127.0.0.1:8765/icon-512.png";
+          m.maskableIconUrl = "http://127.0.0.1:8765/maskable-512.png";
+          delete m.monochromeIconUrl;
+          fs.writeFileSync(p, JSON.stringify(m, null, 2));
+          NODE
+          curl --fail --retry 5 http://127.0.0.1:8765/icon-512.png >/dev/null
+          timeout 180 npx bubblewrap update --manifest=/tmp/twa-manifest.json --skipVersionUpgrade
       - name: Commit generated project and lockfile
         run: |
           git config user.name "github-actions[bot]"

@@ -28,6 +28,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+      - run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
       - run: npm ci
       - name: Configure Bubblewrap
         run: npx bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"

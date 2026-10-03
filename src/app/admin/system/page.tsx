@@ -6,13 +6,16 @@ export default async function AdminSystemPage() {
   await requireAdmin();
   const now = new Date();
   const d1 = new Date(now.getTime() - 86400000);
-  const [latestMigration, aiFailures, audits] = await Promise.all([
+  const [latestMigration, aiFailures, audits, activePushSubscriptions, notificationDeliveries24h, notificationFailures24h] = await Promise.all([
     db.$queryRaw<Array<{ migration_name: string; finished_at: Date | null }>>`
       SELECT migration_name, finished_at FROM "_prisma_migrations"
       WHERE finished_at IS NOT NULL ORDER BY finished_at DESC LIMIT 1
     `.catch(() => []),
     db.aiUsageEvent.count({ where: { status: "ERROR", createdAt: { gte: d1 } } }),
     db.adminAuditLog.findMany({ orderBy: { createdAt: "desc" }, take: 30 }),
+    db.webPushSubscription.count({ where: { status: "ACTIVE" } }),
+    db.notificationDelivery.count({ where: { createdAt: { gte: d1 } } }),
+    db.notificationDelivery.count({ where: { createdAt: { gte: d1 }, status: { in: ["FAILED_TRANSIENT", "FAILED_PERMANENT"] } } }),
   ]);
   const release = process.env.NEXT_PUBLIC_APP_RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GIT_COMMIT_SHA ?? "unknown";
   const environment = process.env.NEXT_PUBLIC_APP_ENV ?? process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown";
@@ -25,7 +28,7 @@ export default async function AdminSystemPage() {
       <article className="panel admin-metric"><span>App environment</span><strong>{environment}</strong><small>{release}</small></article>
       <article className="panel admin-metric"><span>Database</span><strong>reachable</strong><small>{latestMigration[0]?.migration_name ?? "migration version unavailable"}</small></article>
       <article className="panel admin-metric"><span>AI failures · 24h</span><strong>{aiFailures}</strong><small>Inspect Sentry for exception-level debugging</small></article>
-      <article className="panel admin-metric"><span>Background jobs</span><strong>not configured</strong><small>No scheduled notification/background-job subsystem is present yet.</small></article>
+      <article className="panel admin-metric"><span>Review notification job</span><strong>{activePushSubscriptions} devices</strong><small>{notificationDeliveries24h} deliveries · {notificationFailures24h} failures in 24h</small></article>
     </section>
     <section className="admin-two-column">
       <article className="panel"><h2>External observability</h2><div className="admin-action-list">{sentryUrl?<Link href={sentryUrl} target="_blank" rel="noreferrer">Open Sentry</Link>:<span className="muted">Set SENTRY_DASHBOARD_URL to link Sentry.</span>}{posthogUrl?<Link href={posthogUrl} target="_blank" rel="noreferrer">Open PostHog</Link>:<span className="muted">Set POSTHOG_DASHBOARD_URL to link PostHog.</span>}</div></article>

@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { useTranslations } from "@/i18n/client";
 import { resetObservabilityIdentity } from "@/components/observability-identity";
 import { clearPwaRuntimeCaches } from "@/components/pwa-manager";
+import { disableCurrentPushDeviceForLogout } from "@/lib/notifications/client";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export function SignOutButton() {
         setPending(true);
         try {
           resetObservabilityIdentity();
+          await disableCurrentPushDeviceForLogout();
           await clearPwaRuntimeCaches();
           await authClient.signOut();
           router.replace("/login");

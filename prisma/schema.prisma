@@ -324,6 +324,25 @@ enum EntitlementGrantSource {
   MIGRATION
 }
 
+enum PushSubscriptionStatus {
+  ACTIVE
+  DISABLED
+  INVALID
+}
+
+enum NotificationType {
+  REVIEW_REMINDER
+}
+
+enum NotificationDeliveryStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED_TRANSIENT
+  FAILED_PERMANENT
+  SKIPPED
+}
+
 model User {
   id                   String              @id @default(cuid())
   name                 String              @default("")
@@ -364,6 +383,9 @@ model User {
   subscriptions        Subscription[]
   entitlementGrants    EntitlementGrant[]
   quotaUsage           QuotaUsageEvent[]
+  pushSubscriptions    WebPushSubscription[]
+  notificationPreferences ReviewNotificationPreference[]
+  notificationDeliveries NotificationDelivery[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 
@@ -418,6 +440,8 @@ model UserCourse {
   grammarTransitions    GrammarProgressTransition[]
   grammarRecommendationEvents GrammarRecommendationEvent[]
   quotaUsage            QuotaUsageEvent[]
+  notificationPreference ReviewNotificationPreference?
+  notificationDeliveries NotificationDelivery[]
 
   @@unique([userId, targetLanguage])
   @@index([userId, status])
@@ -479,6 +503,72 @@ model QuotaUsageEvent {
   @@unique([userId, operationKey, periodKey, sourceRef])
   @@index([userId, operationKey, periodStart, periodEnd])
   @@index([userCourseId, operationKey, periodStart])
+}
+
+
+model WebPushSubscription {
+  id          String                 @id @default(cuid())
+  userId      String
+  endpoint    String                 @unique
+  p256dh      String
+  auth        String
+  userAgent   String?
+  deviceLabel String?
+  status      PushSubscriptionStatus @default(ACTIVE)
+  lastSeenAt  DateTime               @default(now())
+  disabledAt  DateTime?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries  NotificationDelivery[]
+
+  @@index([userId, status])
+  @@index([status, lastSeenAt])
+}
+
+model ReviewNotificationPreference {
+  id                    String     @id @default(cuid())
+  userId                String
+  userCourseId          String     @unique
+  enabled               Boolean    @default(false)
+  reminderMinuteOfDay   Int        @default(1080)
+  minimumDueCount       Int        @default(1)
+  timezoneSource        String     @default("USER")
+  quietStartMinuteOfDay Int?
+  quietEndMinuteOfDay   Int?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  user                  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course                UserCourse @relation(fields: [userCourseId], references: [id], onDelete: Cascade)
+
+  @@index([userId, enabled])
+  @@index([enabled, reminderMinuteOfDay])
+}
+
+model NotificationDelivery {
+  id             String                     @id @default(cuid())
+  userId         String
+  userCourseId   String
+  subscriptionId String
+  type           NotificationType
+  bucketKey      String
+  dueCount       Int
+  status         NotificationDeliveryStatus @default(PENDING)
+  attemptCount   Int                        @default(0)
+  attemptedAt    DateTime?
+  sentAt         DateTime?
+  providerStatus Int?
+  errorCategory  String?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  user           User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course         UserCourse                 @relation(fields: [userCourseId], references: [id], onDelete: Cascade)
+  subscription   WebPushSubscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriptionId, type, bucketKey])
+  @@index([userId, type, createdAt])
+  @@index([status, attemptedAt])
+  @@index([userCourseId, createdAt])
 }
 
 model UserGuideState {

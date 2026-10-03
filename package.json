@@ -42,7 +42,8 @@
     "@sentry/nextjs": "10.75.2",
     "posthog-js": "1.433.1",
     "posthog-node": "5.54.1",
-    "@serwist/next": "9.5.12"
+    "@serwist/next": "9.5.12",
+    "web-push": "3.6.7"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
@@ -52,6 +53,7 @@
     "eslint-config-next": "^15.5.3",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "serwist": "9.5.12"
+    "serwist": "9.5.12",
+    "@types/web-push": "3.6.4"
   }
 }

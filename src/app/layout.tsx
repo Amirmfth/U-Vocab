@@ -104,8 +104,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <PageTransition>{children}</PageTransition>
             </div>
           </QueryProvider>
+          <PwaManager />
         </I18nProvider>
-        <PwaManager />
         <Analytics />
         <SpeedInsights />
       </body>

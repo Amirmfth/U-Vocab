@@ -5476,3 +5476,56 @@ summary {
   }
   .pwa-install-actions .button { flex: 1; }
 }
+
+/* Review reminder settings */
+.notification-settings { display: grid; gap: 18px; }
+.notification-settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.notification-settings-heading h2 { margin: 4px 0 6px; }
+.notification-settings-heading p { margin-bottom: 0; }
+.notification-status {
+  flex: none;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: .75rem;
+  font-weight: 700;
+}
+.notification-status.is-enabled {
+  border-color: color-mix(in srgb, var(--success) 48%, var(--border));
+  background: var(--success-soft);
+  color: var(--success);
+}
+.notification-preferences-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.notification-preferences-grid label { display: grid; gap: 6px; color: var(--text-muted); font-size: .78rem; }
+.notification-preferences-grid input {
+  min-height: 46px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: var(--surface-raised);
+  color: var(--text);
+}
+.notification-device-summary,
+.notification-warning,
+.notification-message { margin: 0; font-size: .84rem; line-height: 1.5; }
+.notification-warning { color: var(--warning); }
+.notification-message { color: var(--text-soft); }
+.notification-actions { display: flex; gap: 10px; }
+.notification-actions .button { width: auto; }
+@media (max-width: 680px) {
+  .notification-settings-heading { align-items: stretch; flex-direction: column; }
+  .notification-status { width: fit-content; }
+  .notification-preferences-grid { grid-template-columns: 1fr; }
+  .notification-actions .button { width: 100%; }
+}

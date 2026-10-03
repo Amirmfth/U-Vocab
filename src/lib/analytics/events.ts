@@ -1,4 +1,8 @@
 export type ProductEventMap = {
+  notifications_enabled: { source: "settings" };
+  notifications_disabled: { source: "settings" | "logout" };
+  review_notification_sent: { dueCount: number };
+  review_notification_opened: { source: "push" };
   pwa_install_prompt_available: { surface: "app" };
   pwa_install_prompt_result: { surface: "app"; outcome: "accepted" | "dismissed" };
   pwa_installed: { surface: "browser" };
@@ -65,6 +69,10 @@ export type ProductEventMap = {
 export type ProductEventName = keyof ProductEventMap;
 
 export const PRODUCT_EVENT_NAMES = new Set<ProductEventName>([
+  "notifications_enabled",
+  "notifications_disabled",
+  "review_notification_sent",
+  "review_notification_opened",
   "pwa_install_prompt_available",
   "pwa_install_prompt_result",
   "pwa_installed",

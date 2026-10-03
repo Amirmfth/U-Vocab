@@ -1,11 +1,10 @@
-name: Generate Android TWA project
+name: Finalize Android lockfile
 
 on:
   push:
     branches:
       - feat/issue-105-android-twa
     paths:
-      - android/twa-manifest.json
       - package.json
       - package-lock.json
       - .github/workflows/generate-android-twa.yml
@@ -14,7 +13,7 @@ permissions:
   contents: write
 
 jobs:
-  generate:
+  lockfile:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,50 +21,17 @@ jobs:
           ref: feat/issue-105-android-twa
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
       - run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - run: npm ci
-      - name: Configure Bubblewrap
-        run: |
-          mkdir -p "$HOME/.bubblewrap"
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
-      - name: Generate Android project
-        run: |
-          cp android/twa-manifest.json /tmp/twa-manifest.json
-          python3 -m http.server 8765 --directory android/assets >/tmp/uvocab-twa-assets.log 2>&1 &
-          ASSET_SERVER_PID=$!
-          trap 'kill "$ASSET_SERVER_PID" 2>/dev/null || true' EXIT
-          node - <<'NODE'
-          const fs = require("fs");
-          const p = "/tmp/twa-manifest.json";
-          const m = JSON.parse(fs.readFileSync(p, "utf8"));
-          m.iconUrl = "http://127.0.0.1:8765/icon-512.svg";
-          m.maskableIconUrl = "http://127.0.0.1:8765/maskable-512.svg";
-          delete m.monochromeIconUrl;
-          fs.writeFileSync(p, JSON.stringify(m, null, 2));
-          NODE
-          for i in 1 2 3 4 5 6 7 8 9 10; do
-            if curl --fail --silent http://127.0.0.1:8765/icon-512.svg >/dev/null; then
-              break
-            fi
-            sleep 0.5
-          done
-          curl --fail --silent http://127.0.0.1:8765/icon-512.svg >/dev/null
-          timeout 180 npx bubblewrap update --manifest=/tmp/twa-manifest.json --skipVersionUpgrade
-      - name: Commit generated project and lockfile
+      - name: Commit package lock
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json android
-          git reset -- android/release.keystore || true
+          git add package-lock.json
           if git diff --cached --quiet; then
-            echo "Android project already current."
+            echo "Lockfile already current."
           else
-            git commit -m "Generate Bubblewrap Android project"
+            git commit -m "Update Android tooling package lock"
             git push origin HEAD:feat/issue-105-android-twa
           fi

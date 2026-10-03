@@ -1,0 +1,47 @@
+name: Generate Android TWA project
+
+on:
+  push:
+    branches:
+      - feat/issue-105-android-twa
+    paths:
+      - android/twa-manifest.json
+      - package.json
+      - package-lock.json
+      - .github/workflows/generate-android-twa.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/issue-105-android-twa
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: npm ci
+      - name: Configure Bubblewrap
+        run: npx bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
+      - name: Generate Android project
+        run: npx bubblewrap update --manifest=android/twa-manifest.json --skipVersionUpgrade
+      - name: Commit generated project and lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json android
+          git reset -- android/release.keystore || true
+          if git diff --cached --quiet; then
+            echo "Android project already current."
+          else
+            git commit -m "Generate Bubblewrap Android project"
+            git push origin HEAD:feat/issue-105-android-twa
+          fi

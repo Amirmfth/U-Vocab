@@ -75,3 +75,13 @@ test("Play Billing remains intentionally disabled pending policy-compliant check
   assert.match(docs, /Play Billing/i);
   assert.match(docs, /provider-neutral/i);
 });
+
+
+test("release CI verifies the signer against deployed production Digital Asset Links", () => {
+  const workflow = read(".github/workflows/android-twa.yml");
+  assert.match(workflow, /Verify production Digital Asset Links against release signer/);
+  assert.match(workflow, /keytool -list -v/);
+  assert.match(workflow, /https:\/\/uvocab\.ir\/\.well-known\/assetlinks\.json/);
+  assert.match(workflow, /delegate_permission\/common\.handle_all_urls/);
+  assert.match(workflow, /ir\.uvocab\.app/);
+});

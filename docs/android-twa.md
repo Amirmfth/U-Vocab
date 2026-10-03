@@ -145,6 +145,10 @@ Expected CI secrets:
 
 The workflow reconstructs the keystore only in the runner workspace and deletes it with the ephemeral runner.
 
+Before publishing release artifacts, CI extracts the SHA-256 fingerprint from the exact release keystore and checks the deployed `https://uvocab.ir/.well-known/assetlinks.json`. The release job fails if the production origin does not trust `ir.uvocab.app` with that signer. This prevents accidentally shipping a package that falls back to browser/custom-tab UI because DAL configuration is stale.
+
+For a Play App Signing release, remember that Google re-signs the uploaded bundle. The production DAL must additionally contain the **Play App Signing** certificate fingerprint from Play Console; verify a Play-installed build separately before production rollout.
+
 For Google Play, the primary store artifact is the signed Android App Bundle (AAB). A signed APK may additionally be produced for direct internal distribution where needed.
 
 Normal Next.js CI does not require any Android signing secret.

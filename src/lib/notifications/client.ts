@@ -16,21 +16,50 @@ export function pushSupported() {
   );
 }
 
+async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message: string) {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => reject(new Error(message)), milliseconds);
+      }),
+    ]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
+}
+
+async function readyPushRegistration() {
+  return withTimeout(
+    navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(
+      () => navigator.serviceWorker.ready,
+    ),
+    15000,
+    "The notification service worker did not become ready. Reload and try again.",
+  );
+}
+
 export async function currentPushSubscription() {
   if (!pushSupported()) return null;
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await navigator.serviceWorker.getRegistration("/");
+  if (!registration) return null;
   return registration.pushManager.getSubscription();
 }
 
 export async function subscribeCurrentDevice(publicKey: string) {
   if (!pushSupported()) throw new Error("Push notifications are not supported.");
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await readyPushRegistration();
   const existing = await registration.pushManager.getSubscription();
   if (existing) return existing;
-  return registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(publicKey),
-  });
+  return withTimeout(
+    registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    }),
+    30000,
+    "The browser did not complete push subscription. Try again.",
+  );
 }
 
 export async function registerSubscriptionWithServer(subscription: PushSubscription) {

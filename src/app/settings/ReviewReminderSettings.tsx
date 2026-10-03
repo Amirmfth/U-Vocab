@@ -43,9 +43,9 @@ export function ReviewReminderSettings({
     setSupported(available);
     if (!available) return;
     setPermission(Notification.permission);
-    void currentPushSubscription().then((subscription) => {
-      setDeviceSubscribed(Boolean(subscription));
-    });
+    void currentPushSubscription()
+      .then((subscription) => setDeviceSubscribed(Boolean(subscription)))
+      .catch(() => setDeviceSubscribed(false));
   }, []);
 
   const savePreference = async (nextEnabled: boolean) => {

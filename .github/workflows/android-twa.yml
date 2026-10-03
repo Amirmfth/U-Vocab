@@ -69,6 +69,45 @@ jobs:
         env:
           ANDROID_RELEASE_KEYSTORE_PATH: ${{ github.workspace }}/android/release.keystore
         run: gradle -p android :app:assembleRelease :app:bundleRelease :app:lintRelease --stacktrace
+
+      - name: Verify production Digital Asset Links against release signer
+        env:
+          ANDROID_RELEASE_KEYSTORE_PATH: ${{ github.workspace }}/android/release.keystore
+        run: |
+          set -euo pipefail
+          FINGERPRINT="$(
+            keytool -list -v               -keystore "$ANDROID_RELEASE_KEYSTORE_PATH"               -storepass "$ANDROID_RELEASE_KEYSTORE_PASSWORD"               -alias "$ANDROID_RELEASE_KEY_ALIAS"               | awk -F': ' '/SHA256:/{print $2; exit}'
+          )"
+          test -n "$FINGERPRINT"
+          curl --fail --silent --show-error --location             --proto '=https' --tlsv1.2             https://uvocab.ir/.well-known/assetlinks.json             -o /tmp/assetlinks.json
+          FINGERPRINT="$FINGERPRINT" python3 - <<'PY'
+          import json
+          import os
+
+          with open("/tmp/assetlinks.json", "r", encoding="utf-8") as handle:
+              statements = json.load(handle)
+
+          fingerprint = os.environ["FINGERPRINT"].upper()
+          expected_package = "ir.uvocab.app"
+          expected_relation = "delegate_permission/common.handle_all_urls"
+
+          valid = any(
+              expected_relation in statement.get("relation", [])
+              and statement.get("target", {}).get("namespace") == "android_app"
+              and statement.get("target", {}).get("package_name") == expected_package
+              and fingerprint in [
+                  value.upper()
+                  for value in statement.get("target", {}).get("sha256_cert_fingerprints", [])
+              ]
+              for statement in statements
+          )
+
+          if not valid:
+              raise SystemExit(
+                  "Production Digital Asset Links do not trust the certificate that signed this release."
+              )
+          PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: uvocab-twa-release

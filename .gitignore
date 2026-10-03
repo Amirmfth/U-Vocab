@@ -5,3 +5,15 @@ node_modules
 *.log
 *.tsbuildinfo
 /public/sw.js
+
+# Android / TWA local signing and generated artifacts
+android/*.keystore
+android/*.jks
+android/*.p12
+android/.gradle/
+android/local.properties
+android/app/build/
+android/build/
+android/*.apk
+android/*.aab
+android/app-release-*

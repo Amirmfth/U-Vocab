@@ -19,7 +19,10 @@
     "auth:bootstrap": "tsx scripts/bootstrap-existing-auth-user.ts",
     "lexicon:maintain": "tsx scripts/maintain-lexicon.ts",
     "entitlement:grant-pro": "tsx scripts/grant-pro.ts",
-    "admin:promote": "tsx scripts/promote-admin.ts"
+    "admin:promote": "tsx scripts/promote-admin.ts",
+    "android:update": "bubblewrap update --manifest=android/twa-manifest.json --skipVersionUpgrade",
+    "android:build:unsigned": "bubblewrap build --manifest=android/twa-manifest.json --skipSigning",
+    "android:version": "tsx scripts/bump-android-version.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
@@ -54,6 +57,7 @@
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "serwist": "9.5.12",
-    "@types/web-push": "3.6.4"
+    "@types/web-push": "3.6.4",
+    "@bubblewrap/cli": "1.25.0"
   }
 }

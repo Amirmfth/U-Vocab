@@ -1,0 +1,44 @@
+{
+  "packageId": "ir.uvocab.app",
+  "host": "uvocab.ir",
+  "name": "U-Vocab",
+  "launcherName": "U-Vocab",
+  "display": "standalone",
+  "themeColor": "#09090b",
+  "themeColorDark": "#09090b",
+  "navigationColor": "#09090b",
+  "navigationColorDark": "#09090b",
+  "navigationDividerColor": "#09090b",
+  "navigationDividerColorDark": "#09090b",
+  "backgroundColor": "#09090b",
+  "enableNotifications": true,
+  "enableSiteSettingsShortcut": true,
+  "fallbackType": "customtabs",
+  "orientation": "default",
+  "startUrl": "/",
+  "iconUrl": "https://uvocab.ir/pwa/icon-512.png",
+  "maskableIconUrl": "https://uvocab.ir/pwa/maskable-512.png",
+  "monochromeIconUrl": "https://uvocab.ir/pwa/icon-192.png",
+  "webManifestUrl": "https://uvocab.ir/manifest.webmanifest",
+  "minSdkVersion": 23,
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "generatorApp": "bubblewrap-cli",
+  "signingKey": {
+    "path": "./release.keystore",
+    "alias": "uvocab-release"
+  },
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "features": {
+    "playBilling": {
+      "enabled": false
+    },
+    "locationDelegation": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  }
+}

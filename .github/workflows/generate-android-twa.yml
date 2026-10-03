@@ -49,7 +49,13 @@ jobs:
           delete m.monochromeIconUrl;
           fs.writeFileSync(p, JSON.stringify(m, null, 2));
           NODE
-          curl --fail --retry 5 http://127.0.0.1:8765/icon-512.png >/dev/null
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent http://127.0.0.1:8765/icon-512.png >/dev/null; then
+              break
+            fi
+            sleep 0.5
+          done
+          curl --fail --silent http://127.0.0.1:8765/icon-512.png >/dev/null
           timeout 180 npx bubblewrap update --manifest=/tmp/twa-manifest.json --skipVersionUpgrade
       - name: Commit generated project and lockfile
         run: |

@@ -1,0 +1,71 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "ir.uvocab.app"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "ir.uvocab.app"
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName "1.0.0"
+
+        resValue "string", "appName", "U-Vocab"
+        resValue "string", "launcherName", "U-Vocab"
+        resValue "string", "launchUrl", "https://uvocab.ir/"
+        resValue "string", "hostName", "uvocab.ir"
+        resValue "string", "webManifestUrl", "https://uvocab.ir/manifest.webmanifest"
+        resValue "string", "providerAuthority", "ir.uvocab.app.fileprovider"
+        resValue "string", "fallbackType", "customtabs"
+        resValue "string", "generatorApp", "bubblewrap-cli"
+        resValue "bool", "enableNotification", "true"
+        resValue "integer", "splashScreenFadeOutDuration", "0"
+        resValue "color", "colorPrimary", "#09090b"
+        resValue "color", "colorPrimaryDark", "#09090b"
+        resValue "color", "navigationColor", "#09090b"
+        resValue "color", "navigationColorDark", "#09090b"
+        resValue "color", "navigationDividerColor", "#09090b"
+        resValue "color", "navigationDividerColorDark", "#09090b"
+        resValue "color", "backgroundColor", "#09090b"
+    }
+
+    signingConfigs {
+        if (System.getenv("ANDROID_RELEASE_KEYSTORE_PATH")) {
+            release {
+                storeFile file(System.getenv("ANDROID_RELEASE_KEYSTORE_PATH"))
+                storePassword System.getenv("ANDROID_RELEASE_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_RELEASE_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            if (System.getenv("ANDROID_RELEASE_KEYSTORE_PATH")) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds = true
+        abortOnError = true
+    }
+}
+
+dependencies {
+    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.7.3"
+}

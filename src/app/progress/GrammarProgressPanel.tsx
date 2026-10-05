@@ -82,7 +82,7 @@ export async function GrammarProgressPanel({
       _sum: { occurrences: true },
     }),
     db.grammarEvidence.findMany({
-      where: { userId, accepted: true },
+      where: { userId, userCourseId, accepted: true },
       include: {
         grammarConcept: {
           select: { slug: true, title: true },

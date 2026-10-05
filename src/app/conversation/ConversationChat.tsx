@@ -96,6 +96,7 @@ export function ConversationChat({
   const [transcribing, setTranscribing] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [remainingMinutes, setRemainingMinutes] = useState(voiceRemainingMinutes);
   const [retryBlob, setRetryBlob] = useState<Blob | null>(null);
   const [retryDurationMs, setRetryDurationMs] = useState(0);
   const [retryRequestId, setRetryRequestId] = useState<string | null>(null);
@@ -178,7 +179,7 @@ export function ConversationChat({
         body: form,
       });
       const payload = (await response.json().catch(() => null)) as
-        | { transcript?: string; error?: string; code?: string }
+        | { transcript?: string; error?: string; code?: string; remainingMinutes?: number }
         | null;
 
       if (!response.ok || !payload?.transcript) {
@@ -194,6 +195,9 @@ export function ConversationChat({
       }
 
       const transcript = payload.transcript.trim();
+      if (typeof payload.remainingMinutes === "number") {
+        setRemainingMinutes(Math.max(0, payload.remainingMinutes));
+      }
       setRetryBlob(null);
       setRetryDurationMs(0);
       setRetryRequestId(null);
@@ -234,7 +238,7 @@ export function ConversationChat({
   }
 
   async function startRecording() {
-    if (!voiceEnabled || voiceRemainingMinutes <= 0 || recording || transcribing) {
+    if (!voiceEnabled || remainingMinutes <= 0 || recording || transcribing) {
       return;
     }
     if (
@@ -451,7 +455,7 @@ export function ConversationChat({
   }
 
   const elapsedSeconds = Math.ceil(elapsedMs / 1000);
-  const voiceUnavailable = !voiceEnabled || voiceRemainingMinutes <= 0;
+  const voiceUnavailable = !voiceEnabled || remainingMinutes <= 0;
 
   return (
     <section className="conversation-chat">
@@ -518,7 +522,7 @@ export function ConversationChat({
                 title={
                   !voiceEnabled
                     ? t("conversation.voice.proRequired")
-                    : voiceRemainingMinutes <= 0
+                    : remainingMinutes <= 0
                       ? t("conversation.voice.quotaReached")
                       : t("conversation.voice.start")
                 }
@@ -623,7 +627,7 @@ export function ConversationChat({
           <span className="conversation-voice-quota">
             {voiceEnabled
               ? t("conversation.voice.remaining", {
-                  remaining: voiceRemainingMinutes,
+                  remaining: remainingMinutes,
                   limit: voiceLimitMinutes,
                 })
               : t("conversation.voice.proRequired")}

@@ -60,6 +60,7 @@ export type AIUsageRecordInput = {
   durationMs?: number | null;
   timeToFirstTokenMs?: number | null;
   metadata?: Record<string, SafeMetadataValue>;
+  durationSeconds?: number | null;
 };
 
 export async function recordAIUsage(input: AIUsageRecordInput) {
@@ -81,6 +82,7 @@ export async function recordAIUsage(input: AIUsageRecordInput) {
       cachedInputTokens,
       outputTokens,
       reasoningTokens,
+      durationSeconds: input.durationSeconds,
     });
 
     await db.aiUsageEvent.create({

@@ -56,6 +56,7 @@ export function createAIUsageRecorder(
     model: string;
     provider?: string;
     metadata?: SafeAIMetadata;
+    durationSeconds?: number | null;
   },
   persistUsage: (input: AIUsageRecordInput) => Promise<void> = recordAIUsage,
 ) {
@@ -93,6 +94,7 @@ export function createAIUsageRecorder(
       durationMs: Math.max(0, Math.round(nowMs() - startedAt)),
       timeToFirstTokenMs: args.timeToFirstTokenMs ?? null,
       metadata: input.metadata,
+      durationSeconds: input.durationSeconds,
     });
   }
 

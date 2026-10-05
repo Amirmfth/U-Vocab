@@ -249,7 +249,18 @@ The TWA requests web-origin permissions through Chrome.
 
 Do not add contacts, location, storage, camera, or other native Android permissions unless a real product capability requires them.
 
-When voice/microphone input is shipped, test microphone permission from the TWA on supported Android/Chrome versions. The current wrapper does not add a native JavaScript bridge or custom permission layer.
+Recorded Conversation speech input is now implemented through the web platform's `getUserMedia()` + `MediaRecorder` flow. The TWA still does not add a native JavaScript bridge, custom microphone permission layer, or `RECORD_AUDIO` permission to the wrapper manifest; the trusted page is rendered by the Android browser and site permission is requested only after the learner taps the microphone.
+
+Before an Android release, verify on a physical device:
+
+1. open an active Conversation in the verified TWA;
+2. tap the microphone and confirm the site/browser microphone prompt appears only from that gesture;
+3. allow access, record a short turn, stop, and confirm editable transcript text appears;
+4. edit the transcript and send it through the normal Conversation flow;
+5. deny microphone access and confirm typing remains usable;
+6. revoke the site microphone permission in Android/Chrome settings and confirm the app recovers with an explanatory error;
+7. confirm the 90-second recording limit and retry behavior;
+8. test Persian UI/RTL around the recorder controls.
 
 Location delegation is explicitly disabled.
 

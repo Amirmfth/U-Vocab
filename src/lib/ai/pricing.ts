@@ -8,9 +8,20 @@ export type ModelPricing = {
   inputPerMillion: number;
   cachedInputPerMillion: number;
   outputPerMillion: number;
+  durationPerMinute?: number;
 };
 
 const OPENAI_STANDARD_2026_09_25: ModelPricing[] = [
+  {
+    key: "openai-transcription-2026-10-05:gpt-transcribe",
+    provider: "openai",
+    model: "gpt-transcribe",
+    currency: "USD",
+    inputPerMillion: 0,
+    cachedInputPerMillion: 0,
+    outputPerMillion: 0,
+    durationPerMinute: 0.0045,
+  },
   {
     key: "openai-standard-2026-09-25:gpt-5-mini",
     provider: "openai",
@@ -71,6 +82,7 @@ export function calculateUsageCost(input: {
   cachedInputTokens: number;
   outputTokens: number;
   reasoningTokens: number;
+  durationSeconds?: number | null;
 }) {
   const pricing = pricingFor(input.provider, input.model);
   if (!pricing) {
@@ -82,6 +94,20 @@ export function calculateUsageCost(input: {
       outputCost: null,
       reasoningCost: null,
       totalCost: null,
+    };
+  }
+
+  if (pricing.durationPerMinute !== undefined) {
+    const minutes = Math.max(0, input.durationSeconds ?? 0) / 60;
+    const durationCost = minutes * pricing.durationPerMinute;
+    return {
+      pricingKey: pricing.key,
+      currency: pricing.currency,
+      inputCost: durationCost,
+      cachedInputCost: 0,
+      outputCost: 0,
+      reasoningCost: 0,
+      totalCost: durationCost,
     };
   }
 

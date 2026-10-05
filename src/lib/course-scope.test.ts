@@ -97,3 +97,16 @@ test("German migration backfills learner settings and preserves course-owned his
   assert.match(migration, /DROP COLUMN "targetLevel"/);
   assert.match(migration, /DROP COLUMN "preferredTranslation"/);
 });
+
+
+test("progress analytics keep learner evidence scoped to the active course", () => {
+  const page = readFileSync("src/app/progress/page.tsx", "utf8");
+  const grammarPanel = readFileSync(
+    "src/app/progress/GrammarProgressPanel.tsx",
+    "utf8",
+  );
+
+  assert.match(page, /userCourseId: course\.id/);
+  assert.match(page, /resolveProgressRange\(query\.range, entitlements\.config\.features\.long_history\)/);
+  assert.match(grammarPanel, /where: \{ userId, userCourseId, accepted: true \}/);
+});

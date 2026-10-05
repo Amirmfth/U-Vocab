@@ -1128,6 +1128,8 @@ export const fa = {
   "progress.heatmapAria": "۳۶۵ روز فعالیت واژگان",
   "progress.activities": "{date}: {count} فعالیت یادگیری",
   "progress.activitiesTitle": "{date} · {count} فعالیت",
+  "progress.heatmapAria7": "۷ روز فعالیت واژگان",
+  "progress.comparePair": "فعلی {current} · قبلی {previous}",
 
   "progress.freeRangeNote": "تحلیل رایگان یک نمای مفید ۷ روزه نشان می‌دهد. Pro سابقه طولانی‌تر و مقایسه دوره‌ها را باز می‌کند.",
   "progress.days7": "۷ روز اخیر",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { scheduleReview } from "./fsrs";
-import { buildActivityDays, localDateKey, recentFailedRetrievals, rescueRisk } from "./progress";
+import { buildActivityDays, localDateKey, percentChange, progressRangeWindow, recentFailedRetrievals, rescueRisk, resolveProgressRange } from "./progress";
 
 test("successful retrieval clears earlier rescue failures", () => {
   const failures = recentFailedRetrievals([
@@ -55,4 +55,33 @@ test("activity aggregation separates reading and production signals", () => {
   assert.equal(days[0].readingEncounters, 1);
   assert.equal(days[0].mistakesCorrected, 1);
   assert.equal(days[0].durationMs, 45000);
+});
+
+
+test("free progress is pinned to the useful seven-day range", () => {
+  assert.equal(resolveProgressRange("365", false), "7");
+  assert.equal(resolveProgressRange("30", false), "7");
+  assert.equal(resolveProgressRange(undefined, false), "7");
+});
+
+test("pro progress accepts bounded historical ranges", () => {
+  assert.equal(resolveProgressRange("7", true), "7");
+  assert.equal(resolveProgressRange("90", true), "90");
+  assert.equal(resolveProgressRange("365", true), "365");
+  assert.equal(resolveProgressRange("all", true), "30");
+});
+
+test("progress comparison windows are adjacent and bounded", () => {
+  const now = new Date("2026-10-05T12:00:00Z");
+  const window = progressRangeWindow("30", now);
+  assert.equal(window.days, 30);
+  assert.equal(window.currentStart.toISOString(), "2026-09-05T12:00:00.000Z");
+  assert.equal(window.previousEnd.toISOString(), "2026-09-05T12:00:00.000Z");
+  assert.equal(window.previousStart.toISOString(), "2026-08-06T12:00:00.000Z");
+});
+
+test("percent change avoids invented infinity when the prior period is zero", () => {
+  assert.equal(percentChange(0, 0), 0);
+  assert.equal(percentChange(5, 0), null);
+  assert.equal(percentChange(15, 10), 0.5);
 });

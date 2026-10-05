@@ -1,4 +1,9 @@
 export type ProductEventMap = {
+  voice_recording_started: { targetLanguage: string };
+  voice_recording_cancelled: { durationSeconds: number };
+  voice_transcription_completed: { durationSeconds: number; audioBytes: number };
+  voice_transcription_failed: { reason: string; durationSeconds: number };
+  voice_transcript_sent: { edited: boolean };
   notifications_enabled: { source: "settings" };
   notifications_disabled: { source: "settings" | "logout" };
   review_notification_sent: { dueCount: number };
@@ -69,6 +74,11 @@ export type ProductEventMap = {
 export type ProductEventName = keyof ProductEventMap;
 
 export const PRODUCT_EVENT_NAMES = new Set<ProductEventName>([
+  "voice_recording_started",
+  "voice_recording_cancelled",
+  "voice_transcription_completed",
+  "voice_transcription_failed",
+  "voice_transcript_sent",
   "notifications_enabled",
   "notifications_disabled",
   "review_notification_sent",

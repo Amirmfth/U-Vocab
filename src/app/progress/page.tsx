@@ -4,7 +4,7 @@ import { ArrowRight, Clock3, Flame, ShieldCheck, TrendingUp } from "lucide-react
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
-import { buildActivityDays, localDateKey } from "@/lib/progress";
+import { buildActivityDays, localDateKey, progressRangeWindow, resolveProgressRange } from "@/lib/progress";
 import { currentRetrievability } from "@/lib/fsrs";
 import { getServerTranslator } from "@/i18n/server";
 import {
@@ -18,21 +18,14 @@ import { TimezoneSync } from "./TimezoneSync";
 import { GrammarProgressPanel } from "./GrammarProgressPanel";
 import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
 import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
-
-const RANGE_DAYS: Record<string, number | null> = {
-  "7": 7,
-  "30": 30,
-  "90": 90,
-  "365": 365,
-  all: null,
-};
+import { getEntitlements } from "@/lib/entitlements/service";
+import { LockedFeature } from "@/components/entitlement-primitives";
 
 const rangeLabelKeys: Record<string, MessageKey> = {
   "7": "progress.range.7",
   "30": "progress.range.30",
   "90": "progress.range.90",
   "365": "progress.range.365",
-  all: "progress.range.all",
 };
 
 const weaknessKeys: Record<string, MessageKey> = {
@@ -57,14 +50,6 @@ const weaknessKeys: Record<string, MessageKey> = {
   OTHER: "mistake.type.other",
   PRODUCTION: "progress.productionWeakness",
 };
-
-function rangeCutoff(range: string) {
-  const days = RANGE_DAYS[range] ?? 30;
-  if (days === null) return null;
-  const date = new Date();
-  date.setDate(date.getDate() - days);
-  return date;
-}
 
 function minutes(ms: number) {
   return Math.round(ms / 60000);
@@ -92,23 +77,27 @@ export default async function ProgressPage({
     searchParams,
   ]);
   const { locale, t } = await getServerTranslator(user);
-  const range = query.range && query.range in RANGE_DAYS ? query.range : "30";
-  const cutoff = rangeCutoff(range);
-  const activityCutoff = new Date();
-  activityCutoff.setDate(activityCutoff.getDate() - 366);
+  const entitlements = await getEntitlements(user.id);
+  const isPro = entitlements.config.features.advanced_analytics;
+  const range = resolveProgressRange(query.range, entitlements.config.features.long_history);
+  const now = new Date();
+  const rangeWindow = progressRangeWindow(range, now);
+  const cutoff = rangeWindow.currentStart;
+  const activityCutoff = new Date(now);
+  activityCutoff.setDate(activityCutoff.getDate() - (isPro ? 366 : 8));
 
-  const metricAttemptWhere = cutoff
-    ? { userCourseId: course.id, createdAt: { gte: cutoff } }
-    : { userCourseId: course.id };
-  const metricReviewWhere = cutoff
-    ? {
-        userVocabulary: { userCourseId: course.id },
-        reviewedAt: { gte: cutoff },
-      }
-    : { userVocabulary: { userCourseId: course.id } };
-  const metricEncounterWhere = cutoff
-    ? { userCourseId: course.id, createdAt: { gte: cutoff } }
-    : { userCourseId: course.id };
+  const metricAttemptWhere = {
+    userCourseId: course.id,
+    createdAt: { gte: cutoff },
+  };
+  const metricReviewWhere = {
+    userVocabulary: { userCourseId: course.id },
+    reviewedAt: { gte: cutoff },
+  };
+  const metricEncounterWhere = {
+    userCourseId: course.id,
+    createdAt: { gte: cutoff },
+  };
 
   const [
     vocabulary,
@@ -120,6 +109,8 @@ export default async function ProgressPage({
     heatEncounters,
     activityMistakes,
     openMistakes,
+    previousAttempts,
+    previousReviews,
   ] = await Promise.all([
     db.userVocabulary.findMany({
       where: { userCourseId: course.id },
@@ -181,6 +172,30 @@ export default async function ProgressPage({
       where: { userCourseId: course.id, resolvedAt: null },
       select: { type: true, occurrences: true },
     }),
+    isPro
+      ? db.attempt.findMany({
+          where: {
+            userCourseId: course.id,
+            createdAt: {
+              gte: rangeWindow.previousStart,
+              lt: rangeWindow.previousEnd,
+            },
+          },
+          select: { durationMs: true, correct: true },
+        })
+      : Promise.resolve([]),
+    isPro
+      ? db.review.findMany({
+          where: {
+            userVocabulary: { userCourseId: course.id },
+            reviewedAt: {
+              gte: rangeWindow.previousStart,
+              lt: rangeWindow.previousEnd,
+            },
+          },
+          select: { rating: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   const active = vocabulary.filter(
@@ -220,7 +235,6 @@ export default async function ProgressPage({
     (item) => item.state === "MASTERED" || item.state === "MAINTENANCE",
   ).length;
 
-  const now = new Date();
   const nextWeek = new Date(now);
   nextWeek.setDate(nextWeek.getDate() + 7);
   const dueNow = vocabulary.filter(
@@ -275,7 +289,7 @@ export default async function ProgressPage({
     (day) => day.date === selectedDay,
   );
 
-  const monthKeys = lastMonthKeys(today);
+  const monthKeys = isPro ? lastMonthKeys(today) : [];
   const monthlyTrend = monthKeys.map((month) => ({
     month,
     learned: vocabulary.filter(
@@ -292,6 +306,60 @@ export default async function ProgressPage({
     1,
     ...monthlyTrend.map((item) => Math.max(item.learned, item.mastered)),
   );
+
+  const previousLearned = isPro
+    ? vocabulary.filter(
+        (item) =>
+          item.addedAt >= rangeWindow.previousStart &&
+          item.addedAt < rangeWindow.previousEnd,
+      ).length
+    : 0;
+  const previousMastered = isPro
+    ? vocabulary.filter(
+        (item) =>
+          item.masteredAt &&
+          item.masteredAt >= rangeWindow.previousStart &&
+          item.masteredAt < rangeWindow.previousEnd,
+      ).length
+    : 0;
+  const previousDurationMs = previousAttempts.reduce(
+    (sum, attempt) => sum + (attempt.durationMs ?? 0),
+    0,
+  );
+  const previousPracticeAccuracy = previousAttempts.length
+    ? previousAttempts.filter((attempt) => attempt.correct).length /
+      previousAttempts.length
+    : 0;
+  const previousReviewSuccess = previousReviews.length
+    ? previousReviews.filter((review) => review.rating !== "AGAIN").length /
+      previousReviews.length
+    : 0;
+  const hasPreviousActivity =
+    previousAttempts.length > 0 ||
+    previousReviews.length > 0 ||
+    previousLearned > 0 ||
+    previousMastered > 0;
+
+  const topWeaknessLabel = weakAreas[0]
+    ? weaknessKeys[weakAreas[0][0]]
+      ? t(weaknessKeys[weakAreas[0][0]])
+      : weakAreas[0][0].replaceAll("_", " ").toLowerCase()
+    : null;
+  const strongestArea =
+    averageRecognition > averageProduction
+      ? t("progress.reportRecognition")
+      : t("progress.reportProduction");
+  const recentImprovement =
+    masteredInRange > 0
+      ? t("progress.reportImprovement", {
+          count: formatNumber(locale, masteredInRange),
+        })
+      : t("progress.reportNoImprovement");
+  const nextArea = topWeaknessLabel
+    ? t("progress.reportNextWeakness", { area: topWeaknessLabel })
+    : averageRecognition - averageProduction >= 0.12
+      ? t("progress.reportNextProduction")
+      : t("progress.reportNoWeakness");
 
   return (
     <main className="page">
@@ -312,7 +380,7 @@ export default async function ProgressPage({
       </section>
 
       <nav className="range-tabs" aria-label={t("progress.range")}>
-        {["7", "30", "90", "365", "all"].map((value) => (
+        {(isPro ? ["7", "30", "90", "365"] : ["7"]).map((value) => (
           <Link
             key={value}
             href={"/progress?range=" + value}
@@ -322,6 +390,9 @@ export default async function ProgressPage({
           </Link>
         ))}
       </nav>
+      {!isPro ? (
+        <p className="analytics-caveat">{t("progress.freeRangeNote")}</p>
+      ) : null}
 
       <section className="progress-summary">
         <div>
@@ -482,14 +553,15 @@ export default async function ProgressPage({
         </article>
       </section>
 
-      <section className="panel progress-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">{t("progress.growth")}</p>
-            <h2>{t("progress.trend")}</h2>
+      {isPro ? (
+        <section className="panel progress-panel">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">{t("progress.growth")}</p>
+              <h2>{t("progress.trend")}</h2>
+            </div>
           </div>
-        </div>
-        <div className="trend-chart" aria-label={t("progress.trendAria")}>
+          <div className="trend-chart" aria-label={t("progress.trendAria")}>
           {monthlyTrend.map((item) => (
             <div className="trend-month" key={item.month}>
               <div className="trend-bars">
@@ -533,14 +605,101 @@ export default async function ProgressPage({
             {t("progress.masteredLegend")}
           </span>
         </div>
-        <p className="analytics-caveat">{t("progress.trendCaveat")}</p>
-      </section>
+          <p className="analytics-caveat">{t("progress.trendCaveat")}</p>
+        </section>
+      ) : (
+        <LockedFeature
+          title={t("progress.proAdvancedTitle")}
+          description={t("progress.proAdvancedDescription")}
+          upgradeLabel={t("progress.upgradePro")}
+        />
+      )}
+
+      {isPro ? (
+        <section className="progress-grid">
+          <article className="panel progress-panel">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">{t("progress.compare")}</p>
+                <h2>{t("progress.compareTitle")}</h2>
+              </div>
+            </div>
+            {hasPreviousActivity ? (
+              <div className="weakness-list">
+                <div>
+                  <span>{t("progress.wordsAdded")}</span>
+                  <strong>
+                    {formatNumber(locale, learnedInRange)} / {formatNumber(locale, previousLearned)}
+                  </strong>
+                </div>
+                <div>
+                  <span>{t("progress.wordsMastered")}</span>
+                  <strong>
+                    {formatNumber(locale, masteredInRange)} / {formatNumber(locale, previousMastered)}
+                  </strong>
+                </div>
+                <div>
+                  <span>{t("progress.practiceTime")}</span>
+                  <strong>
+                    {formatNumber(locale, minutes(totalDurationMs))} / {formatNumber(locale, minutes(previousDurationMs))}
+                  </strong>
+                </div>
+                <div>
+                  <span>{t("progress.reviewAccuracy")}</span>
+                  <strong>
+                    {formatPercent(locale, reviewSuccess)} / {formatPercent(locale, previousReviewSuccess)}
+                  </strong>
+                </div>
+                <div>
+                  <span>{t("progress.attemptAccuracy")}</span>
+                  <strong>
+                    {formatPercent(locale, practiceAccuracy)} / {formatPercent(locale, previousPracticeAccuracy)}
+                  </strong>
+                </div>
+              </div>
+            ) : (
+              <p className="muted">{t("progress.noComparisonData")}</p>
+            )}
+            <p className="analytics-caveat">
+              {t("progress.currentPeriod")} / {t("progress.previousPeriod")}
+            </p>
+          </article>
+
+          <article className="panel progress-panel">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">{t("progress.report")}</p>
+                <h2>{t("progress.reportTitle")}</h2>
+              </div>
+            </div>
+            <div className="weakness-list">
+              <div>
+                <span>{t("progress.strongestArea")}</span>
+                <strong>{strongestArea}</strong>
+              </div>
+              <div>
+                <span>{t("progress.highestImpactWeakness")}</span>
+                <strong>{topWeaknessLabel ?? t("progress.reportNoWeakness")}</strong>
+              </div>
+              <div>
+                <span>{t("progress.recentImprovement")}</span>
+                <strong>{recentImprovement}</strong>
+              </div>
+              <div>
+                <span>{t("progress.nextArea")}</span>
+                <strong>{nextArea}</strong>
+              </div>
+            </div>
+            <p className="analytics-caveat">{t("progress.basedOnRecorded")}</p>
+          </article>
+        </section>
+      ) : null}
 
       <section className="panel heatmap-panel">
         <div className="section-heading">
           <div>
             <p className="eyebrow">{t("progress.activity")}</p>
-            <h2>{t("progress.days365")}</h2>
+            <h2>{t(isPro ? "progress.days365" : "progress.days7")}</h2>
           </div>
           <span className="muted">{user.timezone}</span>
         </div>
@@ -551,6 +710,7 @@ export default async function ProgressPage({
           selectedDay={selectedDay}
           range={range}
           locale={locale}
+          daysToShow={isPro ? 365 : 7}
         />
 
         <div className="day-detail">

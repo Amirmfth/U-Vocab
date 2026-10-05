@@ -490,7 +490,7 @@ export function ConversationChat({
             value={draft}
             disabled={streaming}
             placeholder={t("conversation.replyPlaceholder")}
-            aria-label={t("conversation.yourGermanReply")}
+            aria-label={t("conversation.yourReply")}
             lang={lang}
             dir={dir}
             className="learning-content"

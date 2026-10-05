@@ -794,6 +794,7 @@ export default async function ProgressPage({
           selectedDay={selectedDay}
           range={range}
           locale={locale}
+          dayCount={canUseAdvancedAnalytics ? 365 : 7}
         />
 
         <div className="day-detail">

@@ -610,6 +610,7 @@ export const en = {
   "conversation.voice.draftExistsBody": "Choose whether to append the transcript or replace your current draft.",
   "conversation.voice.append": "Append transcript",
   "conversation.voice.replace": "Replace draft",
+  "conversation.voice.discard": "Discard transcript",
   "conversation.evaluating": "Evaluating session…",
   "conversation.finish": "Finish & evaluate",
   "conversation.preparingReplay": "Preparing replay…",

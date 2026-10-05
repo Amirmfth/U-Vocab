@@ -50,6 +50,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@bubblewrap/cli": "1.25.0",
     "@types/node": "^24.3.1",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
@@ -57,8 +58,6 @@
     "eslint": "^9.35.0",
     "eslint-config-next": "^15.5.3",
     "serwist": "9.5.12",
-    "@types/web-push": "3.6.4",
-    "@bubblewrap/cli": "1.25.0"
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

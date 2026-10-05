@@ -601,6 +601,13 @@ export function ConversationChat({
               >
                 {t("conversation.voice.replace")}
               </button>
+              <button
+                type="button"
+                className="button button-secondary"
+                onClick={() => setPendingTranscript(null)}
+              >
+                {t("conversation.voice.discard")}
+              </button>
             </div>
           </div>
         ) : null}

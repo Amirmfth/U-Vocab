@@ -1124,6 +1124,7 @@ export const en = {
   "progress.rescueWeak": "Rescue weak words",
   "progress.reviewMistakes": "Review mistakes",
   "progress.heatmapAria": "365 days of vocabulary activity",
+  "progress.heatmapAria7": "7 days of vocabulary activity",
   "progress.activities": "{date}: {count} learning activities",
   "progress.activitiesTitle": "{date} · {count} activities",
 

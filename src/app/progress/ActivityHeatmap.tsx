@@ -31,19 +31,21 @@ export function ActivityHeatmap({
   selectedDay,
   range,
   locale,
+  daysToShow = 365,
 }: {
   days: ActivityDay[];
   today: string;
   selectedDay?: string;
   range: string;
   locale: UiLocale;
+  daysToShow?: number;
 }) {
   const t = createTranslator(locale);
   const lookup = new Map(days.map((day) => [day.date, day]));
   const keys: string[] = [];
   let key = today;
 
-  for (let index = 0; index < 365; index += 1) {
+  for (let index = 0; index < daysToShow; index += 1) {
     keys.push(key);
     key = previousDateKey(key);
   }

@@ -1126,6 +1126,8 @@ export const en = {
   "progress.heatmapAria": "365 days of vocabulary activity",
   "progress.activities": "{date}: {count} learning activities",
   "progress.activitiesTitle": "{date} · {count} activities",
+  "progress.heatmapAria7": "7 days of vocabulary activity",
+  "progress.comparePair": "Current {current} · Previous {previous}",
 
   "progress.freeRangeNote": "Free analytics show a useful 7-day snapshot. Pro unlocks longer history and comparisons.",
   "progress.days7": "Recent 7 days",

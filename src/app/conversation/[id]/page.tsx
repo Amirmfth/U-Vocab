@@ -11,6 +11,7 @@ import { getServerTranslator } from "@/i18n/server";
 import { formatNumber, formatPercent } from "@/i18n/format";
 import type { MessageKey } from "@/i18n/core";
 import { ConversationChat } from "../ConversationChat";
+import { checkQuota, getEntitlements } from "@/lib/entitlements/service";
 import {
   ConversationFinish,
   ConversationReplay,
@@ -48,6 +49,16 @@ export default async function ConversationSessionPage({
   });
 
   if (!session) notFound();
+
+  const [entitlements, voiceQuota] = await Promise.all([
+    getEntitlements(user.id),
+    checkQuota({
+      userId: user.id,
+      userCourseId: course.id,
+      timeZone: user.timezone,
+      key: "voice_transcription_minutes_monthly",
+    }),
+  ]);
 
   const summary = session.summary
     ? conversationFinalEvaluationSchema.safeParse(session.summary)
@@ -145,6 +156,10 @@ export default async function ConversationSessionPage({
               content: message.content,
             }))}
             tutorLabel={session.aiRole}
+            targetLanguage={course.targetLanguage}
+            voiceEnabled={entitlements.config.features.voice_transcription}
+            voiceRemainingMinutes={voiceQuota.remaining}
+            voiceLimitMinutes={voiceQuota.limit}
           />
           <ConversationFinish sessionId={session.id} />
         </>

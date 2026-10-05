@@ -81,6 +81,52 @@ export function buildActivityDays(input: {
   return Array.from(days.values()).sort((a, b) => a.date.localeCompare(b.date));
 }
 
+export type ProgressRange = "7" | "30" | "90" | "365";
+
+const PROGRESS_RANGE_DAYS: Record<ProgressRange, number> = {
+  "7": 7,
+  "30": 30,
+  "90": 90,
+  "365": 365,
+};
+
+export function resolveProgressRange(
+  requested: string | undefined,
+  hasLongHistory: boolean,
+): ProgressRange {
+  if (!hasLongHistory) return "7";
+  if (
+    requested === "7" ||
+    requested === "30" ||
+    requested === "90" ||
+    requested === "365"
+  ) {
+    return requested;
+  }
+  return "30";
+}
+
+export function progressRangeWindow(range: ProgressRange, now = new Date()) {
+  const days = PROGRESS_RANGE_DAYS[range];
+  const currentStart = new Date(now);
+  currentStart.setDate(currentStart.getDate() - days);
+
+  const previousStart = new Date(currentStart);
+  previousStart.setDate(previousStart.getDate() - days);
+
+  return {
+    days,
+    currentStart,
+    previousStart,
+    previousEnd: currentStart,
+  };
+}
+
+export function percentChange(current: number, previous: number) {
+  if (previous === 0) return current === 0 ? 0 : null;
+  return (current - previous) / previous;
+}
+
 export function rescueRisk(input: {
   fsrsCard: unknown;
   nextReviewAt: Date | null;

@@ -1126,6 +1126,7 @@ export const fa = {
   "progress.rescueWeak": "تقویت واژه‌های ضعیف",
   "progress.reviewMistakes": "مرور اشتباه‌ها",
   "progress.heatmapAria": "۳۶۵ روز فعالیت واژگان",
+  "progress.heatmapAria7": "۷ روز فعالیت واژگان",
   "progress.activities": "{date}: {count} فعالیت یادگیری",
   "progress.activitiesTitle": "{date} · {count} فعالیت",
 

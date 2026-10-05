@@ -9,6 +9,7 @@ import { consumeQuota, requireEntitlement } from "@/lib/entitlements/service";
 import { EntitlementError } from "@/lib/entitlements/errors";
 import { startOperation } from "@/lib/performance";
 import { sendProductEventForUser } from "@/lib/analytics/server";
+import { parseBlob } from "music-metadata";
 import {
   CONVERSATION_AUDIO,
   extensionForAudioMime,
@@ -49,17 +50,10 @@ export async function POST(request: Request) {
   const audio = form.get("audio");
   const sessionId = String(form.get("sessionId") ?? "").trim();
   const requestId = String(form.get("requestId") ?? "").trim();
-  const durationMs = Math.round(Number(form.get("durationMs") ?? 0));
+  const clientDurationMs = Math.round(Number(form.get("durationMs") ?? 0));
 
   if (!(audio instanceof File) || !sessionId || !requestId || requestId.length > 120) {
     return errorResponse("INVALID_UPLOAD", "Audio, session, and request ID are required.", 400);
-  }
-  if (
-    !Number.isFinite(durationMs) ||
-    durationMs < CONVERSATION_AUDIO.minDurationMs ||
-    durationMs > CONVERSATION_AUDIO.maxDurationSeconds * 1000
-  ) {
-    return errorResponse("INVALID_DURATION", "Recording duration is outside the allowed range.", 400);
   }
   if (audio.size <= 0) return errorResponse("EMPTY_AUDIO", "The recording is empty.", 400);
   if (audio.size > CONVERSATION_AUDIO.maxBytes) {
@@ -67,6 +61,22 @@ export async function POST(request: Request) {
   }
   if (!isSupportedConversationAudioMime(audio.type)) {
     return errorResponse("UNSUPPORTED_AUDIO", "This audio format is not supported.", 415);
+  }
+
+  let parsedDurationSeconds: number;
+  try {
+    const parsed = await parseBlob(audio, { duration: true, skipCovers: true });
+    parsedDurationSeconds = Number(parsed.format.duration ?? 0);
+  } catch {
+    return errorResponse("INVALID_AUDIO", "The recording could not be read.", 415);
+  }
+
+  if (
+    !Number.isFinite(parsedDurationSeconds) ||
+    parsedDurationSeconds * 1000 < CONVERSATION_AUDIO.minDurationMs ||
+    parsedDurationSeconds > CONVERSATION_AUDIO.maxDurationSeconds + 0.5
+  ) {
+    return errorResponse("INVALID_DURATION", "Recording duration is outside the allowed range.", 400);
   }
 
   const session = await db.conversationSession.findFirst({
@@ -80,7 +90,7 @@ export async function POST(request: Request) {
   });
   if (!session) return errorResponse("SESSION_NOT_FOUND", "Conversation not found.", 404);
 
-  const durationSeconds = Math.max(1, Math.ceil(durationMs / 1000));
+  const durationSeconds = Math.max(1, Math.ceil(parsedDurationSeconds));
   const quotaMinutes = Math.max(1, Math.ceil(durationSeconds / 60));
 
   let quotaRemaining = 0;
@@ -129,6 +139,7 @@ export async function POST(request: Request) {
       audioBytes: audio.size,
       audioMime: normalizedAudioMime(audio.type),
       targetLanguage: course.targetLanguage,
+      clientDurationMs: Number.isFinite(clientDurationMs) ? clientDurationMs : null,
     },
   });
 

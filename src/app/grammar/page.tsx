@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -80,11 +81,53 @@ export default async function GrammarPage({
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const { locale, t } = await getServerTranslator(user);
-  const dashboard = await getGrammarDashboard(user.id, course.id);
   const language = targetLanguageConfig(course.targetLanguage);
   const languageLabel =
     course.targetLanguage === "GERMAN" ? t("common.german") : language.label;
   const params = await searchParams;
+
+  return <main className="page grammar-hub">
+    <PersistedFirstUseGuide
+      userId={user.id}
+      guide={FIRST_USE_GUIDES.grammar}
+      title={t("guidance.grammar.title")}
+      description={t("guidance.grammar.body")}
+      items={[t("guidance.grammar.item1")]}
+      dismissLabel={t("guidance.dismiss")}
+    />
+    <section className="grammar-hero">
+      <div>
+        <p className="eyebrow">{t("grammar.eyebrow")}</p>
+        <h1>{t("grammar.structure", { language: languageLabel })}</h1>
+        <p className="page-description">{t("grammar.description")}</p>
+      </div>
+    </section>
+    <div className="grammar-filter-strip" aria-label={t("grammar.filterLevel")}>
+      <Link href="/grammar" className={!params.level && !params.category ? "is-active" : ""}>{t("grammar.all")}</Link>
+      {CEFR_LEVELS.map((level) => <Link key={level} href={"/grammar?level=" + level} className={params.level === level ? "is-active" : ""}>{level}</Link>)}
+    </div>
+    <Suspense key={`${params.level ?? ""}:${params.category ?? ""}`} fallback={<GrammarDashboardLoading label={t("loading.surface", { surface: t("nav.grammar") })} />}>
+      <GrammarDashboardContent userId={user.id} courseId={course.id} params={params} locale={locale} t={t} languageLabel={languageLabel} />
+    </Suspense>
+  </main>;
+}
+
+function GrammarDashboardLoading({ label }: { label: string }) {
+  return <div aria-busy="true" aria-label={label}>
+    <div className="grammar-summary">{Array.from({ length: 4 }, (_, index) => <div className="skeleton loading-metric" key={index} />)}</div>
+    <div className="skeleton-stack">{Array.from({ length: 5 }, (_, index) => <div className="skeleton loading-action-row" key={index} />)}</div>
+  </div>;
+}
+
+async function GrammarDashboardContent({ userId, courseId, params, locale, t, languageLabel }: {
+  userId: string;
+  courseId: string;
+  params: { level?: string; category?: string };
+  locale: Awaited<ReturnType<typeof getServerTranslator>>["locale"];
+  t: Translator;
+  languageLabel: string;
+}) {
+  const dashboard = await getGrammarDashboard(userId, courseId);
 
   const selectedLevel = CEFR_LEVELS.includes(params.level as CefrLevel)
     ? (params.level as CefrLevel)
@@ -102,21 +145,7 @@ export default async function GrammarPage({
   );
 
   return (
-    <main className="page grammar-hub">
-      <PersistedFirstUseGuide
-        userId={user.id}
-        guide={FIRST_USE_GUIDES.grammar}
-        title={t("guidance.grammar.title")}
-        description={t("guidance.grammar.body")}
-        items={[t("guidance.grammar.item1")]}
-        dismissLabel={t("guidance.dismiss")}
-      />
-      <section className="grammar-hero">
-        <div>
-          <p className="eyebrow">{t("grammar.eyebrow")}</p>
-          <h1>{t("grammar.structure", { language: languageLabel })}</h1>
-          <p className="page-description">{t("grammar.description")}</p>
-        </div>
+    <>
         <div
           className="grammar-level-path"
           aria-label={t("grammar.levelPath", { language: languageLabel })}
@@ -131,7 +160,6 @@ export default async function GrammarPage({
             <strong>{dashboard.targetLevel}</strong>
           </span>
         </div>
-      </section>
 
       <section className="grammar-summary" aria-label={t("grammar.summary")}>
         <div>
@@ -219,21 +247,6 @@ export default async function GrammarPage({
           <GraduationCap size={20} />
         </div>
 
-        <div className="grammar-filter-strip" aria-label={t("grammar.filterLevel")}>
-          <Link href="/grammar" className={!selectedLevel && !selectedCategory ? "is-active" : ""}>
-            {t("grammar.all")}
-          </Link>
-          {CEFR_LEVELS.map((level) => (
-            <Link
-              key={level}
-              href={"/grammar?level=" + level}
-              className={selectedLevel === level ? "is-active" : ""}
-            >
-              {level}
-            </Link>
-          ))}
-        </div>
-
         <div className="grammar-category-strip" aria-label={t("grammar.filterCategory")}>
           {dashboard.categories.map((category) => (
             <Link
@@ -252,6 +265,6 @@ export default async function GrammarPage({
           ))}
         </div>
       </section>
-    </main>
+    </>
   );
 }

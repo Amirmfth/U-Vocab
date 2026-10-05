@@ -235,7 +235,7 @@ a {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 2px;
-  padding: 7px;
+  padding: 9px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   background: rgba(17, 17, 20, 0.92);
@@ -244,7 +244,7 @@ a {
 }
 
 .mobile-nav-item {
-  min-height: 52px;
+  min-height: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -253,7 +253,7 @@ a {
   border-radius: 14px;
   color: var(--text-muted);
   font-size: 0.66rem;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+  transition: color 160ms ease, transform 160ms ease;
 }
 
 .mobile-nav-item:active {
@@ -261,11 +261,15 @@ a {
 }
 
 .mobile-nav-item.is-active {
-  color: var(--text);
-  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .mobile-nav-icon { position: relative; display: inline-flex; }
+
+[data-vocabulary-language="ENGLISH"] .vocabulary-translation:not(.vocabulary-translation-en),
+[data-vocabulary-language="PERSIAN"] .vocabulary-translation:not(.vocabulary-translation-fa) {
+  display: none;
+}
 .mobile-nav-icon .review-nav-badge {
   position: absolute;
   top: -8px;

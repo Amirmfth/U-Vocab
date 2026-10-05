@@ -31,13 +31,46 @@ async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message
 }
 
 async function readyPushRegistration() {
-  return withTimeout(
-    navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(
-      () => navigator.serviceWorker.ready,
-    ),
+  const registration = await withTimeout(
+    navigator.serviceWorker.register("/sw.js", { scope: "/" }),
     15000,
-    "The notification service worker did not become ready. Reload and try again.",
+    "The notification service worker could not be registered. Reload and try again.",
   );
+
+  if (registration.active) return registration;
+  if (registration.waiting) {
+    registration.waiting.postMessage({ type: "UVOCAB_SKIP_WAITING" });
+  }
+
+  const listenerController = new AbortController();
+  try {
+    await withTimeout(new Promise<void>((resolve, reject) => {
+      const watched = new Set<ServiceWorker>();
+
+      const checkState = () => {
+        if (registration.active) {
+          resolve();
+        } else if (registration.installing?.state === "redundant") {
+          reject(new Error("The notification service worker failed to install. Reload and try again."));
+        }
+      };
+      const watchWorker = () => {
+        for (const worker of [registration.installing, registration.waiting]) {
+          if (worker && !watched.has(worker)) {
+            watched.add(worker);
+            worker.addEventListener("statechange", checkState, { signal: listenerController.signal });
+          }
+        }
+        checkState();
+      };
+
+      registration.addEventListener("updatefound", watchWorker, { signal: listenerController.signal });
+      watchWorker();
+    }), 15000, "The notification service worker did not activate. Reload and try again.");
+  } finally {
+    listenerController.abort();
+  }
+  return registration;
 }
 
 export async function currentPushSubscription() {

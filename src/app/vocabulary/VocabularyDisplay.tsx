@@ -1,14 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import type { TranslationLanguage } from "@prisma/client";
-import { BookOpen, Plus } from "lucide-react";
-import { isTranslationVisible } from "@/lib/translations";
-import { useI18n } from "@/i18n/client";
-import type { MessageKey } from "@/i18n/core";
+import { BookOpen } from "lucide-react";
+import type { MessageKey, Translator } from "@/i18n/core";
+import type { UiLocale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { VocabularyFilters } from "./VocabularyFilters";
 
 type VocabularyRow = {
   id: string;
@@ -31,43 +25,21 @@ const stateKeys: Record<string, MessageKey> = {
 };
 
 export function VocabularyDisplay({
-  preferredTranslation,
   targetLanguage,
   rows,
   total,
-  current,
-  partOfSpeechOptions,
-  levelOptions,
+  locale,
+  t,
 }: {
-  preferredTranslation: TranslationLanguage;
   targetLanguage: "de" | "fr" | "en";
   rows: VocabularyRow[];
   total: number;
-  current: { q: string; status: string; pos: string; level: string; relation: string; sort: string };
-  partOfSpeechOptions: { value: string; label: string }[];
-  levelOptions: { value: string; label: string }[];
+  locale: UiLocale;
+  t: Translator;
 }) {
-  const [language, setLanguage] = useState(preferredTranslation);
-  const { locale, t } = useI18n();
 
   return (
     <>
-      <section className="page-header compact library-header">
-        <h1>{t("vocab.title")}</h1>
-        <Link href="/vocabulary/new" className="button button-primary" prefetch>
-          <Plus size={18} />
-          {t("nav.addWord")}
-        </Link>
-      </section>
-
-      <VocabularyFilters
-        current={current}
-        partOfSpeechOptions={partOfSpeechOptions}
-        levelOptions={levelOptions}
-        language={language}
-        onLanguageChange={setLanguage}
-      />
-
       <p className="library-count vocabulary-list-count">
         <strong>{formatNumber(locale, rows.length)}</strong> {t("vocab.shown")}{" "}
         <span aria-hidden="true">·</span>{" "}
@@ -84,12 +56,12 @@ export function VocabularyDisplay({
                 </div>
                 <div className="translation-line">
                   {row.translations
-                    .filter((translation) => isTranslationVisible(language, translation.language))
-                    .slice(0, language === "BOTH" ? 2 : 1)
+                    .filter((translation) => translation.language === "en" || translation.language === "fa")
+                    .filter((translation, index, translations) => translations.findIndex((candidate) => candidate.language === translation.language) === index)
                     .map((translation) => (
                       <span
                         key={translation.id}
-                        className="learning-content"
+                        className={`learning-content vocabulary-translation vocabulary-translation-${translation.language}`}
                         lang={translation.language === "fa" ? "fa" : "en"}
                         dir={translation.language === "fa" ? "rtl" : "ltr"}
                       >

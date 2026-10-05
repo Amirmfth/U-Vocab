@@ -1,4 +1,7 @@
-import type { RelationType } from "@prisma/client";
+import { PartOfSpeech, type RelationType } from "@prisma/client";
+import { Suspense } from "react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
@@ -8,6 +11,8 @@ import { connection } from "next/server";
 import { getCachedVocabularyLibrary } from "@/lib/cached-data";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { VocabularyDisplay } from "./VocabularyDisplay";
+import { VocabularyControls } from "./VocabularyControls";
+import { getServerTranslator } from "@/i18n/server";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -45,9 +50,62 @@ export default async function Vocabulary({
     sort: query.sort ?? "RECENTLY_ADDED",
   };
 
-  const items = await getCachedVocabularyLibrary(user.id, course.id);
+  const { locale, t } = await getServerTranslator(user);
+  const partOfSpeechOptions = Object.values(PartOfSpeech).map((value) => ({
+    value,
+    label: value.replaceAll("_", " ").toLowerCase(),
+  }));
 
-  const normalizedQuery = current.q.toLocaleLowerCase(language.locale);
+  return (
+    <main className="page vocabulary-page">
+      <VocabularyScrollRestoration />
+      <section className="page-header compact library-header">
+        <h1>{t("vocab.title")}</h1>
+        <Link href="/vocabulary/new" className="button button-primary" prefetch>
+          <Plus size={18} />
+          {t("nav.addWord")}
+        </Link>
+      </section>
+      <VocabularyControls
+        preferredTranslation={course.explanationLanguage}
+        current={current}
+        partOfSpeechOptions={partOfSpeechOptions}
+        levelOptions={LEVELS.map((level) => ({ value: level, label: level }))}
+      >
+        <Suspense key={JSON.stringify(current)} fallback={<VocabularyListLoading label={t("loading.surface", { surface: t("vocab.title") })} />}>
+          <VocabularyList userId={user.id} courseId={course.id} targetLanguage={language.code} current={current} nowTime={nowTime} recentCutoffTime={recentCutoffTime} locale={locale} t={t} />
+        </Suspense>
+      </VocabularyControls>
+    </main>
+  );
+}
+
+function VocabularyListLoading({ label }: { label: string }) {
+  return <div aria-busy="true" aria-label={label}>
+    <div className="skeleton loading-list-count" />
+    <div className="vocabulary-list">
+      {Array.from({ length: 6 }, (_, index) => <div className="vocabulary-row loading-vocabulary-row" key={index} aria-hidden="true">
+        <div className="vocabulary-row-main skeleton-stack"><div className="skeleton loading-row-word" /><div className="skeleton loading-row-translation" /></div>
+        <div className="skeleton loading-row-meta" /><div className="skeleton loading-row-mastery" />
+      </div>)}
+    </div>
+  </div>;
+}
+
+async function VocabularyList({ userId, courseId, targetLanguage, current, nowTime, recentCutoffTime, locale, t }: {
+  userId: string;
+  courseId: string;
+  targetLanguage: "de" | "fr" | "en";
+  current: { q: string; status: string; pos: string; level: string; relation: string; sort: string };
+  nowTime: number;
+  recentCutoffTime: number;
+  locale: Awaited<ReturnType<typeof getServerTranslator>>["locale"];
+  t: Awaited<ReturnType<typeof getServerTranslator>>["t"];
+}) {
+
+  const items = await getCachedVocabularyLibrary(userId, courseId);
+
+  const normalizedQuery = current.q.toLocaleLowerCase(targetLanguage === "de" ? "de-DE" : targetLanguage === "fr" ? "fr-FR" : "en-US");
 
   const filtered = items.filter((item) => {
     const word = item.lexeme;
@@ -165,15 +223,6 @@ export default async function Vocabulary({
     }
   });
 
-  const partOfSpeechOptions = Array.from(
-    new Set(items.map((item) => item.lexeme.partOfSpeech)),
-  )
-    .sort()
-    .map((value) => ({
-      value,
-      label: value.replaceAll("_", " ").toLowerCase(),
-    }));
-
   const rows = sorted.map((item) => {
     const word = item.lexeme;
     const mastery = Math.round(
@@ -191,18 +240,5 @@ export default async function Vocabulary({
     };
   });
 
-  return (
-    <main className="page vocabulary-page">
-      <VocabularyScrollRestoration />
-      <VocabularyDisplay
-        preferredTranslation={course.explanationLanguage}
-        targetLanguage={language.code}
-        rows={rows}
-        total={items.length}
-        current={current}
-        partOfSpeechOptions={partOfSpeechOptions}
-        levelOptions={LEVELS.map((level) => ({ value: level, label: level }))}
-      />
-    </main>
-  );
+  return <VocabularyDisplay targetLanguage={targetLanguage} rows={rows} total={items.length} locale={locale} t={t} />;
 }

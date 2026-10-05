@@ -629,31 +629,31 @@ export default async function ProgressPage({
                 <div>
                   <span>{t("progress.wordsAdded")}</span>
                   <strong>
-                    {formatNumber(locale, learnedInRange)} / {formatNumber(locale, previousLearned)}
+                    {t("progress.comparePair", { current: formatNumber(locale, learnedInRange), previous: formatNumber(locale, previousLearned) })}
                   </strong>
                 </div>
                 <div>
                   <span>{t("progress.wordsMastered")}</span>
                   <strong>
-                    {formatNumber(locale, masteredInRange)} / {formatNumber(locale, previousMastered)}
+                    {t("progress.comparePair", { current: formatNumber(locale, masteredInRange), previous: formatNumber(locale, previousMastered) })}
                   </strong>
                 </div>
                 <div>
                   <span>{t("progress.practiceTime")}</span>
                   <strong>
-                    {formatNumber(locale, minutes(totalDurationMs))} / {formatNumber(locale, minutes(previousDurationMs))}
+                    {t("progress.comparePair", { current: formatNumber(locale, minutes(totalDurationMs)), previous: formatNumber(locale, minutes(previousDurationMs)) })}
                   </strong>
                 </div>
                 <div>
                   <span>{t("progress.reviewAccuracy")}</span>
                   <strong>
-                    {formatPercent(locale, reviewSuccess)} / {formatPercent(locale, previousReviewSuccess)}
+                    {t("progress.comparePair", { current: formatPercent(locale, reviewSuccess), previous: formatPercent(locale, previousReviewSuccess) })}
                   </strong>
                 </div>
                 <div>
                   <span>{t("progress.attemptAccuracy")}</span>
                   <strong>
-                    {formatPercent(locale, practiceAccuracy)} / {formatPercent(locale, previousPracticeAccuracy)}
+                    {t("progress.comparePair", { current: formatPercent(locale, practiceAccuracy), previous: formatPercent(locale, previousPracticeAccuracy) })}
                   </strong>
                 </div>
               </div>
@@ -711,6 +711,7 @@ export default async function ProgressPage({
           range={range}
           locale={locale}
           daysToShow={isPro ? 365 : 7}
+          ariaLabel={t(isPro ? "progress.heatmapAria" : "progress.heatmapAria7")}
         />
 
         <div className="day-detail">

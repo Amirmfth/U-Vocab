@@ -56,12 +56,14 @@ export async function GrammarProgressPanel({
   currentLevel,
   targetLevel,
   locale,
+  compact = false,
 }: {
   userId: string;
   userCourseId: string;
   currentLevel: CefrLevel;
   targetLevel: CefrLevel;
   locale: UiLocale;
+  compact?: boolean;
 }) {
   const t = createTranslator(locale);
   const [progress, mistakes, recentEvidence, transitions] = await Promise.all([
@@ -233,7 +235,7 @@ export async function GrammarProgressPanel({
         </span>
       </div>
 
-      {byLevel.length ? (
+      {!compact && byLevel.length ? (
         <div className="grammar-progress-section">
           <h3>{t("progress.grammar.byLevel")}</h3>
           <div className="grammar-profile-breakdown">
@@ -252,7 +254,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      {byCategory.length ? (
+      {!compact && byCategory.length ? (
         <div className="grammar-progress-section">
           <h3>{t("progress.grammar.byCategory")}</h3>
           <div className="grammar-profile-breakdown">
@@ -271,7 +273,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      {weaknesses.length ? (
+      {!compact && weaknesses.length ? (
         <div className="grammar-progress-section">
           <h3>{t("progress.grammar.needsAttention")}</h3>
           <div className="collection-list">
@@ -302,7 +304,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      {transitions.length ? (
+      {!compact && transitions.length ? (
         <div className="grammar-progress-section">
           <h3>{t("progress.grammar.recentChanges")}</h3>
           <div className="weakness-list">
@@ -323,7 +325,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      {recentEvidence.length ? (
+      {!compact && recentEvidence.length ? (
         <div className="grammar-progress-section">
           <h3>{t("progress.grammar.recentEvidence")}</h3>
           <div className="weakness-list">

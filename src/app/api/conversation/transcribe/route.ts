@@ -35,6 +35,14 @@ export async function POST(request: Request) {
     return errorResponse("AUTH_FAILED", "Could not authenticate request.", 500);
   }
 
+  const contentLength = Number(request.headers.get("content-length") ?? 0);
+  if (
+    Number.isFinite(contentLength) &&
+    contentLength > CONVERSATION_AUDIO.maxBytes + 512 * 1024
+  ) {
+    return errorResponse("AUDIO_TOO_LARGE", "The recording is too large.", 413);
+  }
+
   const form = await request.formData().catch(() => null);
   if (!form) return errorResponse("INVALID_UPLOAD", "Invalid audio upload.", 400);
 
@@ -75,10 +83,11 @@ export async function POST(request: Request) {
   const durationSeconds = Math.max(1, Math.ceil(durationMs / 1000));
   const quotaMinutes = Math.max(1, Math.ceil(durationSeconds / 60));
 
+  let quotaRemaining = 0;
   try {
     await requireEntitlement(user.id, "voice_transcription");
     await assertProviderSpendSafety({ userId: user.id, timeZone: user.timezone });
-    await consumeQuota({
+    const quota = await consumeQuota({
       userId: user.id,
       userCourseId: course.id,
       timeZone: user.timezone,
@@ -90,6 +99,7 @@ export async function POST(request: Request) {
         audioBytes: audio.size,
       },
     });
+    quotaRemaining = quota.remaining;
   } catch (error) {
     if (error instanceof EntitlementError) {
       perf.success({ accepted: false, entitlementCode: error.code });
@@ -145,10 +155,6 @@ export async function POST(request: Request) {
     if (!transcript) {
       const error = new Error("Transcription was empty.");
       await usage.failure(error, response as never);
-      await sendProductEventForUser(user.id, "voice_transcription_failed", {
-        reason: "empty_transcript",
-        durationSeconds,
-      });
       return errorResponse("EMPTY_TRANSCRIPT", "No speech was recognized. You can retry or type instead.", 422);
     }
 
@@ -164,13 +170,9 @@ export async function POST(request: Request) {
       targetLanguage: course.targetLanguage,
     });
 
-    return Response.json({ transcript });
+    return Response.json({ transcript, remainingMinutes: quotaRemaining });
   } catch (error) {
     await usage.failure(error);
-    await sendProductEventForUser(user.id, "voice_transcription_failed", {
-      reason: "provider",
-      durationSeconds,
-    });
     perf.fail(error, { durationSeconds, audioBytes: audio.size });
     return errorResponse(
       "TRANSCRIPTION_FAILED",

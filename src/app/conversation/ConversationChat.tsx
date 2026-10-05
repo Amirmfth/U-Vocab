@@ -349,7 +349,7 @@ export function ConversationChat({
 
   function stopRecording() {
     const recorder = recorderRef.current;
-    if (recorder?.state !== "inactive") recorder?.stop();
+    if (recorder && recorder.state !== "inactive") recorder.stop();
   }
 
   function cancelRecording() {
@@ -358,7 +358,7 @@ export function ConversationChat({
     const durationSeconds = Math.max(0, Math.ceil(elapsedMs / 1000));
     captureProductEvent("voice_recording_cancelled", { durationSeconds });
     const recorder = recorderRef.current;
-    if (recorder?.state !== "inactive") recorder.stop();
+    if (recorder && recorder.state !== "inactive") recorder.stop();
     clearRecordingTimer();
     stopTracks();
     setElapsedMs(0);

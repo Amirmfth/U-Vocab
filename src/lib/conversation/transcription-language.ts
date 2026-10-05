@@ -14,3 +14,11 @@ const TRANSCRIPTION_LANGUAGE_CODES: Record<string, string> = {
 export function transcriptionLanguageForTarget(targetLanguage: string) {
   return TRANSCRIPTION_LANGUAGE_CODES[targetLanguage.toUpperCase()] ?? null;
 }
+
+export function documentLanguageForTarget(targetLanguage: string) {
+  return transcriptionLanguageForTarget(targetLanguage) ?? "und";
+}
+
+export function directionForTarget(targetLanguage: string): "ltr" | "rtl" {
+  return targetLanguage.toUpperCase() === "PERSIAN" ? "rtl" : "ltr";
+}

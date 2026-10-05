@@ -612,6 +612,7 @@ export const fa = {
   "conversation.voice.draftExistsBody": "انتخاب کنید متن تبدیل‌شده به انتهای پیش‌نویس افزوده شود یا جای آن را بگیرد.",
   "conversation.voice.append": "افزودن متن",
   "conversation.voice.replace": "جایگزینی پیش‌نویس",
+  "conversation.voice.discard": "حذف متن تبدیل‌شده",
   "conversation.evaluating": "در حال ارزیابی جلسه…",
   "conversation.finish": "پایان و ارزیابی",
   "conversation.preparingReplay": "در حال آماده‌سازی تکرار…",

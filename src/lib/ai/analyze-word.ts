@@ -39,7 +39,7 @@ export async function analyzeLexeme(input: {
           {
             role: "system",
             content:
-              `You analyze ${language.promptName} lexical units for U-Vocab. Prefer complete usable lexical patterns, collocations, morphology, and governed prepositions over isolated translations. Respect ${language.promptName}-specific grammar rather than importing rules from another language. For nouns, return the natural dictionary article/gender information where useful. Preserve meaningful accents and apostrophes. Return natural English and Persian meanings. Assign the lexical unit's usual CEFR level (A1 through C2).`,
+              `You analyze ${language.promptName} lexical units for U-Vocab. Prefer complete usable lexical patterns, collocations, morphology, and governed prepositions over isolated translations. Respect ${language.promptName}-specific grammar rather than importing rules from another language. For nouns, return the natural dictionary article/gender information where useful. Preserve meaningful accents and apostrophes. Return a concise monolingual definition in the target language plus natural English and Persian meanings. When the target language is English, the targetDefinition must be an English definition, while englishMeanings are explanatory fallback text only and must not be treated as a cross-language translation. Include useful morphology: irregular plurals, countability, phrasal/multi-word behavior, verb patterns, and collocations where relevant. Assign the lexical unit's usual CEFR level (A1 through C2).`,
           },
           { role: "user", content: input.text },
         ],

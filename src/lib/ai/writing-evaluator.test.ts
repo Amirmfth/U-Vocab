@@ -21,6 +21,12 @@ function baseEvaluation() {
     repetition: [],
     collocationFeedback: [],
     lexicalMistakes: [],
+    masteryEvidence: {
+      recognition: "NONE" as const,
+      meaningRecall: "NONE" as const,
+      production: "NONE" as const,
+      contextualUsage: "NONE" as const,
+    },
     grammarObservations: [],
     strongerVocabulary: [],
     corrections: [],

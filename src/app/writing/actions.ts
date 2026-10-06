@@ -137,6 +137,7 @@ export async function createWritingSessionAction(
           generateWritingTask({
             userId: user.id,
             userCourseId: course.id,
+            targetLanguage: course.targetLanguage,
             mode,
             level,
             taskType,
@@ -205,7 +206,7 @@ export async function createWritingSessionAction(
   );
 }
 
-async function detectKnownLexemes(userCourseId: string, draft: string) {
+async function detectKnownLexemes(userCourseId: string, draft: string, targetLanguage: Parameters<typeof detectLexemePresence>[2]) {
   const vocabulary = await db.userVocabulary.findMany({
     where: { userCourseId },
     select: {
@@ -220,6 +221,7 @@ async function detectKnownLexemes(userCourseId: string, draft: string) {
     detectLexemePresence(
       draft,
       vocabulary.map((item) => item.lexeme.lemma),
+      targetLanguage,
     ),
   );
   const selected = vocabulary
@@ -327,7 +329,7 @@ export async function evaluateWritingAction(
         );
 
         const observed = await perf.span("dbRead", () =>
-          detectKnownLexemes(course.id, draft),
+          detectKnownLexemes(course.id, draft, course.targetLanguage),
         );
         const requiredTargets = session.targets.map((target) => ({
           id: target.lexemeId,
@@ -336,7 +338,7 @@ export async function evaluateWritingAction(
         }));
         const requiredIds = new Set(requiredTargets.map((target) => target.id));
         const observedVocabulary = observed.filter((item) => !requiredIds.has(item.id));
-        const repetitions = detectRepeatedWords(draft);
+        const repetitions = detectRepeatedWords(draft, 3, course.targetLanguage);
         const parentId = session.parentId;
         const parent = parentId
           ? await perf.span("dbRead", () =>
@@ -395,6 +397,7 @@ export async function evaluateWritingAction(
           evaluateWriting({
             userId: user.id,
             userCourseId: course.id,
+            targetLanguage: course.targetLanguage,
             evaluationLocale: evaluationLocaleForPreference(course.explanationLanguage),
             level: session.level,
             mode: session.mode,
@@ -493,7 +496,7 @@ export async function evaluateWritingAction(
             userCourseId: course.id,
             userVocabularyId: userVocabulary?.id ?? null,
             exerciseType: "FREE_SENTENCE" as const,
-            prompt: "Use vocabulary naturally in a German writing task.",
+            prompt: "Use vocabulary naturally in a writing task for the active course language.",
             answer: draft,
             expected: item.lemma,
             correct: usage.correct,

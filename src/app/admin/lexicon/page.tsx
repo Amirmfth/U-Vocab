@@ -42,7 +42,7 @@ export default async function AdminLexiconPage({
       where,
       include: {
         aliases: { orderBy: { createdAt: "asc" }, take: 20 },
-        senses: { orderBy: { createdAt: "asc" }, take: 12, include: { translations: { take: 12 } } },
+        senses: { orderBy: { createdAt: "asc" }, take: 12, include: { translations: { take: 12 }, definitions: { take: 12 } } },
         provenance: { orderBy: { createdAt: "desc" }, take: 8 },
         translations: { take: 12 },
         examples: { take: 4 },
@@ -112,7 +112,7 @@ export default async function AdminLexiconPage({
 
         <div className="admin-three-column">
           <section><h3>Aliases</h3><div className="admin-chip-list">{lexeme.aliases.map((alias)=><form action={removeAliasAction} key={alias.id} className="admin-chip"><input type="hidden" name="aliasId" value={alias.id}/><span>{alias.surface} · {alias.kind}</span><ConfirmSubmitButton className="admin-chip-delete" message={"Remove alias “"+alias.surface+"”?"}>×</ConfirmSubmitButton></form>)}</div><form action={addAliasAction} className="admin-inline-form"><input type="hidden" name="lexemeId" value={lexeme.id}/><input name="surface" placeholder="New alias" required/><select name="kind" defaultValue="SPELLING_VARIANT">{["USER_INPUT","ARTICLE_VARIANT","SPELLING_VARIANT","INFLECTED_FORM","IMPORTED","GENERATED"].map(x=><option key={x}>{x}</option>)}</select><button className="button button-secondary">Add</button></form></section>
-          <section><h3>Senses & translations</h3>{lexeme.senses.map((sense)=><div className="admin-data-block" key={sense.id}><strong>{sense.key} · {sense.reviewState}</strong><span>{sense.gloss ?? "No gloss"}</span><small>{sense.translations.map(t=>t.language+": "+t.text).join(" · ") || "No translations"}</small></div>)}</section>
+          <section><h3>Senses, definitions & translations</h3>{lexeme.senses.map((sense)=><div className="admin-data-block" key={sense.id}><strong>{sense.key} · {sense.reviewState}</strong><span>{sense.gloss ?? "No gloss"}</span><small>{[...sense.definitions.map(d=>"definition "+d.language+": "+d.text),...sense.translations.map(t=>t.language+": "+t.text)].join(" · ") || "No semantic data"}</small></div>)}</section>
           <section><h3>Provenance</h3>{lexeme.provenance.map((p)=><div className="admin-data-block" key={p.id}><strong>{p.source} · {p.reviewState}</strong><span>{p.provider ?? "—"} / {p.model ?? "—"}</span><small>{p.promptVersion ?? "no prompt version"} · {p.contentVersion ?? "no content version"}</small></div>)}</section>
         </div>
 

@@ -55,7 +55,7 @@ export async function analyzeLexemeBatch(input: {
           {
             role: "system",
             content:
-              `Analyze each supplied ${language.promptName} word or phrase independently. Fill every required word_N field, where N is the input index. For each word, identify its canonical lemma and part of speech, usual CEFR level, natural English and Persian meanings, useful ${language.promptName}-specific grammar patterns, and one concise example. Preserve meaningful accents and apostrophes. Keep each result concise. Do not omit, merge, or invent input words.`,
+              `Analyze each supplied ${language.promptName} word or phrase independently. Fill every required word_N field, where N is the input index. For each word, identify its canonical lemma and part of speech, usual CEFR level, a concise monolingual target-language definition, natural English and Persian meanings, useful ${language.promptName}-specific grammar/morphology patterns, and one concise example. For English targets, capture phrasal verbs, irregular morphology, countability, verb patterns, and collocations where useful. Preserve meaningful accents and apostrophes. Keep each result concise. Do not omit, merge, or invent input words.`,
           },
           {
             role: "user",

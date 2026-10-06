@@ -5,6 +5,7 @@ import {
   rebuildLexemeEmbeddings,
 } from "@/lib/semantic/embeddings";
 import { rerankVocabularyRecommendations } from "@/lib/ai/decisions/recommendation-reranker";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type RecommendationReason = {
   label: string;
@@ -87,9 +88,10 @@ export async function getVocabularyRecommendations(
 ): Promise<VocabularyRecommendation[]> {
   const course = await db.userCourse.findFirst({
     where: { id: userCourseId, userId },
-    select: { currentLevel: true, targetLevel: true },
+    select: { currentLevel: true, targetLevel: true, targetLanguage: true },
   });
   if (!course) return [];
+  const targetLanguageCode = targetLanguageConfig(course.targetLanguage).code;
 
   const [known, dismissed, recentUnknownEncounters] = await Promise.all([
     db.userVocabulary.findMany({
@@ -153,6 +155,7 @@ export async function getVocabularyRecommendations(
 
   const levelCandidates = await db.lexeme.findMany({
       where: {
+        language: targetLanguageCode,
         userStates: { none: { userCourseId } },
         cefrLevel: course.targetLevel,
       },
@@ -178,6 +181,7 @@ export async function getVocabularyRecommendations(
       FROM "Lexeme" candidate
       JOIN "Lexeme" anchor ON anchor."id" = ${anchorId}
       WHERE candidate."embedding" IS NOT NULL
+        AND candidate."language" = ${targetLanguageCode}
         AND candidate."id" <> anchor."id"
         AND NOT EXISTS (
           SELECT 1
@@ -212,6 +216,7 @@ export async function getVocabularyRecommendations(
   const candidates = await db.lexeme.findMany({
     where: {
       id: { in: [...signalIds] },
+      language: targetLanguageCode,
       userStates: { none: { userCourseId } },
       recommendationFeedback: {
         none: { userCourseId, action: "DISMISSED" },

@@ -1,4 +1,5 @@
 import { AI_PROVIDER } from "./client";
+import { aiRoute, isAIOperation } from "./routing";
 import {
   recordAIUsage,
   type AIUsageLike,
@@ -62,6 +63,10 @@ export function createAIUsageRecorder(
 ) {
   const startedAt = nowMs();
   let recorded = false;
+  const routeMetadata =
+    isAIOperation(input.operation)
+      ? { routeReason: aiRoute(input.operation).reason }
+      : {};
 
   async function persist(args: {
     status: "SUCCESS" | "ERROR";
@@ -93,7 +98,7 @@ export function createAIUsageRecorder(
       retryCount: args.retryCount ?? null,
       durationMs: Math.max(0, Math.round(nowMs() - startedAt)),
       timeToFirstTokenMs: args.timeToFirstTokenMs ?? null,
-      metadata: input.metadata,
+      metadata: { ...routeMetadata, ...input.metadata },
       durationSeconds: input.durationSeconds,
     });
   }

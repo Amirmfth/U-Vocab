@@ -111,6 +111,7 @@ const mistakeKeys: Record<string, MessageKey> = {
 function GrammarAndUsage({
   patterns,
   locale,
+  targetLanguageCode,
 }: {
   patterns: PrimaryWord["patterns"];
   locale: UiLocale;
@@ -157,6 +158,7 @@ function LexicalGrammarLinks({
     Awaited<ReturnType<typeof getCachedWordSecondary>>
   >["grammarLinks"];
   locale: UiLocale;
+  targetLanguageCode: string;
 }) {
   if (!links.length) return null;
   const t = createTranslator(locale);
@@ -294,6 +296,7 @@ async function DeferredWordDetails({
   patterns: PrimaryWord["patterns"];
   primaryState: PrimaryWord["userStates"][number];
   locale: UiLocale;
+  targetLanguageCode: string;
 }) {
   const word = await getCachedWordSecondary(
     userId,
@@ -347,7 +350,11 @@ async function DeferredWordDetails({
         />
       </section>
 
-      <GrammarAndUsage patterns={patterns} locale={locale} />
+      <GrammarAndUsage
+        patterns={patterns}
+        locale={locale}
+        targetLanguageCode={targetLanguageCode}
+      />
       <LexicalGrammarLinks links={word.grammarLinks} locale={locale} />
 
       <WordMastery state={primaryState} locale={locale} />
@@ -553,7 +560,7 @@ export default async function Word({
           >
             <Brain size={17} /> {t("word.practice")}
           </Link>
-          {word.partOfSpeech === "VERB" ? (
+          {word.partOfSpeech === "VERB" && course.targetLanguage === "GERMAN" ? (
             <VerbConjugation lexemeId={word.id} userScope={course.id} />
           ) : null}
         </nav>

@@ -90,6 +90,31 @@ const frenchAdapter: LexiconLanguageAdapter = {
   },
 };
 
+const englishAdapter: LexiconLanguageAdapter = {
+  languageCode: "en",
+  locale: "en-US",
+  normalizeInput(input) {
+    const surface = input
+      .normalize("NFKC")
+      .replace(/[’‘`´]/gu, "'")
+      .replace(/\s+/gu, " ")
+      .trim();
+    const normalizedLookup = normalizeFormatting(surface, this.locale);
+    const variants = new Set([normalizedLookup]);
+    const possessive = normalizedLookup.match(/^(.+)'s$/u)?.[1]?.trim();
+    if (possessive) variants.add(possessive);
+    return {
+      surface,
+      normalizedLookup,
+      lookupVariants: Array.from(variants),
+      articleVariant: null,
+    };
+  },
+  normalizeCanonical(lemma) {
+    return normalizeFormatting(lemma, this.locale);
+  },
+};
+
 function genericAdapter(language: TargetLanguage): LexiconLanguageAdapter {
   const config = targetLanguageConfig(language);
   return {
@@ -114,5 +139,6 @@ function genericAdapter(language: TargetLanguage): LexiconLanguageAdapter {
 export function lexiconAdapter(language: TargetLanguage): LexiconLanguageAdapter {
   if (language === "GERMAN") return germanAdapter;
   if (language === "FRENCH") return frenchAdapter;
+  if (language === "ENGLISH") return englishAdapter;
   return genericAdapter(language);
 }

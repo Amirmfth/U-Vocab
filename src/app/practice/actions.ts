@@ -214,12 +214,12 @@ export async function submitPracticeAnswer(input:PracticeAnswerInput):Promise<Pr
 
     const item=await perf.span("dbRead",()=>db.userVocabulary.findFirst({
       where:{ id:userVocabularyId,userCourseId:course.id },
-      include:{ lexeme:{ include:{ patterns:true,translations:true,examples:true } } },
+      include:{ lexeme:{ include:{ patterns:true,translations:true,definitions:true,examples:true } } },
     }));
     if(!item) return { status:"error",message:"Vocabulary item not found." };
 
     let exercise=buildExercise(input.exerciseType,item.lexeme,course.explanationLanguage);
-    if(input.conjugation){
+    if(input.conjugation && course.targetLanguage === "GERMAN"){
       const conjugation=await getVerbConjugationForUser({ userId:user.id,userCourseId:course.id,lexemeId:item.lexemeId });
       if(conjugation.status!=="ok") return { status:"error",message:"Verb conjugation is unavailable." };
       const row=conjugation.data.indicative.present.forms.find((form)=>form.person===input.conjugation?.person);

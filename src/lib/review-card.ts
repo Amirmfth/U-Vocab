@@ -1,13 +1,13 @@
 import type { ExerciseType, TranslationLanguage } from "@prisma/client";
-import { isTranslationVisible } from "@/lib/translations";
+import { preferredLexicalMeaning } from "@/lib/lexical-meaning";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import type { ExerciseLexeme, LearnerSnapshot } from "@/lib/exercises/types";
 
 export type ReviewCardFamily =
-  | "GERMAN_MEANING"
-  | "MEANING_GERMAN";
+  | "TARGET_MEANING"
+  | "MEANING_TARGET";
 
-export type ReviewContentLanguage = "de" | "en" | "fa";
+export type ReviewContentLanguage = "de" | "fr" | "en" | "fa";
 
 export type ReviewCardDefinition = {
   family: ReviewCardFamily;
@@ -26,14 +26,17 @@ export type ReviewCardDefinition = {
 };
 
 function meaning(lexeme: ExerciseLexeme, preference: TranslationLanguage) {
-  const translation =
-    lexeme.translations.find((item) =>
-      isTranslationVisible(preference, item.language),
-    ) ?? lexeme.translations[0];
-
+  const resolved = preferredLexicalMeaning(lexeme, preference);
   return {
-    text: translation?.text ?? "",
-    language: translation?.language === "fa" ? ("fa" as const) : ("en" as const),
+    text: resolved.text,
+    language:
+      resolved.language === "fa"
+        ? ("fa" as const)
+        : resolved.language === "fr"
+          ? ("fr" as const)
+          : resolved.language === "de"
+            ? ("de" as const)
+            : ("en" as const),
   };
 }
 
@@ -53,28 +56,28 @@ export function buildReviewCard(input: {
     recentTypes[0] === "MEANING_RECALL"
   ) {
     return {
-      family: "MEANING_GERMAN",
+      family: "MEANING_TARGET",
       exerciseType: "REVERSE_RECALL",
       front: {
-        prompt: translated.text || "Recall the German lexical unit.",
+        prompt: translated.text || "Recall the target-language lexical unit.",
         hint: lexeme.partOfSpeech.toLowerCase(),
         language: translated.text ? translated.language : "en",
       },
       back: {
         answer: label,
         details: pattern ? [pattern] : [],
-        language: "de",
-        detailsLanguage: "de",
+        language: (lexeme.language === "fr" ? "fr" : lexeme.language === "en" ? "en" : "de"),
+        detailsLanguage: (lexeme.language === "fr" ? "fr" : lexeme.language === "en" ? "en" : "de"),
       },
     };
   }
 
   return {
-    family: "GERMAN_MEANING",
+    family: "TARGET_MEANING",
     exerciseType: "MEANING_RECALL",
     front: {
       prompt: label,
-      language: "de",
+      language: (lexeme.language === "fr" ? "fr" : lexeme.language === "en" ? "en" : "de"),
     },
     back: {
       answer: translated.text,
@@ -83,7 +86,7 @@ export function buildReviewCard(input: {
         lexeme.examples[0]?.targetText ?? "",
       ].filter(Boolean),
       language: translated.language,
-      detailsLanguage: "de",
+      detailsLanguage: (lexeme.language === "fr" ? "fr" : lexeme.language === "en" ? "en" : "de"),
     },
   };
 }

@@ -175,6 +175,7 @@ export async function commitIngestionCandidates(
           update: {},
           include: {
             translations: true,
+            definitions: true,
             patterns: { take: 1 },
             examples: { take: 1 },
           },
@@ -208,8 +209,28 @@ export async function commitIngestionCandidates(
         update: {},
       });
 
+      if (candidate.targetDefinition?.trim()) {
+        await tx.lexemeDefinition.upsert({
+          where: {
+            senseId_language: {
+              senseId: sense.id,
+              language,
+            },
+          },
+          create: {
+            lexemeId: lexeme.id,
+            senseId: sense.id,
+            language,
+            text: candidate.targetDefinition.trim(),
+          },
+          update: {
+            text: candidate.targetDefinition.trim(),
+          },
+        });
+      }
+
       for (const translation of [
-        candidate.englishMeaning
+        candidate.englishMeaning && language !== "en"
           ? { language: "en", text: candidate.englishMeaning }
           : null,
         candidate.persianMeaning

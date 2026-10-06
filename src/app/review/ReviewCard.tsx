@@ -20,7 +20,7 @@ const ratings: Array<{
   { grade: "EASY", labelKey: "review.ratingEasy", hintKey: "review.ratingEasyHint" },
 ];
 
-function direction(language: "de" | "en" | "fa") {
+function direction(language: "de" | "fr" | "en" | "fa") {
   return language === "fa" ? ("rtl" as const) : ("ltr" as const);
 }
 

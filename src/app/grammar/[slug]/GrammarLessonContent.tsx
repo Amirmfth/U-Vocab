@@ -116,7 +116,7 @@ export function GrammarLessonContent({
           {lesson.examples.map((example, index) => (
             <article className="panel grammar-rich-example" key={index}>
               <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
-                {example.german}
+                {example.targetText}
               </strong>
               <p>{example.translation}</p>
               <small>{example.note}</small>

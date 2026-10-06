@@ -16,7 +16,7 @@ const queue: ReviewQueueData = {
       lemma: "Haus",
       article: "das",
       review: {
-        family: "GERMAN_MEANING",
+        family: "TARGET_MEANING",
         exerciseType: "MEANING_RECALL",
         front: { prompt: "Haus", language: "de" },
         back: { answer: "house", details: [], language: "en", detailsLanguage: "de" },
@@ -28,7 +28,7 @@ const queue: ReviewQueueData = {
       lemma: "gehen",
       article: null,
       review: {
-        family: "GERMAN_MEANING",
+        family: "TARGET_MEANING",
         exerciseType: "MEANING_RECALL",
         front: { prompt: "gehen", language: "de" },
         back: { answer: "go", details: [], language: "en", detailsLanguage: "de" },

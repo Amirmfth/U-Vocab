@@ -157,6 +157,7 @@ export function getCachedVocabularyLibrary(userId: string, userCourseId: string)
             lexeme: {
               include: {
                 translations: true,
+                definitions: true,
                 patterns: true,
                 outgoing: {
                   select: {
@@ -197,6 +198,7 @@ export function getCachedWordPrimary(userId: string, userCourseId: string, lexem
         where: { id: lexemeId },
         include: {
           translations: true,
+          definitions: true,
           patterns: true,
           userStates: {
             where: { userCourseId },

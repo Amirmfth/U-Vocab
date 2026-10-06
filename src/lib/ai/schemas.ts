@@ -18,6 +18,7 @@ export const lexicalAnalysisSchema = z.object({
   gender: z.string().nullable(),
   plural: z.string().nullable(),
   cefrLevel: z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]),
+  targetDefinition: z.string().min(1),
   englishMeanings: z.array(z.string()).min(1),
   persianMeanings: z.array(z.string()).min(1),
   patterns: z.array(

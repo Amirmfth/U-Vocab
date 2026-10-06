@@ -73,6 +73,7 @@ async function lexemeEmbeddingText(lexemeId: string) {
     where: { id: lexemeId },
     include: {
       translations: true,
+      definitions: true,
       patterns: true,
       examples: { take: 3 },
     },
@@ -85,6 +86,9 @@ async function lexemeEmbeddingText(lexemeId: string) {
     lexeme.partOfSpeech,
     ...lexeme.translations.map(
       (translation) => translation.language + ": " + translation.text,
+    ),
+    ...lexeme.definitions.map(
+      (definition) => "definition " + definition.language + ": " + definition.text,
     ),
     ...lexeme.patterns.map((pattern) => pattern.pattern),
     ...lexeme.examples.map((example) => example.targetText),

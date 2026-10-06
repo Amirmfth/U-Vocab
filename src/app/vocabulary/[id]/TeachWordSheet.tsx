@@ -13,7 +13,8 @@ export function TeachWordSheet({ lexemeId, label }: {
   lexemeId: string;
   label: string;
 }) {
-  const language = useWordLanguage() === "PERSIAN" ? "fa" : "en";
+  const { language: selectedLanguage } = useWordLanguage();
+  const language = selectedLanguage === "PERSIAN" ? "fa" : "en";
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lesson, setLesson] = useState<string | null>(null);

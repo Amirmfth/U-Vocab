@@ -3,6 +3,7 @@ import test from "node:test";
 import { buildReviewCard } from "./review-card";
 
 const lexeme={
+  language:"de",
   lemma:"warten",
   article:null,
   partOfSpeech:"VERB",
@@ -24,7 +25,7 @@ test("grammar mistakes still produce a translation review card",()=>{
     },
     recentTypes:[],
   });
-  assert.equal(card.family,"MEANING_GERMAN");
+  assert.equal(card.family,"MEANING_TARGET");
   assert.equal(card.front.prompt,"to wait");
   assert.match(card.back.answer,/warten/);
 });
@@ -42,12 +43,12 @@ test("weak contextual usage still produces a translation review card",()=>{
     },
     recentTypes:[],
   });
-  assert.equal(card.family,"GERMAN_MEANING");
+  assert.equal(card.family,"TARGET_MEANING");
   assert.equal(card.front.prompt,"warten");
   assert.equal(card.back.answer,"to wait");
 });
 
-test("production weakness flips review direction meaning to German",()=>{
+test("production weakness flips review direction meaning to target",()=>{
   const card=buildReviewCard({
     lexeme:{ ...lexeme,patterns:[],examples:[] },
     preference:"ENGLISH",
@@ -60,7 +61,7 @@ test("production weakness flips review direction meaning to German",()=>{
     },
     recentTypes:[],
   });
-  assert.equal(card.family,"MEANING_GERMAN");
+  assert.equal(card.family,"MEANING_TARGET");
   assert.equal(card.front.prompt,"to wait");
   assert.match(card.back.answer,/warten/);
 });

@@ -1,5 +1,5 @@
 import type { TranslationLanguage } from "@prisma/client";
-import { isTranslationVisible } from "@/lib/translations";
+import { preferredLexicalMeaning } from "@/lib/lexical-meaning";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { deterministicChoiceOptions } from "./options";
 import type {
@@ -12,35 +12,28 @@ function preferredMeaning(
   lexeme: ExerciseLexeme,
   preference: TranslationLanguage,
 ) {
-  const preferredLanguage = preference === "PERSIAN" ? "fa" : "en";
-  return (
-    lexeme.translations.find(
-      (translation) => translation.language === preferredLanguage,
-    )?.text ??
-    lexeme.translations.find((translation) =>
-      isTranslationVisible(preference, translation.language),
-    )?.text ??
-    lexeme.translations[0]?.text ??
-    ""
-  );
+  return preferredLexicalMeaning(lexeme, preference).text;
 }
 
-function cleanToken(value: string) {
-  return value.toLocaleLowerCase("de-DE").replace(/[^\p{L}äöüß]/gu, "");
+function cleanToken(value: string, locale = "en-US") {
+  return value.toLocaleLowerCase(locale).replace(/[^\p{L}\p{M}'-]/gu, "");
 }
 
-export function buildCloze(sentence: string, lemma: string) {
+export function buildCloze(sentence: string, lemma: string, locale = "de-DE") {
   const tokens = sentence.split(/(\s+)/);
-  const target = cleanToken(lemma);
-  const stem = target.endsWith("en") ? target.slice(0, -2) : target;
+  const target = cleanToken(lemma, locale);
+  const stem =
+    locale === "de-DE" && target.endsWith("en")
+      ? target.slice(0, -2)
+      : target;
   const index = tokens.findIndex((token) => {
-    const cleaned = cleanToken(token);
+    const cleaned = cleanToken(token, locale);
     return cleaned === target || (stem.length >= 3 && cleaned.startsWith(stem));
   });
   if (index < 0) return null;
   const expected = tokens[index]
-    .replace(/^[^\p{L}]*/u, "")
-    .replace(/[^\p{L}äöüß]*$/iu, "");
+    .replace(/^[^\p{L}\p{M}]*/u, "")
+    .replace(/[^\p{L}\p{M}'-]*$/u, "");
   if (!expected) return null;
   const hidden = tokens[index].replace(expected, "_____");
   return {
@@ -60,10 +53,18 @@ export function eligibleExerciseTypes(
     "MEANING_RECALL",
     "REVERSE_RECALL",
   ];
-  if (lexeme.partOfSpeech === "NOUN" && lexeme.article) result.push("ARTICLE");
+  if (lexeme.language === "de" && lexeme.partOfSpeech === "NOUN" && lexeme.article) {
+    result.push("ARTICLE");
+  }
   if (lexeme.patterns.length) result.push("CASE_PREPOSITION", "COLLOCATION");
   if (
-    lexeme.examples.some((example) => buildCloze(example.targetText, lexeme.lemma))
+    lexeme.examples.some((example) =>
+      buildCloze(
+        example.targetText,
+        lexeme.lemma,
+        lexeme.language === "de" ? "de-DE" : lexeme.language === "fr" ? "fr-FR" : "en-US",
+      ),
+    )
   )
     result.push("CLOZE");
   if (lexeme.examples.length) result.push("CONTEXTUAL_CHOICE");
@@ -90,8 +91,12 @@ export function buildExercise(
   const meaning = preferredMeaning(lexeme, preference);
   const pattern = lexeme.patterns[0]?.pattern;
   const example = lexeme.examples[0]?.targetText;
+  const locale =
+    lexeme.language === "de" ? "de-DE" :
+    lexeme.language === "fr" ? "fr-FR" :
+    "en-US";
   const cloze = lexeme.examples
-    .map((item) => buildCloze(item.targetText, lexeme.lemma))
+    .map((item) => buildCloze(item.targetText, lexeme.lemma, locale))
     .find(Boolean);
 
   switch (type) {
@@ -198,7 +203,7 @@ export function buildExercise(
   return choiceOrText(
     {
       type: "REVERSE_RECALL",
-      prompt: "Which German lexical unit matches: " + meaning,
+      prompt: "Which target-language lexical unit matches: " + meaning,
       expected: lexeme.lemma || formatLexemeLabel(lexeme),
       skill: "production",
       requiresAI: false,

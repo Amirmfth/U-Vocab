@@ -20,6 +20,7 @@ export type IngestionCandidate = {
   article?: string | null;
   plural?: string | null;
   cefrLevel?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | null;
+  targetDefinition?: string | null;
   englishMeaning: string;
   persianMeaning: string;
   pattern?: string | null;

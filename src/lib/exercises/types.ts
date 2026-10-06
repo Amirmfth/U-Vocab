@@ -15,10 +15,12 @@ export type ExerciseDefinition = {
 };
 
 export type ExerciseLexeme = {
+  language?: string;
   lemma: string;
   article: string | null;
   partOfSpeech: string;
   translations: { language: string; text: string }[];
+  definitions?: { language: string; text: string }[];
   patterns: { pattern: string; explanation: string | null }[];
   examples: { targetText: string }[];
 };

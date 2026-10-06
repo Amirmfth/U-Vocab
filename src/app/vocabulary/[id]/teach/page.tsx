@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { targetLanguageConfig } from "@/lib/languages";
-import { isTranslationVisible } from "@/lib/translations";
+import { visibleLexicalMeanings } from "@/lib/lexical-meaning";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { buildExercise } from "@/lib/exercises/build";
 import { getServerTranslator } from "@/i18n/server";
@@ -45,6 +45,7 @@ export default async function TeachWordPage({
     },
     include: {
       translations: true,
+      definitions: true,
       patterns: true,
       examples: { take: 6 },
       outgoing: {
@@ -52,7 +53,7 @@ export default async function TeachWordPage({
         take: 8,
       },
       userStates: {
-        where: { userId: user.id },
+        where: { userCourseId: course.id },
         take: 1,
       },
     },
@@ -61,8 +62,9 @@ export default async function TeachWordPage({
   if (!word || !word.userStates[0]) notFound();
 
   const item = word.userStates[0];
-  const visibleTranslations = word.translations.filter((translation) =>
-    isTranslationVisible(course.explanationLanguage, translation.language),
+  const visibleMeanings = visibleLexicalMeanings(
+    word,
+    course.explanationLanguage,
   );
 
   const productionExercise = buildExercise(
@@ -97,9 +99,9 @@ export default async function TeachWordPage({
             <BookOpenCheck size={20} />
           </div>
 
-          {visibleTranslations.map((translation) => (
+          {visibleMeanings.map((translation) => (
             <p
-              key={translation.id}
+              key={translation.kind + ":" + translation.language + ":" + translation.text}
               className="lesson-meaning learning-content"
               lang={translation.language === "fa" ? "fa" : "en"}
               dir={translation.language === "fa" ? "rtl" : "ltr"}
@@ -151,7 +153,9 @@ export default async function TeachWordPage({
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {example.targetText}
                 </strong>
-                {course.explanationLanguage !== "PERSIAN" && example.english ? (
+                {course.targetLanguage !== "ENGLISH" &&
+                course.explanationLanguage !== "PERSIAN" &&
+                example.english ? (
                   <span className="learning-content" lang="en" dir="ltr">
                     {example.english}
                   </span>

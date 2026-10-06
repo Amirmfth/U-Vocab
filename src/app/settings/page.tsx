@@ -85,6 +85,7 @@ export default async function SettingsPage() {
         preference={course.explanationLanguage}
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
+        languageLabel={languageLabel}
       />
 
       <section className="panel account-links">

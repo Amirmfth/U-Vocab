@@ -15,6 +15,7 @@ export async function getRescueWords(userId: string, userCourseId: string, limit
         lexeme: {
           include: {
             translations: true,
+            definitions: true,
             patterns: true,
             examples: { take: 3 },
             mistakes: {

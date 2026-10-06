@@ -838,6 +838,7 @@ model Lexeme {
   cefrLevel    String?
   notes        String?
   translations Translation[]
+  definitions  LexemeDefinition[]
   senses       LexemeSense[]
   aliases      LexemeAlias[]
   provenance   LexemeProvenance[]
@@ -884,6 +885,7 @@ model LexemeSense {
   updatedAt   DateTime            @updatedAt
   lexeme      Lexeme              @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
   translations Translation[]
+  definitions LexemeDefinition[]
   provenance  LexemeProvenance[]
 
   @@unique([lexemeId, key])
@@ -924,6 +926,21 @@ model LexemeProvenance {
   @@index([lexemeId, createdAt])
   @@index([senseId])
   @@index([source, reviewState])
+}
+
+model LexemeDefinition {
+  id        String      @id @default(cuid())
+  lexemeId  String
+  senseId   String
+  language  String
+  text      String
+  lexeme    Lexeme      @relation(fields: [lexemeId], references: [id], onDelete: Cascade)
+  sense     LexemeSense @relation(fields: [senseId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([senseId, language])
+  @@index([lexemeId, language])
 }
 
 model Translation {

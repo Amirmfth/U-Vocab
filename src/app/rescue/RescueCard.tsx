@@ -45,6 +45,7 @@ export type RescueSessionCard = {
   exercise: ExerciseDefinition;
   riskPercent: number;
   reasons: string[];
+  targetLanguage?: "de" | "fr" | "en";
 };
 
 export function RescueCard(
@@ -120,7 +121,7 @@ export function RescueCard(
             {props.exercise.expected || label}
           </strong>
           {props.exercise.expected && props.exercise.expected !== label ? (
-            <p className="word learning-content" lang="de" dir="ltr">
+            <p className="word learning-content" lang={props.targetLanguage ?? "de"} dir="ltr">
               {label}
             </p>
           ) : null}

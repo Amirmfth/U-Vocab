@@ -7,7 +7,7 @@ import { createAIUsageRecorder } from "./usage-recorder";
 import { targetLanguageConfig } from "@/lib/languages";
 
 const grammarLessonExampleSchema = z.object({
-  german: z.string().max(500),
+  targetText: z.string().max(500),
   translation: z.string().max(500),
   note: z.string().max(500),
 });
@@ -99,7 +99,7 @@ export async function generateGrammarLesson(input: {
         {
           role: "system",
           content:
-            `You are writing the complete teaching lesson for ONE canonical ${target.promptName} grammar concept in U-Vocab. The supplied concept is authoritative. Expand it pedagogically; do not rename it, change its CEFR placement, invent prerequisites, contradict supplied rules, or create new curriculum concepts. The learner should be able to study this page alone and understand the concept deeply. Write all explanations, table labels, notes, and example translations in ${input.language === "fa" ? "natural Persian (Farsi) using Persian script" : "clear English"}, while keeping ${target.promptName} examples, grammar forms, and wrong/correct sentences in ${target.promptName}. The example field named "german" is a legacy schema key retained for backwards compatibility; its VALUE must contain ${target.promptName} text. The example translation field must contain the ${input.language === "fa" ? "Persian" : "English"} translation. Explain intuition as well as mechanics. Use tables only when they materially clarify forms or patterns. Examples must be natural modern ${target.promptName} and progress from simple to harder. Explicitly contrast commonly confused nearby structures when relevant. Include realistic wrong/correct learner mistakes. Exceptions must be genuine and useful; return an empty array if none are important. Avoid filler, motivational prose, Markdown, external links, and textbook-style jargon without explanation. The cheat sheet must be concise enough to scan before speaking or writing.`,
+            `You are writing the complete teaching lesson for ONE canonical ${target.promptName} grammar concept in U-Vocab. The supplied concept is authoritative. Expand it pedagogically; do not rename it, change its CEFR placement, invent prerequisites, contradict supplied rules, or create new curriculum concepts. The learner should be able to study this page alone and understand the concept deeply. Write all explanations, table labels, notes, and example translations in ${input.language === "fa" ? "natural Persian (Farsi) using Persian script" : "clear English"}, while keeping ${target.promptName} examples, grammar forms, and wrong/correct sentences in ${target.promptName}. The targetText field must contain the ${target.promptName} example. The example translation field must contain the ${input.language === "fa" ? "Persian" : "English"} translation. Explain intuition as well as mechanics. Use tables only when they materially clarify forms or patterns. Examples must be natural modern ${target.promptName} and progress from simple to harder. Explicitly contrast commonly confused nearby structures when relevant. Include realistic wrong/correct learner mistakes. Exceptions must be genuine and useful; return an empty array if none are important. Avoid filler, motivational prose, Markdown, external links, and textbook-style jargon without explanation. The cheat sheet must be concise enough to scan before speaking or writing.`,
         },
         {
           role: "user",

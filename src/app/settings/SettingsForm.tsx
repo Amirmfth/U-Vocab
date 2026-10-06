@@ -15,10 +15,12 @@ export function SettingsForm({
   preference,
   currentLevel,
   targetLevel,
+  languageLabel,
 }: {
   preference: TranslationLanguage;
   currentLevel: CefrLevel;
   targetLevel: CefrLevel;
+  languageLabel: string;
 }) {
   const [state, action] = useActionState(updateTranslationPreference, initialState);
   const t = useTranslations();
@@ -49,7 +51,7 @@ export function SettingsForm({
       </div>
 
       <div className="field">
-        <label htmlFor="currentLevel-trigger">{t("settings.currentGermanLevel")}</label>
+        <label htmlFor="currentLevel-trigger">{t("settings.currentLanguageLevel", { language: languageLabel })}</label>
         <span className="muted">{t("settings.currentLevelHelp")}</span>
         <ActivitySelect
           defaultValue={currentLevel}
@@ -60,7 +62,7 @@ export function SettingsForm({
       </div>
 
       <div className="field">
-        <label htmlFor="targetLevel-trigger">{t("settings.targetGermanLevel")}</label>
+        <label htmlFor="targetLevel-trigger">{t("settings.targetLanguageLevel", { language: languageLabel })}</label>
         <span className="muted">{t("settings.targetLevelHelp")}</span>
         <ActivitySelect
           defaultValue={targetLevel}

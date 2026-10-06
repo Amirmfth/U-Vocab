@@ -9,9 +9,12 @@ import { queryKeys } from "./query-keys";
 test("course-scoped query keys and cache tags do not collide", () => {
   const de = "course-de";
   const fr = "course-fr";
+  const en = "course-en";
 
   assert.notDeepEqual(queryKeys.vocabulary.list(de), queryKeys.vocabulary.list(fr));
   assert.notDeepEqual(queryKeys.review.queue(de), queryKeys.review.queue(fr));
+  assert.notDeepEqual(queryKeys.vocabulary.list(fr), queryKeys.vocabulary.list(en));
+  assert.notDeepEqual(queryKeys.review.queue(fr), queryKeys.review.queue(en));
   assert.notDeepEqual(queryKeys.word.detail(de, "lexeme-1"), queryKeys.word.detail(fr, "lexeme-1"));
   assert.notDeepEqual(queryKeys.word.conjugation(de, "lexeme-1"), queryKeys.word.conjugation(fr, "lexeme-1"));
   assert.notDeepEqual(queryKeys.mistakes.open(de), queryKeys.mistakes.open(fr));
@@ -44,6 +47,13 @@ test("German remains the enabled complete course capability", () => {
   });
   assert.equal(TARGET_LANGUAGE_CONFIG.FRENCH.enabled, false);
   assert.equal(TARGET_LANGUAGE_CONFIG.ENGLISH.enabled, false);
+  assert.deepEqual(TARGET_LANGUAGE_CONFIG.ENGLISH.capabilities, {
+    vocabulary: true,
+    grammar: true,
+    reading: true,
+    writing: true,
+    conversation: true,
+  });
 });
 
 test("schema allows the same learner content in different courses without collision", () => {

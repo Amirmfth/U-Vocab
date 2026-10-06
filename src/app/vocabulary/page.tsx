@@ -120,11 +120,12 @@ async function VocabularyList({ userId, courseId, targetLanguage, current, nowTi
       const searchable = [
         word.lemma,
         ...word.translations.map((translation) => translation.text),
+        ...word.definitions.map((definition) => definition.text),
         ...word.outgoing.map((relation) => relation.target.lemma),
         ...word.incoming.map((relation) => relation.source.lemma),
       ]
         .join(" ")
-        .toLocaleLowerCase("de-DE");
+        .toLocaleLowerCase(targetLanguage === "de" ? "de-DE" : targetLanguage === "fr" ? "fr-FR" : "en-US");
 
       if (!searchable.includes(normalizedQuery)) return false;
     }
@@ -204,7 +205,7 @@ async function VocabularyList({ userId, courseId, targetLanguage, current, nowTi
   const sorted = [...filtered].sort((a, b) => {
     switch (current.sort) {
       case "ALPHABETICAL":
-        return a.lexeme.lemma.localeCompare(b.lexeme.lemma, "de");
+        return a.lexeme.lemma.localeCompare(b.lexeme.lemma, targetLanguage);
       case "CEFR_ASC":
         return (cefrRank.get(a.lexeme.cefrLevel ?? "") ?? 99) -
           (cefrRank.get(b.lexeme.cefrLevel ?? "") ?? 99);
@@ -231,7 +232,14 @@ async function VocabularyList({ userId, courseId, targetLanguage, current, nowTi
     return {
       id: word.id,
       label: formatLexemeLabel(word),
-      translations: word.translations.map(({ id, language, text }) => ({ id, language, text })),
+      meanings: [
+        ...word.translations
+          .filter((item) => item.language !== targetLanguage)
+          .map(({ id, language, text }) => ({ id, language, text, kind: "translation" as const })),
+        ...word.definitions
+          .filter((item) => item.language === targetLanguage)
+          .map(({ id, language, text }) => ({ id, language, text, kind: "definition" as const })),
+      ],
       cefrLevel: word.cefrLevel,
       state: item.state,
       mastery,

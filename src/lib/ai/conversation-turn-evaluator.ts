@@ -7,6 +7,10 @@ import { startOperation } from "@/lib/performance";
 import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 import type { TargetLanguage } from "@prisma/client";
 import { targetLanguageConfig } from "@/lib/languages";
+import {
+  evaluatorMistakeSchema,
+  masteryEvidenceSchema,
+} from "./evaluation-intelligence";
 
 export const conversationTurnEvaluationSchema = z.object({
   targetUsage: z.array(
@@ -16,24 +20,8 @@ export const conversationTurnEvaluationSchema = z.object({
       correct: z.boolean(),
       score: z.number().min(0).max(1),
       feedback: z.string(),
-      mistakes: z.array(
-        z.object({
-          type: z.enum([
-            "ARTICLE",
-            "CASE",
-            "PREPOSITION",
-            "REFLEXIVE",
-            "COLLOCATION",
-            "WORD_CHOICE",
-            "WORD_FORM",
-            "SPELLING",
-            "OTHER",
-          ]),
-          expected: z.string().nullable(),
-          actual: z.string().nullable(),
-          explanation: z.string(),
-        }),
-      ),
+      mistakes: z.array(evaluatorMistakeSchema).max(6),
+      masteryEvidence: masteryEvidenceSchema,
     }),
   ),
   relevantCorrection: z.string().nullable(),
@@ -64,7 +52,7 @@ export async function evaluateConversationTurn(input: {
     userCourseId: input.userCourseId,
     operation: "conversation_turn_evaluation",
     model: route.model,
-    metadata: { level: input.level, messageChars: input.message.length, targetCount: input.targets.length, targetLanguage: language.code },
+    metadata: { level: input.level, messageChars: input.message.length, targetCount: input.targets.length, targetLanguage: language.code, routeReason: route.reason },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -75,7 +63,7 @@ export async function evaluateConversationTurn(input: {
           role: "system",
           content:
             evaluationLanguageInstruction(input.evaluationLocale) +
-            ` Evaluate only the learner's use of the supplied ${language.promptName} target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, governed prepositions, form, spelling, agreement, register, and naturalness according to ${language.promptName}. Do not import German-specific case or word-order assumptions into another language. Do not penalize unrelated grammar. Feedback and mistake explanations must quote or name the exact attempted phrase and give the exact corrected ${language.promptName} form when there is an error. Avoid generic praise or generic criticism. relevantCorrection should be a very short actionable correction only when useful; otherwise null.`,
+            ` Evaluate only the learner's use of the supplied ${language.promptName} target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, governed prepositions, form, spelling, agreement, register, and naturalness according to ${language.promptName}. Do not import German-specific case or word-order assumptions into another language. Do not penalize unrelated grammar. Feedback and mistake explanations must quote or name the exact attempted phrase and give the exact corrected ${language.promptName} form when there is an error. For each mistake classify a bounded cause, confidence, and intervention, distinguishing typo/orthography from lexical or semantic knowledge gaps. target masteryEvidence is evidence only and must not assign canonical mastery or scheduling. Avoid generic praise or generic criticism. relevantCorrection should be a very short actionable correction only when useful; otherwise null.`,
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined, targetLanguage: language.code }) },
       ],

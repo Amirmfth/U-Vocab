@@ -101,8 +101,11 @@ const englishAdapter: LexiconLanguageAdapter = {
       .trim();
     const normalizedLookup = normalizeFormatting(surface, this.locale);
     const variants = new Set([normalizedLookup]);
+    const contractionBases = new Set([
+      "it", "he", "she", "that", "what", "who", "where", "when", "why", "how", "there", "here",
+    ]);
     const possessive = normalizedLookup.match(/^(.+)'s$/u)?.[1]?.trim();
-    if (possessive) variants.add(possessive);
+    if (possessive && !contractionBases.has(possessive)) variants.add(possessive);
     return {
       surface,
       normalizedLookup,

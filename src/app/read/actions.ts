@@ -35,7 +35,7 @@ export async function createReadingDocument(
       if (content.length < 20) {
         return {
           status: "error",
-          message: "Paste a little more German text.",
+          message: "Paste a little more text in your course language.",
         };
       }
 
@@ -61,13 +61,14 @@ export async function createReadingDocument(
         const knownLemmas = new Set(
           known.map((item) => item.lexeme.normalized),
         );
-        const candidates = rankReadingCandidates(content, knownLemmas, 30);
-        const excerpt = buildReadingExcerpt(content, candidates, 12_000);
+        const candidates = rankReadingCandidates(content, knownLemmas, 30, course.targetLanguage);
+        const excerpt = buildReadingExcerpt(content, candidates, 12_000, course.targetLanguage);
 
         const analysis = await perf.span("ai", () =>
           analyzeReadingText({
             userId: user.id,
             userCourseId: course.id,
+            targetLanguage: course.targetLanguage,
             text: excerpt,
             originalTextChars: content.length,
             candidates,

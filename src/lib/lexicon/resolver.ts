@@ -38,7 +38,7 @@ export function candidateFromLexeme(lexeme: ResolvedLexeme, sourceType: Ingestio
     persianMeaning: persian,
     pattern: lexeme.patterns[0]?.pattern ?? null,
     patternExplanation: lexeme.patterns[0]?.explanation ?? null,
-    example: lexeme.examples[0]?.german ?? null,
+    example: lexeme.examples[0]?.targetText ?? null,
     resolutionSource: "canonical_hit",
   };
 }

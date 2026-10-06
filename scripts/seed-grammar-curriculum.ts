@@ -14,6 +14,10 @@ import {
   assertValidFrenchGrammarCurriculum,
   frenchGrammarCurriculum,
 } from "../src/lib/grammar/french-curriculum";
+import {
+  assertValidEnglishGrammarCurriculum,
+  englishGrammarCurriculum,
+} from "../src/lib/grammar/english-curriculum";
 import { syncDeclaredLevelGrammarAssumptions } from "../src/lib/grammar/progress";
 import { targetLanguageConfig } from "../src/lib/languages";
 
@@ -144,6 +148,11 @@ async function seedGrammarCurriculum() {
     targetLanguage: "FRENCH",
     concepts: frenchGrammarCurriculum,
     validate: assertValidFrenchGrammarCurriculum,
+  });
+  await seedLanguageCurriculum({
+    targetLanguage: "ENGLISH",
+    concepts: englishGrammarCurriculum,
+    validate: assertValidEnglishGrammarCurriculum,
   });
 }
 

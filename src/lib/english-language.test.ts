@@ -14,6 +14,7 @@ test("English normalization preserves contractions, apostrophes, possessives and
   assert.equal(adapter.normalizeInput("DON’T").normalizedLookup, "don't");
   assert.equal(adapter.normalizeInput("teacher’s").normalizedLookup, "teacher's");
   assert.deepEqual(adapter.normalizeInput("teacher’s").lookupVariants, ["teacher's", "teacher"]);
+  assert.deepEqual(adapter.normalizeInput("it’s").lookupVariants, ["it's"]);
   assert.equal(adapter.normalizeCanonical("look after", "PHRASE"), "look after");
   assert.equal(adapter.normalizeCanonical("carry on", "VERB"), "carry on");
 });

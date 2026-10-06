@@ -15,22 +15,25 @@ function preferredMeaning(
   return preferredLexicalMeaning(lexeme, preference).text;
 }
 
-function cleanToken(value: string) {
-  return value.toLocaleLowerCase("de-DE").replace(/[^\p{L}äöüß]/gu, "");
+function cleanToken(value: string, locale = "en-US") {
+  return value.toLocaleLowerCase(locale).replace(/[^\p{L}\p{M}'-]/gu, "");
 }
 
-export function buildCloze(sentence: string, lemma: string) {
+export function buildCloze(sentence: string, lemma: string, locale = "en-US") {
   const tokens = sentence.split(/(\s+)/);
-  const target = cleanToken(lemma);
-  const stem = target.endsWith("en") ? target.slice(0, -2) : target;
+  const target = cleanToken(lemma, locale);
+  const stem =
+    locale === "de-DE" && target.endsWith("en")
+      ? target.slice(0, -2)
+      : target;
   const index = tokens.findIndex((token) => {
     const cleaned = cleanToken(token, locale);
     return cleaned === target || (stem.length >= 3 && cleaned.startsWith(stem));
   });
   if (index < 0) return null;
   const expected = tokens[index]
-    .replace(/^[^\p{L}]*/u, "")
-    .replace(/[^\p{L}äöüß]*$/iu, "");
+    .replace(/^[^\p{L}\p{M}]*/u, "")
+    .replace(/[^\p{L}\p{M}'-]*$/u, "");
   if (!expected) return null;
   const hidden = tokens[index].replace(expected, "_____");
   return {

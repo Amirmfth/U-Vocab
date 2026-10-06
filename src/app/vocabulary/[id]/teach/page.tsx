@@ -53,7 +53,7 @@ export default async function TeachWordPage({
         take: 8,
       },
       userStates: {
-        where: { userId: user.id },
+        where: { userCourseId: course.id },
         take: 1,
       },
     },

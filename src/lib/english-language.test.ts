@@ -126,9 +126,13 @@ test("English course switching remains independent from UI locale", () => {
   assert.match(courseActions, /targetLanguage/);
   assert.doesNotMatch(courseActions, /uiLocale/);
 
-  const localeAction = fs.readFileSync("src/app/settings/locale-actions.ts", "utf8");
-  assert.match(localeAction, /uiLocale/);
-  assert.doesNotMatch(localeAction, /activeCourseId/);
+  const settingsActions = fs.readFileSync("src/app/settings/actions.ts", "utf8");
+  const uiLocaleBlock = settingsActions.slice(
+    settingsActions.indexOf("export async function updateUiLocale"),
+    settingsActions.indexOf("export async function updateTranslationPreference"),
+  );
+  assert.match(uiLocaleBlock, /uiLocale/);
+  assert.doesNotMatch(uiLocaleBlock, /activeCourseId|targetLanguage/);
 });
 
 test("English core AI surfaces remain target-language routed", () => {

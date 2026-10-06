@@ -181,6 +181,7 @@ export async function evaluateWriting(input: {
         used: false,
         correct: false,
         naturalness: 0,
+        confidence: 1,
         note:
           input.evaluationLocale === "fa"
             ? "این واژهٔ هدف در این متن استفاده نشد."

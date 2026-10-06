@@ -113,14 +113,10 @@ function GrammarAndUsage({
   patterns,
   locale,
   targetLanguageCode,
-  currentLevel,
-  targetLevel,
 }: {
   patterns: PrimaryWord["patterns"];
   locale: UiLocale;
   targetLanguageCode: string;
-  currentLevel: string;
-  targetLevel: string;
 }) {
   const t = createTranslator(locale);
   return (
@@ -294,6 +290,8 @@ async function DeferredWordDetails({
   primaryState,
   locale,
   targetLanguageCode,
+  currentLevel,
+  targetLevel,
 }: {
   userId: string;
   userCourseId: string;
@@ -303,6 +301,8 @@ async function DeferredWordDetails({
   primaryState: PrimaryWord["userStates"][number];
   locale: UiLocale;
   targetLanguageCode: string;
+  currentLevel: string;
+  targetLevel: string;
 }) {
   const word = await getCachedWordSecondary(
     userId,

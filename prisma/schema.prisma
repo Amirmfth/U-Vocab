@@ -953,7 +953,7 @@ model LexicalPattern {
 model Example {
   id            String  @id @default(cuid())
   lexemeId      String
-  german        String
+  targetText    String
   english       String?
   persian       String?
   level         String?
@@ -1181,7 +1181,7 @@ model LexemeInsight {
   id                 String   @id @default(cuid())
   lexemeId           String
   level              String
-  germanDefinition   String
+  targetDefinition   String
   englishExplanation String
   persianExplanation String
   grammarNotes       String

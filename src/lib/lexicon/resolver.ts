@@ -7,6 +7,7 @@ type DbLike = PrismaClient | Prisma.TransactionClient;
 
 const LEXEME_INCLUDE = {
   translations: true,
+  definitions: true,
   patterns: { take: 1 },
   examples: { take: 1 },
 } satisfies Prisma.LexemeInclude;
@@ -22,6 +23,8 @@ export type ExistingLexemeResolution =
 export function candidateFromLexeme(lexeme: ResolvedLexeme, sourceType: IngestionSourceType): IngestionCandidate {
   const english = lexeme.translations.find((item) => item.language === "en")?.text ?? "";
   const persian = lexeme.translations.find((item) => item.language === "fa")?.text ?? "";
+  const targetDefinition =
+    lexeme.definitions.find((item) => item.language === lexeme.language)?.text ?? null;
   return {
     key: lexeme.normalized + ":" + lexeme.partOfSpeech,
     sourceType,
@@ -34,6 +37,7 @@ export function candidateFromLexeme(lexeme: ResolvedLexeme, sourceType: Ingestio
     cefrLevel: lexeme.cefrLevel && ["A1","A2","B1","B2","C1","C2"].includes(lexeme.cefrLevel)
       ? lexeme.cefrLevel as IngestionCandidate["cefrLevel"]
       : null,
+    targetDefinition,
     englishMeaning: english,
     persianMeaning: persian,
     pattern: lexeme.patterns[0]?.pattern ?? null,

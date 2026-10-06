@@ -339,6 +339,184 @@ const templates: Record<string, Template[]> = {
       ),
     },
   ],
+  "fr.article.definite": [
+    {
+      key: "fr-definite-article",
+      type: "GRAMMAR_CHOICE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "ARTICLE",
+      build: (lexeme) => lexeme?.article
+        ? choice(
+            { key:"fr-definite-article",type:"GRAMMAR_CHOICE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"ARTICLE" },
+            "Choose the definite article for “" + lexeme.lemma + "”.",
+            lexeme.article,
+            ["le", "la", "l'", "les"],
+          )
+        : choice(
+            { key:"fr-definite-article",type:"GRAMMAR_CHOICE",dimension:"UNDERSTANDING",mistakeType:"ARTICLE" },
+            "Choose the correct definite article: ___ maison",
+            "la",
+            ["le", "la", "les"],
+          ),
+    },
+  ],
+  "fr.negation.ne-pas": [
+    {
+      key: "fr-ne-pas",
+      type: "GRAMMAR_REORDER",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "WORD_ORDER",
+      build: () => text(
+        { key:"fr-ne-pas",type:"GRAMMAR_REORDER",dimension:"CONTROLLED_PRODUCTION",mistakeType:"WORD_ORDER" },
+        "Put the words in order: ne / je / comprends / pas",
+        "je ne comprends pas",
+      ),
+    },
+  ],
+  "fr.pronoun.direct-object": [
+    {
+      key: "fr-le-before-verb",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "PRONOUN",
+      build: () => text(
+        { key:"fr-le-before-verb",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"PRONOUN" },
+        "Replace “le livre”: Je ___ lis.",
+        "le",
+      ),
+    },
+  ],
+  "fr.pronoun.y-en": [
+    {
+      key: "fr-y-place",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "PRONOUN",
+      build: () => text(
+        { key:"fr-y-place",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"PRONOUN" },
+        "Replace “à Paris”: J'___ vais demain.",
+        "y",
+      ),
+    },
+    {
+      key: "fr-en-quantity",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "PRONOUN",
+      build: () => text(
+        { key:"fr-en-quantity",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"PRONOUN" },
+        "Replace the repeated noun phrase: Tu veux des pommes ? Oui, j'___ veux deux.",
+        "en",
+      ),
+    },
+  ],
+  "fr.tense.passe-compose": [
+    {
+      key: "fr-passe-compose-avoir",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "TENSE",
+      build: () => text(
+        { key:"fr-passe-compose-avoir",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"TENSE" },
+        "Complete: J'___ travaillé hier.",
+        "ai",
+      ),
+    },
+  ],
+  "fr.tense.imparfait": [
+    {
+      key: "fr-imparfait-etre",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "TENSE",
+      build: () => text(
+        { key:"fr-imparfait-etre",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"TENSE" },
+        "Complete: Quand j'___ petit, je jouais dehors.",
+        "étais",
+      ),
+    },
+  ],
+  "fr.tense.past-contrast": [
+    {
+      key: "fr-past-contrast",
+      type: "GRAMMAR_CHOICE",
+      dimension: "UNDERSTANDING",
+      mistakeType: "TENSE",
+      build: () => choice(
+        { key:"fr-past-contrast",type:"GRAMMAR_CHOICE",dimension:"UNDERSTANDING",mistakeType:"TENSE" },
+        "Choose the natural pair for background + completed event:",
+        "Il pleuvait quand je suis sorti.",
+        [
+          "Il pleuvait quand je suis sorti.",
+          "Il a plu quand je sortais.",
+          "Il pleuvait quand je sortais.",
+        ],
+      ),
+    },
+  ],
+  "fr.pronoun.relative-basic": [
+    {
+      key: "fr-qui-subject",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "RELATIVE_CLAUSE",
+      build: () => text(
+        { key:"fr-qui-subject",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"RELATIVE_CLAUSE" },
+        "Complete: C'est la femme ___ parle.",
+        "qui",
+      ),
+    },
+    {
+      key: "fr-que-object",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "RELATIVE_CLAUSE",
+      build: () => text(
+        { key:"fr-que-object",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"RELATIVE_CLAUSE" },
+        "Complete: C'est le livre ___ je lis.",
+        "que",
+      ),
+    },
+  ],
+  "fr.subjunctive.present": [
+    {
+      key: "fr-il-faut-subj",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "SUBJUNCTIVE",
+      build: () => text(
+        { key:"fr-il-faut-subj",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"SUBJUNCTIVE" },
+        "Complete: Il faut que tu ___ demain. (venir)",
+        "viennes",
+      ),
+    },
+  ],
+  "fr.conjunction.si-clauses": [
+    {
+      key: "fr-si-imparfait-cond",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "TENSE",
+      build: () => text(
+        { key:"fr-si-imparfait-cond",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"TENSE" },
+        "Complete: Si j'avais le temps, je ___ plus. (voyager)",
+        "voyagerais",
+      ),
+    },
+  ],
+  "fr.passive.basic": [
+    {
+      key: "fr-passive-etre",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "PASSIVE",
+      build: () => text(
+        { key:"fr-passive-etre",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"PASSIVE" },
+        "Complete: Le projet ___ financé par la ville.",
+        "est",
+      ),
+    },
+  ]
 };
 
 export function grammarExerciseVariants(

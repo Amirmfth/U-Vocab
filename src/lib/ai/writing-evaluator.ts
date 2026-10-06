@@ -5,6 +5,8 @@ import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
+import type { TargetLanguage } from "@prisma/client";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export const writingGrammarObservationSchema = z.object({
   grammarConceptId: z.string(),
@@ -65,7 +67,7 @@ export const writingEvaluationSchema = z.object({
   grammarObservations: z.array(writingGrammarObservationSchema).max(16),
   strongerVocabulary: z.array(
     z.object({
-      german: z.string(),
+      targetText: z.string(),
       meaning: z.string(),
       rationale: z.string(),
     }),
@@ -96,6 +98,7 @@ export function calculateWritingOverall(evaluation: Omit<WritingEvaluation, "ove
 export async function evaluateWriting(input: {
   userId: string;
   userCourseId: string;
+  targetLanguage: TargetLanguage;
   evaluationLocale: EvaluationLocale;
   level: string;
   mode: "GUIDED" | "OPEN";
@@ -124,6 +127,7 @@ export async function evaluateWriting(input: {
     previousEvaluation?: Pick<WritingEvaluation, "overall" | "summary" | "improvements" | "corrections" | "grammarObservations">;
   };
 }) {
+  const language = targetLanguageConfig(input.targetLanguage);
   const route = aiRoute("writing_evaluation");
   const perf = startOperation("ai.writing_evaluation", { model: route.model, draftChars: input.draft.length, targetCount: input.requiredTargets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
@@ -131,7 +135,7 @@ export async function evaluateWriting(input: {
     userCourseId: input.userCourseId,
     operation: "writing_evaluation",
     model: route.model,
-    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.requiredTargets.length },
+    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.requiredTargets.length, targetLanguage: language.code },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -142,9 +146,9 @@ export async function evaluateWriting(input: {
           role: "system",
           content:
             evaluationLanguageInstruction(input.evaluationLocale) +
-            " Evaluate this German writing practice. Word count and repeated-word counts are precomputed; use them instead of recounting. Score each category from 0 to 1 using this rubric: 0.9-1.0 = consistently strong for the requested level, 0.75-0.89 = solid with minor issues, 0.55-0.74 = partly successful with clear weaknesses, 0.30-0.54 = limited control, below 0.30 = largely unsuccessful. Task completion measures fulfillment of the actual task, including an appropriate response to the target length. Organization measures structure and cohesion. Grammar measures accuracy and control. Vocabulary range measures variety appropriate to the level. Vocabulary accuracy measures correct word choice, forms, and collocations. Naturalness measures idiomatic, context-appropriate German. Evaluate requiredTargets separately: targetUsage must contain only requiredTargets' lexeme IDs, including unused required targets. observedVocabulary is context only and must never appear in targetUsage. If rewriteContext is present, explicitly assess whether the new draft addressed its prior feedback, but score the new draft on its own merits. The server computes overall from the category scores, so make each category score independently defensible. Feedback must be specific and evidence-based: cite the learner's exact German phrase for each important strength or issue, explain the grammar/lexical/collocational/register reason, and provide a concrete corrected German form when applicable. Prioritize recurring and high-impact issues over cosmetic edits. Do not invent errors. Strengths must say what worked and show a concrete example. Improvements must say what to change next and how. Keep feedback prioritized: at most four strengths, five improvements, five collocation notes, twelve lexical mistakes, eight corrections, and an improved version preserving the learner intent. grammarConcepts is the ONLY allowlist of grammar IDs you may reference. grammarObservations must use only IDs from grammarConcepts. Emit ERROR only for a genuine grammatical error, SUCCESS only for a confidently observable correct use of a relevant concept, and OPPORTUNITY only when a correct sentence could naturally demonstrate a useful not-yet-mastered structure. Never penalize grammar or overall scores for an optional OPPORTUNITY. Do not label every correct token; focus on relevant LEARNING/NEEDS_ATTENTION/ASSUMED concepts and a few level-appropriate opportunities. For ERROR include corrected German when possible. For SUCCESS corrected must be null. For OPPORTUNITY corrected should contain the optional improved form. If rewriteContext contains prior grammarObservations, pay particular attention to whether prior ERROR concepts were corrected, but do not duplicate an error unless it is still present.",
+            ` Evaluate this ${language.promptName} writing practice. Word count and repeated-word counts are precomputed; use them instead of recounting. Score each category from 0 to 1 using this rubric: 0.9-1.0 = consistently strong for the requested level, 0.75-0.89 = solid with minor issues, 0.55-0.74 = partly successful with clear weaknesses, 0.30-0.54 = limited control, below 0.30 = largely unsuccessful. Task completion measures fulfillment of the actual task, including an appropriate response to the target length. Organization measures structure and cohesion. Grammar measures accuracy and control in ${language.promptName}. Vocabulary range measures variety appropriate to the level. Vocabulary accuracy measures correct word choice, forms, agreement, and collocations. Naturalness measures idiomatic, context-appropriate ${language.promptName}. Evaluate requiredTargets separately: targetUsage must contain only requiredTargets' lexeme IDs, including unused required targets. observedVocabulary is context only and must never appear in targetUsage. If rewriteContext is present, explicitly assess whether the new draft addressed its prior feedback, but score the new draft on its own merits. The server computes overall from the category scores, so make each category score independently defensible. Feedback must be specific and evidence-based: cite the learner's exact ${language.promptName} phrase for each important strength or issue, explain the grammar/lexical/collocational/register reason, and provide a concrete corrected ${language.promptName} form when applicable. Do not import German-specific case or word-order assumptions into another language. Prioritize recurring and high-impact issues over cosmetic edits. Do not invent errors. Strengths must say what worked and show a concrete example. Improvements must say what to change next and how. Keep feedback prioritized: at most four strengths, five improvements, five collocation notes, twelve lexical mistakes, eight corrections, and an improved version preserving the learner intent. strongerVocabulary.targetText must contain the stronger target-language expression. grammarConcepts is the ONLY allowlist of grammar IDs you may reference. grammarObservations must use only IDs from grammarConcepts. Emit ERROR only for a genuine grammatical error, SUCCESS only for a confidently observable correct use of a relevant concept, and OPPORTUNITY only when a correct sentence could naturally demonstrate a useful not-yet-mastered structure. Never penalize grammar or overall scores for an optional OPPORTUNITY. Do not label every correct token; focus on relevant LEARNING/NEEDS_ATTENTION/ASSUMED concepts and a few level-appropriate opportunities. For ERROR include corrected ${language.promptName} when possible. For SUCCESS corrected must be null. For OPPORTUNITY corrected should contain the optional improved form. If rewriteContext contains prior grammarObservations, pay particular attention to whether prior ERROR concepts were corrected, but do not duplicate an error unless it is still present.`,
         },
-        { role: "user", content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined }) },
+        { role: "user", content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined, targetLanguage: language.code }) },
       ],
       text: {
         format: zodTextFormat(writingEvaluationSchema, "writing_evaluation"),

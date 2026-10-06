@@ -7,6 +7,7 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { generateLexicalExamples } from "@/lib/ai/lexical-examples";
 import { generateQuickTeach } from "@/lib/ai/quick-teach";
 import { revalidateUserDomains } from "@/lib/cache-tags";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type InsightActionState = {
   status: "idle" | "success" | "error";
@@ -36,6 +37,8 @@ export async function generateQuickTeachAction(lexemeId: string, displayLanguage
       ?? "";
     const lesson = await generateQuickTeach({
       userId: user.id,
+      userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       lemma: lexeme.lemma,
       article: lexeme.article,
       partOfSpeech: lexeme.partOfSpeech,
@@ -65,25 +68,28 @@ export async function generateExamplesAction(
       where: { id: lexemeId, userStates: { some: { userCourseId: course.id } } },
       include: {
         patterns: { select: { pattern: true } },
-        examples: { select: { german: true } },
+        examples: { select: { targetText: true } },
       },
     });
     if (!lexeme) {
       return { status: "error", message: "This word is not in your vocabulary." };
     }
 
+    const language = targetLanguageConfig(course.targetLanguage);
     const generated = await generateLexicalExamples({
+      userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       userId: user.id,
       lemma: lexeme.lemma,
       article: lexeme.article,
       partOfSpeech: lexeme.partOfSpeech,
       level: course.targetLevel,
       patterns: lexeme.patterns.map((pattern) => pattern.pattern),
-      existingExamples: lexeme.examples.slice(0, 8).map((example) => example.german),
+      existingExamples: lexeme.examples.slice(0, 8).map((example) => example.targetText),
     });
     const seen = new Set<string>();
     const unique = generated.filter((example) => {
-      const normalized = example.german.toLocaleLowerCase("de-DE").trim();
+      const normalized = example.targetText.toLocaleLowerCase(language.locale).trim();
       if (!normalized || seen.has(normalized)) return false;
       seen.add(normalized);
       return true;
@@ -95,7 +101,7 @@ export async function generateExamplesAction(
         await tx.example.createMany({
           data: unique.slice(0, 4).map((example) => ({
             lexemeId: lexeme.id,
-            german: example.german,
+            targetText: example.targetText,
             english: example.english,
             persian: example.persian,
             register: example.register,

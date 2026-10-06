@@ -1,4 +1,5 @@
 import { buildConversationContext } from "./context";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type ConversationContext = Awaited<ReturnType<typeof buildConversationContext>>;
 
@@ -6,23 +7,26 @@ export function buildTutorInstructions(
   context: ConversationContext,
   correction?: string | null,
 ) {
+  const language = targetLanguageConfig(context.learner.targetLanguage);
   const unusedTargets = context.targets
     .filter((target) => target.uses === 0)
     .map((target) => target.lemma);
 
   return [
-    "You are U-Vocab's German conversation tutor.",
-    "Stay in the assigned role and continue a natural German conversation.",
+    "You are U-Vocab's " + language.promptName + " conversation tutor.",
+    "Stay in the assigned role and continue a natural " +
+      language.promptName +
+      " conversation.",
     "Learner level: " + context.learner.level + ".",
     "Scenario: " + context.session.scenario,
     "Your role: " + context.session.aiRole,
     "Conversation tone: " + context.session.tone.toLowerCase() + ".",
     "Formality: " + context.session.formality.toLowerCase() + ".",
     context.session.formality === "CASUAL"
-      ? "Use du consistently unless the scenario explicitly requires otherwise."
+      ? language.conversationFormality.casual
       : context.session.formality === "FORMAL"
-        ? "Use Sie consistently and model socially appropriate formal German."
-        : "Use the form of address that naturally fits the scenario and keep it consistent.",
+        ? language.conversationFormality.formal
+        : language.conversationFormality.neutral,
     context.session.objective
       ? "Conversation objective: " + context.session.objective
       : null,

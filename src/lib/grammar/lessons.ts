@@ -1,15 +1,16 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, TargetLanguage } from "@prisma/client";
 import {
   generateGrammarLesson,
   type GrammarLessonSource,
 } from "@/lib/ai/grammar-lesson";
+import { targetLanguageFromCode } from "@/lib/languages";
 
 export async function getGrammarLessonSource(
   db: PrismaClient,
   grammarConceptId: string,
-): Promise<(GrammarLessonSource & { contentVersion: number; slug: string }) | null> {
+): Promise<(GrammarLessonSource & { contentVersion: number; slug: string; targetLanguage: TargetLanguage }) | null> {
   const concept = await db.grammarConcept.findFirst({
-    where: { id: grammarConceptId, active: true, language: "de" },
+    where: { id: grammarConceptId, active: true },
     include: {
       prerequisites: {
         include: {
@@ -25,8 +26,11 @@ export async function getGrammarLessonSource(
     },
   });
   if (!concept) return null;
+  const targetLanguage = targetLanguageFromCode(concept.language);
+  if (!targetLanguage) return null;
 
   return {
+    targetLanguage,
     id: concept.id,
     slug: concept.slug,
     title: concept.title,
@@ -50,13 +54,20 @@ export async function getGrammarLessonSource(
 
 export async function generateAndPersistGrammarLesson(
   db: PrismaClient,
-  input: { grammarConceptId: string; language: "en" | "fa"; userId?: string },
+  input: {
+    grammarConceptId: string;
+    language: "en" | "fa";
+    userId?: string;
+    userCourseId?: string;
+  },
 ) {
   const source = await getGrammarLessonSource(db, input.grammarConceptId);
   if (!source) throw new Error("Grammar concept not found.");
 
   const generated = await generateGrammarLesson({
     userId: input.userId,
+    userCourseId: input.userCourseId,
+    targetLanguage: source.targetLanguage,
     concept: source,
     language: input.language,
   });

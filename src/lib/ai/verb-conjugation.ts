@@ -28,7 +28,7 @@ export async function getVerbConjugationForUser(input:{ userId:string; userCours
     partOfSpeech:lexeme.partOfSpeech,
     notes:lexeme.notes,
     patterns:lexeme.patterns.map((p)=>({ pattern:p.pattern, explanation:p.explanation })),
-    examples:lexeme.examples.map((e)=>e.german),
+    examples:lexeme.examples.map((e)=>e.targetText),
   };
   const cacheInput = {
     operation:OPERATION,

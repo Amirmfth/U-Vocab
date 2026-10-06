@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { isTranslationVisible } from "@/lib/translations";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { buildExercise } from "@/lib/exercises/build";
@@ -35,6 +36,7 @@ export default async function TeachWordPage({
     getCurrentCourse(),
   ]);
   const { t } = await getServerTranslator(user);
+  const targetLanguageCode = targetLanguageConfig(course.targetLanguage).code;
 
   const word = await db.lexeme.findFirst({
     where: {
@@ -79,7 +81,7 @@ export default async function TeachWordPage({
         <p className="eyebrow">
           {t("word.lesson.eyebrow", { level: course.targetLevel })}
         </p>
-        <h1 className="learning-content" lang="de" dir="ltr">
+        <h1 className="learning-content" lang={targetLanguageCode} dir="ltr">
           {formatLexemeLabel(word)}
         </h1>
         <p className="page-description">{t("word.lesson.description")}</p>
@@ -119,7 +121,7 @@ export default async function TeachWordPage({
           {word.patterns.length ? (
             word.patterns.map((pattern) => (
               <div className="lesson-pattern" key={pattern.id}>
-                <strong className="learning-content" lang="de" dir="ltr">
+                <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {pattern.pattern}
                 </strong>
                 {pattern.explanation ? (
@@ -146,8 +148,8 @@ export default async function TeachWordPage({
           <div className="lesson-examples">
             {word.examples.slice(0, 4).map((example) => (
               <div className="lesson-example" key={example.id}>
-                <strong className="learning-content" lang="de" dir="ltr">
-                  {example.german}
+                <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
+                  {example.targetText}
                 </strong>
                 {course.explanationLanguage !== "PERSIAN" && example.english ? (
                   <span className="learning-content" lang="en" dir="ltr">
@@ -181,7 +183,7 @@ export default async function TeachWordPage({
                   href={"/vocabulary/" + relation.target.id}
                   className="relation-chip"
                 >
-                  <span className="learning-content" lang="de" dir="ltr">
+                  <span className="learning-content" lang={targetLanguageCode} dir="ltr">
                     {relation.target.lemma}
                   </span>
                   <small>

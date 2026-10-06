@@ -60,6 +60,7 @@ export async function createConversationSessionAction(
     const setup = await generateConversationSetup({
       userId: user.id,
       userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       kind,
       level: course.currentLevel,
       topic,
@@ -174,6 +175,7 @@ export async function completeConversationAction(
     const evaluation = await evaluateConversationSession({
       userId: user.id,
       userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       evaluationLocale: evaluationLocaleForPreference(course.explanationLanguage),
       kind: session.kind,
       level: session.level,

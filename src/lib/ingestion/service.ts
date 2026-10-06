@@ -255,14 +255,14 @@ export async function commitIngestionCandidates(
 
       if (candidate.example) {
         const existingExample = await tx.example.findFirst({
-          where: { lexemeId: lexeme.id, german: candidate.example },
+          where: { lexemeId: lexeme.id, targetText: candidate.example },
           select: { id: true },
         });
         if (!existingExample) {
           await tx.example.create({
             data: {
               lexemeId: lexeme.id,
-              german: candidate.example,
+              targetText: candidate.example,
               generatedByAi: provenanceSource === "AI_GENERATED",
             },
           });

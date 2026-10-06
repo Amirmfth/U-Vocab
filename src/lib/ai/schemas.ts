@@ -28,7 +28,7 @@ export const lexicalAnalysisSchema = z.object({
   ),
   examples: z.array(
     z.object({
-      german: z.string(),
+      targetText: z.string(),
       english: z.string(),
       persian: z.string(),
     }),

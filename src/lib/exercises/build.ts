@@ -63,7 +63,7 @@ export function eligibleExerciseTypes(
   if (lexeme.partOfSpeech === "NOUN" && lexeme.article) result.push("ARTICLE");
   if (lexeme.patterns.length) result.push("CASE_PREPOSITION", "COLLOCATION");
   if (
-    lexeme.examples.some((example) => buildCloze(example.german, lexeme.lemma))
+    lexeme.examples.some((example) => buildCloze(example.targetText, lexeme.lemma))
   )
     result.push("CLOZE");
   if (lexeme.examples.length) result.push("CONTEXTUAL_CHOICE");
@@ -89,9 +89,9 @@ export function buildExercise(
 ): ExerciseDefinition {
   const meaning = preferredMeaning(lexeme, preference);
   const pattern = lexeme.patterns[0]?.pattern;
-  const example = lexeme.examples[0]?.german;
+  const example = lexeme.examples[0]?.targetText;
   const cloze = lexeme.examples
-    .map((item) => buildCloze(item.german, lexeme.lemma))
+    .map((item) => buildCloze(item.targetText, lexeme.lemma))
     .find(Boolean);
 
   switch (type) {

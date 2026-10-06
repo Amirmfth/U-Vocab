@@ -4,6 +4,8 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import type { TargetLanguage } from "@prisma/client";
+import { targetLanguageConfig } from "@/lib/languages";
 
 const readingQuestionSchema = z.object({
   type: z.enum(["COMPREHENSION", "VOCABULARY", "GRAMMAR"]),
@@ -36,6 +38,7 @@ export type GeneratedReading = z.infer<typeof generatedReadingSchema>;
 export async function generateReading(input: {
   userId: string;
   userCourseId: string;
+  targetLanguage: TargetLanguage;
   level: string;
   length: "SHORT" | "MEDIUM" | "LONG";
   minimumTargets: number;
@@ -49,11 +52,13 @@ export async function generateReading(input: {
     status: string;
   }>;
 }) {
+  const language = targetLanguageConfig(input.targetLanguage);
   const route = aiRoute("story_generation");
   const perf = startOperation("ai.reading_generation", {
     model: route.model,
     level: input.level,
     grammarTargets: input.grammarConcepts.length,
+    targetLanguage: language.code,
   });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
@@ -66,6 +71,7 @@ export async function generateReading(input: {
       selectedTargetCount: input.selectedTargets.length,
       candidateTargetCount: input.candidateTargets.length,
       grammarTargetCount: input.grammarConcepts.length,
+      targetLanguage: language.code,
     },
   });
 
@@ -78,11 +84,11 @@ export async function generateReading(input: {
           {
             role: "system",
             content:
-              "Generate natural, coherent German reading material whose main purpose is reading comprehension. Match the requested CEFR level. Include at least minimumTargets DISTINCT vocabulary lemmas from selectedTargets and candidateTargets as exact standalone words or phrases in the content, prioritizing selectedTargets. Plan the story around them so the prose remains idiomatic. Return usedTargets only for target lemmas that genuinely appear. grammarConcepts is the ONLY grammar-ID allowlist; grammarCoverage and GRAMMAR questions may reference only those IDs. Coverage must quote an excerpt that actually demonstrates the concept. Grammar coverage may be lower when naturalness requires it. Include mostly comprehension questions, with at most two vocabulary/grammar questions. Questions must be answerable from the text and have exactly four options. A GRAMMAR question should test understanding of the structure in context, not terminology trivia. Do not reveal question answers in annotations or explanations embedded in the reading text.",
+              `Generate natural, coherent ${language.promptName} reading material whose main purpose is reading comprehension. Match the requested CEFR level. Include at least minimumTargets DISTINCT vocabulary lemmas from selectedTargets and candidateTargets as exact standalone words or phrases in the content, prioritizing selectedTargets. Plan the text around them so the prose remains idiomatic in ${language.promptName}. Return usedTargets only for target lemmas that genuinely appear. grammarConcepts is the ONLY grammar-ID allowlist; grammarCoverage and GRAMMAR questions may reference only those IDs. Coverage must quote an excerpt that actually demonstrates the concept. Grammar coverage may be lower when naturalness requires it. Include mostly comprehension questions, with at most two vocabulary/grammar questions. Questions must be answerable from the text and have exactly four options. A GRAMMAR question should test understanding of the structure in context, not terminology trivia. Preserve ${language.promptName}-specific spelling, accents, agreement, and punctuation. Do not reveal question answers in annotations or explanations embedded in the reading text.`,
           },
           {
             role: "user",
-            content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined }),
+            content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined, targetLanguage: language.code }),
           },
         ],
         text: {

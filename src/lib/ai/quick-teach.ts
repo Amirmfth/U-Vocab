@@ -1,9 +1,13 @@
+import type { TargetLanguage } from "@prisma/client";
 import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export async function generateQuickTeach(input: {
   userId: string;
+  userCourseId: string;
+  targetLanguage: TargetLanguage;
   lemma: string;
   article: string | null;
   partOfSpeech: string;
@@ -12,12 +16,18 @@ export async function generateQuickTeach(input: {
   language: "English" | "Persian";
   patterns: string[];
 }) {
+  const target = targetLanguageConfig(input.targetLanguage);
   const route = aiRoute("quick_teach");
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "quick_teach",
     model: route.model,
-    metadata: { level: input.level, language: input.language },
+    metadata: {
+      level: input.level,
+      language: input.language,
+      targetLanguage: target.code,
+    },
   });
 
   try {
@@ -27,7 +37,7 @@ export async function generateQuickTeach(input: {
       input: [
         {
           role: "system",
-          content: `You are a practical German tutor. Teach the given word in ${input.language} at the learner's CEFR level. Aim for a useful 200 to 300 word lesson (or equivalent length in Persian). Explain when to use it, give two natural German examples with translations, note one common mistake or nuance. Keep the explanation clear and avoid filler.`,
+          content: `You are a practical ${target.promptName} tutor. Teach the given lexical unit in ${input.language} at the learner's CEFR level. Aim for a useful 200 to 300 word lesson (or equivalent length in Persian). Explain when to use it, give two natural ${target.promptName} examples with translations, note one common mistake or nuance, and preserve language-specific spelling and morphology. Keep the explanation clear and avoid filler.`,
         },
         {
           role: "user",

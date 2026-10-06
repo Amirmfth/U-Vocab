@@ -6,10 +6,12 @@ export function GrammarLessonContent({
   lesson,
   language,
   uiLocale,
+  targetLanguageCode,
 }: {
   lesson: GrammarLessonResult;
   language: "en" | "fa";
   uiLocale: UiLocale;
+  targetLanguageCode: string;
 }) {
   const t = createTranslator(uiLocale);
 
@@ -113,7 +115,7 @@ export function GrammarLessonContent({
         <div className="grammar-rich-example-list">
           {lesson.examples.map((example, index) => (
             <article className="panel grammar-rich-example" key={index}>
-              <strong className="learning-content" lang="de" dir="ltr">
+              <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                 {example.german}
               </strong>
               <p>{example.translation}</p>
@@ -162,13 +164,13 @@ export function GrammarLessonContent({
             <article className="panel grammar-mistake-example" key={index}>
               <p className="grammar-wrong">
                 <span>{t("grammar.lesson.not")}</span>{" "}
-                <b className="learning-content" lang="de" dir="ltr">
+                <b className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {mistake.wrong}
                 </b>
               </p>
               <p className="grammar-correct">
                 <span>{t("grammar.lesson.use")}</span>{" "}
-                <b className="learning-content" lang="de" dir="ltr">
+                <b className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {mistake.correct}
                 </b>
               </p>

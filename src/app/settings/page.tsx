@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
-import { targetLanguageConfig } from "@/lib/languages";
+import { ENABLED_TARGET_LANGUAGES, targetLanguageConfig } from "@/lib/languages";
 import { getServerTranslator } from "@/i18n/server";
 import { uiLocaleFromDb } from "@/i18n/config";
 import { SettingsForm } from "./SettingsForm";
@@ -10,6 +10,7 @@ import { SignOutButton } from "./SignOutButton";
 import { getEffectivePlan, getQuotaSummary } from "@/lib/entitlements/service";
 import { PlanStatusCard } from "./PlanStatusCard";
 import { ReviewReminderSettings } from "./ReviewReminderSettings";
+import { CourseManagement } from "./CourseManagement";
 import { db } from "@/lib/db";
 import { minuteToTimeValue } from "@/lib/notifications/time";
 import { publicVapidKey, webPushConfigured } from "@/lib/notifications/config";
@@ -18,7 +19,7 @@ export default async function SettingsPage() {
   await connection();
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
   const { locale, t } = await getServerTranslator(user);
-  const [plan, quotas, notificationPreference, activePushDevices] = await Promise.all([
+  const [plan, quotas, notificationPreference, activePushDevices, courses] = await Promise.all([
     getEffectivePlan(user.id),
     getQuotaSummary({
       userId: user.id,
@@ -31,10 +32,18 @@ export default async function SettingsPage() {
     db.webPushSubscription.count({
       where: { userId: user.id, status: "ACTIVE" },
     }),
+    db.userCourse.findMany({
+      where: { userId: user.id, status: "ACTIVE" },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
   const language = targetLanguageConfig(course.targetLanguage);
   const languageLabel =
-    course.targetLanguage === "GERMAN" ? t("common.german") : language.label;
+    course.targetLanguage === "GERMAN"
+      ? t("common.german")
+      : course.targetLanguage === "FRENCH"
+        ? t("common.french")
+        : language.label;
 
   return (
     <main className="page">
@@ -49,6 +58,14 @@ export default async function SettingsPage() {
           })}
         </p>
       </section>
+
+      <CourseManagement
+        courses={courses}
+        activeCourseId={course.id}
+        enabledLanguages={[...ENABLED_TARGET_LANGUAGES]}
+        canCreateAdditionalCourse={plan.plan === "PRO"}
+        t={t}
+      />
 
       <PlanStatusCard plan={plan} quotas={quotas} locale={locale} t={t} />
 

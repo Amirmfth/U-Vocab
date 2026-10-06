@@ -10,7 +10,7 @@ const noun={
   partOfSpeech:"NOUN",
   translations:[{ language:"en",text:"table" }],
   patterns:[{ pattern:"am Tisch",explanation:null }],
-  examples:[{ german:"Der Tisch steht im Zimmer." }],
+  examples:[{ targetText:"Der Tisch steht im Zimmer." }],
 };
 
 test("quick practice never needs open writing as a fallback",()=>{

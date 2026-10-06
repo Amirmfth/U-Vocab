@@ -6,6 +6,7 @@ import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { getServerTranslator } from "@/i18n/server";
 import { formatNumber, formatPercent } from "@/i18n/format";
@@ -35,6 +36,7 @@ export default async function WritingSessionPage({
     getCurrentCourse(),
   ]);
   const { locale, t } = await getServerTranslator(user);
+  const targetLanguageCode = targetLanguageConfig(course.targetLanguage).code;
   const session = await db.writingSession.findFirst({
     where: { id, userId: user.id, userCourseId: course.id },
     include: {
@@ -123,7 +125,7 @@ export default async function WritingSessionPage({
 
       <section className="panel writing-task">
         <p className="eyebrow">{t("writing.detail.task")}</p>
-        <pre className="learning-content" lang="de" dir="ltr">{session.task}</pre>
+        <pre className="learning-content" lang={targetLanguageCode} dir="ltr">{session.task}</pre>
 
         {session.targets.length ? (
           <div className="writing-targets">
@@ -131,7 +133,7 @@ export default async function WritingSessionPage({
               <span
                 key={target.id}
                 className="learning-content"
-                lang="de"
+                lang={targetLanguageCode}
                 dir="ltr"
               >
                 {formatLexemeLabel(target.lexeme)}
@@ -172,6 +174,7 @@ export default async function WritingSessionPage({
             sessionId={session.id}
             initialDraft={session.draft}
             targetWords={session.targetWords}
+            targetLanguageCode={targetLanguageCode}
           />
         </>
       ) : evaluation?.success ? (
@@ -277,7 +280,7 @@ export default async function WritingSessionPage({
                         )}
                       </div>
 
-                      <p className="learning-content" lang="de" dir="ltr">
+                      <p className="learning-content" lang={targetLanguageCode} dir="ltr">
                         {observation.original}
                       </p>
                       {observation.corrected ? (
@@ -285,7 +288,7 @@ export default async function WritingSessionPage({
                           {isOpportunity
                             ? t("writing.detail.try")
                             : t("writing.detail.correction")}{" "}
-                          <strong className="learning-content" lang="de" dir="ltr">
+                          <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                             {observation.corrected}
                           </strong>
                         </p>
@@ -352,7 +355,7 @@ export default async function WritingSessionPage({
                 return (
                   <div className="writing-feedback-row" key={usage.lexemeId}>
                     <div>
-                      <strong className="learning-content" lang="de" dir="ltr">
+                      <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                         {target.lexeme.lemma}
                       </strong>
                       <span className="learning-content" dir="auto">{usage.note}</span>
@@ -386,7 +389,7 @@ export default async function WritingSessionPage({
               {evaluation.data.repetition.map((item) => (
                 <div className="writing-feedback-row" key={item.item}>
                   <div>
-                    <strong className="learning-content" lang="de" dir="ltr">
+                    <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                       {item.item} · {formatNumber(locale, item.count)}×
                     </strong>
                     <span className="learning-content" dir="auto">
@@ -416,10 +419,10 @@ export default async function WritingSessionPage({
               <p className="eyebrow">{t("writing.detail.corrections")}</p>
               {evaluation.data.corrections.map((item, index) => (
                 <div className="writing-correction" key={index}>
-                  <del className="learning-content" lang="de" dir="ltr">
+                  <del className="learning-content" lang={targetLanguageCode} dir="ltr">
                     {item.original}
                   </del>
-                  <strong className="learning-content" lang="de" dir="ltr">
+                  <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                     {item.corrected}
                   </strong>
                   <span className="learning-content" dir="auto">
@@ -434,10 +437,10 @@ export default async function WritingSessionPage({
             <section className="panel writing-feedback-section">
               <p className="eyebrow">{t("writing.detail.strongerVocab")}</p>
               {evaluation.data.strongerVocabulary.map((item) => (
-                <div className="writing-feedback-row" key={item.german}>
+                <div className="writing-feedback-row" key={item.targetText}>
                   <div>
-                    <strong className="learning-content" lang="de" dir="ltr">
-                      {item.german}
+                    <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
+                      {item.targetText}
                     </strong>
                     <span className="learning-content" dir="auto">
                       {item.meaning} · {item.rationale}
@@ -450,7 +453,7 @@ export default async function WritingSessionPage({
 
           <section className="panel improved-writing">
             <p className="eyebrow">{t("writing.detail.improvedVersion")}</p>
-            <p className="learning-content" lang="de" dir="ltr">
+            <p className="learning-content" lang={targetLanguageCode} dir="ltr">
               {evaluation.data.improvedVersion}
             </p>
           </section>
@@ -459,13 +462,13 @@ export default async function WritingSessionPage({
             <section className="writing-comparison">
               <article className="panel">
                 <p className="eyebrow">{t("writing.detail.previousAttempt")}</p>
-                <p className="learning-content" lang="de" dir="ltr">
+                <p className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {parent.draft}
                 </p>
               </article>
               <article className="panel">
                 <p className="eyebrow">{t("writing.detail.rewrite")}</p>
-                <p className="learning-content" lang="de" dir="ltr">
+                <p className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {session.draft}
                 </p>
               </article>

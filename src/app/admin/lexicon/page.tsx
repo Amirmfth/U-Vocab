@@ -117,7 +117,7 @@ export default async function AdminLexiconPage({
         </div>
 
         <div className="admin-two-column">
-          <section><h3>Patterns</h3>{lexeme.patterns.map(p=><div className="admin-data-block" key={p.id}>{p.pattern}</div>)}<h3>Examples</h3>{lexeme.examples.map(e=><div className="admin-data-block" key={e.id}><strong>{e.german}</strong><span>{e.english ?? e.persian ?? ""}</span></div>)}</section>
+          <section><h3>Patterns</h3>{lexeme.patterns.map(p=><div className="admin-data-block" key={p.id}>{p.pattern}</div>)}<h3>Examples</h3>{lexeme.examples.map(e=><div className="admin-data-block" key={e.id}><strong>{e.targetText}</strong><span>{e.english ?? e.persian ?? ""}</span></div>)}</section>
           <section><h3>Review state</h3><form action={reviewLexemeAction} className="admin-inline-form"><input type="hidden" name="lexemeId" value={lexeme.id}/><select name="reviewState" defaultValue={lexeme.provenance[0]?.reviewState ?? "ACCEPTED"}>{Object.values(LexemeReviewState).map(x=><option key={x}>{x}</option>)}</select><ConfirmSubmitButton message="Change curated review state for this lexeme?">Apply state</ConfirmSubmitButton></form><p className="muted">{lexeme._count.encounters} encounters · {lexeme._count.mistakes} linked mistake records</p></section>
         </div>
       </article>)}

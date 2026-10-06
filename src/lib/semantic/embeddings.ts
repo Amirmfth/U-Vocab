@@ -87,7 +87,7 @@ async function lexemeEmbeddingText(lexemeId: string) {
       (translation) => translation.language + ": " + translation.text,
     ),
     ...lexeme.patterns.map((pattern) => pattern.pattern),
-    ...lexeme.examples.map((example) => example.german),
+    ...lexeme.examples.map((example) => example.targetText),
   ]
     .filter(Boolean)
     .join(" | ");

@@ -1,9 +1,13 @@
+import type { TargetLanguage } from "@prisma/client";
 import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export async function generateGrammarQuickTeach(input: {
   userId: string;
+  userCourseId: string;
+  targetLanguage: TargetLanguage;
   title: string;
   level: string;
   targetLevel: string;
@@ -15,15 +19,18 @@ export async function generateGrammarQuickTeach(input: {
   personalVocabulary: string[];
   previousAngle?: string | null;
 }) {
+  const target = targetLanguageConfig(input.targetLanguage);
   const route = aiRoute("grammar_quick_teach");
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
+    userCourseId: input.userCourseId,
     operation: "grammar_quick_teach",
     model: route.model,
     metadata: {
       level: input.level,
       targetLevel: input.targetLevel,
       language: input.language,
+      targetLanguage: target.code,
     },
   });
 
@@ -47,11 +54,12 @@ export async function generateGrammarQuickTeach(input: {
         {
           role: "system",
           content:
-            `You are a German grammar tutor. Explain the supplied canonical grammar concept in ${input.language} from a DIFFERENT pedagogical angle than the main stored lesson. Choose one angle from: ${availableAngles.join(", ")}. Start the response with a single line exactly in the form "Angle: <chosen angle>". Then give a fresh, self-contained explanation of roughly 500-800 words (or equivalent Persian length). The concept data and supplied rules are authoritative: never contradict them, never invent a new grammar concept, and do not change CEFR placement. Prefer concrete German examples. Use the learner's personal vocabulary naturally when useful. If recent mistakes are supplied, address the misunderstanding without exposing private metadata. Include at least one contrast, one common mistake, and a tiny final checklist. Markdown is allowed and should be readable in a bottom sheet.`,
+            `You are a ${target.promptName} grammar tutor. Explain the supplied canonical ${target.promptName} grammar concept in ${input.language} from a DIFFERENT pedagogical angle than the main stored lesson. Choose one angle from: ${availableAngles.join(", ")}. Start the response with a single line exactly in the form "Angle: <chosen angle>". Then give a fresh, self-contained explanation of roughly 500-800 words (or equivalent Persian length). The concept data and supplied rules are authoritative: never contradict them, never invent a new grammar concept, and do not change CEFR placement. Prefer concrete ${target.promptName} examples. Use the learner's personal vocabulary naturally when useful. If recent mistakes are supplied, address the misunderstanding without exposing private metadata. Include at least one contrast, one common mistake, and a tiny final checklist. Markdown is allowed and should be readable in a bottom sheet.`,
         },
         {
           role: "user",
           content: JSON.stringify({
+            targetLanguage: target.code,
             title: input.title,
             learnerLevel: input.level,
             targetLevel: input.targetLevel,

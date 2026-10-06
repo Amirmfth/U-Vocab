@@ -201,3 +201,8 @@ Expected structural improvements:
 - repeated comparisons/expansions create no provider request on valid cache hits
 
 Do not claim a production percentage improvement until the Usage dashboard contains enough post-deploy samples for a meaningful before/after comparison.
+
+
+## Low-cost decision calls
+
+Recommendation reranking, lexical-edge reranking, and daily-session planning use the fast route with bounded candidate/state payloads and output budgets below 500 tokens. Learner-specific results use the per-course decision cache. Writing and final-conversation evaluation can use deterministic request-complexity routing; no additional router-model call is introduced. See `docs/ai-model-routing.md`.

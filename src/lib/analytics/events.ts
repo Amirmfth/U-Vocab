@@ -31,6 +31,16 @@ export type ProductEventMap = {
     alreadyOwned: boolean;
   };
   vocabulary_limit_reached: { limit: number; used: number };
+  recommendation_added: {
+    lexemeId: string;
+    aiReasonCode?: string | null;
+    shownPosition?: number | null;
+  };
+  recommendation_dismissed: {
+    lexemeId: string;
+    aiReasonCode?: string | null;
+    shownPosition?: number | null;
+  };
 
   review_session_started: { dueCount: number; mode: string };
   review_answered: { rating: string; durationMs?: number | null };
@@ -97,6 +107,8 @@ export const PRODUCT_EVENT_NAMES = new Set<ProductEventName>([
   "vocabulary_added",
   "vocabulary_duplicate_resolved",
   "vocabulary_limit_reached",
+  "recommendation_added",
+  "recommendation_dismissed",
   "review_session_started",
   "review_answered",
   "review_session_completed",

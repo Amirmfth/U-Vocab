@@ -7,7 +7,7 @@ import { formatNumber } from "@/i18n/format";
 type VocabularyRow = {
   id: string;
   label: string;
-  translations: { id: string; language: string; text: string }[];
+  meanings: { id: string; language: string; text: string; kind: "translation" | "definition" }[];
   cefrLevel: string | null;
   state: string;
   mastery: number;
@@ -55,17 +55,21 @@ export function VocabularyDisplay({
                   {row.label}
                 </div>
                 <div className="translation-line">
-                  {row.translations
-                    .filter((translation) => translation.language === "en" || translation.language === "fa")
-                    .filter((translation, index, translations) => translations.findIndex((candidate) => candidate.language === translation.language) === index)
-                    .map((translation) => (
+                  {row.meanings
+                    .filter((meaning, index, meanings) =>
+                      meanings.findIndex((candidate) =>
+                        candidate.language === meaning.language &&
+                        candidate.kind === meaning.kind
+                      ) === index,
+                    )
+                    .map((meaning) => (
                       <span
-                        key={translation.id}
-                        className={`learning-content vocabulary-translation vocabulary-translation-${translation.language}`}
-                        lang={translation.language === "fa" ? "fa" : "en"}
-                        dir={translation.language === "fa" ? "rtl" : "ltr"}
+                        key={meaning.id}
+                        className={`learning-content vocabulary-translation vocabulary-translation-${meaning.language}`}
+                        lang={meaning.language}
+                        dir={meaning.language === "fa" ? "rtl" : "ltr"}
                       >
-                        {translation.text}
+                        {meaning.text}
                       </span>
                     ))}
                 </div>

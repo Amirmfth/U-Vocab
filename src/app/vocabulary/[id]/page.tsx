@@ -184,7 +184,7 @@ function LexicalGrammarLinks({
               <strong className="learning-content" lang="en" dir="ltr">
                 {link.grammarConcept.title}
               </strong>
-              <small className="learning-content" dir="auto">
+              <small className="learning-content" lang={targetLanguageCode} dir="auto">
                 {link.lexicalPattern?.pattern ??
                   link.note ??
                   t(
@@ -355,7 +355,7 @@ async function DeferredWordDetails({
         locale={locale}
         targetLanguageCode={targetLanguageCode}
       />
-      <LexicalGrammarLinks links={word.grammarLinks} locale={locale} />
+      <LexicalGrammarLinks links={word.grammarLinks} locale={locale} targetLanguageCode={targetLanguageCode} />
 
       <WordMastery state={primaryState} locale={locale} />
 

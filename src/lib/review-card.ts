@@ -80,7 +80,7 @@ export function buildReviewCard(input: {
       answer: translated.text,
       details: [
         pattern ?? "",
-        lexeme.examples[0]?.german ?? "",
+        lexeme.examples[0]?.targetText ?? "",
       ].filter(Boolean),
       language: translated.language,
       detailsLanguage: "de",

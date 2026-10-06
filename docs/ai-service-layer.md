@@ -79,3 +79,8 @@ AI does **not** own:
 - deterministic battle scoring
 
 Those remain application/database logic.
+
+
+## Bounded personalization decisions
+
+Issue #120 adds a shared structured decision layer under `src/lib/ai/decisions/`. It follows the same central provider/routing/telemetry architecture. Deterministic services own truth and candidate generation; AI may only rank supplied recommendation/relationship IDs or allocate time among already-available session activities. Every decision feature has a deterministic fallback and independent rollout flag. See `docs/ai-personalization-decisions.md`.

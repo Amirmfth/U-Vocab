@@ -10,6 +10,7 @@ import { generateWritingTask } from "@/lib/ai/writing-task";
 import { evaluateWriting } from "@/lib/ai/writing-evaluator";
 import { writingEvaluationSchema } from "@/lib/ai/writing-evaluator";
 import { recordMistakesBatch } from "@/lib/mistakes-batch";
+import { EVALUATOR_HIGH_CONFIDENCE } from "@/lib/ai/evaluation-intelligence";
 import {
   updateVocabularyMasteryBatch,
   type VocabularyMasteryUpdate,
@@ -511,7 +512,12 @@ export async function evaluateWritingAction(
                 0,
                 Math.min(
                   1,
-                  userVocabulary.production + (usage.correct ? 0.08 : -0.02),
+                  userVocabulary.production +
+                    (usage.correct
+                      ? 0.08
+                      : usage.confidence >= EVALUATOR_HIGH_CONFIDENCE
+                        ? -0.02
+                        : 0),
                 ),
               ),
               contextualUsage: Math.max(
@@ -519,7 +525,11 @@ export async function evaluateWritingAction(
                 Math.min(
                   1,
                   userVocabulary.contextualUsage +
-                    (usage.correct ? 0.08 : -0.015),
+                    (usage.correct
+                      ? 0.08
+                      : usage.confidence >= EVALUATOR_HIGH_CONFIDENCE
+                        ? -0.015
+                        : 0),
                 ),
               ),
             });
@@ -551,7 +561,8 @@ export async function evaluateWritingAction(
           .filter(
             (mistake) =>
               Boolean(mistake.lexemeId) &&
-              validIds.has(mistake.lexemeId as string),
+              validIds.has(mistake.lexemeId as string) &&
+              mistake.confidence >= EVALUATOR_HIGH_CONFIDENCE,
           )
           .map((mistake) => ({
             lexemeId: mistake.lexemeId as string,

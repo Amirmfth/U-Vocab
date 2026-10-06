@@ -5,6 +5,13 @@ import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
+import {
+  evaluatorMistakeSchema,
+  localErrorSignal,
+  masteryEvidenceSchema,
+} from "./evaluation-intelligence";
+import type { TargetLanguage } from "@prisma/client";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
@@ -13,30 +20,16 @@ export const productionEvaluationSchema = z.object({
   feedback: z.string().max(600),
   retryPrompt: z.string().max(300).nullable(),
   improvedSentence: z.string().max(600).nullable(),
-  mistakes: z.array(
-    z.object({
-      type: z.enum([
-        "ARTICLE",
-        "CASE",
-        "PREPOSITION",
-        "REFLEXIVE",
-        "COLLOCATION",
-        "WORD_CHOICE",
-        "WORD_FORM",
-        "SPELLING",
-        "OTHER",
-      ]),
-      expected: z.string().nullable(),
-      actual: z.string().nullable(),
-      explanation: z.string(),
-    }),
-  ).max(6),
+  mistakes: z.array(evaluatorMistakeSchema).max(6),
+  masteryEvidence: masteryEvidenceSchema,
 });
 
 export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
 
 export async function evaluateVocabularyProduction(input: {
   userId: string;
+  userCourseId?: string;
+  targetLanguage?: TargetLanguage;
   evaluationLocale?: EvaluationLocale;
   exerciseType: string;
   exercisePrompt: string;
@@ -47,13 +40,24 @@ export async function evaluateVocabularyProduction(input: {
   examples: string[];
   answer: string;
 }) {
+  const language = targetLanguageConfig(input.targetLanguage ?? "GERMAN");
   const route = aiRoute("answer_evaluation");
+  const localSignal = localErrorSignal(input.expected, input.answer);
   const perf = startOperation("ai.answer_evaluation", { model: route.model, answerChars: input.answer.length, exerciseType: input.exerciseType });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     operation: "answer_evaluation",
     model: route.model,
-    metadata: { answerChars: input.answer.length, exerciseType: input.exerciseType, patternCount: input.patterns.length, exampleCount: input.examples.length },
+    userCourseId: input.userCourseId,
+    metadata: {
+      answerChars: input.answer.length,
+      exerciseType: input.exerciseType,
+      patternCount: input.patterns.length,
+      exampleCount: input.examples.length,
+      routeReason: route.reason,
+      localErrorSignal: localSignal.kind,
+      targetLanguage: language.code,
+    },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -64,11 +68,17 @@ export async function evaluateVocabularyProduction(input: {
           role: "system",
           content:
             evaluationLanguageInstruction(input.evaluationLocale ?? "en") +
-            " You are U-Vocab's German vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, article, case, preposition, reflexive structure, collocation, word choice, word form, spelling, register, and naturalness. Accept valid alternatives. Feedback must identify the exact phrase that succeeded or failed, explain why, and provide a corrected German form when useful. If the answer is wrong or incomplete, provide a short retryPrompt that asks the learner to try again without simply giving away the full answer.",
+            ` You are U-Vocab's ${language.promptName} vocabulary evaluator. Evaluate the learner's answer against the exercise goal and target lexical unit. Focus on lexical correctness, morphology, grammar tied to the lexical unit, collocation, word choice, word form, spelling, register, and naturalness. Accept valid alternatives. For every mistake classify a bounded cause, confidence, and intervention. Use localErrorSignal as strong evidence for TYPO/ORTHOGRAPHY_GAP when it says NEAR_TYPO; do not punish a near spelling slip like a semantic knowledge gap. ATTENTION_SLIP is allowed only when the response is near-correct and inconsistent with the supplied evidence, not as a psychological inference. masteryEvidence is evidence only: do not assign learner state or scheduling. Feedback must identify the exact phrase that succeeded or failed, explain why, and provide a corrected ${language.promptName} form when useful. If the answer is wrong or incomplete, provide a short retryPrompt without giving away the full answer.`,
         },
         {
           role: "user",
-          content: JSON.stringify({ ...input, userId: undefined }),
+          content: JSON.stringify({
+            ...input,
+            userId: undefined,
+            userCourseId: undefined,
+            targetLanguage: language.code,
+            localErrorSignal: localSignal,
+          }),
         },
       ],
       text: {

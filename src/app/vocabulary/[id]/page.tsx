@@ -37,6 +37,7 @@ import { VerbConjugation } from "./VerbConjugation";
 import { ExampleGenerationPanel } from "./ExampleGenerationPanel";
 import { TeachWordSheet } from "./TeachWordSheet";
 import { WordPageScrollReset } from "./WordPageScrollReset";
+import { rerankLexicalEdges } from "@/lib/ai/decisions/lexical-edge-reranker";
 
 type PrimaryWord = NonNullable<Awaited<ReturnType<typeof getCachedWordPrimary>>>;
 
@@ -289,6 +290,8 @@ async function DeferredWordDetails({
   primaryState,
   locale,
   targetLanguageCode,
+  currentLevel,
+  targetLevel,
 }: {
   userId: string;
   userCourseId: string;
@@ -298,6 +301,8 @@ async function DeferredWordDetails({
   primaryState: PrimaryWord["userStates"][number];
   locale: UiLocale;
   targetLanguageCode: string;
+  currentLevel: string;
+  targetLevel: string;
 }) {
   const word = await getCachedWordSecondary(
     userId,
@@ -309,6 +314,35 @@ async function DeferredWordDetails({
 
   const t = createTranslator(locale);
   const state = word.userStates[0];
+
+  const personalizedRelations = await rerankLexicalEdges({
+    userId,
+    userCourseId,
+    sourceLexemeId: word.id,
+    sourceMastery: {
+      recognition: primaryState.recognition,
+      meaningRecall: primaryState.meaningRecall,
+      production: primaryState.production,
+      contextualUsage: primaryState.contextualUsage,
+    },
+    currentLevel,
+    targetLevel,
+    mistakeTypes: word.mistakes
+      .filter((mistake) => !mistake.resolvedAt)
+      .map((mistake) => mistake.type),
+    surface: "word_detail",
+    candidates: word.outgoing.map((relation) => ({
+      relationId: relation.id,
+      relationType: relation.type,
+      targetLexemeId: relation.targetId,
+      targetLemma: relation.target.lemma,
+      targetCefrLevel: relation.target.cefrLevel,
+      targetKnownState: relation.target.userStates[0]?.state ?? "UNKNOWN",
+      recentEncounter: relation.target.encounters.length > 0,
+      recurringConfusion: false,
+    })),
+    relations: word.outgoing,
+  });
 
   return (
     <>
@@ -360,7 +394,7 @@ async function DeferredWordDetails({
 
       <WordMastery state={primaryState} locale={locale} />
 
-      {word.outgoing.length ? (
+      {personalizedRelations.relations.length ? (
         <section className="panel intelligence-panel">
           <div className="section-heading">
             <div>
@@ -370,7 +404,7 @@ async function DeferredWordDetails({
           </div>
 
           <div className="relation-list">
-            {word.outgoing.map((relation) => (
+            {personalizedRelations.relations.map((relation) => (
               <Link
                 href={"/vocabulary/" + relation.target.id}
                 className="relation-chip"
@@ -582,6 +616,8 @@ export default async function Word({
             primaryState={state}
             locale={locale}
             targetLanguageCode={targetLanguageCode}
+            currentLevel={course.currentLevel}
+            targetLevel={course.targetLevel}
           />
         </Suspense>
       </WordLanguageProvider>

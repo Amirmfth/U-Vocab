@@ -231,8 +231,24 @@ export function getCachedWordSecondary(
         include: {
           examples: true,
           outgoing: {
-            include: { target: true },
-            take: 10,
+            include: {
+              target: {
+                include: {
+                  userStates: {
+                    where: { userCourseId },
+                    select: { state: true },
+                    take: 1,
+                  },
+                  encounters: {
+                    where: { userCourseId },
+                    select: { createdAt: true },
+                    orderBy: { createdAt: "desc" },
+                    take: 1,
+                  },
+                },
+              },
+            },
+            take: 12,
           },
           grammarLinks: {
             where: { confidence: { gte: 0.65 } },

@@ -426,6 +426,7 @@ model UserCourse {
   mistakes              Mistake[]
   encounters            Encounter[]
   aiUsage               AiUsageEvent[]
+  aiDecisionCaches       AiDecisionCache[]
   topicPacks            TopicPack[]
   stories               Story[]
   readingDocuments      ReadingDocument[]
@@ -1132,6 +1133,24 @@ model Encounter {
 enum AIUsageStatus {
   SUCCESS
   ERROR
+}
+
+model AiDecisionCache {
+  id            String     @id @default(cuid())
+  userCourseId  String
+  operation     String
+  cacheKey      String     @unique
+  promptVersion String
+  model         String
+  sourceHash    String
+  payload       Json
+  expiresAt     DateTime
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  course        UserCourse @relation(fields: [userCourseId], references: [id], onDelete: Cascade)
+
+  @@index([userCourseId, operation, updatedAt])
+  @@index([expiresAt])
 }
 
 model AiUsageEvent {

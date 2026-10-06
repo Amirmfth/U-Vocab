@@ -4,6 +4,8 @@ import {
   ensureLexemeEmbedding,
   rebuildLexemeEmbeddings,
 } from "@/lib/semantic/embeddings";
+import { rerankVocabularyRecommendations } from "@/lib/ai/decisions/recommendation-reranker";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export type RecommendationReason = {
   label: string;
@@ -15,11 +17,20 @@ export type VocabularyRecommendation = {
   lemma: string;
   article: string | null;
   partOfSpeech: string;
+  cefrLevel: string | null;
   english: string | null;
   persian: string | null;
   score: number;
   similarity: number;
   reasons: RecommendationReason[];
+  signals: {
+    graphNeighbor: boolean;
+    recentEncounter: boolean;
+    levelMatch: boolean;
+    weakAnchor: boolean;
+  };
+  aiRelevanceScore?: number;
+  aiReasonCode?: string;
 };
 
 export function scoreRecommendation(input: {
@@ -77,9 +88,10 @@ export async function getVocabularyRecommendations(
 ): Promise<VocabularyRecommendation[]> {
   const course = await db.userCourse.findFirst({
     where: { id: userCourseId, userId },
-    select: { targetLevel: true },
+    select: { currentLevel: true, targetLevel: true, targetLanguage: true },
   });
   if (!course) return [];
+  const targetLanguageCode = targetLanguageConfig(course.targetLanguage).code;
 
   const [known, dismissed, recentUnknownEncounters] = await Promise.all([
     db.userVocabulary.findMany({
@@ -91,7 +103,7 @@ export async function getVocabularyRecommendations(
             incoming: { select: { sourceId: true } },
             mistakes: {
               where: { userId, resolvedAt: null },
-              select: { occurrences: true },
+              select: { occurrences: true, type: true },
             },
           },
         },
@@ -143,6 +155,7 @@ export async function getVocabularyRecommendations(
 
   const levelCandidates = await db.lexeme.findMany({
       where: {
+        language: targetLanguageCode,
         userStates: { none: { userCourseId } },
         cefrLevel: course.targetLevel,
       },
@@ -168,6 +181,7 @@ export async function getVocabularyRecommendations(
       FROM "Lexeme" candidate
       JOIN "Lexeme" anchor ON anchor."id" = ${anchorId}
       WHERE candidate."embedding" IS NOT NULL
+        AND candidate."language" = ${targetLanguageCode}
         AND candidate."id" <> anchor."id"
         AND NOT EXISTS (
           SELECT 1
@@ -202,6 +216,7 @@ export async function getVocabularyRecommendations(
   const candidates = await db.lexeme.findMany({
     where: {
       id: { in: [...signalIds] },
+      language: targetLanguageCode,
       userStates: { none: { userCourseId } },
       recommendationFeedback: {
         none: { userCourseId, action: "DISMISSED" },
@@ -212,7 +227,7 @@ export async function getVocabularyRecommendations(
     },
   });
 
-  return candidates
+  const deterministic = candidates
     .map((candidate) => {
       const similarity = semanticSimilarities.get(candidate.id) ?? 0;
       const graphNeighbor = graphIds.has(candidate.id);
@@ -242,14 +257,54 @@ export async function getVocabularyRecommendations(
         lemma: candidate.lemma,
         article: candidate.article,
         partOfSpeech: candidate.partOfSpeech,
+        cefrLevel: candidate.cefrLevel,
         english,
         persian,
         score: ranked.score,
         similarity,
         reasons: ranked.reasons,
+        signals: {
+          graphNeighbor,
+          recentEncounter,
+          levelMatch,
+          weakAnchor: semanticWeakLink,
+        },
       };
     })
     .filter((candidate) => candidate.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
+    .sort((a, b) => b.score - a.score);
+
+  const weakDimensions = [
+    known.some((item) => item.production < 0.5) ? "production" : null,
+    known.some((item) => item.contextualUsage < 0.5) ? "contextualUsage" : null,
+    known.some((item) => item.meaningRecall < 0.5) ? "meaningRecall" : null,
+    known.some((item) => item.recognition < 0.5) ? "recognition" : null,
+  ].filter((value): value is string => Boolean(value));
+
+  const mistakeCounts = new Map<string, number>();
+  for (const item of known) {
+    for (const mistake of item.lexeme.mistakes) {
+      mistakeCounts.set(
+        mistake.type,
+        (mistakeCounts.get(mistake.type) ?? 0) + mistake.occurrences,
+      );
+    }
+  }
+  const recurringMistakeTypes = [...mistakeCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([type]) => type);
+
+  const reranked = await rerankVocabularyRecommendations({
+    userId,
+    userCourseId,
+    currentLevel: course.currentLevel,
+    targetLevel: course.targetLevel,
+    weakDimensions,
+    recurringMistakeTypes,
+    recentTopics: [],
+    candidates: deterministic.slice(0, Math.max(limit, 20)),
+  });
+
+  return reranked.recommendations.slice(0, limit);
 }

@@ -1,4 +1,4 @@
-// Standard text-token prices verified against the official OpenAI model/pricing pages on 2026-09-25.
+// Standard text-token prices verified against the official OpenAI model/pricing pages on 2026-10-06.
 // Costs are stored on each usage event so later price changes do not alter history.
 export type ModelPricing = {
   key: string;
@@ -11,7 +11,7 @@ export type ModelPricing = {
   durationPerMinute?: number;
 };
 
-const OPENAI_STANDARD_2026_09_25: ModelPricing[] = [
+const OPENAI_STANDARD_2026_10_06: ModelPricing[] = [
   {
     key: "openai-transcription-2026-10-05:gpt-transcribe",
     provider: "openai",
@@ -21,6 +21,15 @@ const OPENAI_STANDARD_2026_09_25: ModelPricing[] = [
     cachedInputPerMillion: 0,
     outputPerMillion: 0,
     durationPerMinute: 0.0045,
+  },
+  {
+    key: "openai-standard-2026-10-06:gpt-6.1-sol",
+    provider: "openai",
+    model: "gpt-6.1-sol",
+    currency: "USD",
+    inputPerMillion: 1,
+    cachedInputPerMillion: 0.05,
+    outputPerMillion: 5,
   },
   {
     key: "openai-standard-2026-09-25:gpt-5-mini",
@@ -70,7 +79,7 @@ const OPENAI_STANDARD_2026_09_25: ModelPricing[] = [
 ];
 
 export function pricingFor(provider: string, model: string) {
-  return OPENAI_STANDARD_2026_09_25.find(
+  return OPENAI_STANDARD_2026_10_06.find(
     (pricing) => pricing.provider === provider && pricing.model === model,
   ) ?? null;
 }

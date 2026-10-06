@@ -1,7 +1,10 @@
 import OpenAI from "openai";
 
 export const AI_PROVIDER = process.env.AI_PROVIDER ?? "openai";
-export const AI_MODEL = process.env.OPENAI_MODEL ?? "gpt-5-mini";
+export const AI_MODEL =
+  process.env.OPENAI_MODEL ??
+  process.env.OPENAI_COMPLEX_MODEL ??
+  "gpt-6.1-sol";
 export const AI_MAX_RETRIES = Math.max(
   0,
   Number(process.env.OPENAI_MAX_RETRIES ?? "2") || 2,

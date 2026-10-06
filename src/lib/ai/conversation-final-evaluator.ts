@@ -1,12 +1,16 @@
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { getOpenAI } from "./client";
-import { aiRoute } from "./routing";
+import { aiRoute, conversationFinalComplexity } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 import type { TargetLanguage } from "@prisma/client";
 import { targetLanguageConfig } from "@/lib/languages";
+import {
+  evaluatorMistakeSchema,
+  masteryEvidenceSchema,
+} from "./evaluation-intelligence";
 
 export const conversationFinalEvaluationSchema = z.object({
   taskSuccess: z.boolean(),
@@ -17,6 +21,8 @@ export const conversationFinalEvaluationSchema = z.object({
   summary: z.string(),
   strengths: z.array(z.string()).max(6),
   improvements: z.array(z.string()).max(6),
+  mistakes: z.array(evaluatorMistakeSchema).max(10),
+  masteryEvidence: masteryEvidenceSchema,
   targetResults: z.array(
     z.object({
       lexemeId: z.string(),
@@ -51,14 +57,20 @@ export async function evaluateConversationSession(input: {
   messages: Array<{ role: "user" | "assistant"; content: string }>;
 }) {
   const language = targetLanguageConfig(input.targetLanguage);
-  const route = aiRoute("conversation_final_evaluation");
+  const route = aiRoute("conversation_final_evaluation", {
+    complexity: conversationFinalComplexity({
+      messageCount: input.messages.length,
+      level: input.level,
+      targetCount: input.targets.length,
+    }),
+  });
   const perf = startOperation("ai.conversation_final_evaluation", { model: route.model, messageCount: input.messages.length, targetCount: input.targets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     userCourseId: input.userCourseId,
     operation: "conversation_final_evaluation",
     model: route.model,
-    metadata: { level: input.level, messageCount: input.messages.length, targetCount: input.targets.length, kind: input.kind, targetLanguage: language.code },
+    metadata: { level: input.level, messageCount: input.messages.length, targetCount: input.targets.length, kind: input.kind, targetLanguage: language.code, routeReason: route.reason },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -68,7 +80,7 @@ export async function evaluateConversationSession(input: {
         {
           role: "system",
           content:
-            evaluationLanguageInstruction(input.evaluationLocale) + ` Evaluate the completed ${language.promptName} conversation. For a mission, taskSuccess means the conversational objective was actually achieved, not merely mentioned. Assess ${language.promptName} grammar, naturalness, vocabulary, and each target lexical unit. Feedback must be specific and evidence-based: reference concrete learner utterances, identify the exact grammar/word-choice/collocation/register issue, explain why it matters, and provide a corrected ${language.promptName} phrase where useful. Strengths must also cite concrete successful language use. Prioritize patterns and high-impact issues rather than generic advice. Be constructive and concise. Do not treat the score as an official CEFR assessment.`,
+            evaluationLanguageInstruction(input.evaluationLocale) + ` Evaluate the completed ${language.promptName} conversation. For a mission, taskSuccess means the conversational objective was actually achieved, not merely mentioned. Assess ${language.promptName} grammar, naturalness, vocabulary, and each target lexical unit. Feedback must be specific and evidence-based: reference concrete learner utterances, identify the exact grammar/word-choice/collocation/register issue, explain why it matters, and provide a corrected ${language.promptName} phrase where useful. Strengths must also cite concrete successful language use. Prioritize patterns and high-impact issues rather than generic advice. Return a bounded mistake list with cause, confidence, and intervention classifications, and bounded masteryEvidence that application code may treat as evidence only. Distinguish orthographic slips from lexical/semantic knowledge gaps. Be constructive and concise. Do not treat the score as an official CEFR assessment.`,
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined, targetLanguage: language.code }) },
       ],

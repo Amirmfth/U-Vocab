@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { generateGrammarQuickTeach } from "@/lib/ai/grammar-quick-teach";
 import { recordProductEvent } from "@/lib/product-events";
 import { reportUnexpectedError } from "@/lib/observability/errors";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export async function startGrammarConceptAction(formData: FormData) {
   const grammarConceptId = String(formData.get("grammarConceptId") ?? "");
@@ -15,8 +16,9 @@ export async function startGrammarConceptAction(formData: FormData) {
   if (!grammarConceptId || !slug) return;
 
   const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+  const language = targetLanguageConfig(course.targetLanguage);
   const concept = await db.grammarConcept.findFirst({
-    where: { id: grammarConceptId, slug, active: true },
+    where: { id: grammarConceptId, slug, active: true, language: language.code },
     select: { id: true, introducedAt: true },
   });
   if (!concept) return;
@@ -77,19 +79,20 @@ export async function generateGrammarQuickTeachAction(
 ) {
   try {
     const [user, course] = await Promise.all([getCurrentUser(), getCurrentCourse()]);
+    const target = targetLanguageConfig(course.targetLanguage);
     const concept = await db.grammarConcept.findFirst({
-      where: { id: grammarConceptId, active: true, language: "de" },
+      where: { id: grammarConceptId, active: true, language: target.code },
       include: {
         lessons: { select: { language: true, overview: true, intuition: true } },
         mistakes: {
-          where: { userId: user.id, resolvedAt: null },
+          where: { userId: user.id, userCourseId: course.id, resolvedAt: null },
           orderBy: { lastOccurredAt: "desc" },
           take: 5,
         },
         lexemeLinks: {
           where: {
             confidence: { gte: 0.65 },
-            lexeme: { userStates: { some: { userId: user.id } } },
+            lexeme: { userStates: { some: { userCourseId: course.id } } },
           },
           include: {
             lexeme: {
@@ -135,6 +138,8 @@ export async function generateGrammarQuickTeachAction(
       ?? concept.lessons.find((item) => item.language === "en");
     const lesson = await generateGrammarQuickTeach({
       userId: user.id,
+      userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       title: concept.title,
       level: course.currentLevel,
       targetLevel: course.targetLevel,

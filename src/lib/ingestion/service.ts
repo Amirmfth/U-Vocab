@@ -175,6 +175,7 @@ export async function commitIngestionCandidates(
           update: {},
           include: {
             translations: true,
+            definitions: true,
             patterns: { take: 1 },
             examples: { take: 1 },
           },
@@ -232,7 +233,7 @@ export async function commitIngestionCandidates(
         candidate.englishMeaning && language !== "en"
           ? { language: "en", text: candidate.englishMeaning }
           : null,
-        candidate.persianMeaning && language !== "fa"
+        candidate.persianMeaning
           ? { language: "fa", text: candidate.persianMeaning }
           : null,
       ].filter((item): item is { language: string; text: string } => Boolean(item))) {

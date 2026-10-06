@@ -33,3 +33,19 @@ ALTER TABLE "LexemeDefinition"
 -- Existing German/French translation rows are intentionally untouched.
 -- No translation is reclassified automatically because existing rows are
 -- cross-language learner data and must remain stable.
+
+
+-- Generalize legacy GrammarLesson example objects from {"german": "..."}
+-- to {"targetText": "..."} while preserving all other JSON fields.
+UPDATE "GrammarLesson"
+SET "examples" = COALESCE((
+  SELECT jsonb_agg(
+    CASE
+      WHEN item ? 'german'
+        THEN (item - 'german') || jsonb_build_object('targetText', item->'german')
+      ELSE item
+    END
+  )
+  FROM jsonb_array_elements("GrammarLesson"."examples"::jsonb) AS item
+), '[]'::jsonb)
+WHERE jsonb_typeof("examples"::jsonb) = 'array';

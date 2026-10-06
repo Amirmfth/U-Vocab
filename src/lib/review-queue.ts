@@ -39,6 +39,7 @@ export async function getReviewQueueData(input:{
         lexeme:{
           include:{
             translations:true,
+            definitions:true,
             patterns:true,
             examples:true,
             mistakes:{

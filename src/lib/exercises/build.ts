@@ -19,7 +19,7 @@ function cleanToken(value: string, locale = "en-US") {
   return value.toLocaleLowerCase(locale).replace(/[^\p{L}\p{M}'-]/gu, "");
 }
 
-export function buildCloze(sentence: string, lemma: string, locale = "en-US") {
+export function buildCloze(sentence: string, lemma: string, locale = "de-DE") {
   const tokens = sentence.split(/(\s+)/);
   const target = cleanToken(lemma, locale);
   const stem =

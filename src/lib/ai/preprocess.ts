@@ -45,7 +45,7 @@ export function normalizedTargetTokens(
   if (config.code === "de") {
     return normalized.match(/[a-zäöüß][a-zäöüß'-]{2,}/gu) ?? [];
   }
-  return normalized.match(/[a-z][a-z'-]{2,}/gu) ?? [];
+  return normalized.match(/[a-z][a-z'-]{1,}/gu) ?? [];
 }
 
 export const normalizedGermanTokens = (text: string) =>

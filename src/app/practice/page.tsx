@@ -170,7 +170,7 @@ async function PracticeSession({ params, userId, t }: {
     ),
     lemmas:distractorItems.map((item)=>formatLexemeLabel(item.lexeme)),
     patterns:distractorItems.flatMap((item)=>item.lexeme.patterns.map((pattern)=>pattern.pattern)),
-    examples:distractorItems.flatMap((item)=>item.lexeme.examples.map((example)=>example.german)),
+    examples:distractorItems.flatMap((item)=>item.lexeme.examples.map((example)=>example.targetText)),
   };
 
   const recent:ExerciseType[]=[];

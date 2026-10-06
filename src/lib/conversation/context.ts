@@ -102,6 +102,7 @@ export async function buildConversationContext(input: {
     },
     learner: {
       level: session.course.targetLevel,
+      targetLanguage: session.course.targetLanguage,
       translationPreference: session.course.explanationLanguage,
     },
     targets: session.targets.map((target) => ({

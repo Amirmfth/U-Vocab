@@ -208,11 +208,31 @@ export async function commitIngestionCandidates(
         update: {},
       });
 
+      if (candidate.targetDefinition?.trim()) {
+        await tx.lexemeDefinition.upsert({
+          where: {
+            senseId_language: {
+              senseId: sense.id,
+              language,
+            },
+          },
+          create: {
+            lexemeId: lexeme.id,
+            senseId: sense.id,
+            language,
+            text: candidate.targetDefinition.trim(),
+          },
+          update: {
+            text: candidate.targetDefinition.trim(),
+          },
+        });
+      }
+
       for (const translation of [
-        candidate.englishMeaning
+        candidate.englishMeaning && language !== "en"
           ? { language: "en", text: candidate.englishMeaning }
           : null,
-        candidate.persianMeaning
+        candidate.persianMeaning && language !== "fa"
           ? { language: "fa", text: candidate.persianMeaning }
           : null,
       ].filter((item): item is { language: string; text: string } => Boolean(item))) {

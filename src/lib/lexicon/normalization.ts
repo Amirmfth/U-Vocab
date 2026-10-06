@@ -39,13 +39,54 @@ const germanAdapter: LexiconLanguageAdapter = {
     return {
       surface,
       normalizedLookup,
-      lookupVariants: Array.from(new Set([normalizedLookup, ...(articleVariant ? [articleVariant] : [])])),
+      lookupVariants: Array.from(
+        new Set([normalizedLookup, ...(articleVariant ? [articleVariant] : [])]),
+      ),
       articleVariant,
     };
   },
   normalizeCanonical(lemma, partOfSpeech) {
     const normalized = normalizeFormatting(lemma, this.locale);
-    return partOfSpeech === "NOUN" ? normalized.replace(/^(der|die|das)\s+/u, "") : normalized;
+    return partOfSpeech === "NOUN"
+      ? normalized.replace(/^(der|die|das)\s+/u, "")
+      : normalized;
+  },
+};
+
+function frenchArticleVariant(normalized: string) {
+  const elision = normalized.match(/^l'(.+)$/u);
+  if (elision?.[1]) return elision[1].trim();
+
+  const article = normalized.match(
+    /^(?:le|la|les|un|une|des|du|de la|de l')\s*(.+)$/u,
+  );
+  return article?.[1]?.trim() || null;
+}
+
+const frenchAdapter: LexiconLanguageAdapter = {
+  languageCode: "fr",
+  locale: "fr-FR",
+  normalizeInput(input) {
+    const surface = input
+      .normalize("NFKC")
+      .replace(/[’‘`´]/gu, "'")
+      .replace(/\s+/gu, " ")
+      .trim();
+    const normalizedLookup = normalizeFormatting(surface, this.locale);
+    const articleVariant = frenchArticleVariant(normalizedLookup);
+    return {
+      surface,
+      normalizedLookup,
+      lookupVariants: Array.from(
+        new Set([normalizedLookup, ...(articleVariant ? [articleVariant] : [])]),
+      ),
+      articleVariant,
+    };
+  },
+  normalizeCanonical(lemma, partOfSpeech) {
+    const normalized = normalizeFormatting(lemma, this.locale);
+    if (partOfSpeech !== "NOUN") return normalized;
+    return frenchArticleVariant(normalized) ?? normalized;
   },
 };
 
@@ -57,7 +98,12 @@ function genericAdapter(language: TargetLanguage): LexiconLanguageAdapter {
     normalizeInput(input) {
       const surface = input.normalize("NFKC").replace(/\s+/gu, " ").trim();
       const normalizedLookup = normalizeFormatting(surface, config.locale);
-      return { surface, normalizedLookup, lookupVariants: [normalizedLookup], articleVariant: null };
+      return {
+        surface,
+        normalizedLookup,
+        lookupVariants: [normalizedLookup],
+        articleVariant: null,
+      };
     },
     normalizeCanonical(lemma) {
       return normalizeFormatting(lemma, config.locale);
@@ -66,5 +112,7 @@ function genericAdapter(language: TargetLanguage): LexiconLanguageAdapter {
 }
 
 export function lexiconAdapter(language: TargetLanguage): LexiconLanguageAdapter {
-  return language === "GERMAN" ? germanAdapter : genericAdapter(language);
+  if (language === "GERMAN") return germanAdapter;
+  if (language === "FRENCH") return frenchAdapter;
+  return genericAdapter(language);
 }

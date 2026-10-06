@@ -54,11 +54,11 @@ const germanAdapter: LexiconLanguageAdapter = {
 };
 
 function frenchArticleVariant(normalized: string) {
-  const elision = normalized.match(/^l'(.+)$/u);
+  const elision = normalized.match(/^(?:de l'|l')(.+)$/u);
   if (elision?.[1]) return elision[1].trim();
 
   const article = normalized.match(
-    /^(?:le|la|les|un|une|des|du|de la|de l')\s*(.+)$/u,
+    /^(?:de la|les|une|des|du|le|la|un)\s+(.+)$/u,
   );
   return article?.[1]?.trim() || null;
 }

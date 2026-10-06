@@ -65,7 +65,7 @@ function candidateFromLexicalAnalysis(
     persianMeaning: analysis.persianMeanings.join("؛ "),
     pattern: analysis.patterns[0]?.pattern ?? null,
     patternExplanation: analysis.patterns[0]?.explanation ?? null,
-    example: analysis.examples[0]?.german ?? null,
+    example: analysis.examples[0]?.targetText ?? null,
     resolutionSource: "ai_generation",
     provenance: {
       source: "AI_GENERATED",

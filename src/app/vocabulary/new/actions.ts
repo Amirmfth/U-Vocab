@@ -61,6 +61,7 @@ function candidateFromLexicalAnalysis(
     article: analysis.article,
     plural: analysis.plural,
     cefrLevel: analysis.cefrLevel,
+    targetDefinition: analysis.targetDefinition,
     englishMeaning: analysis.englishMeanings.join("; "),
     persianMeaning: analysis.persianMeanings.join("؛ "),
     pattern: analysis.patterns[0]?.pattern ?? null,

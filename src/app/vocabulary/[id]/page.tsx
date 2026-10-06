@@ -515,7 +515,10 @@ export default async function Word({
 
   return (
     <main className="page word-detail-page">
-      <WordLanguageProvider preference={course.explanationLanguage}>
+      <WordLanguageProvider
+        preference={course.explanationLanguage}
+        targetLanguageCode={targetLanguageCode}
+      >
         <WordPageScrollReset wordId={word.id} />
         <section className="page-header word-identity-hero">
           <div className="word-detail-topline">
@@ -547,7 +550,10 @@ export default async function Word({
 
           <div className="word-hero-meanings">
             <div className="word-hero-meaning-list">
-              <WordMeaning translations={word.translations} />
+              <WordMeaning
+                translations={word.translations}
+                definitions={word.definitions}
+              />
             </div>
           </div>
         </section>

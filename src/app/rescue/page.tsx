@@ -186,6 +186,7 @@ export default async function RescuePage({
         item.lexeme,
         course.explanationLanguage,
       ),
+      targetLanguage: targetLanguageCode,
       riskPercent: Math.round(item.risk.score * 100),
       reasons: item.risk.reasons.length
         ? item.risk.reasons.map((reason) =>

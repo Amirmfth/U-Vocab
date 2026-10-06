@@ -101,7 +101,7 @@ export default async function TeachWordPage({
 
           {visibleMeanings.map((translation) => (
             <p
-              key={translation.id}
+              key={translation.kind + ":" + translation.language + ":" + translation.text}
               className="lesson-meaning learning-content"
               lang={translation.language === "fa" ? "fa" : "en"}
               dir={translation.language === "fa" ? "rtl" : "ltr"}

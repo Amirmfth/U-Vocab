@@ -4,6 +4,8 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import type { TargetLanguage } from "@prisma/client";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export const readingAnalysisSchema = z.object({
   title: z.string().nullable(),
@@ -36,19 +38,21 @@ export type ReadingAnalysis = z.infer<typeof readingAnalysisSchema>;
 export async function analyzeReadingText(input: {
   userId: string;
   userCourseId: string;
+  targetLanguage: TargetLanguage;
   text: string;
   originalTextChars: number;
   candidates: Array<{ token: string; count: number }>;
   targetLevel: string;
 }) {
+  const language = targetLanguageConfig(input.targetLanguage);
   const route = aiRoute("reading_analysis");
-  const perf = startOperation("ai.reading_analysis", { model: route.model, inputChars: input.text.length, targetLevel: input.targetLevel });
+  const perf = startOperation("ai.reading_analysis", { model: route.model, inputChars: input.text.length, targetLevel: input.targetLevel, targetLanguage: language.code });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     userCourseId: input.userCourseId,
     operation: "reading_analysis",
     model: route.model,
-    metadata: { inputChars: input.text.length, originalTextChars: input.originalTextChars, candidateCount: input.candidates.length, targetLevel: input.targetLevel, lengthBucket: input.originalTextChars < 2000 ? "short" : input.originalTextChars < 8000 ? "medium" : "long" },
+    metadata: { inputChars: input.text.length, originalTextChars: input.originalTextChars, candidateCount: input.candidates.length, targetLevel: input.targetLevel, targetLanguage: language.code, lengthBucket: input.originalTextChars < 2000 ? "short" : input.originalTextChars < 8000 ? "medium" : "long" },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -58,7 +62,7 @@ export async function analyzeReadingText(input: {
         {
           role: "system",
           content:
-            "Analyze this bounded German excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, verb-preposition patterns, separable/reflexive constructions, and meaningful lemmas; do not turn every token into an item. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, concise English/Persian meanings, at most one useful grammar pattern, and each lexical unit's usual CEFR level (A1 through C2).",
+            `Analyze this bounded ${language.promptName} excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, governed-preposition patterns, morphology, and meaningful lemmas that are natural for ${language.promptName}; do not turn every token into an item. Do not import German-specific case, separable-verb, or noun-article assumptions into another language. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, preserve meaningful accents and apostrophes, return concise English/Persian meanings, at most one useful grammar pattern, and each lexical unit's usual CEFR level (A1 through C2).`,
         },
         {
           role: "user",

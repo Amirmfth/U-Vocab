@@ -1,11 +1,27 @@
 import { connection } from "next/server";
 import Link from "next/link";
-import { ArrowRight, Clock3, Flame, ShieldCheck, TrendingUp } from "lucide-react";
+import {
+  ArrowRight,
+  Clock3,
+  Flame,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
 import { buildActivityDays, localDateKey } from "@/lib/progress";
+import {
+  compareMetric,
+  learningReport,
+  previousPeriod,
+  rangeCutoff,
+  resolveProgressRange,
+  type ProgressRange,
+} from "@/lib/progress-analytics";
 import { currentRetrievability } from "@/lib/fsrs";
+import { getEntitlements } from "@/lib/entitlements/service";
 import { getServerTranslator } from "@/i18n/server";
 import {
   formatDate,
@@ -13,21 +29,14 @@ import {
   formatPercent,
 } from "@/i18n/format";
 import type { MessageKey } from "@/i18n/core";
+import { LockedFeature } from "@/components/entitlement-primitives";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { TimezoneSync } from "./TimezoneSync";
 import { GrammarProgressPanel } from "./GrammarProgressPanel";
 import { PersistedFirstUseGuide } from "@/components/PersistedFirstUseGuide";
 import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
-const RANGE_DAYS: Record<string, number | null> = {
-  "7": 7,
-  "30": 30,
-  "90": 90,
-  "365": 365,
-  all: null,
-};
-
-const rangeLabelKeys: Record<string, MessageKey> = {
+const rangeLabelKeys: Record<ProgressRange, MessageKey> = {
   "7": "progress.range.7",
   "30": "progress.range.30",
   "90": "progress.range.90",
@@ -58,13 +67,13 @@ const weaknessKeys: Record<string, MessageKey> = {
   PRODUCTION: "progress.productionWeakness",
 };
 
-function rangeCutoff(range: string) {
-  const days = RANGE_DAYS[range] ?? 30;
-  if (days === null) return null;
-  const date = new Date();
-  date.setDate(date.getDate() - days);
-  return date;
-}
+const productionExerciseTypes = [
+  "FREE_SENTENCE",
+  "PARAPHRASE",
+  "COLLOCATION",
+  "CASE_PREPOSITION",
+  "CONTEXTUAL_CHOICE",
+] as const;
 
 function minutes(ms: number) {
   return Math.round(ms / 60000);
@@ -80,6 +89,12 @@ function lastMonthKeys(todayKey: string) {
   return result;
 }
 
+function signedNumber(locale: "en" | "fa", value: number) {
+  const formatted = formatNumber(locale, Math.abs(value));
+  if (value === 0) return formatted;
+  return (value > 0 ? "+" : "−") + formatted;
+}
+
 export default async function ProgressPage({
   searchParams,
 }: {
@@ -91,35 +106,70 @@ export default async function ProgressPage({
     getCurrentCourse(),
     searchParams,
   ]);
-  const { locale, t } = await getServerTranslator(user);
-  const range = query.range && query.range in RANGE_DAYS ? query.range : "30";
-  const cutoff = rangeCutoff(range);
-  const activityCutoff = new Date();
-  activityCutoff.setDate(activityCutoff.getDate() - 366);
+  const [{ locale, t }, entitlements] = await Promise.all([
+    getServerTranslator(user),
+    getEntitlements(user.id),
+  ]);
 
-  const metricAttemptWhere = cutoff
-    ? { userCourseId: course.id, createdAt: { gte: cutoff } }
-    : { userCourseId: course.id };
-  const metricReviewWhere = cutoff
+  const canUseAdvancedAnalytics =
+    entitlements.config.features.advanced_analytics &&
+    entitlements.config.features.long_history;
+  const range = resolveProgressRange(query.range, canUseAdvancedAnalytics);
+  const now = new Date();
+  const cutoff = rangeCutoff(range, now);
+  const priorPeriod = canUseAdvancedAnalytics ? previousPeriod(range, now) : null;
+
+  const activityDaysToLoad = canUseAdvancedAnalytics ? 366 : 7;
+  const activityCutoff = new Date(
+    now.getTime() - activityDaysToLoad * 24 * 60 * 60 * 1000,
+  );
+
+  const metricAttemptWhere = {
+    userCourseId: course.id,
+    ...(cutoff ? { createdAt: { gte: cutoff } } : {}),
+  };
+  const metricReviewWhere = {
+    userVocabulary: { userCourseId: course.id },
+    ...(cutoff ? { reviewedAt: { gte: cutoff } } : {}),
+  };
+  const metricEncounterWhere = {
+    userCourseId: course.id,
+    ...(cutoff ? { createdAt: { gte: cutoff } } : {}),
+  };
+
+  const priorAttemptWhere = priorPeriod
+    ? {
+        userCourseId: course.id,
+        createdAt: { gte: priorPeriod.start, lt: priorPeriod.end },
+      }
+    : null;
+  const priorReviewWhere = priorPeriod
     ? {
         userVocabulary: { userCourseId: course.id },
-        reviewedAt: { gte: cutoff },
+        reviewedAt: { gte: priorPeriod.start, lt: priorPeriod.end },
       }
-    : { userVocabulary: { userCourseId: course.id } };
-  const metricEncounterWhere = cutoff
-    ? { userCourseId: course.id, createdAt: { gte: cutoff } }
-    : { userCourseId: course.id };
+    : null;
 
   const [
     vocabulary,
-    metricAttempts,
-    metricReviews,
-    metricEncounters,
+    attemptAggregate,
+    correctAttemptCount,
+    productionAttemptCount,
+    correctProductionAttemptCount,
+    reviewCount,
+    successfulReviewCount,
+    encounterCount,
     heatAttempts,
     heatReviews,
     heatEncounters,
     activityMistakes,
     openMistakes,
+    priorAttemptAggregate,
+    priorCorrectAttemptCount,
+    priorProductionAttemptCount,
+    priorCorrectProductionAttemptCount,
+    priorReviewCount,
+    priorSuccessfulReviewCount,
   ] = await Promise.all([
     db.userVocabulary.findMany({
       where: { userCourseId: course.id },
@@ -131,30 +181,38 @@ export default async function ProgressPage({
         production: true,
         contextualUsage: true,
         stability: true,
-        retrievability: true,
         fsrsCard: true,
         nextReviewAt: true,
         addedAt: true,
         masteredAt: true,
       },
     }),
-    db.attempt.findMany({
+    db.attempt.aggregate({
       where: metricAttemptWhere,
-      select: {
-        createdAt: true,
-        exerciseType: true,
-        durationMs: true,
+      _sum: { durationMs: true },
+      _count: { _all: true },
+    }),
+    db.attempt.count({
+      where: { ...metricAttemptWhere, correct: true },
+    }),
+    db.attempt.count({
+      where: {
+        ...metricAttemptWhere,
+        exerciseType: { in: [...productionExerciseTypes] },
+      },
+    }),
+    db.attempt.count({
+      where: {
+        ...metricAttemptWhere,
+        exerciseType: { in: [...productionExerciseTypes] },
         correct: true,
       },
     }),
-    db.review.findMany({
-      where: metricReviewWhere,
-      select: { reviewedAt: true, rating: true },
+    db.review.count({ where: metricReviewWhere }),
+    db.review.count({
+      where: { ...metricReviewWhere, rating: { not: "AGAIN" } },
     }),
-    db.encounter.findMany({
-      where: metricEncounterWhere,
-      select: { createdAt: true, source: true },
-    }),
+    db.encounter.count({ where: metricEncounterWhere }),
     db.attempt.findMany({
       where: { userCourseId: course.id, createdAt: { gte: activityCutoff } },
       select: { createdAt: true, exerciseType: true, durationMs: true },
@@ -181,6 +239,41 @@ export default async function ProgressPage({
       where: { userCourseId: course.id, resolvedAt: null },
       select: { type: true, occurrences: true },
     }),
+    priorAttemptWhere
+      ? db.attempt.aggregate({
+          where: priorAttemptWhere,
+          _sum: { durationMs: true },
+          _count: { _all: true },
+        })
+      : Promise.resolve(null),
+    priorAttemptWhere
+      ? db.attempt.count({ where: { ...priorAttemptWhere, correct: true } })
+      : Promise.resolve(null),
+    priorAttemptWhere
+      ? db.attempt.count({
+          where: {
+            ...priorAttemptWhere,
+            exerciseType: { in: [...productionExerciseTypes] },
+          },
+        })
+      : Promise.resolve(null),
+    priorAttemptWhere
+      ? db.attempt.count({
+          where: {
+            ...priorAttemptWhere,
+            exerciseType: { in: [...productionExerciseTypes] },
+            correct: true,
+          },
+        })
+      : Promise.resolve(null),
+    priorReviewWhere
+      ? db.review.count({ where: priorReviewWhere })
+      : Promise.resolve(null),
+    priorReviewWhere
+      ? db.review.count({
+          where: { ...priorReviewWhere, rating: { not: "AGAIN" } },
+        })
+      : Promise.resolve(null),
   ]);
 
   const active = vocabulary.filter(
@@ -219,8 +312,8 @@ export default async function ProgressPage({
   const totalMastered = vocabulary.filter(
     (item) => item.state === "MASTERED" || item.state === "MAINTENANCE",
   ).length;
+  const learningCount = Math.max(0, vocabulary.length - totalMastered);
 
-  const now = new Date();
   const nextWeek = new Date(now);
   nextWeek.setDate(nextWeek.getDate() + 7);
   const dueNow = vocabulary.filter(
@@ -233,17 +326,15 @@ export default async function ProgressPage({
       item.nextReviewAt <= nextWeek,
   ).length;
 
-  const totalDurationMs = metricAttempts.reduce(
-    (sum, attempt) => sum + (attempt.durationMs ?? 0),
-    0,
-  );
-  const reviewSuccess = metricReviews.length
-    ? metricReviews.filter((review) => review.rating !== "AGAIN").length /
-      metricReviews.length
+  const totalDurationMs = attemptAggregate._sum.durationMs ?? 0;
+  const reviewSuccess = reviewCount
+    ? successfulReviewCount / reviewCount
     : 0;
-  const practiceAccuracy = metricAttempts.length
-    ? metricAttempts.filter((attempt) => attempt.correct).length /
-      metricAttempts.length
+  const practiceAccuracy = attemptAggregate._count._all
+    ? correctAttemptCount / attemptAggregate._count._all
+    : 0;
+  const productionSuccess = productionAttemptCount
+    ? correctProductionAttemptCount / productionAttemptCount
     : 0;
 
   const weaknessMap = new Map<string, number>();
@@ -293,6 +384,63 @@ export default async function ProgressPage({
     ...monthlyTrend.map((item) => Math.max(item.learned, item.mastered)),
   );
 
+  const priorLearned = priorPeriod
+    ? vocabulary.filter(
+        (item) =>
+          item.addedAt >= priorPeriod.start && item.addedAt < priorPeriod.end,
+      ).length
+    : 0;
+  const priorMastered = priorPeriod
+    ? vocabulary.filter(
+        (item) =>
+          item.masteredAt &&
+          item.masteredAt >= priorPeriod.start &&
+          item.masteredAt < priorPeriod.end,
+      ).length
+    : 0;
+  const priorDurationMs = priorAttemptAggregate?._sum.durationMs ?? 0;
+  const priorReviewSuccess =
+    priorReviewCount && priorSuccessfulReviewCount !== null
+      ? priorSuccessfulReviewCount / priorReviewCount
+      : 0;
+  const priorProductionSuccess =
+    priorProductionAttemptCount && priorCorrectProductionAttemptCount !== null
+      ? priorCorrectProductionAttemptCount / priorProductionAttemptCount
+      : 0;
+
+  const comparisons = priorPeriod
+    ? {
+        learned: compareMetric(learnedInRange, priorLearned),
+        mastered: compareMetric(masteredInRange, priorMastered),
+        practiceMinutes: compareMetric(minutes(totalDurationMs), minutes(priorDurationMs)),
+        reviewSuccess: compareMetric(reviewSuccess, priorReviewSuccess),
+        productionSuccess: compareMetric(productionSuccess, priorProductionSuccess),
+      }
+    : null;
+
+  const report = learningReport({
+    recognition: averageRecognition,
+    production: averageProduction,
+    retention: averageRetention,
+    dueNow,
+    topWeakness: weakAreas[0]?.[0] ?? null,
+    masteredDelta: comparisons?.mastered.delta ?? null,
+  });
+
+  const reportLabel = (value: string) => {
+    if (value === "recognition") return t("progress.recognition");
+    if (value === "production") return t("progress.production");
+    if (value === "retention") return t("progress.retention");
+    if (value === "reviews") return t("progress.reviewQueue");
+    if (value === "practice") return t("progress.activePractice");
+    if (value === "mastery") return t("progress.mastered");
+    if (value === "steady") return t("progress.report.steady");
+    if (value === "none") return t("progress.report.noMajorWeakness");
+    return weaknessKeys[value]
+      ? t(weaknessKeys[value])
+      : value.replaceAll("_", " ").toLowerCase();
+  };
+
   return (
     <main className="page">
       <TimezoneSync savedTimezone={user.timezone} />
@@ -312,15 +460,29 @@ export default async function ProgressPage({
       </section>
 
       <nav className="range-tabs" aria-label={t("progress.range")}>
-        {["7", "30", "90", "365", "all"].map((value) => (
-          <Link
-            key={value}
-            href={"/progress?range=" + value}
-            className={"range-tab " + (range === value ? "is-active" : "")}
-          >
-            {t(rangeLabelKeys[value])}
-          </Link>
-        ))}
+        {(["7", "30", "90", "365", "all"] as ProgressRange[]).map((value) =>
+          canUseAdvancedAnalytics || value === "7" ? (
+            <Link
+              key={value}
+              href={"/progress?range=" + value}
+              className={"range-tab " + (range === value ? "is-active" : "")}
+              aria-current={range === value ? "page" : undefined}
+            >
+              {t(rangeLabelKeys[value])}
+            </Link>
+          ) : (
+            <span
+              key={value}
+              className="range-tab is-locked"
+              aria-label={t("progress.proRangeLocked", {
+                range: t(rangeLabelKeys[value]),
+              })}
+            >
+              {t(rangeLabelKeys[value])}
+              <small>{t("plan.pro")}</small>
+            </span>
+          ),
+        )}
       </nav>
 
       <section className="progress-summary">
@@ -334,12 +496,11 @@ export default async function ProgressPage({
           </small>
         </div>
         <div>
-          <span>{t("progress.activeEstimate")}</span>
-          <strong>{formatNumber(locale, active)}</strong>
+          <span>{t("progress.mastered")}</span>
+          <strong>{formatNumber(locale, totalMastered)}</strong>
           <small>
-            {t("progress.passiveDeveloping", {
-              passive: formatNumber(locale, passive),
-              developing: formatNumber(locale, developing),
+            {t("progress.learningCount", {
+              count: formatNumber(locale, learningCount),
             })}
           </small>
         </div>
@@ -349,13 +510,9 @@ export default async function ProgressPage({
           <small>{t("progress.retrievability")}</small>
         </div>
         <div>
-          <span>{t("progress.mastered")}</span>
-          <strong>{formatNumber(locale, totalMastered)}</strong>
-          <small>
-            {t("progress.masteredRange", {
-              count: formatNumber(locale, masteredInRange),
-            })}
-          </small>
+          <span>{t("progress.dueReviews")}</span>
+          <strong>{formatNumber(locale, dueNow)}</strong>
+          <small>{t("progress.dueNow")}</small>
         </div>
       </section>
 
@@ -365,6 +522,7 @@ export default async function ProgressPage({
         currentLevel={course.currentLevel}
         targetLevel={course.targetLevel}
         locale={locale}
+        compact={!canUseAdvancedAnalytics}
       />
 
       <section className="progress-grid">
@@ -384,9 +542,7 @@ export default async function ProgressPage({
               </span>
               <div className="metric-bar">
                 <span
-                  style={{
-                    width: Math.round(averageRecognition * 100) + "%",
-                  }}
+                  style={{ width: Math.round(averageRecognition * 100) + "%" }}
                 />
               </div>
             </div>
@@ -413,47 +569,55 @@ export default async function ProgressPage({
             </div>
             <Clock3 size={19} />
           </div>
-          <div className="workload-numbers">
+          <div className={"workload-numbers " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
             <div>
               <strong>{formatNumber(locale, dueNow)}</strong>
               <span>{t("progress.dueNow")}</span>
             </div>
-            <div>
-              <strong>{formatNumber(locale, dueWeek)}</strong>
-              <span>{t("progress.next7Days")}</span>
-            </div>
-            <div>
-              <strong>{formatNumber(locale, metricReviews.length)}</strong>
-              <span>{t("progress.reviewsRange")}</span>
-            </div>
+            {canUseAdvancedAnalytics ? (
+              <>
+                <div>
+                  <strong>{formatNumber(locale, dueWeek)}</strong>
+                  <span>{t("progress.next7Days")}</span>
+                </div>
+                <div>
+                  <strong>{formatNumber(locale, reviewCount)}</strong>
+                  <span>{t("progress.reviewsRange")}</span>
+                </div>
+              </>
+            ) : null}
           </div>
           <p className="analytics-caveat">
-            {t("progress.reviewSuccess", {
-              percent: formatPercent(locale, reviewSuccess),
-            })}
+            {canUseAdvancedAnalytics
+              ? t("progress.reviewSuccess", {
+                  percent: formatPercent(locale, reviewSuccess),
+                })
+              : t("progress.freeWorkloadCaveat")}
           </p>
         </article>
 
-        <article className="panel progress-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">{t("progress.time")}</p>
-              <h2>{t("progress.activePractice")}</h2>
+        {canUseAdvancedAnalytics ? (
+          <article className="panel progress-panel">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">{t("progress.time")}</p>
+                <h2>{t("progress.activePractice")}</h2>
+              </div>
+              <Flame size={19} />
             </div>
-            <Flame size={19} />
-          </div>
-          <p className="big-metric">
-            {t("progress.minutes", {
-              count: formatNumber(locale, minutes(totalDurationMs)),
-            })}
-          </p>
-          <p className="analytics-caveat">
-            {t("progress.practiceAccuracy", {
-              percent: formatPercent(locale, practiceAccuracy),
-              count: formatNumber(locale, metricEncounters.length),
-            })}
-          </p>
-        </article>
+            <p className="big-metric">
+              {t("progress.minutes", {
+                count: formatNumber(locale, minutes(totalDurationMs)),
+              })}
+            </p>
+            <p className="analytics-caveat">
+              {t("progress.practiceAccuracy", {
+                percent: formatPercent(locale, practiceAccuracy),
+                count: formatNumber(locale, encounterCount),
+              })}
+            </p>
+          </article>
+        ) : null}
 
         <article className="panel progress-panel">
           <div className="section-heading">
@@ -465,16 +629,18 @@ export default async function ProgressPage({
           </div>
           {weakAreas.length ? (
             <div className="weakness-list">
-              {weakAreas.slice(0, 6).map(([type, count]) => (
-                <div key={type}>
-                  <span>
-                    {weaknessKeys[type]
-                      ? t(weaknessKeys[type])
-                      : type.replaceAll("_", " ").toLowerCase()}
-                  </span>
-                  <strong>{formatNumber(locale, count)}</strong>
-                </div>
-              ))}
+              {weakAreas
+                .slice(0, canUseAdvancedAnalytics ? 6 : 3)
+                .map(([type, count]) => (
+                  <div key={type}>
+                    <span>
+                      {weaknessKeys[type]
+                        ? t(weaknessKeys[type])
+                        : type.replaceAll("_", " ").toLowerCase()}
+                    </span>
+                    <strong>{formatNumber(locale, count)}</strong>
+                  </div>
+                ))}
             </div>
           ) : (
             <p className="muted">{t("progress.noWeakness")}</p>
@@ -482,65 +648,142 @@ export default async function ProgressPage({
         </article>
       </section>
 
-      <section className="panel progress-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">{t("progress.growth")}</p>
-            <h2>{t("progress.trend")}</h2>
-          </div>
-        </div>
-        <div className="trend-chart" aria-label={t("progress.trendAria")}>
-          {monthlyTrend.map((item) => (
-            <div className="trend-month" key={item.month}>
-              <div className="trend-bars">
-                <span
-                  className="trend-bar learned"
-                  style={{
-                    height:
-                      Math.max(3, (item.learned / maxTrend) * 100) + "%",
-                  }}
-                  title={t("progress.learnedTitle", {
-                    count: formatNumber(locale, item.learned),
-                  })}
-                />
-                <span
-                  className="trend-bar mastered"
-                  style={{
-                    height:
-                      Math.max(3, (item.mastered / maxTrend) * 100) + "%",
-                  }}
-                  title={t("progress.masteredTitle", {
-                    count: formatNumber(locale, item.mastered),
-                  })}
-                />
+      {!canUseAdvancedAnalytics ? (
+        <LockedFeature
+          title={t("progress.pro.title")}
+          description={t("progress.pro.description")}
+          upgradeLabel={t("progress.pro.upgrade")}
+        />
+      ) : (
+        <>
+          {comparisons ? (
+            <section className="panel progress-panel">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">{t("progress.comparison.eyebrow")}</p>
+                  <h2>{t("progress.comparison.title")}</h2>
+                </div>
+                <TrendingUp size={19} />
               </div>
-              <small>
-                {formatDate(
-                  locale,
-                  new Date(item.month + "-01T12:00:00Z"),
-                  { month: "short" },
-                )}
-              </small>
+              <div className="weakness-list">
+                <div>
+                  <span>{t("progress.comparison.wordsAdded")}</span>
+                  <strong>{signedNumber(locale, comparisons.learned.delta)}</strong>
+                </div>
+                <div>
+                  <span>{t("progress.comparison.mastered")}</span>
+                  <strong>{signedNumber(locale, comparisons.mastered.delta)}</strong>
+                </div>
+                <div>
+                  <span>{t("progress.comparison.practiceTime")}</span>
+                  <strong>
+                    {signedNumber(locale, comparisons.practiceMinutes.delta)} {t("progress.comparison.minutesUnit")}
+                  </strong>
+                </div>
+                <div>
+                  <span>{t("progress.comparison.reviewSuccess")}</span>
+                  <strong>
+                    {formatPercent(locale, comparisons.reviewSuccess.current)} →{" "}
+                    {formatPercent(locale, comparisons.reviewSuccess.previous)}
+                  </strong>
+                </div>
+                <div>
+                  <span>{t("progress.comparison.productionSuccess")}</span>
+                  <strong>
+                    {formatPercent(locale, comparisons.productionSuccess.current)} →{" "}
+                    {formatPercent(locale, comparisons.productionSuccess.previous)}
+                  </strong>
+                </div>
+              </div>
+              <p className="analytics-caveat">{t("progress.comparison.caveat")}</p>
+            </section>
+          ) : null}
+
+          <section className="panel progress-panel">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">{t("progress.report.eyebrow")}</p>
+                <h2>{t("progress.report.title")}</h2>
+              </div>
+              <Sparkles size={19} />
             </div>
-          ))}
-        </div>
-        <div className="trend-legend">
-          <span>
-            <i className="trend-key learned" /> {t("progress.added")}
-          </span>
-          <span>
-            <i className="trend-key mastered" />{" "}
-            {t("progress.masteredLegend")}
-          </span>
-        </div>
-        <p className="analytics-caveat">{t("progress.trendCaveat")}</p>
-      </section>
+            <div className="weakness-list">
+              <div>
+                <span>{t("progress.report.strongest")}</span>
+                <strong>{reportLabel(report.strongest)}</strong>
+              </div>
+              <div>
+                <span>{t("progress.report.weakness")}</span>
+                <strong>{reportLabel(report.highestImpactWeakness)}</strong>
+              </div>
+              <div>
+                <span>{t("progress.report.improvement")}</span>
+                <strong>{reportLabel(report.recentImprovement)}</strong>
+              </div>
+              <div>
+                <span>{t("progress.report.next")}</span>
+                <strong>{reportLabel(report.suggestedNext)}</strong>
+              </div>
+            </div>
+            <p className="analytics-caveat">{t("progress.report.caveat")}</p>
+          </section>
+
+          <section className="panel progress-panel">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">{t("progress.growth")}</p>
+                <h2>{t("progress.trend")}</h2>
+              </div>
+            </div>
+            <div className="trend-chart" aria-label={t("progress.trendAria")}>
+              {monthlyTrend.map((item) => (
+                <div className="trend-month" key={item.month}>
+                  <div className="trend-bars">
+                    <span
+                      className="trend-bar learned"
+                      style={{ height: Math.max(3, (item.learned / maxTrend) * 100) + "%" }}
+                      title={t("progress.learnedTitle", {
+                        count: formatNumber(locale, item.learned),
+                      })}
+                    />
+                    <span
+                      className="trend-bar mastered"
+                      style={{ height: Math.max(3, (item.mastered / maxTrend) * 100) + "%" }}
+                      title={t("progress.masteredTitle", {
+                        count: formatNumber(locale, item.mastered),
+                      })}
+                    />
+                  </div>
+                  <small>
+                    {formatDate(locale, new Date(item.month + "-01T12:00:00Z"), {
+                      month: "short",
+                    })}
+                  </small>
+                </div>
+              ))}
+            </div>
+            <div className="trend-legend">
+              <span>
+                <i className="trend-key learned" /> {t("progress.added")}
+              </span>
+              <span>
+                <i className="trend-key mastered" /> {t("progress.masteredLegend")}
+              </span>
+            </div>
+            <p className="analytics-caveat">{t("progress.trendCaveat")}</p>
+          </section>
+        </>
+      )}
 
       <section className="panel heatmap-panel">
         <div className="section-heading">
           <div>
             <p className="eyebrow">{t("progress.activity")}</p>
-            <h2>{t("progress.days365")}</h2>
+            <h2>
+              {canUseAdvancedAnalytics
+                ? t("progress.days365")
+                : t("progress.days7")}
+            </h2>
           </div>
           <span className="muted">{user.timezone}</span>
         </div>
@@ -551,16 +794,15 @@ export default async function ProgressPage({
           selectedDay={selectedDay}
           range={range}
           locale={locale}
+          dayCount={canUseAdvancedAnalytics ? 365 : 7}
         />
 
         <div className="day-detail">
           <div>
             <strong>
-              {formatDate(
-                locale,
-                new Date(selectedDay + "T12:00:00Z"),
-                { dateStyle: "medium" },
-              )}
+              {formatDate(locale, new Date(selectedDay + "T12:00:00Z"), {
+                dateStyle: "medium",
+              })}
             </strong>
             <span>
               {selectedActivity
@@ -586,26 +828,17 @@ export default async function ProgressPage({
             </span>
             <span>
               {t("progress.readingEncounters", {
-                count: formatNumber(
-                  locale,
-                  selectedActivity?.readingEncounters ?? 0,
-                ),
+                count: formatNumber(locale, selectedActivity?.readingEncounters ?? 0),
               })}
             </span>
             <span>
               {t("progress.mistakesCorrected", {
-                count: formatNumber(
-                  locale,
-                  selectedActivity?.mistakesCorrected ?? 0,
-                ),
+                count: formatNumber(locale, selectedActivity?.mistakesCorrected ?? 0),
               })}
             </span>
             <span>
               {t("progress.minutes", {
-                count: formatNumber(
-                  locale,
-                  minutes(selectedActivity?.durationMs ?? 0),
-                ),
+                count: formatNumber(locale, minutes(selectedActivity?.durationMs ?? 0)),
               })}
             </span>
           </div>

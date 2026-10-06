@@ -31,19 +31,21 @@ export function ActivityHeatmap({
   selectedDay,
   range,
   locale,
+  dayCount = 365,
 }: {
   days: ActivityDay[];
   today: string;
   selectedDay?: string;
   range: string;
   locale: UiLocale;
+  dayCount?: number;
 }) {
   const t = createTranslator(locale);
   const lookup = new Map(days.map((day) => [day.date, day]));
   const keys: string[] = [];
   let key = today;
 
-  for (let index = 0; index < 365; index += 1) {
+  for (let index = 0; index < dayCount; index += 1) {
     keys.push(key);
     key = previousDateKey(key);
   }
@@ -51,7 +53,7 @@ export function ActivityHeatmap({
 
   return (
     <div className="heatmap-scroll">
-      <div className="activity-heatmap" aria-label={t("progress.heatmapAria")}>
+      <div className="activity-heatmap" aria-label={t(dayCount <= 7 ? "progress.heatmapAria7" : "progress.heatmapAria")}>
         {keys.map((date) => {
           const day = lookup.get(date);
           const count = day

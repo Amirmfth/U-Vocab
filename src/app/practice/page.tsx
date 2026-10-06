@@ -110,7 +110,7 @@ async function PracticeSession({ params, userId, t }: {
     return <main className="page focus-page">
       <div className="focus-meta">
         <Link href="/grammar">{t("nav.grammar")}</Link>
-        <span className={params.grammar==="1"?undefined:"learning-content"} lang={params.grammar==="1"?undefined:"de"} dir={params.grammar==="1"?undefined:"ltr"}>{params.grammar==="1"?t("practice.recommended"):grammarExercises[0].lemma}</span>
+        <span className={params.grammar==="1"?undefined:"learning-content"} lang={params.grammar==="1"?undefined:course.targetLanguage==="GERMAN"?"de":course.targetLanguage==="FRENCH"?"fr":"en"} dir={params.grammar==="1"?undefined:"ltr"}>{params.grammar==="1"?t("practice.recommended"):grammarExercises[0].lemma}</span>
       </div>
       <PracticeForm exercises={grammarExercises}/>
     </main>;
@@ -123,6 +123,7 @@ async function PracticeSession({ params, userId, t }: {
         include:{
           patterns:true,
           translations:true,
+          definitions:true,
           examples:true,
           mistakes:{
             where:{ userCourseId:course.id,resolvedAt:null },
@@ -143,7 +144,7 @@ async function PracticeSession({ params, userId, t }: {
       where:{ userCourseId:course.id },
       include:{
         lexeme:{
-          include:{ patterns:true,translations:true,examples:true },
+          include:{ patterns:true,translations:true,definitions:true,examples:true },
         },
       },
       orderBy:{ addedAt:"desc" },
@@ -163,11 +164,15 @@ async function PracticeSession({ params, userId, t }: {
 
   const optionLanguage=course.explanationLanguage==="PERSIAN"?"fa":"en";
   const optionPools={
-    meanings:distractorItems.flatMap((item)=>
-      item.lexeme.translations
-        .filter((translation)=>translation.language===optionLanguage)
-        .map((translation)=>translation.text),
-    ),
+    meanings:distractorItems.flatMap((item)=>{
+      const translated=item.lexeme.translations
+        .filter((translation)=>translation.language===optionLanguage && translation.language!==item.lexeme.language)
+        .map((translation)=>translation.text);
+      if(translated.length) return translated;
+      return item.lexeme.definitions
+        .filter((definition)=>definition.language===optionLanguage)
+        .map((definition)=>definition.text);
+    }),
     lemmas:distractorItems.map((item)=>formatLexemeLabel(item.lexeme)),
     patterns:distractorItems.flatMap((item)=>item.lexeme.patterns.map((pattern)=>pattern.pattern)),
     examples:distractorItems.flatMap((item)=>item.lexeme.examples.map((example)=>example.targetText)),
@@ -220,7 +225,7 @@ async function PracticeSession({ params, userId, t }: {
     </main>;
   }
 
-  if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"){
+  if(params.lexeme&&items[0].lexeme.partOfSpeech==="VERB"&&course.targetLanguage==="GERMAN"){
     const conjugation=await getVerbConjugationForUser({ userId,userCourseId:course.id,lexemeId:items[0].lexemeId });
     if(conjugation.status==="ok"){
       const form=conjugation.data.indicative.present.forms.find((row)=>row.person==="du");
@@ -251,7 +256,7 @@ async function PracticeSession({ params, userId, t }: {
   return <main className="page focus-page">
     <div className="focus-meta">
       <Link href="/practice">{t("nav.practice")}</Link>
-      <span className={params.lexeme?"learning-content":undefined} lang={params.lexeme?"de":undefined} dir={params.lexeme?"ltr":undefined}>{params.lexeme?items[0].lexeme.lemma:t("practice.vocabulary")}</span>
+      <span className={params.lexeme?"learning-content":undefined} lang={params.lexeme?(course.targetLanguage==="GERMAN"?"de":course.targetLanguage==="FRENCH"?"fr":"en"):undefined} dir={params.lexeme?"ltr":undefined}>{params.lexeme?items[0].lexeme.lemma:t("practice.vocabulary")}</span>
     </div>
     <PracticeForm exercises={exercises}/>
   </main>;

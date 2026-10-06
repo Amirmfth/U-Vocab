@@ -8,7 +8,7 @@ const lexeme={
   partOfSpeech:"VERB",
   translations:[{ language:"en",text:"to wait" }],
   patterns:[{ pattern:"auf + Akkusativ warten",explanation:null }],
-  examples:[{ german:"Ich warte auf den Bus." }],
+  examples:[{ targetText:"Ich warte auf den Bus." }],
 };
 
 test("grammar mistakes still produce a translation review card",()=>{

@@ -1,4 +1,5 @@
 import type { CefrLevel, PrismaClient, SessionActivity, SessionKind, TargetLanguage } from "@prisma/client";
+import { targetLanguageConfig } from "@/lib/languages";
 import {
   getGrammarRecommendation,
   grammarRecommendationActionHref,
@@ -42,6 +43,7 @@ export async function buildSessionPlan(
   },
 ) {
   const now = new Date();
+  const language = targetLanguageConfig(input.targetLanguage);
   const [due, weak, fresh, latestStory, latestReading] = await Promise.all([
     db.userVocabulary.findMany({
       where: {
@@ -160,7 +162,7 @@ export async function buildSessionPlan(
     items.push({
       activity: "CONTEXT",
       title: "Context: " + context.title,
-      description: "Re-encounter vocabulary in connected German.",
+      description: "Re-encounter vocabulary in connected " + language.label + ".",
       href: context.href,
       plannedMinutes: minutes.context,
     });

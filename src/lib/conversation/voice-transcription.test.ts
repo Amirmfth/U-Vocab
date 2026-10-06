@@ -34,6 +34,7 @@ test("browser MIME normalization maps to provider-supported extensions", () => {
 test("target language is routed through a reusable transcription abstraction", () => {
   assert.equal(transcriptionLanguageForTarget("GERMAN"), "de");
   assert.equal(transcriptionLanguageForTarget("FRENCH"), "fr");
+  assert.equal(transcriptionLanguageForTarget("ENGLISH"), "en");
   assert.equal(transcriptionLanguageForTarget("PERSIAN"), "fa");
   assert.equal(transcriptionLanguageForTarget("UNKNOWN"), null);
   assert.equal(directionForTarget("PERSIAN"), "rtl");

@@ -36,7 +36,7 @@ export function reconcileRecommendationRanking(
   const seen = new Set<string>();
   const ranked: Array<VocabularyRecommendation & {
     aiRelevanceScore?: number;
-    aiReasonCode?: z.infer<typeof recommendationReasonCodeSchema>;
+    aiReasonCode?: string;
   }> = [];
 
   for (const item of decision.ranked) {

@@ -193,7 +193,7 @@ export async function createReadingDocument(
                 if (missingKeys.has(key) && unit.example) {
                   examples.push({
                     lexemeId: lexeme.id,
-                    german: unit.example,
+                    targetText: unit.example,
                     generatedByAi: true,
                   });
                 }

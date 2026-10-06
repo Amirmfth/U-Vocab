@@ -29,6 +29,10 @@ export const FRENCH_TARGET_LANGUAGE_ENABLED =
   flagEnabled("NEXT_PUBLIC_ENABLE_FRENCH_TARGET_LANGUAGE") ||
   flagEnabled("ENABLE_FRENCH_TARGET_LANGUAGE");
 
+export const ENGLISH_TARGET_LANGUAGE_ENABLED =
+  flagEnabled("NEXT_PUBLIC_ENABLE_ENGLISH_TARGET_LANGUAGE") ||
+  flagEnabled("ENABLE_ENGLISH_TARGET_LANGUAGE");
+
 export const TARGET_LANGUAGE_CONFIG: Record<TargetLanguage, TargetLanguageConfig> = {
   GERMAN: {
     code: "de",
@@ -76,18 +80,18 @@ export const TARGET_LANGUAGE_CONFIG: Record<TargetLanguage, TargetLanguageConfig
     label: "English",
     nativeLabel: "English",
     promptName: "English",
-    enabled: false,
+    enabled: ENGLISH_TARGET_LANGUAGE_ENABLED,
     conversationFormality: {
       casual: "Use a natural casual register.",
       formal: "Use a natural formal register.",
       neutral: "Use the register that naturally fits the scenario.",
     },
     capabilities: {
-      vocabulary: false,
-      grammar: false,
-      reading: false,
-      writing: false,
-      conversation: false,
+      vocabulary: true,
+      grammar: true,
+      reading: true,
+      writing: true,
+      conversation: true,
     },
   },
 };

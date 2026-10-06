@@ -5,6 +5,7 @@ import { applyMasteryDelta, practiceMasteryDelta } from "./mastery";
 import { selectExerciseType } from "./select";
 
 const noun={
+  language:"de",
   lemma:"Tisch",
   article:"der",
   partOfSpeech:"NOUN",

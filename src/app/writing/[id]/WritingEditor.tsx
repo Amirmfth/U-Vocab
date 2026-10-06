@@ -19,10 +19,12 @@ export function WritingEditor({
   sessionId,
   initialDraft,
   targetWords,
+  targetLanguageCode,
 }: {
   sessionId: string;
   initialDraft: string;
   targetWords: number;
+  targetLanguageCode: string;
 }) {
   const router = useRouter();
   const { locale, t } = useI18n();
@@ -50,7 +52,7 @@ export function WritingEditor({
         placeholder={t("writing.editor.placeholder")}
         autoComplete="off"
         aria-describedby="writing-word-count"
-        lang="de"
+        lang={targetLanguageCode}
         dir="ltr"
       />
 

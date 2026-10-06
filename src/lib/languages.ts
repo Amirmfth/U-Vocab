@@ -7,6 +7,11 @@ export type TargetLanguageConfig = {
   nativeLabel: string;
   promptName: string;
   enabled: boolean;
+  conversationFormality: {
+    casual: string;
+    formal: string;
+    neutral: string;
+  };
   capabilities: {
     vocabulary: boolean;
     grammar: boolean;
@@ -32,6 +37,11 @@ export const TARGET_LANGUAGE_CONFIG: Record<TargetLanguage, TargetLanguageConfig
     nativeLabel: "Deutsch",
     promptName: "German",
     enabled: true,
+    conversationFormality: {
+      casual: "Use du consistently unless the scenario explicitly requires otherwise.",
+      formal: "Use Sie consistently and model socially appropriate formal German.",
+      neutral: "Use the form of address that naturally fits the scenario and keep it consistent.",
+    },
     capabilities: {
       vocabulary: true,
       grammar: true,
@@ -47,6 +57,11 @@ export const TARGET_LANGUAGE_CONFIG: Record<TargetLanguage, TargetLanguageConfig
     nativeLabel: "Français",
     promptName: "French",
     enabled: FRENCH_TARGET_LANGUAGE_ENABLED,
+    conversationFormality: {
+      casual: "Use tu consistently unless the scenario explicitly requires otherwise.",
+      formal: "Use vous consistently and model socially appropriate formal French.",
+      neutral: "Use tu or vous according to the scenario and keep that choice consistent.",
+    },
     capabilities: {
       vocabulary: true,
       grammar: true,
@@ -62,6 +77,11 @@ export const TARGET_LANGUAGE_CONFIG: Record<TargetLanguage, TargetLanguageConfig
     nativeLabel: "English",
     promptName: "English",
     enabled: false,
+    conversationFormality: {
+      casual: "Use a natural casual register.",
+      formal: "Use a natural formal register.",
+      neutral: "Use the register that naturally fits the scenario.",
+    },
     capabilities: {
       vocabulary: false,
       grammar: false,

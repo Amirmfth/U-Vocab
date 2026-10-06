@@ -516,6 +516,175 @@ const templates: Record<string, Template[]> = {
         "est",
       ),
     },
+  ],
+  "en.sentence.do-support": [
+    {
+      key: "en-do-question",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "WORD_ORDER",
+      build: () => text(
+        { key:"en-do-question",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"WORD_ORDER" },
+        "Complete the question: ___ you work here?",
+        "Do",
+      ),
+    },
+  ],
+  "en.article.a-an-the": [
+    {
+      key: "en-a-an",
+      type: "GRAMMAR_CHOICE",
+      dimension: "UNDERSTANDING",
+      mistakeType: "ARTICLE",
+      build: () => choice(
+        { key:"en-a-an",type:"GRAMMAR_CHOICE",dimension:"UNDERSTANDING",mistakeType:"ARTICLE" },
+        "Choose the natural article: ___ hour",
+        "an",
+        ["a", "an", "the"],
+      ),
+    },
+  ],
+  "en.noun.countability": [
+    {
+      key: "en-countability-advice",
+      type: "GRAMMAR_CHOICE",
+      dimension: "UNDERSTANDING",
+      mistakeType: "WORD_FORM",
+      build: () => choice(
+        { key:"en-countability-advice",type:"GRAMMAR_CHOICE",dimension:"UNDERSTANDING",mistakeType:"WORD_FORM" },
+        "Choose the natural phrase:",
+        "some advice",
+        ["an advice", "some advice", "two advices"],
+      ),
+    },
+  ],
+  "en.tense.present-contrast": [
+    {
+      key: "en-present-contrast",
+      type: "GRAMMAR_CHOICE",
+      dimension: "UNDERSTANDING",
+      mistakeType: "TENSE",
+      build: () => choice(
+        { key:"en-present-contrast",type:"GRAMMAR_CHOICE",dimension:"UNDERSTANDING",mistakeType:"TENSE" },
+        "Choose the sentence for a temporary situation this week:",
+        "I'm working from home this week.",
+        [
+          "I work from home this week.",
+          "I'm working from home this week.",
+          "I've worked from home this week every week.",
+        ],
+      ),
+    },
+  ],
+  "en.tense.present-perfect": [
+    {
+      key: "en-present-perfect",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "TENSE",
+      build: () => text(
+        { key:"en-present-perfect",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"TENSE" },
+        "Complete: I ___ already finished.",
+        "have",
+      ),
+    },
+  ],
+  "en.modal.obligation": [
+    {
+      key: "en-should-advice",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "WORD_CHOICE",
+      build: () => text(
+        { key:"en-should-advice",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"WORD_CHOICE" },
+        "Give advice: You ___ get some rest.",
+        "should",
+      ),
+    },
+  ],
+  "en.pronoun.relative-basic": [
+    {
+      key: "en-relative-who",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "RELATIVE_CLAUSE",
+      build: () => text(
+        { key:"en-relative-who",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"RELATIVE_CLAUSE" },
+        "Complete: The person ___ called left a message.",
+        "who",
+      ),
+    },
+  ],
+  "en.conditional.second": [
+    {
+      key: "en-second-conditional",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "TENSE",
+      build: () => text(
+        { key:"en-second-conditional",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"TENSE" },
+        "Complete: If I had more time, I ___ travel more.",
+        "would",
+      ),
+    },
+  ],
+  "en.passive.basic": [
+    {
+      key: "en-passive-built",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "PASSIVE",
+      build: () => text(
+        { key:"en-passive-built",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"PASSIVE" },
+        "Complete: The bridge ___ built in 1990.",
+        "was",
+      ),
+    },
+  ],
+  "en.infinitive.gerund": [
+    {
+      key: "en-enjoy-gerund",
+      type: "GRAMMAR_CLOZE",
+      dimension: "CONTROLLED_PRODUCTION",
+      mistakeType: "WORD_FORM",
+      build: () => text(
+        { key:"en-enjoy-gerund",type:"GRAMMAR_CLOZE",dimension:"CONTROLLED_PRODUCTION",mistakeType:"WORD_FORM" },
+        "Complete: I enjoy ___ before bed. (read)",
+        "reading",
+      ),
+    },
+  ],
+  "en.particle.phrasal-verbs": [
+    {
+      key: "en-phrasal-separable",
+      type: "GRAMMAR_CHOICE",
+      dimension: "UNDERSTANDING",
+      mistakeType: "WORD_ORDER",
+      build: () => choice(
+        { key:"en-phrasal-separable",type:"GRAMMAR_CHOICE",dimension:"UNDERSTANDING",mistakeType:"WORD_ORDER" },
+        "Choose the natural sentence:",
+        "Turn it off.",
+        ["Turn off it.", "Turn it off.", "It turn off."],
+      ),
+    },
+  ],
+  "en.clause.inversion": [
+    {
+      key: "en-negative-inversion",
+      type: "GRAMMAR_CORRECTION",
+      dimension: "UNDERSTANDING",
+      mistakeType: "WORD_ORDER",
+      build: () => choice(
+        { key:"en-negative-inversion",type:"GRAMMAR_CORRECTION",dimension:"UNDERSTANDING",mistakeType:"WORD_ORDER" },
+        "Choose the correct emphatic inversion:",
+        "Never have I seen that before.",
+        [
+          "Never have I seen that before.",
+          "Never I have seen that before.",
+          "Never I saw have that before.",
+        ],
+      ),
+    },
   ]
 };
 

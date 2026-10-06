@@ -23,6 +23,7 @@ import type { MessageKey } from "@/i18n/core";
 import type { UiLocale } from "@/i18n/config";
 import { CEFR_LEVELS, CEFR_RANK } from "@/lib/grammar/levels";
 import { ONBOARDING_STEP_COUNT } from "@/lib/onboarding";
+import { targetLanguageConfig } from "@/lib/languages";
 import {
   completeOnboarding,
   finishCoreLoopStep,
@@ -169,8 +170,14 @@ export function OnboardingWizard({
                   aria-pressed={selectedLanguage === language}
                 >
                   <span>
-                    <strong>{language === "GERMAN" ? t("common.german") : language}</strong>
-                    <small>{language === "GERMAN" ? "Deutsch" : language}</small>
+                    <strong>
+                      {language === "GERMAN"
+                        ? t("common.german")
+                        : language === "FRENCH"
+                          ? t("common.french")
+                          : targetLanguageConfig(language).label}
+                    </strong>
+                    <small>{targetLanguageConfig(language).nativeLabel}</small>
                   </span>
                   {selectedLanguage === language ? <Check size={18} /> : null}
                 </button>

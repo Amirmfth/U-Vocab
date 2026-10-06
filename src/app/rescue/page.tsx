@@ -6,7 +6,8 @@ import { getCurrentCourse } from "@/lib/current-course";
 import { getRescueWords } from "@/lib/rescue";
 import { buildExercise } from "@/lib/exercises/build";
 import { selectReviewExerciseType } from "@/lib/exercises/review-select";
-import { isTranslationVisible } from "@/lib/translations";
+import { visibleLexicalMeanings } from "@/lib/lexical-meaning";
+import { targetLanguageConfig } from "@/lib/languages";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { getServerTranslator } from "@/i18n/server";
 import { formatNumber, formatPercent } from "@/i18n/format";
@@ -58,6 +59,7 @@ export default async function RescuePage({
     searchParams,
   ]);
   const { locale, t } = await getServerTranslator(user);
+  const targetLanguageCode = targetLanguageConfig(course.targetLanguage).code;
   const requestedIds = Array.from(
     new Set(query.ids?.split(",").filter(Boolean) ?? []),
   ).slice(0, 20);
@@ -92,7 +94,7 @@ export default async function RescuePage({
                     <div>
                       <strong
                         className="learning-content"
-                        lang="de"
+                        lang={targetLanguageCode}
                         dir="ltr"
                       >
                         {formatLexemeLabel(item.lexeme)}
@@ -175,12 +177,10 @@ export default async function RescuePage({
       userVocabularyId: item.id,
       lemma: item.lexeme.lemma,
       article: item.lexeme.article,
-      translations: item.lexeme.translations.filter((translation) =>
-        isTranslationVisible(
-          course.explanationLanguage,
-          translation.language,
-        ),
-      ),
+      translations: visibleLexicalMeanings(
+        item.lexeme,
+        course.explanationLanguage,
+      ).map(({ language, text }) => ({ language, text })),
       exercise: buildExercise(
         exerciseType,
         item.lexeme,

@@ -20,7 +20,7 @@ export type ExerciseLexeme = {
   partOfSpeech: string;
   translations: { language: string; text: string }[];
   patterns: { pattern: string; explanation: string | null }[];
-  examples: { german: string }[];
+  examples: { targetText: string }[];
 };
 
 export type ExerciseOptionPools = {

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { evaluateConversationTurn } from "@/lib/ai/conversation-turn-evaluator";
 import { recordMistakesBatch, type MistakeInput } from "@/lib/mistakes-batch";
 import { evaluationLocaleForPreference } from "@/lib/evaluation-locale";
+import { EVALUATOR_HIGH_CONFIDENCE } from "@/lib/ai/evaluation-intelligence";
 import {
   updateConversationTargetsBatch,
   updateVocabularyMasteryBatch,
@@ -104,20 +105,31 @@ export async function processConversationTurn(input: {
           0,
           Math.min(
             1,
-            userVocabulary.production + (usage.correct ? 0.08 : -0.025),
+            userVocabulary.production +
+              (usage.correct
+                ? 0.08
+                : usage.confidence >= EVALUATOR_HIGH_CONFIDENCE
+                  ? -0.025
+                  : 0),
           ),
         ),
         contextualUsage: Math.max(
           0,
           Math.min(
             1,
-            userVocabulary.contextualUsage + (usage.correct ? 0.1 : -0.02),
+            userVocabulary.contextualUsage +
+              (usage.correct
+                ? 0.1
+                : usage.confidence >= EVALUATOR_HIGH_CONFIDENCE
+                  ? -0.02
+                  : 0),
           ),
         ),
       });
     }
 
     for (const mistake of usage.mistakes) {
+      if (mistake.confidence < EVALUATOR_HIGH_CONFIDENCE) continue;
       mistakes.push({
         lexemeId: usage.lexemeId,
         ...mistake,

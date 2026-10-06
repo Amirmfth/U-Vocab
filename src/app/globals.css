@@ -5689,3 +5689,62 @@ summary {
     text-align: start;
   }
 }
+
+
+.course-management {
+  display: grid;
+  gap: 16px;
+}
+
+.course-management-list {
+  display: grid;
+  gap: 8px;
+}
+
+.course-management-list form {
+  margin: 0;
+}
+
+.course-management-row {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--text);
+  text-align: start;
+  cursor: pointer;
+}
+
+.course-management-row > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.course-management-row small,
+.course-management-row > span:last-child {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.course-management-row.is-active {
+  border-color: var(--primary);
+}
+
+.course-management-row:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.course-create-list,
+.course-upgrade {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}

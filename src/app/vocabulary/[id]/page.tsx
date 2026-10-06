@@ -153,6 +153,7 @@ function GrammarAndUsage({
 function LexicalGrammarLinks({
   links,
   locale,
+  targetLanguageCode,
 }: {
   links: NonNullable<
     Awaited<ReturnType<typeof getCachedWordSecondary>>

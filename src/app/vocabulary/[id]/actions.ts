@@ -37,6 +37,8 @@ export async function generateQuickTeachAction(lexemeId: string, displayLanguage
       ?? "";
     const lesson = await generateQuickTeach({
       userId: user.id,
+      userCourseId: course.id,
+      targetLanguage: course.targetLanguage,
       lemma: lexeme.lemma,
       article: lexeme.article,
       partOfSpeech: lexeme.partOfSpeech,

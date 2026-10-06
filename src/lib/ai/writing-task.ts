@@ -4,6 +4,8 @@ import { getOpenAI } from "./client";
 import { aiRoute } from "./routing";
 import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
+import type { TargetLanguage } from "@prisma/client";
+import { targetLanguageConfig } from "@/lib/languages";
 
 export const writingTaskSchema = z.object({
   title: z.string(),
@@ -14,6 +16,7 @@ export const writingTaskSchema = z.object({
 export async function generateWritingTask(input: {
   userId: string;
   userCourseId: string;
+  targetLanguage: TargetLanguage;
   mode: "GUIDED" | "OPEN";
   level: string;
   taskType: string;
@@ -21,12 +24,14 @@ export async function generateWritingTask(input: {
   targetWords: number;
   targets: Array<{ lemma: string; patterns: string[] }>;
 }) {
+  const language = targetLanguageConfig(input.targetLanguage);
   const route = aiRoute("writing_task");
   const perf = startOperation("ai.writing_task", {
     model: route.model,
     mode: input.mode,
     level: input.level,
     targetCount: input.targets.length,
+    targetLanguage: language.code,
   });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
@@ -39,6 +44,7 @@ export async function generateWritingTask(input: {
       taskType: input.taskType,
       targetWords: input.targetWords,
       targetCount: input.targets.length,
+      targetLanguage: language.code,
     },
   });
   try {
@@ -50,11 +56,11 @@ export async function generateWritingTask(input: {
           {
             role: "system",
             content:
-              "Create a realistic German writing-practice task. Match the requested CEFR level, writing type, topic, and approximate word count. Do not claim this is an official exam or official CEFR certification. In GUIDED mode, make the supplied target lexical units naturally useful without requiring awkward use of every item. In OPEN mode, do not prescribe vocabulary. Return a concise title, the task instructions, and a short content checklist.",
+              `Create a realistic ${language.promptName} writing-practice task. Match the requested CEFR level, writing type, topic, and approximate word count. Do not claim this is an official exam or official CEFR certification. In GUIDED mode, make the supplied target lexical units naturally useful without requiring awkward use of every item. In OPEN mode, do not prescribe vocabulary. Preserve ${language.promptName}-specific conventions and register. Return a concise title, the task instructions, and a short content checklist.`,
           },
           {
             role: "user",
-            content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined }),
+            content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined, targetLanguage: language.code }),
           },
         ],
         text: { format: zodTextFormat(writingTaskSchema, "writing_task") },

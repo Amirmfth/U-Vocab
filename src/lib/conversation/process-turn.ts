@@ -23,7 +23,7 @@ export async function processConversationTurn(input: {
       status: "ACTIVE",
     },
     include: {
-      course: { select: { explanationLanguage: true } },
+      course: { select: { explanationLanguage: true, targetLanguage: true } },
       targets: {
         include: {
           lexeme: { include: { patterns: true } },
@@ -37,6 +37,7 @@ export async function processConversationTurn(input: {
   const evaluation = await evaluateConversationTurn({
     userId: input.userId,
     userCourseId: input.userCourseId,
+    targetLanguage: session.course.targetLanguage,
     evaluationLocale: evaluationLocaleForPreference(session.course.explanationLanguage),
     level: session.level,
     message: input.message,

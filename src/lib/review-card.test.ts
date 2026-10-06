@@ -3,6 +3,7 @@ import test from "node:test";
 import { buildReviewCard } from "./review-card";
 
 const lexeme={
+  language:"de",
   lemma:"warten",
   article:null,
   partOfSpeech:"VERB",
@@ -47,7 +48,7 @@ test("weak contextual usage still produces a translation review card",()=>{
   assert.equal(card.back.answer,"to wait");
 });
 
-test("production weakness flips review direction meaning to German",()=>{
+test("production weakness flips review direction meaning to target",()=>{
   const card=buildReviewCard({
     lexeme:{ ...lexeme,patterns:[],examples:[] },
     preference:"ENGLISH",

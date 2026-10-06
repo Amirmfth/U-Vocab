@@ -184,6 +184,7 @@ export async function previewVocabularyText(
           article: item.article,
           plural: item.plural,
           cefrLevel: item.cefrLevel,
+          targetDefinition: item.targetDefinition,
           englishMeaning: item.englishMeaning,
           persianMeaning: item.persianMeaning,
           pattern: item.pattern,

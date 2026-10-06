@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCurrentCourse } from "@/lib/current-course";
+import { targetLanguageConfig } from "@/lib/languages";
 import { formatLexemeLabel } from "@/lib/lexeme-display";
 import { toDate } from "@/lib/relative-time";
 import { startOperation } from "@/lib/performance";
@@ -113,6 +114,7 @@ function GrammarAndUsage({
 }: {
   patterns: PrimaryWord["patterns"];
   locale: UiLocale;
+  targetLanguageCode: string;
 }) {
   const t = createTranslator(locale);
   return (
@@ -129,7 +131,7 @@ function GrammarAndUsage({
         {patterns.length ? (
           patterns.map((pattern) => (
             <div className="pattern-block" key={pattern.id}>
-              <strong className="learning-content" lang="de" dir="ltr">
+              <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                 {pattern.pattern}
               </strong>
               {pattern.explanation ? (
@@ -283,6 +285,7 @@ async function DeferredWordDetails({
   patterns,
   primaryState,
   locale,
+  targetLanguageCode,
 }: {
   userId: string;
   userCourseId: string;
@@ -325,8 +328,8 @@ async function DeferredWordDetails({
                     <span className="badge">{example.register}</span>
                   ) : null}
                 </div>
-                <strong className="learning-content" lang="de" dir="ltr">
-                  {example.german}
+                <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
+                  {example.targetText}
                 </strong>
                 <WordExampleMeaning
                   english={example.english}
@@ -366,7 +369,7 @@ async function DeferredWordDetails({
                 key={relation.id}
                 prefetch
               >
-                <span className="learning-content" lang="de" dir="ltr">
+                <span className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {relation.target.lemma}
                 </span>
                 <small>
@@ -485,6 +488,7 @@ export default async function Word({
     perf.span("course", () => getCurrentCourse()),
   ]);
   const { locale, t } = await getServerTranslator(user);
+  const targetLanguageCode = targetLanguageConfig(course.targetLanguage).code;
 
   const word = await perf.span("dbRead", () =>
     getCachedWordPrimary(user.id, course.id, id),
@@ -523,7 +527,7 @@ export default async function Word({
             <WordLanguageSwitch />
           </div>
 
-          <h1 className="learning-content" lang="de" dir="ltr">
+          <h1 className="learning-content" lang={targetLanguageCode} dir="ltr">
             {formatLexemeLabel(word)}
           </h1>
 
@@ -563,6 +567,7 @@ export default async function Word({
             patterns={word.patterns}
             primaryState={state}
             locale={locale}
+            targetLanguageCode={targetLanguageCode}
           />
         </Suspense>
       </WordLanguageProvider>

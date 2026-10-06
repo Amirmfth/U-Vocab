@@ -338,7 +338,7 @@ const templates: Record<string, Template[]> = {
         "kein",
       ),
     },
-  ],,
+  ],
   "fr.article.definite": [
     {
       key: "fr-definite-article",

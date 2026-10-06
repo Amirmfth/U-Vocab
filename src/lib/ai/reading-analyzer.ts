@@ -22,6 +22,7 @@ export const readingAnalysisSchema = z.object({
       article: z.string().nullable(),
       plural: z.string().nullable(),
       cefrLevel: z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]),
+      targetDefinition: z.string(),
       englishMeaning: z.string(),
       persianMeaning: z.string(),
       pattern: z.string().nullable(),
@@ -62,7 +63,7 @@ export async function analyzeReadingText(input: {
         {
           role: "system",
           content:
-            `Analyze this bounded ${language.promptName} excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, governed-preposition patterns, morphology, and meaningful lemmas that are natural for ${language.promptName}; do not turn every token into an item. Do not import German-specific case, separable-verb, or noun-article assumptions into another language. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, preserve meaningful accents and apostrophes, return concise English/Persian meanings, at most one useful grammar pattern, and each lexical unit's usual CEFR level (A1 through C2).`,
+            `Analyze this bounded ${language.promptName} excerpt for high-value lexical learning. The candidate list was ranked deterministically after removing the learner's known vocabulary. Prefer useful phrases, collocations, idioms, governed-preposition patterns, morphology, and meaningful lemmas that are natural for ${language.promptName}; do not turn every token into an item. Do not import German-specific case, separable-verb, or noun-article assumptions into another language. Return at most 30 lexical units. Use exact observed surface forms from the excerpt, preserve meaningful accents and apostrophes, return a concise monolingual target-language definition plus concise English/Persian meanings, at most one useful grammar pattern, and each lexical unit's usual CEFR level (A1 through C2).`,
         },
         {
           role: "user",

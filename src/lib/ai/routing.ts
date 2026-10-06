@@ -143,6 +143,10 @@ export function conversationFinalComplexity(input: {
     : ("COMPLEX" as const);
 }
 
+export function isAIOperation(value: string): value is AIOperation {
+  return Object.prototype.hasOwnProperty.call(ROUTES, value);
+}
+
 export const AI_OPERATION_BUDGETS = Object.fromEntries(
   Object.entries(ROUTES).map(([operation, route]) => [
     operation,

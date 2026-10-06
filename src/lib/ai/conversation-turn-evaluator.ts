@@ -19,6 +19,7 @@ export const conversationTurnEvaluationSchema = z.object({
       used: z.boolean(),
       correct: z.boolean(),
       score: z.number().min(0).max(1),
+      confidence: z.number().min(0).max(1),
       feedback: z.string(),
       mistakes: z.array(evaluatorMistakeSchema).max(6),
       masteryEvidence: masteryEvidenceSchema,
@@ -63,7 +64,7 @@ export async function evaluateConversationTurn(input: {
           role: "system",
           content:
             evaluationLanguageInstruction(input.evaluationLocale) +
-            ` Evaluate only the learner's use of the supplied ${language.promptName} target lexical units in this single message. Mark used=false when a target is not actually attempted. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, governed prepositions, form, spelling, agreement, register, and naturalness according to ${language.promptName}. Do not import German-specific case or word-order assumptions into another language. Do not penalize unrelated grammar. Feedback and mistake explanations must quote or name the exact attempted phrase and give the exact corrected ${language.promptName} form when there is an error. For each mistake classify a bounded cause, confidence, and intervention, distinguishing typo/orthography from lexical or semantic knowledge gaps. target masteryEvidence is evidence only and must not assign canonical mastery or scheduling. Avoid generic praise or generic criticism. relevantCorrection should be a very short actionable correction only when useful; otherwise null.`,
+            ` Evaluate only the learner's use of the supplied ${language.promptName} target lexical units in this single message. Mark used=false when a target is not actually attempted. Include confidence for each correctness judgment. When used, judge lexical correctness, grammar tied to the lexical unit, collocation, governed prepositions, form, spelling, agreement, register, and naturalness according to ${language.promptName}. Do not import German-specific case or word-order assumptions into another language. Do not penalize unrelated grammar. Feedback and mistake explanations must quote or name the exact attempted phrase and give the exact corrected ${language.promptName} form when there is an error. For each mistake classify a bounded cause, confidence, and intervention, distinguishing typo/orthography from lexical or semantic knowledge gaps. target masteryEvidence is evidence only and must not assign canonical mastery or scheduling. Avoid generic praise or generic criticism. relevantCorrection should be a very short actionable correction only when useful; otherwise null.`,
         },
         { role: "user", content: JSON.stringify({ ...input, userId: undefined, userCourseId: undefined, targetLanguage: language.code }) },
       ],

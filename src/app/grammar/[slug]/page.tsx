@@ -311,6 +311,7 @@ export default async function GrammarConceptPage({
           lesson={richLesson}
           language={selectedLesson?.language === "fa" ? "fa" : "en"}
           uiLocale={locale}
+          targetLanguageCode={language.code}
         />
       ) : (
         <>
@@ -427,16 +428,16 @@ export default async function GrammarConceptPage({
           <div className="grammar-vocab-grid">
             {vocabulary.map((item) => (
               <Link href={"/vocabulary/" + item.lexeme.id} key={item.id}>
-                <strong className="learning-content" lang="de" dir="ltr">
+                <strong className="learning-content" lang={language.code} dir="ltr">
                   {item.lexeme.article ? item.lexeme.article + " " : ""}
                   {item.lexeme.lemma}
                 </strong>
                 {item.pattern ? (
-                  <span className="learning-content" lang="de" dir="ltr">
+                  <span className="learning-content" lang={language.code} dir="ltr">
                     {item.pattern}
                   </span>
                 ) : item.lexeme.patterns[0] ? (
-                  <span className="learning-content" lang="de" dir="ltr">
+                  <span className="learning-content" lang={language.code} dir="ltr">
                     {item.lexeme.patterns[0].pattern}
                   </span>
                 ) : (

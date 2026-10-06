@@ -73,7 +73,7 @@ export default async function ReadingDocumentPage({
         explanation: pattern.explanation,
       })),
       examples: item.lexeme.examples.map((example) => ({
-        german: example.german,
+        german: example.targetText,
         english: example.english,
         persian: example.persian,
       })),

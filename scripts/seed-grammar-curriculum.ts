@@ -2,19 +2,30 @@ import {
   CefrLevel,
   GrammarCategory,
   GrammarRelationType,
+  TargetLanguage,
 } from "@prisma/client";
 import { db } from "../src/lib/db";
 import {
   assertValidGrammarCurriculum,
   grammarCurriculum,
+  type GrammarCurriculumConcept,
 } from "../src/lib/grammar/curriculum";
+import {
+  assertValidFrenchGrammarCurriculum,
+  frenchGrammarCurriculum,
+} from "../src/lib/grammar/french-curriculum";
 import { syncDeclaredLevelGrammarAssumptions } from "../src/lib/grammar/progress";
+import { targetLanguageConfig } from "../src/lib/languages";
 
-async function seedGrammarCurriculum() {
-  assertValidGrammarCurriculum();
-
+async function seedLanguageCurriculum(input: {
+  targetLanguage: TargetLanguage;
+  concepts: GrammarCurriculumConcept[];
+  validate: () => void;
+}) {
+  input.validate();
+  const language = targetLanguageConfig(input.targetLanguage);
   const prismaCategories = new Set<string>(Object.values(GrammarCategory));
-  const missingCategories = [...new Set(grammarCurriculum.map((concept) => concept.category))]
+  const missingCategories = [...new Set(input.concepts.map((concept) => concept.category))]
     .filter((category) => !prismaCategories.has(category));
   if (missingCategories.length > 0) {
     throw new Error(
@@ -22,16 +33,15 @@ async function seedGrammarCurriculum() {
     );
   }
 
-  const ids = grammarCurriculum.map((concept) => concept.id);
+  const ids = input.concepts.map((concept) => concept.id);
 
-  // Each upsert is independent. Keeping the entire curriculum in one interactive
-  // transaction exceeds Prisma's default five-second timeout on remote databases.
-  for (const concept of grammarCurriculum) {
+  for (const concept of input.concepts) {
     await db.grammarConcept.upsert({
       where: { id: concept.id },
       create: {
         id: concept.id,
         slug: concept.slug,
+        language: language.code,
         title: concept.title,
         shortDescription: concept.shortDescription,
         category: concept.category as GrammarCategory,
@@ -47,6 +57,7 @@ async function seedGrammarCurriculum() {
       },
       update: {
         slug: concept.slug,
+        language: language.code,
         title: concept.title,
         shortDescription: concept.shortDescription,
         category: concept.category as GrammarCategory,
@@ -66,25 +77,25 @@ async function seedGrammarCurriculum() {
   await db.grammarConcept.updateMany({
     where: {
       id: { notIn: ids },
-      language: "de",
+      language: language.code,
     },
     data: { active: false },
   });
 
-  for (const concept of grammarCurriculum) {
+  for (const concept of input.concepts) {
     await db.grammarConcept.update({
       where: { id: concept.id },
       data: { parentId: concept.parentId ?? null },
     });
   }
 
-  const prerequisites = grammarCurriculum.flatMap((concept) =>
+  const prerequisites = input.concepts.flatMap((concept) =>
     (concept.prerequisites ?? []).map((prerequisiteId) => ({
       conceptId: concept.id,
       prerequisiteId,
     })),
   );
-  const relations = grammarCurriculum.flatMap((concept) =>
+  const relations = input.concepts.flatMap((concept) =>
     (concept.related ?? []).map((relation) => ({
       sourceId: concept.id,
       targetId: relation.targetId,
@@ -92,16 +103,15 @@ async function seedGrammarCurriculum() {
     })),
   );
 
-  // Replace graph edges together so a failed seed cannot leave a partial graph.
   await db.$transaction([
     db.grammarPrerequisite.deleteMany({ where: { conceptId: { in: ids } } }),
     db.grammarConceptRelation.deleteMany({ where: { sourceId: { in: ids } } }),
-    db.grammarPrerequisite.createMany({ data: prerequisites }),
-    db.grammarConceptRelation.createMany({ data: relations }),
+    ...(prerequisites.length ? [db.grammarPrerequisite.createMany({ data: prerequisites })] : []),
+    ...(relations.length ? [db.grammarConceptRelation.createMany({ data: relations })] : []),
   ]);
 
   const courses = await db.userCourse.findMany({
-    where: { targetLanguage: "GERMAN", status: "ACTIVE" },
+    where: { targetLanguage: input.targetLanguage, status: "ACTIVE" },
     select: {
       id: true,
       userId: true,
@@ -120,8 +130,21 @@ async function seedGrammarCurriculum() {
   }
 
   console.log(
-    `Seeded ${grammarCurriculum.length} canonical German grammar concepts and synchronized ${courses.length} learner profile(s).`,
+    `Seeded ${input.concepts.length} canonical ${language.label} grammar concepts and synchronized ${courses.length} learner profile(s).`,
   );
+}
+
+async function seedGrammarCurriculum() {
+  await seedLanguageCurriculum({
+    targetLanguage: "GERMAN",
+    concepts: grammarCurriculum,
+    validate: assertValidGrammarCurriculum,
+  });
+  await seedLanguageCurriculum({
+    targetLanguage: "FRENCH",
+    concepts: frenchGrammarCurriculum,
+    validate: assertValidFrenchGrammarCurriculum,
+  });
 }
 
 seedGrammarCurriculum()

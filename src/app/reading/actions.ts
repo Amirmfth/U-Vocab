@@ -187,6 +187,7 @@ export async function createGeneratedReading(
       const draft = await generateReading({
         userId: user.id,
         userCourseId: course.id,
+        targetLanguage: course.targetLanguage,
         level,
         length,
         topic,

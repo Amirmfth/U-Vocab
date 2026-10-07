@@ -10,6 +10,7 @@ import {
   runNativeDecision,
   scoreAnswer,
   type DecisionQuestion,
+  type DecisionAnswerMap,
 } from "./native";
 import {
   decisionRolloutMode,
@@ -97,7 +98,7 @@ function nativeQuestions(candidates: VocabularyRecommendation[]): DecisionQuesti
 
 function nativeRecommendationDecision(
   candidates: VocabularyRecommendation[],
-  answers: Awaited<ReturnType<typeof runNativeDecision>> extends { status: "ok"; answers: infer T } ? T : never,
+  answers: DecisionAnswerMap,
 ): RecommendationRerankDecision {
   return {
     ranked: candidates

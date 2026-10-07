@@ -11,6 +11,12 @@ import {
   evaluatorMistakeSchema,
   masteryEvidenceSchema,
 } from "./evaluation-intelligence";
+import { evaluateConversationTurnWithDecisions } from "./decisions/conversation-turn";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./decisions/mode";
 
 export const conversationTurnEvaluationSchema = z.object({
   targetUsage: z.array(
@@ -32,7 +38,7 @@ export type ConversationTurnEvaluation = z.infer<
   typeof conversationTurnEvaluationSchema
 >;
 
-export async function evaluateConversationTurn(input: {
+async function evaluateConversationTurnWithResponses(input: {
   userId: string;
   userCourseId: string;
   targetLanguage: TargetLanguage;
@@ -103,4 +109,52 @@ export async function evaluateConversationTurn(input: {
     }
     throw error;
   }
+}
+
+
+export async function evaluateConversationTurn(input: {
+  userId: string;
+  userCourseId: string;
+  targetLanguage: TargetLanguage;
+  evaluationLocale: EvaluationLocale;
+  level: string;
+  message: string;
+  targets: Array<{
+    lexemeId: string;
+    lemma: string;
+    patterns: string[];
+  }>;
+}) {
+  const mode = decisionRolloutMode(
+    "OPENAI_DECISIONS_CONVERSATION_TURN_MODE",
+    false,
+  );
+
+  if (!shouldRunNativeDecision(mode)) {
+    return evaluateConversationTurnWithResponses(input);
+  }
+
+  if (mode === "shadow") {
+    const [legacy, native] = await Promise.all([
+      evaluateConversationTurnWithResponses(input),
+      evaluateConversationTurnWithDecisions(input),
+    ]);
+    if (native.status === "ok") {
+      const nativeUsed = native.data.targetUsage.filter((item) => item.used).length;
+      const legacyUsed = legacy.targetUsage.filter((item) => item.used).length;
+      console.info("Decisions conversation shadow comparison", {
+        nativeUsed,
+        legacyUsed,
+        sameUsedCount: nativeUsed === legacyUsed,
+      });
+    }
+    return legacy;
+  }
+
+  const native = await evaluateConversationTurnWithDecisions(input);
+  if (shouldUseNativeDecision(mode) && native.status === "ok") {
+    return native.data;
+  }
+
+  return evaluateConversationTurnWithResponses(input);
 }

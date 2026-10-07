@@ -11,6 +11,7 @@ export const AI_PROMPT_VERSIONS: Record<string, string> = {
   topic_pack_generation: "v2",
   story_generation: "v2",
   reading_analysis: "v2",
+  reading_candidate_filter: "v1",
   writing_task: "v2",
   writing_evaluation: "v3",
   conversation_setup: "v2",

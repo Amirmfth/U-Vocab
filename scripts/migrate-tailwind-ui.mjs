@@ -216,15 +216,6 @@ for (const relative of CSS_FILES) {
   retainedRoots.push(filteredGlobals(root));
 }
 
-const classUtilities = new Map(
-  [...styleMap.entries()].map(([className, entries]) => [
-    className,
-    [...entries.values()]
-      .sort((a, b) => a.order - b.order)
-      .map((entry) => entry.token),
-  ]),
-);
-
 const sourceFiles = walkFiles(path.join(ROOT, "src")).filter((file) =>
   SOURCE_EXTENSIONS.has(path.extname(file)),
 );
@@ -299,18 +290,17 @@ function splitResponsivePrefix(token) {
 
 const dynamicFamilies = [];
 for (const prefix of [...dynamicClassPrefixes].sort()) {
-  const matchingClasses = [...classUtilities.keys()]
+  const matchingClasses = [...styleMap.keys()]
     .filter((className) => className.startsWith(prefix))
     .sort();
   if (!matchingClasses.length) continue;
 
   const baseHook = prefix.replace(/-+$/, "");
-  const baseUtilities = [...(classUtilities.get(baseHook) ?? [])];
-  const seen = new Set(baseUtilities);
+  const baseEntries = new Map(styleMap.get(baseHook) ?? []);
 
   for (const modifierClass of matchingClasses) {
-    for (const token of classUtilities.get(modifierClass) ?? []) {
-      const parts = splitResponsivePrefix(token);
+    for (const [key, entry] of styleMap.get(modifierClass) ?? []) {
+      const parts = splitResponsivePrefix(entry.token);
       if (!/^\[[^\]]+:.+\]!?$/.test(parts.rest)) continue;
       const wrapped =
         parts.prefix +
@@ -318,16 +308,26 @@ for (const prefix of [...dynamicClassPrefixes].sort()) {
         modifierClass +
         "]:" +
         parts.rest;
-      if (!seen.has(wrapped)) {
-        seen.add(wrapped);
-        baseUtilities.push(wrapped);
+      const wrappedKey = key.replace("|&|", "|&." + modifierClass + "|");
+      const existing = baseEntries.get(wrappedKey);
+      if (!existing || entry.order >= existing.order) {
+        baseEntries.set(wrappedKey, { token: wrapped, order: entry.order });
       }
     }
   }
 
-  classUtilities.set(baseHook, baseUtilities);
+  styleMap.set(baseHook, baseEntries);
   dynamicFamilies.push({ prefix, baseHook, matchingClasses });
 }
+
+const classUtilities = new Map(
+  [...styleMap.entries()].map(([className, entries]) => [
+    className,
+    [...entries.values()]
+      .sort((a, b) => a.order - b.order)
+      .map((entry) => entry.token),
+  ]),
+);
 
 const expandedClasses = new Set();
 const modifiedFiles = [];
@@ -350,18 +350,28 @@ function expandClassText(text) {
     }
     original.push(token);
   }
-  const extras = [];
-  const seen = new Set(original);
+  const winners = new Map();
   for (const token of original) {
-    const utilities = classUtilities.get(token);
-    if (!utilities) continue;
+    const entries = styleMap.get(token);
+    if (!entries) continue;
     expandedClasses.add(token);
-    for (const utility of utilities) {
-      if (seen.has(utility)) continue;
-      seen.add(utility);
-      extras.push(utility);
+    for (const [key, entry] of entries) {
+      const existing = winners.get(key);
+      if (!existing || entry.order >= existing.order) {
+        winners.set(key, entry);
+      }
     }
   }
+
+  const seen = new Set(original);
+  const extras = [...winners.values()]
+    .sort((a, b) => a.order - b.order)
+    .map((entry) => entry.token)
+    .filter((utility) => {
+      if (seen.has(utility)) return false;
+      seen.add(utility);
+      return true;
+    });
   if (!extras.length) return text;
 
   const trailingDynamicPrefix =

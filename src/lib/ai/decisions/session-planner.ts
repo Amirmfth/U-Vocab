@@ -3,6 +3,18 @@ import type { SessionActivity } from "@prisma/client";
 import { aiRoute } from "../routing";
 import { getDecisionCache, putDecisionCache } from "./cache";
 import { runStructuredDecision } from "./run-decision";
+import {
+  FIVE_LEVEL_SCORE,
+  normalizedScore,
+  runNativeDecision,
+  scoreAnswer,
+  type DecisionQuestion,
+} from "./native";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./mode";
 
 export const DAILY_SESSION_MAX_SEGMENTS = 5;
 export const URGENT_DUE_REVIEW_THRESHOLD = 5;
@@ -124,6 +136,90 @@ export function validateSessionDecision(input: {
   return { valid: true as const, items };
 }
 
+export function allocateSessionByPriority(input: {
+  deterministicItems: DeterministicSessionItem[];
+  requestedMinutes: number;
+  dueCount: number;
+  priorities: Map<SessionActivity, number>;
+}) {
+  const boundedMinutes = Math.max(5, Math.min(20, input.requestedMinutes));
+  const available = input.deterministicItems.slice(0, DAILY_SESSION_MAX_SEGMENTS);
+  if (!available.length) return [];
+
+  const ranked = [...available].sort((a, b) => {
+    const urgentA =
+      a.activity === "DUE_REVIEW" && input.dueCount >= URGENT_DUE_REVIEW_THRESHOLD
+        ? 1
+        : 0;
+    const urgentB =
+      b.activity === "DUE_REVIEW" && input.dueCount >= URGENT_DUE_REVIEW_THRESHOLD
+        ? 1
+        : 0;
+    if (urgentA !== urgentB) return urgentB - urgentA;
+    return (
+      (input.priorities.get(b.activity) ?? 0.5) -
+      (input.priorities.get(a.activity) ?? 0.5)
+    );
+  });
+
+  const selected = ranked.slice(0, Math.min(DAILY_SESSION_MAX_SEGMENTS, boundedMinutes));
+  const weights = selected.map((item) => {
+    const base = 0.25 + (input.priorities.get(item.activity) ?? 0.5);
+    const urgency =
+      item.activity === "DUE_REVIEW" && input.dueCount >= URGENT_DUE_REVIEW_THRESHOLD
+        ? 0.75
+        : 0;
+    return base + urgency;
+  });
+  const weightTotal = weights.reduce((sum, value) => sum + value, 0) || 1;
+
+  let remaining = boundedMinutes;
+  return selected.map((item, index) => {
+    const slotsLeft = selected.length - index;
+    const minutes =
+      index === selected.length - 1
+        ? remaining
+        : Math.max(
+            1,
+            Math.min(
+              remaining - (slotsLeft - 1),
+              Math.round((boundedMinutes * weights[index]) / weightTotal),
+            ),
+          );
+    remaining -= minutes;
+    return {
+      ...item,
+      plannedMinutes: minutes,
+      reasonCode:
+        item.activity === "DUE_REVIEW" &&
+        input.dueCount >= URGENT_DUE_REVIEW_THRESHOLD
+          ? ("REVIEW_URGENCY" as const)
+          : item.activity === "PRODUCTION"
+            ? ("WEAK_PRODUCTION" as const)
+            : item.activity === "GRAMMAR"
+              ? ("GRAMMAR_WEAKNESS" as const)
+              : item.activity === "CONTEXT"
+                ? ("CONTEXT_REINFORCEMENT" as const)
+                : item.activity === "NEW_WORD"
+                  ? ("NEW_LEARNING" as const)
+                  : ("BALANCE" as const),
+    };
+  });
+}
+
+function sessionPriorityQuestions(
+  items: DeterministicSessionItem[],
+): DecisionQuestion[] {
+  return [...new Set(items.map((item) => item.activity))].map((activity) => ({
+    type: "score" as const,
+    name: "priority:" + activity,
+    instructions:
+      "How high should " + activity +
+      " be prioritized in this learner's next short study session, given the supplied learner state and available activities?",
+    levels: [...FIVE_LEVEL_SCORE],
+  }));
+}
+
 export async function planDailySession(input: {
   userId: string;
   userCourseId: string;
@@ -140,10 +236,12 @@ export async function planDailySession(input: {
     input.deterministicItems,
     input.requestedMinutes,
   );
-  if (
-    !deterministic.length ||
-    process.env.AI_DAILY_SESSION_PLANNER_ENABLED !== "true"
-  ) {
+  const legacyEnabled = process.env.AI_DAILY_SESSION_PLANNER_ENABLED === "true";
+  const mode = decisionRolloutMode(
+    "OPENAI_DECISIONS_SESSION_PLANNER_MODE",
+    legacyEnabled,
+  );
+  if (!deterministic.length || (!legacyEnabled && mode === "off")) {
     return { items: deterministic, usedAI: false, fallback: false };
   }
 
@@ -163,70 +261,103 @@ export async function planDailySession(input: {
     localDateKey: input.localDateKey,
     requestedMinutes: input.requestedMinutes,
     availableActivities: deterministic.map((item) => item.activity),
+    mode: shouldUseNativeDecision(mode) ? "decisions" : "responses",
   };
 
-  const cached = await getDecisionCache<DailySessionPlanDecision>({
+  const cached = await getDecisionCache<ValidatedSessionItem[]>({
     userCourseId: input.userCourseId,
     operation: "daily_session_plan",
-    model: route.model,
+    model: shouldUseNativeDecision(mode) ? "gpt-6-luna" : route.model,
     dimensions,
     source: payload,
   });
   if (cached) {
+    return { items: cached, usedAI: true, fallback: false, cached: true };
+  }
+
+  const nativePromise = shouldRunNativeDecision(mode)
+    ? runNativeDecision({
+        userId: input.userId,
+        userCourseId: input.userCourseId,
+        operation: "daily_session_plan",
+        evidence: payload,
+        questions: sessionPriorityQuestions(deterministic),
+        metadata: {
+          shadow: mode === "shadow",
+          requestedMinutes: input.requestedMinutes,
+          availableActivityCount: deterministic.length,
+        },
+      })
+    : Promise.resolve(null);
+
+  const legacyPromise =
+    mode === "on"
+      ? Promise.resolve(null)
+      : runStructuredDecision({
+          userId: input.userId,
+          userCourseId: input.userCourseId,
+          operation: "daily_session_plan",
+          schema: dailySessionPlanSchema,
+          schemaName: "daily_session_plan",
+          system:
+            "Allocate the requested session time among only the supplied available learning activities. Preserve urgent due review and keep the session varied.",
+          payload,
+          metadata: {
+            requestedMinutes: input.requestedMinutes,
+            dueCount: input.dueCount,
+            availableActivityCount: deterministic.length,
+          },
+        });
+
+  const [nativeResult, legacyResult] = await Promise.all([nativePromise, legacyPromise]);
+
+  let items: ValidatedSessionItem[] | null = null;
+  let model = route.model;
+  let fallback = false;
+
+  if (shouldUseNativeDecision(mode) && nativeResult?.status === "ok") {
+    const priorities = new Map<SessionActivity, number>();
+    for (const item of deterministic) {
+      const score = normalizedScore(
+        scoreAnswer(nativeResult.answers, "priority:" + item.activity),
+      );
+      if (score !== null) priorities.set(item.activity, score);
+    }
+    items = allocateSessionByPriority({
+      deterministicItems: deterministic,
+      requestedMinutes: input.requestedMinutes,
+      dueCount: input.dueCount,
+      priorities,
+    });
+    model = nativeResult.response.model;
+  } else if (legacyResult?.status === "ok") {
     const validated = validateSessionDecision({
-      decision: cached,
+      decision: legacyResult.data,
       deterministicItems: deterministic,
       requestedMinutes: input.requestedMinutes,
       dueCount: input.dueCount,
     });
-    if (validated.valid) {
-      return { items: validated.items, usedAI: true, fallback: false, cached: true };
-    }
+    if (validated.valid) items = validated.items;
+    model = legacyResult.model;
+    fallback = shouldUseNativeDecision(mode);
+  } else if (shouldUseNativeDecision(mode)) {
+    fallback = true;
   }
 
-  const result = await runStructuredDecision({
-    userId: input.userId,
-    userCourseId: input.userCourseId,
-    operation: "daily_session_plan",
-    schema: dailySessionPlanSchema,
-    schemaName: "daily_session_plan",
-    system:
-      "Allocate the requested session time among only the supplied available learning activities. Preserve urgent due review, prioritize weak production and recurring mistakes, and keep the session varied. Do not select individual cards, words, or grammar concepts.",
-    payload,
-    metadata: {
-      requestedMinutes: input.requestedMinutes,
-      dueCount: input.dueCount,
-      availableActivityCount: deterministic.length,
-    },
-  });
-  if (result.status !== "ok") {
-    return { items: deterministic, usedAI: false, fallback: true };
-  }
-
-  const validated = validateSessionDecision({
-    decision: result.data,
-    deterministicItems: deterministic,
-    requestedMinutes: input.requestedMinutes,
-    dueCount: input.dueCount,
-  });
-  if (!validated.valid) {
-    return {
-      items: deterministic,
-      usedAI: false,
-      fallback: true,
-      validationFailure: validated.reason,
-    };
+  if (!items?.length) {
+    items = deterministic;
+    fallback = true;
   }
 
   await putDecisionCache({
     userCourseId: input.userCourseId,
     operation: "daily_session_plan",
-    model: result.model,
+    model,
     dimensions,
     source: payload,
-    payload: result.data,
+    payload: items,
     ttlSeconds: CACHE_TTL_SECONDS,
   });
 
-  return { items: validated.items, usedAI: true, fallback: false, cached: false };
+  return { items, usedAI: !fallback || Boolean(legacyResult), fallback, cached: false };
 }

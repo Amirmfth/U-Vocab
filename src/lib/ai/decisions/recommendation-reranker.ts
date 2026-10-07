@@ -3,6 +3,20 @@ import type { VocabularyRecommendation } from "@/lib/recommendations";
 import { aiRoute } from "../routing";
 import { getDecisionCache, putDecisionCache } from "./cache";
 import { runStructuredDecision } from "./run-decision";
+import {
+  FIVE_LEVEL_SCORE,
+  choiceAnswer,
+  normalizedScore,
+  runNativeDecision,
+  scoreAnswer,
+  type DecisionQuestion,
+  type DecisionAnswerMap,
+} from "./native";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./mode";
 
 export const RECOMMENDATION_RERANK_CANDIDATE_LIMIT = 20;
 const CACHE_TTL_SECONDS = 6 * 60 * 60;
@@ -57,6 +71,57 @@ export function reconcileRecommendationRanking(
   return ranked;
 }
 
+function nativeQuestions(candidates: VocabularyRecommendation[]): DecisionQuestion[] {
+  const reasons = recommendationReasonCodeSchema.options.map((value) => ({
+    value,
+    description: value.replaceAll("_", " ").toLowerCase(),
+  }));
+  return candidates.flatMap((candidate) => [
+    {
+      type: "score" as const,
+      name: "relevance:" + candidate.lexemeId,
+      instructions:
+        "How pedagogically useful is candidate " + candidate.lexemeId +
+        " for this learner now? Judge level fit, active-use value, recent context, lexical connections, and reinforcement of weak production/context areas.",
+      levels: [...FIVE_LEVEL_SCORE],
+    },
+    {
+      type: "choice" as const,
+      name: "reason:" + candidate.lexemeId,
+      instructions:
+        "What is the strongest pedagogical reason for prioritizing candidate " +
+        candidate.lexemeId + " now?",
+      choices: reasons,
+    },
+  ]);
+}
+
+function nativeRecommendationDecision(
+  candidates: VocabularyRecommendation[],
+  answers: DecisionAnswerMap,
+): RecommendationRerankDecision {
+  return {
+    ranked: candidates
+      .map((candidate) => {
+        const relevance = normalizedScore(
+          scoreAnswer(answers, "relevance:" + candidate.lexemeId),
+        );
+        const reason = choiceAnswer(answers, "reason:" + candidate.lexemeId);
+        if (relevance === null || !reason || typeof reason.choice !== "string") {
+          return null;
+        }
+        const parsedReason = recommendationReasonCodeSchema.safeParse(reason.choice);
+        return {
+          candidateId: candidate.lexemeId,
+          relevanceScore: relevance,
+          reasonCode: parsedReason.success ? parsedReason.data : ("OTHER" as const),
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
+      .sort((a, b) => b.relevanceScore - a.relevanceScore),
+  };
+}
+
 export async function rerankVocabularyRecommendations(input: {
   userId: string;
   userCourseId: string;
@@ -68,7 +133,12 @@ export async function rerankVocabularyRecommendations(input: {
   candidates: VocabularyRecommendation[];
 }) {
   const candidates = input.candidates.slice(0, RECOMMENDATION_RERANK_CANDIDATE_LIMIT);
-  if (!candidates.length || process.env.AI_RECOMMENDATION_RERANK_ENABLED !== "true") {
+  const legacyEnabled = process.env.AI_RECOMMENDATION_RERANK_ENABLED === "true";
+  const mode = decisionRolloutMode(
+    "OPENAI_DECISIONS_RECOMMENDATIONS_MODE",
+    legacyEnabled,
+  );
+  if (!candidates.length || (!legacyEnabled && mode === "off")) {
     return { recommendations: input.candidates, usedAI: false, fallback: false };
   }
 
@@ -96,13 +166,16 @@ export async function rerankVocabularyRecommendations(input: {
     })),
   };
 
+  const dimensions = {
+    candidateIds: candidates.map((candidate) => candidate.lexemeId),
+    mode: shouldUseNativeDecision(mode) ? "decisions" : "responses",
+  };
+
   const cached = await getDecisionCache<RecommendationRerankDecision>({
     userCourseId: input.userCourseId,
     operation: "recommendation_rerank",
-    model: route.model,
-    dimensions: {
-      candidateIds: candidates.map((candidate) => candidate.lexemeId),
-    },
+    model: shouldUseNativeDecision(mode) ? "gpt-6-luna" : route.model,
+    dimensions,
     source: payload,
   });
   if (cached) {
@@ -117,42 +190,88 @@ export async function rerankVocabularyRecommendations(input: {
     };
   }
 
-  const result = await runStructuredDecision({
-    userId: input.userId,
-    userCourseId: input.userCourseId,
-    operation: "recommendation_rerank",
-    schema: recommendationRerankSchema,
-    schemaName: "recommendation_rerank",
-    system:
-      "Rerank only the supplied vocabulary candidates for pedagogical usefulness now. Prefer level fit, active-use value, recent context, lexical connections, and reinforcement of weak production/context areas. Keep decisions conservative and compact.",
-    payload,
-    metadata: {
-      candidateCount: candidates.length,
-      deterministicTopId: candidates[0]?.lexemeId ?? null,
-    },
-  });
+  const nativePromise = shouldRunNativeDecision(mode)
+    ? runNativeDecision({
+        userId: input.userId,
+        userCourseId: input.userCourseId,
+        operation: "recommendation_rerank",
+        evidence: payload,
+        questions: nativeQuestions(candidates),
+        metadata: { shadow: mode === "shadow", candidateCount: candidates.length },
+      })
+    : Promise.resolve(null);
 
-  if (result.status !== "ok") {
+  const legacyPromise =
+    mode === "on"
+      ? Promise.resolve(null)
+      : runStructuredDecision({
+          userId: input.userId,
+          userCourseId: input.userCourseId,
+          operation: "recommendation_rerank",
+          schema: recommendationRerankSchema,
+          schemaName: "recommendation_rerank",
+          system:
+            "Rerank only the supplied vocabulary candidates for pedagogical usefulness now. Prefer level fit, active-use value, recent context, lexical connections, and reinforcement of weak production/context areas. Keep decisions conservative and compact.",
+          payload,
+          metadata: {
+            candidateCount: candidates.length,
+            deterministicTopId: candidates[0]?.lexemeId ?? null,
+          },
+        });
+
+  const [nativeResult, legacyResult] = await Promise.all([nativePromise, legacyPromise]);
+
+  let decision: RecommendationRerankDecision | null = null;
+  let model = route.model;
+  let fallback = false;
+
+  if (shouldUseNativeDecision(mode) && nativeResult?.status === "ok") {
+    decision = nativeRecommendationDecision(candidates, nativeResult.answers);
+    model = nativeResult.response.model;
+  } else if (legacyResult?.status === "ok") {
+    decision = legacyResult.data;
+    model = legacyResult.model;
+    fallback = shouldUseNativeDecision(mode);
+  } else if (shouldUseNativeDecision(mode)) {
+    const fallbackResult = await runStructuredDecision({
+      userId: input.userId,
+      userCourseId: input.userCourseId,
+      operation: "recommendation_rerank",
+      schema: recommendationRerankSchema,
+      schemaName: "recommendation_rerank",
+      system:
+        "Rerank only the supplied vocabulary candidates for pedagogical usefulness now. Return only supplied candidate IDs.",
+      payload,
+      metadata: { candidateCount: candidates.length, decisionsFallback: true },
+    });
+    if (fallbackResult.status === "ok") {
+      decision = fallbackResult.data;
+      model = fallbackResult.model;
+      fallback = true;
+    }
+  }
+
+  if (!decision) {
     return { recommendations: input.candidates, usedAI: false, fallback: true };
   }
 
   await putDecisionCache({
     userCourseId: input.userCourseId,
     operation: "recommendation_rerank",
-    model: result.model,
-    dimensions: { candidateIds: candidates.map((candidate) => candidate.lexemeId) },
+    model,
+    dimensions,
     source: payload,
-    payload: result.data,
+    payload: decision,
     ttlSeconds: CACHE_TTL_SECONDS,
   });
 
   return {
     recommendations: [
-      ...reconcileRecommendationRanking(candidates, result.data),
+      ...reconcileRecommendationRanking(candidates, decision),
       ...input.candidates.slice(candidates.length),
     ],
     usedAI: true,
-    fallback: false,
+    fallback,
     cached: false,
   };
 }

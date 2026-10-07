@@ -7,6 +7,7 @@ export type AIUsageLike = {
   input_tokens?: number | null;
   output_tokens?: number | null;
   total_tokens?: number | null;
+  compute_units?: number | null;
   input_tokens_details?: {
     cached_tokens?: number | null;
   } | null;

@@ -87,3 +87,8 @@ Flag:
 ## Cost and observability
 
 Use `AiUsageEvent` to inspect operation/model/prompt version/tokens/cost/latency/status/routing reason. New decision operations should remain a small fraction of long-form generation cost because they use bounded payloads, tiny output schemas, caching, and the fast route.
+
+
+## Native Decisions API
+
+The bounded decision layer now supports native OpenAI `/v1/decisions` scoring/classification rather than requiring Structured Outputs generation for every judgment. See `docs/openai-decisions-api.md` for rollout modes, privacy, fallbacks, and migrated workloads.

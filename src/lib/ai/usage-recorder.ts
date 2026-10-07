@@ -75,6 +75,7 @@ export function createAIUsageRecorder(
     error?: unknown;
     timeToFirstTokenMs?: number | null;
     retryCount?: number | null;
+    metadata?: SafeAIMetadata;
   }) {
     if (recorded) return;
     recorded = true;
@@ -98,17 +99,21 @@ export function createAIUsageRecorder(
       retryCount: args.retryCount ?? null,
       durationMs: Math.max(0, Math.round(nowMs() - startedAt)),
       timeToFirstTokenMs: args.timeToFirstTokenMs ?? null,
-      metadata: { ...routeMetadata, ...input.metadata },
+      metadata: { ...routeMetadata, ...input.metadata, ...args.metadata },
       durationSeconds: input.durationSeconds,
     });
   }
 
   return {
-    success(response: { usage?: AIUsageLike | null; id?: string | null }) {
+    success(
+      response: { usage?: AIUsageLike | null; id?: string | null },
+      metadata?: SafeAIMetadata,
+    ) {
       return persist({
         status: "SUCCESS",
         usage: response.usage,
         requestId: response.id,
+        metadata,
       });
     },
     failure(

@@ -56,3 +56,8 @@ When OpenAI changes model availability:
 3. update pricing metadata separately from learner logic;
 4. run routing tests and the full CI suite;
 5. use environment overrides for immediate rollback if quality regresses.
+
+
+## Decisions endpoint
+
+Judgment workloads migrated to OpenAI Decisions use `OPENAI_DECISIONS_MODEL` (default `gpt-6-luna`) independently of Responses fast/complex routing. Decisions does not use an LLM router call. Writing still uses semantic Decisions preflight to select the existing Responses FAST/COMPLEX route for generated feedback.

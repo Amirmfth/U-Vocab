@@ -118,8 +118,8 @@ export async function evaluateWritingWithDecisions(input: {
   }
 
   const complexityAnswer = choiceAnswer(result.answers, "complexity");
-  const complexity =
-    complexityAnswer?.choice === "FAST" ? "FAST" : ("COMPLEX" as const);
+  const complexity: "FAST" | "COMPLEX" =
+    complexityAnswer?.choice === "FAST" ? "FAST" : "COMPLEX";
 
   const targetUsage = input.requiredTargets.map((target, index) => {
     const key = "t" + index;

@@ -7,6 +7,12 @@ import { startOperation } from "@/lib/performance";
 import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 import type { TargetLanguage } from "@prisma/client";
 import { targetLanguageConfig } from "@/lib/languages";
+import { scoreConversationFinalWithDecisions } from "./decisions/conversation-final";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./decisions/mode";
 import {
   evaluatorMistakeSchema,
   masteryEvidenceSchema,
@@ -57,6 +63,13 @@ export async function evaluateConversationSession(input: {
   messages: Array<{ role: "user" | "assistant"; content: string }>;
 }) {
   const language = targetLanguageConfig(input.targetLanguage);
+  const decisionMode = decisionRolloutMode(
+    "OPENAI_DECISIONS_CONVERSATION_FINAL_MODE",
+    false,
+  );
+  const decisionScoring = shouldRunNativeDecision(decisionMode)
+    ? await scoreConversationFinalWithDecisions(input)
+    : null;
   const route = aiRoute("conversation_final_evaluation", {
     complexity: conversationFinalComplexity({
       messageCount: input.messages.length,
@@ -70,7 +83,7 @@ export async function evaluateConversationSession(input: {
     userCourseId: input.userCourseId,
     operation: "conversation_final_evaluation",
     model: route.model,
-    metadata: { level: input.level, messageCount: input.messages.length, targetCount: input.targets.length, kind: input.kind, targetLanguage: language.code, routeReason: route.reason },
+    metadata: { level: input.level, messageCount: input.messages.length, targetCount: input.targets.length, kind: input.kind, targetLanguage: language.code, routeReason: route.reason, decisionsMode: decisionMode },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -106,6 +119,12 @@ export async function evaluateConversationSession(input: {
       outputTokens: response.usage?.output_tokens ?? 0,
     });
 
+    if (shouldUseNativeDecision(decisionMode) && decisionScoring?.status === "ok") {
+      return {
+        ...response.output_parsed,
+        ...decisionScoring.data,
+      };
+    }
     return response.output_parsed;
   } catch (error) {
     perf.fail(error);

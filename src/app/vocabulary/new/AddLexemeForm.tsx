@@ -146,55 +146,55 @@ export function AddLexemeForm({ translationPreference }: {
   const remaining = rows.filter((row) => selected.has(row.key) && statuses[row.key]?.state !== "saved").length;
 
   return (
-    <div className="import-workspace">
-      <div className="import-tabs" role="tablist" aria-label={t("vocab.add.input")}>
+    <div className="import-workspace [display:flex] [flex-direction:column] [gap:14px] [width:100%] [max-width:820px]">
+      <div className="import-tabs [display:flex] [gap:4px] [padding:4px] [width:fit-content] [border-radius:12px] [background:var(--surface-raised)] [border:1px_solid_var(--border)] [&_button]:[padding:8px_18px] [&_button]:[border:0] [&_button]:[border-radius:9px] [&_button]:[background:transparent] [&_button]:[color:var(--text-muted)] [&_button]:[cursor:pointer] [&_button[aria-selected=true]]:[background:var(--surface)] [&_button[aria-selected=true]]:[color:var(--text)] [&_button[aria-selected=true]]:[box-shadow:0_1px_4px_rgba(0,_0,_0,_0.12)]" role="tablist" aria-label={t("vocab.add.input")}>
         <button type="button" role="tab" aria-selected={tab === "text"} onClick={() => setTab("text")} disabled={processing}>{t("vocab.add.text")}</button>
         <button type="button" role="tab" aria-selected={tab === "csv"} onClick={() => setTab("csv")} disabled={processing}>{t("vocab.add.csv")}</button>
       </div>
 
       {tab === "text" ? (
-        <form action={previewAction} className="form-panel">
-          <div className="field">
+        <form action={previewAction} className="form-panel [width:100%] [max-width:680px]">
+          <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
             <textarea id="text" name="text" placeholder={t("vocab.add.textPlaceholder")} lang="de" dir="ltr" rows={8} autoComplete="off" required disabled={processing} />
           </div>
           {preview.status === "error" ? <StatusNotice tone="error">{preview.message}</StatusNotice> : null}
           <ActionButton pendingLabel={t("vocab.add.analyzing")} disabled={processing}><ScanText size={18} /> {t("vocab.add.analyze")}</ActionButton>
         </form>
       ) : (
-        <div className="form-panel">
+        <div className="form-panel [width:100%] [max-width:680px]">
           <textarea id="csv-words" value={csvText} onChange={(event) => updateCsv(event.target.value)} placeholder={t("vocab.add.csvPlaceholder")} lang="de" dir="ltr" rows={6} disabled={processing} />
-          <input ref={fileRef} type="file" accept=".csv,text/csv,text/plain" className="import-file-input" aria-label={t("vocab.add.uploadAria")} onChange={async (event) => {
+          <input ref={fileRef} type="file" accept=".csv,text/csv,text/plain" className="import-file-input [display:none]" aria-label={t("vocab.add.uploadAria")} onChange={async (event) => {
             const file = event.target.files?.[0];
             if (file) updateCsv(await file.text());
             event.target.value = "";
           }} />
-          <button type="button" className="button button-secondary" onClick={() => fileRef.current?.click()} disabled={processing}><Upload size={17} /> {t("vocab.add.upload")}</button>
+          <button type="button" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" onClick={() => fileRef.current?.click()} disabled={processing}><Upload size={17} /> {t("vocab.add.upload")}</button>
         </div>
       )}
 
       {rows.length > 0 ? (
-        <section className="panel import-preview">
-          <div className="import-preview-head">
+        <section className="panel import-preview [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [border-radius:18px]">
+          <div className="import-preview-head [display:flex] [flex-direction:column] [gap:5px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1rem] [&_h2]:[letter-spacing:-0.02em] min-[760px]:[flex-direction:row] min-[760px]:[align-items:center] min-[760px]:[justify-content:space-between]">
             <h2>{tab === "csv" ? t("vocab.add.words", { count: formatNumber(locale, rows.length) }) : preview.message}</h2>
-            <span className="muted">{t("vocab.add.select")}</span>
+            <span className="muted [color:var(--text-muted)]">{t("vocab.add.select")}</span>
           </div>
           {importError ? <StatusNotice tone="error">{importError}</StatusNotice> : null}
-          <div className="import-list">
+          <div className="import-list [display:flex] [flex-direction:column] [border-top:1px_solid_var(--border)]">
             {rows.map((row) => {
               const status = statuses[row.key];
               return (
-                <label className={`import-row${status?.state === "saved" ? " import-row--saved" : ""}`} key={row.key}>
-                  {status?.state === "loading" ? <LoaderCircle className="import-row-spinner" size={20} aria-label={t("vocab.add.adding")} />
-                    : status?.state === "saved" ? <Check className="import-row-check" size={20} aria-label={t("vocab.add.added")} />
+                <label className={`import-row [display:grid] [grid-template-columns:auto_minmax(0,_1fr)] [gap:12px] [align-items:start] [padding:14px_0] [border-bottom:1px_solid_var(--border)] [cursor:pointer] [&_>_input]:[width:18px] [&_>_input]:[height:18px] [&_>_input]:[min-height:auto] [&_>_input]:[margin:3px_0_0]${status?.state === "saved" ? " import-row--saved [padding-inline:12px] [border-radius:10px] [background:rgba(47,_160,_102,_0.12)] [cursor:default]" : ""}`} key={row.key}>
+                  {status?.state === "loading" ? <LoaderCircle className="import-row-spinner [flex:none] [animation:import-spin_0.8s_linear_infinite]" size={20} aria-label={t("vocab.add.adding")} />
+                    : status?.state === "saved" ? <Check className="import-row-check [color:#23965a] [margin-top:2px]" size={20} aria-label={t("vocab.add.added")} />
                       : <input type="checkbox" checked={selected.has(row.key)} onChange={() => toggle(row.key)} disabled={processing} />}
-                  <div className="import-row-copy">
-                    <div className="word-meta">
+                  <div className="import-row-copy [min-width:0] [display:flex] [flex-direction:column] [gap:5px] [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.78rem] [&_>_span]:[line-height:1.45] [&_>_small]:[color:var(--text-muted)] [&_>_small]:[font-size:0.78rem] [&_>_small]:[line-height:1.45]">
+                    <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
                       <strong className="learning-content" lang="de" dir="ltr">{row.label}</strong>
                       {row.candidate ? (
                         <>
-                          <span className="badge">{row.candidate.partOfSpeech}</span>
-                          <span className="badge">{row.candidate.cefrLevel}</span>
-                          <span className="badge">{row.candidate.userVocabularyId ? t("vocab.add.inVocabulary") : t("vocab.add.new")}</span>
+                          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{row.candidate.partOfSpeech}</span>
+                          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{row.candidate.cefrLevel}</span>
+                          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{row.candidate.userVocabularyId ? t("vocab.add.inVocabulary") : t("vocab.add.new")}</span>
                         </>
                       ) : null}
                     </div>
@@ -205,14 +205,14 @@ export function AddLexemeForm({ translationPreference }: {
                         {row.candidate.pattern ? <small className="learning-content" lang="de" dir="ltr">{row.candidate.pattern}</small> : null}
                       </>
                     ) : null}
-                    {status?.state === "error" ? <small className="optimistic-error">{status.message}</small> : null}
+                    {status?.state === "error" ? <small className="optimistic-error [width:min(100%,_760px)] [margin-inline:auto] [display:grid] [grid-template-columns:20px_minmax(0,_1fr)_auto] [align-items:center] [gap:9px] [padding:10px_12px] [border:1px_solid_rgba(239,_91,_91,_0.35)] [border-radius:13px] [background:rgba(239,_91,_91,_0.08)] [color:var(--text-soft)] [font-size:0.74rem] [&_>_svg]:[color:var(--danger)] [&_.text-button]:[min-height:36px] max-[480px]:[grid-template-columns:20px_minmax(0,_1fr)] max-[480px]:[&_.text-button]:[grid-column:2] max-[480px]:[&_.text-button]:[justify-self:start]">{status.message}</small> : null}
                   </div>
                 </label>
               );
             })}
           </div>
-          <button className="button button-primary" type="button" onClick={addSelected} disabled={processing || remaining === 0}>
-            {processing ? <LoaderCircle className="import-row-spinner" size={18} /> : <Check size={18} />}
+          <button className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="button" onClick={addSelected} disabled={processing || remaining === 0}>
+            {processing ? <LoaderCircle className="import-row-spinner [flex:none] [animation:import-spin_0.8s_linear_infinite]" size={18} /> : <Check size={18} />}
             {processing
               ? t("vocab.add.addingWords")
               : remaining

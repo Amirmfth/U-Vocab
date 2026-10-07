@@ -113,7 +113,7 @@ export function TeachGrammarSheet({
   return (
     <>
       <button
-        className="button button-primary"
+        className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
         type="button"
         ref={triggerRef}
         onClick={() => {
@@ -128,20 +128,20 @@ export function TeachGrammarSheet({
       <AnimatePresence onExitComplete={() => triggerRef.current?.focus()}>
         {open ? (
           <motion.div
-            className="teach-sheet-overlay"
+            className="teach-sheet-overlay [position:fixed] [z-index:120] [inset:0] [display:flex] [align-items:flex-end] [justify-content:center] [padding:0_16px] max-[619px]:[padding:0]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduceMotion ? 0.12 : 0.2 }}
           >
             <button
-              className="teach-sheet-backdrop"
+              className="teach-sheet-backdrop [position:absolute] [inset:0] [border:0] [background:rgba(0,_0,_0,_0.72)] [backdrop-filter:blur(5px)]"
               type="button"
               aria-label={t("grammar.teach.close")}
               onClick={close}
             />
             <motion.section
-              className="teach-sheet grammar-teach-sheet"
+              className="teach-sheet grammar-teach-sheet [position:relative] [z-index:1] [width:min(640px,_100%)] [max-height:min(76dvh,_680px)] [display:flex] [flex-direction:column] [overflow:hidden] [border:1px_solid_var(--border-strong)] [border-bottom:0] [border-radius:24px_24px_0_0] [background:var(--surface)] [box-shadow:var(--shadow)] max-[619px]:[width:100%] [&_.teach-sheet-header_small]:[display:block] [&_.teach-sheet-header_small]:[margin-top:4px] [&_.teach-sheet-header_small]:[text-transform:capitalize]"
               role="dialog"
               aria-modal="true"
               aria-labelledby="grammar-teach-sheet-title"
@@ -155,21 +155,21 @@ export function TeachGrammarSheet({
                   : { type: "spring", stiffness: 340, damping: 34, mass: 0.9 }
               }
             >
-              <div className="teach-sheet-handle" aria-hidden="true" />
-              <header className="teach-sheet-header">
+              <div className="teach-sheet-handle [width:38px] [height:4px] [flex:0_0_auto] [margin:10px_auto_0] [border-radius:999px] [background:var(--border-strong)]" aria-hidden="true" />
+              <header className="teach-sheet-header [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:16px] [padding:18px_22px_12px] [border-bottom:1px_solid_var(--border)] [&_h2]:[margin:4px_0_0] [&_h2]:[font-size:clamp(1.35rem,_4vw,_1.8rem)]">
                 <div>
-                  <p className="eyebrow">{t("grammar.teach.eyebrow")}</p>
+                  <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.teach.eyebrow")}</p>
                   <h2 id="grammar-teach-sheet-title" className="learning-content" lang="en" dir="ltr">
                     {label}
                   </h2>
                   {angle ? (
-                    <small className="muted">
+                    <small className="muted [color:var(--text-muted)]">
                       {t("grammar.teach.approach", { angle: angle.replaceAll("-", " ") })}
                     </small>
                   ) : null}
                 </div>
                 <button
-                  className="icon-button"
+                  className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]"
                   type="button"
                   aria-label={t("grammar.teach.close")}
                   ref={closeRef}
@@ -179,21 +179,21 @@ export function TeachGrammarSheet({
                 </button>
               </header>
 
-              <div className="teach-sheet-content" aria-live="polite">
+              <div className="teach-sheet-content [min-height:130px] [overflow-y:auto] [overscroll-behavior:contain] [padding:20px_22px]" aria-live="polite">
                 {loading ? (
-                  <p className="muted" role="status">
+                  <p className="muted [color:var(--text-muted)]" role="status">
                     {t("grammar.teach.loading")}
                   </p>
                 ) : null}
                 {error ? (
-                  <p className="optimistic-error" role="alert">
+                  <p className="optimistic-error [width:min(100%,_760px)] [margin-inline:auto] [display:grid] [grid-template-columns:20px_minmax(0,_1fr)_auto] [align-items:center] [gap:9px] [padding:10px_12px] [border:1px_solid_rgba(239,_91,_91,_0.35)] [border-radius:13px] [background:rgba(239,_91,_91,_0.08)] [color:var(--text-soft)] [font-size:0.74rem] [&_>_svg]:[color:var(--danger)] [&_.text-button]:[min-height:36px] max-[480px]:[grid-template-columns:20px_minmax(0,_1fr)] max-[480px]:[&_.text-button]:[grid-column:2] max-[480px]:[&_.text-button]:[justify-self:start]" role="alert">
                     {error}
                   </p>
                 ) : null}
                 {lesson ? (
                   <div
                     className={
-                      "teach-sheet-lesson teach-sheet-lesson--" + language
+                      "teach-sheet-lesson [line-height:1.7] [overflow-wrap:anywhere] [&.teach-sheet-lesson--fa]:[text-align:right] [&.teach-sheet-lesson--en]:[text-align:left] [&_>_:first-child]:[margin-top:0] [&_>_:last-child]:[margin-bottom:0] [&_p]:[margin:0_0_14px] [&_ul]:[margin:0_0_14px] [&_ol]:[margin:0_0_14px] [&_blockquote]:[margin:0_0_14px] [&_h1]:[margin:18px_0_8px] [&_h1]:[font-size:1rem] [&_h1]:[line-height:1.4] [&_h2]:[margin:18px_0_8px] [&_h2]:[font-size:1rem] [&_h2]:[line-height:1.4] [&_h3]:[margin:18px_0_8px] [&_h3]:[font-size:1rem] [&_h3]:[line-height:1.4] [&_ul]:[padding-inline-start:1.4rem] [&_ol]:[padding-inline-start:1.4rem] [&_li_+_li]:[margin-top:6px] [&_strong]:[color:var(--text)] [&_a]:[color:var(--primary-strong)] [&_a]:[text-decoration:underline] [&_blockquote]:[padding-inline-start:12px] [&_blockquote]:[border-inline-start:2px_solid_var(--primary)] [&_blockquote]:[color:var(--text-soft)] [&_pre]:[overflow-x:auto] [&_pre]:[padding:12px] [&_pre]:[border-radius:10px] [&_pre]:[background:var(--surface-soft)] [&_pre]:[direction:ltr] [&_pre]:[text-align:left] [&_code]:[direction:ltr] [&_code]:[unicode-bidi:isolate] [&_table]:[display:block] [&_table]:[max-width:100%] [&_table]:[overflow-x:auto] [&_table]:[border-collapse:collapse] [&_th]:[padding:7px_10px] [&_th]:[border:1px_solid_var(--border)] [&_td]:[padding:7px_10px] [&_td]:[border:1px_solid_var(--border)] teach-sheet-lesson--" + language
                     }
                     dir={language === "fa" ? "rtl" : "ltr"}
                     lang={language}
@@ -205,9 +205,9 @@ export function TeachGrammarSheet({
                 ) : null}
               </div>
 
-              <div className="teach-sheet-footer">
+              <div className="teach-sheet-footer [display:flex] [justify-content:flex-end] [padding:12px_22px_max(16px,_env(safe-area-inset-bottom))] [border-top:1px_solid_var(--border)]">
                 <button
-                  className="button button-secondary"
+                  className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
                   type="button"
                   disabled={loading}
                   onClick={() => void generate(angle)}

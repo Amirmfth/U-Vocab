@@ -1,7 +1,4 @@
 import "./globals.css";
-import "./core-experience.css";
-import "./core-learning-polish.css";
-import "./grammar.css";
 import "@/i18n/fonts.css";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
@@ -75,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body>
         <I18nProvider locale={locale}>
-          <a className="skip-link" href="#main-content">
+          <a className="skip-link [position:fixed] [z-index:200] [top:max(10px,_env(safe-area-inset-top))] [left:12px] [padding:10px_13px] [border:1px_solid_var(--border-strong)] [border-radius:12px] [background:var(--text)] [color:var(--bg)] [font-size:0.8rem] [font-weight:700] [transform:translateY(-160%)] [transition:transform_140ms_ease] [&:focus]:[transform:translateY(0)]" href="#main-content">
             {t("layout.skipToContent")}
           </a>
           {authenticated ? <WebVitals /> : null}
@@ -99,7 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div
               id="main-content"
               tabIndex={-1}
-              className={authenticated ? "app-shell" : "auth-shell"}
+              className={authenticated ? "app-shell [width:100%] [max-width:1180px] [margin:0_auto] [padding:calc(72px_+_env(safe-area-inset-top))_16px_calc(104px_+_env(safe-area-inset-bottom))] min-[620px]:[padding-inline:24px] min-[940px]:[padding:28px_36px_64px]" : "auth-shell [min-height:100dvh] [width:100%]"}
             >
               <PageTransition>{children}</PageTransition>
             </div>

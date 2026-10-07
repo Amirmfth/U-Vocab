@@ -21,7 +21,7 @@ export function AddReadingLexemeForm({
   const [state, action] = useActionState(addReadingLexeme, initialState);
 
   return (
-    <div className="reading-action-stack">
+    <div className="reading-action-stack [display:flex] [flex-direction:column] [gap:14px]">
       <form action={action}>
         <input type="hidden" name="documentId" value={documentId} />
         <input type="hidden" name="lexemeId" value={lexemeId} />

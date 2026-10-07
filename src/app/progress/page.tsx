@@ -442,7 +442,7 @@ export default async function ProgressPage({
   };
 
   return (
-    <main className="page">
+    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
       <TimezoneSync savedTimezone={user.timezone} />
       <PersistedFirstUseGuide
         userId={user.id}
@@ -453,19 +453,19 @@ export default async function ProgressPage({
         dismissLabel={t("guidance.dismiss")}
       />
 
-      <section className="page-header compact">
-        <p className="eyebrow">{t("progress.eyebrow")}</p>
+      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
+        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.eyebrow")}</p>
         <h1>{t("progress.title")}</h1>
-        <p className="page-description">{t("progress.description")}</p>
+        <p className="page-description [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]">{t("progress.description")}</p>
       </section>
 
-      <nav className="range-tabs" aria-label={t("progress.range")}>
+      <nav className="range-tabs [width:fit-content] [max-width:100%] [display:flex] [gap:4px] [overflow-x:auto] [padding:3px] [border:1px_solid_var(--border)] [border-radius:12px] [background:var(--surface)]" aria-label={t("progress.range")}>
         {(["7", "30", "90", "365", "all"] as ProgressRange[]).map((value) =>
           canUseAdvancedAnalytics || value === "7" ? (
             <Link
               key={value}
               href={"/progress?range=" + value}
-              className={"range-tab " + (range === value ? "is-active" : "")}
+              className={"range-tab [min-width:48px] [min-height:38px] [display:grid] [place-items:center] [padding:0_10px] [border-radius:9px] [color:var(--text-muted)] [font-size:0.76rem] [font-weight:600] [white-space:nowrap] [&.is-active]:[background:var(--surface-soft)] [&.is-active]:[color:var(--text)] [&.is-locked]:[grid-auto-flow:column] [&.is-locked]:[gap:6px] [&.is-locked]:[cursor:not-allowed] [&.is-locked]:[opacity:0.72] [&.is-locked_small]:[font-size:0.58rem] [&.is-locked_small]:[font-weight:700] [&.is-locked_small]:[letter-spacing:0.04em] [&.is-locked_small]:[text-transform:uppercase] " + (range === value ? "is-active" : "")}
               aria-current={range === value ? "page" : undefined}
             >
               {t(rangeLabelKeys[value])}
@@ -473,7 +473,7 @@ export default async function ProgressPage({
           ) : (
             <span
               key={value}
-              className="range-tab is-locked"
+              className="range-tab is-locked [min-width:48px] [min-height:38px] [display:grid] [place-items:center] [padding:0_10px] [border-radius:9px] [color:var(--text-muted)] [font-size:0.76rem] [font-weight:600] [white-space:nowrap] [&.is-active]:[background:var(--surface-soft)] [&.is-active]:[color:var(--text)] [&.is-locked]:[grid-auto-flow:column] [&.is-locked]:[gap:6px] [&.is-locked]:[cursor:not-allowed] [&.is-locked]:[opacity:0.72] [&.is-locked_small]:[font-size:0.58rem] [&.is-locked_small]:[font-weight:700] [&.is-locked_small]:[letter-spacing:0.04em] [&.is-locked_small]:[text-transform:uppercase]"
               aria-label={t("progress.proRangeLocked", {
                 range: t(rangeLabelKeys[value]),
               })}
@@ -485,7 +485,7 @@ export default async function ProgressPage({
         )}
       </nav>
 
-      <section className="progress-summary">
+      <section className="progress-summary [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [border:1px_solid_var(--border)] [border-radius:var(--radius-lg)] [overflow:hidden] [&_>_div]:[min-width:0] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:4px] [&_>_div]:[padding:15px_13px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:nth-child(odd)]:[border-right:1px_solid_var(--border)] [&_>_div:nth-last-child(-n_+_2)]:[border-bottom:0] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.7rem] [&_span]:[line-height:1.35] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.7rem] [&_small]:[line-height:1.35] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_strong]:[font-variant-numeric:tabular-nums] [&_strong]:[font-size:1.55rem] [&_strong]:[letter-spacing:-0.05em] min-[620px]:[grid-template-columns:repeat(4,_minmax(0,_1fr))] min-[620px]:[&_>_div]:[border-bottom:0] min-[620px]:[&_>_div:nth-last-child(-n_+_2)]:[border-bottom:0] min-[620px]:[&_>_div:nth-child(odd)]:[border-right:0] min-[620px]:[&_>_div_+_div]:[border-left:1px_solid_var(--border)]">
         <div>
           <span>{t("progress.vocabulary")}</span>
           <strong>{formatNumber(locale, vocabulary.length)}</strong>
@@ -525,22 +525,22 @@ export default async function ProgressPage({
         compact={!canUseAdvancedAnalytics}
       />
 
-      <section className="progress-grid">
-        <article className="panel progress-panel">
-          <div className="section-heading">
+      <section className="progress-grid [display:grid] [grid-template-columns:1fr] [gap:12px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+        <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
             <div>
-              <p className="eyebrow">{t("progress.skillBalance")}</p>
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.skillBalance")}</p>
               <h2>{t("progress.recognitionProduction")}</h2>
             </div>
             <TrendingUp size={19} />
           </div>
-          <div className="progress-bars">
+          <div className="progress-bars [display:flex] [flex-direction:column] [gap:15px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:7px] [&_span]:[display:flex] [&_span]:[justify-content:space-between] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.78rem] [&_b]:[color:var(--text-soft)] [&_b]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
             <div>
               <span>
                 {t("progress.recognition")}{" "}
                 <b>{formatPercent(locale, averageRecognition)}</b>
               </span>
-              <div className="metric-bar">
+              <div className="metric-bar [height:7px] [overflow:hidden] [border-radius:999px] [background:var(--surface-soft)] [&_>_span]:[display:block] [&_>_span]:[height:100%] [&_>_span]:[border-radius:inherit] [&_>_span]:[background:var(--primary)]">
                 <span
                   style={{ width: Math.round(averageRecognition * 100) + "%" }}
                 />
@@ -551,25 +551,25 @@ export default async function ProgressPage({
                 {t("progress.production")}{" "}
                 <b>{formatPercent(locale, averageProduction)}</b>
               </span>
-              <div className="metric-bar">
+              <div className="metric-bar [height:7px] [overflow:hidden] [border-radius:999px] [background:var(--surface-soft)] [&_>_span]:[display:block] [&_>_span]:[height:100%] [&_>_span]:[border-radius:inherit] [&_>_span]:[background:var(--primary)]">
                 <span
                   style={{ width: Math.round(averageProduction * 100) + "%" }}
                 />
               </div>
             </div>
           </div>
-          <p className="analytics-caveat">{t("progress.estimateCaveat")}</p>
+          <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.estimateCaveat")}</p>
         </article>
 
-        <article className="panel progress-panel">
-          <div className="section-heading">
+        <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
             <div>
-              <p className="eyebrow">{t("progress.workload")}</p>
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.workload")}</p>
               <h2>{t("progress.reviewQueue")}</h2>
             </div>
             <Clock3 size={19} />
           </div>
-          <div className={"workload-numbers " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
+          <div className={"workload-numbers [&.is-free]:[grid-template-columns:1fr] [&.is-free_>_div_+_div]:[border-left:0] [display:grid] [grid-template-columns:repeat(3,_minmax(0,_1fr))] [border-top:1px_solid_var(--border)] [border-bottom:1px_solid_var(--border)] [&_>_div]:[min-width:0] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:4px] [&_>_div]:[padding:13px_8px] [&_>_div_+_div]:[border-left:1px_solid_var(--border)] [&_strong]:[font-size:1.35rem] [&_strong]:[font-variant-numeric:tabular-nums] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.67rem] " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
             <div>
               <strong>{formatNumber(locale, dueNow)}</strong>
               <span>{t("progress.dueNow")}</span>
@@ -587,7 +587,7 @@ export default async function ProgressPage({
               </>
             ) : null}
           </div>
-          <p className="analytics-caveat">
+          <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">
             {canUseAdvancedAnalytics
               ? t("progress.reviewSuccess", {
                   percent: formatPercent(locale, reviewSuccess),
@@ -597,20 +597,20 @@ export default async function ProgressPage({
         </article>
 
         {canUseAdvancedAnalytics ? (
-          <article className="panel progress-panel">
-            <div className="section-heading">
+          <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+            <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
               <div>
-                <p className="eyebrow">{t("progress.time")}</p>
+                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.time")}</p>
                 <h2>{t("progress.activePractice")}</h2>
               </div>
               <Flame size={19} />
             </div>
-            <p className="big-metric">
+            <p className="big-metric [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-variant-numeric:tabular-nums] [margin:12px_0_2px] [font-size:clamp(2rem,_10vw,_3.4rem)] [line-height:0.95] [letter-spacing:-0.07em]">
               {t("progress.minutes", {
                 count: formatNumber(locale, minutes(totalDurationMs)),
               })}
             </p>
-            <p className="analytics-caveat">
+            <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">
               {t("progress.practiceAccuracy", {
                 percent: formatPercent(locale, practiceAccuracy),
                 count: formatNumber(locale, encounterCount),
@@ -619,16 +619,16 @@ export default async function ProgressPage({
           </article>
         ) : null}
 
-        <article className="panel progress-panel">
-          <div className="section-heading">
+        <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
             <div>
-              <p className="eyebrow">{t("progress.weakAreas")}</p>
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.weakAreas")}</p>
               <h2>{t("progress.needsWork")}</h2>
             </div>
             <ShieldCheck size={19} />
           </div>
           {weakAreas.length ? (
-            <div className="weakness-list">
+            <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
               {weakAreas
                 .slice(0, canUseAdvancedAnalytics ? 6 : 3)
                 .map(([type, count]) => (
@@ -643,7 +643,7 @@ export default async function ProgressPage({
                 ))}
             </div>
           ) : (
-            <p className="muted">{t("progress.noWeakness")}</p>
+            <p className="muted [color:var(--text-muted)]">{t("progress.noWeakness")}</p>
           )}
         </article>
       </section>
@@ -657,15 +657,15 @@ export default async function ProgressPage({
       ) : (
         <>
           {comparisons ? (
-            <section className="panel progress-panel">
-              <div className="section-heading">
+            <section className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+              <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
                 <div>
-                  <p className="eyebrow">{t("progress.comparison.eyebrow")}</p>
+                  <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.comparison.eyebrow")}</p>
                   <h2>{t("progress.comparison.title")}</h2>
                 </div>
                 <TrendingUp size={19} />
               </div>
-              <div className="weakness-list">
+              <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
                 <div>
                   <span>{t("progress.comparison.wordsAdded")}</span>
                   <strong>{signedNumber(locale, comparisons.learned.delta)}</strong>
@@ -695,19 +695,19 @@ export default async function ProgressPage({
                   </strong>
                 </div>
               </div>
-              <p className="analytics-caveat">{t("progress.comparison.caveat")}</p>
+              <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.comparison.caveat")}</p>
             </section>
           ) : null}
 
-          <section className="panel progress-panel">
-            <div className="section-heading">
+          <section className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+            <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
               <div>
-                <p className="eyebrow">{t("progress.report.eyebrow")}</p>
+                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.report.eyebrow")}</p>
                 <h2>{t("progress.report.title")}</h2>
               </div>
               <Sparkles size={19} />
             </div>
-            <div className="weakness-list">
+            <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
               <div>
                 <span>{t("progress.report.strongest")}</span>
                 <strong>{reportLabel(report.strongest)}</strong>
@@ -725,29 +725,29 @@ export default async function ProgressPage({
                 <strong>{reportLabel(report.suggestedNext)}</strong>
               </div>
             </div>
-            <p className="analytics-caveat">{t("progress.report.caveat")}</p>
+            <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.report.caveat")}</p>
           </section>
 
-          <section className="panel progress-panel">
-            <div className="section-heading">
+          <section className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
+            <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
               <div>
-                <p className="eyebrow">{t("progress.growth")}</p>
+                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.growth")}</p>
                 <h2>{t("progress.trend")}</h2>
               </div>
             </div>
-            <div className="trend-chart" aria-label={t("progress.trendAria")}>
+            <div className="trend-chart [height:150px] [display:grid] [grid-template-columns:repeat(12,_minmax(18px,_1fr))] [gap:5px] [align-items:end] [padding-top:12px] [overflow-x:auto]" aria-label={t("progress.trendAria")}>
               {monthlyTrend.map((item) => (
-                <div className="trend-month" key={item.month}>
-                  <div className="trend-bars">
+                <div className="trend-month [height:100%] [min-width:20px] [display:grid] [grid-template-rows:minmax(0,_1fr)_auto] [gap:6px] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.58rem] [&_small]:[text-align:center]" key={item.month}>
+                  <div className="trend-bars [height:100%] [display:flex] [align-items:end] [justify-content:center] [gap:2px]">
                     <span
-                      className="trend-bar learned"
+                      className="trend-bar learned [width:min(8px,_45%)] [min-height:3px] [border-radius:4px_4px_1px_1px] [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)]"
                       style={{ height: Math.max(3, (item.learned / maxTrend) * 100) + "%" }}
                       title={t("progress.learnedTitle", {
                         count: formatNumber(locale, item.learned),
                       })}
                     />
                     <span
-                      className="trend-bar mastered"
+                      className="trend-bar mastered [width:min(8px,_45%)] [min-height:3px] [border-radius:4px_4px_1px_1px] [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)]"
                       style={{ height: Math.max(3, (item.mastered / maxTrend) * 100) + "%" }}
                       title={t("progress.masteredTitle", {
                         count: formatNumber(locale, item.mastered),
@@ -762,30 +762,30 @@ export default async function ProgressPage({
                 </div>
               ))}
             </div>
-            <div className="trend-legend">
+            <div className="trend-legend [display:flex] [gap:14px] [margin-top:10px] [color:var(--text-muted)] [font-size:0.68rem] [&_span]:[display:inline-flex] [&_span]:[align-items:center] [&_span]:[gap:6px]">
               <span>
-                <i className="trend-key learned" /> {t("progress.added")}
+                <i className="trend-key learned [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)] [width:8px] [height:8px] [border-radius:2px]" /> {t("progress.added")}
               </span>
               <span>
-                <i className="trend-key mastered" /> {t("progress.masteredLegend")}
+                <i className="trend-key mastered [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)] [width:8px] [height:8px] [border-radius:2px]" /> {t("progress.masteredLegend")}
               </span>
             </div>
-            <p className="analytics-caveat">{t("progress.trendCaveat")}</p>
+            <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.trendCaveat")}</p>
           </section>
         </>
       )}
 
-      <section className="panel heatmap-panel">
-        <div className="section-heading">
+      <section className="panel heatmap-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [overflow:hidden] [border-radius:18px]">
+        <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
           <div>
-            <p className="eyebrow">{t("progress.activity")}</p>
+            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.activity")}</p>
             <h2>
               {canUseAdvancedAnalytics
                 ? t("progress.days365")
                 : t("progress.days7")}
             </h2>
           </div>
-          <span className="muted">{user.timezone}</span>
+          <span className="muted [color:var(--text-muted)]">{user.timezone}</span>
         </div>
 
         <ActivityHeatmap
@@ -797,7 +797,7 @@ export default async function ProgressPage({
           dayCount={canUseAdvancedAnalytics ? 365 : 7}
         />
 
-        <div className="day-detail">
+        <div className="day-detail [display:flex] [flex-direction:column] [gap:10px] [padding-top:14px] [border-top:1px_solid_var(--border)] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:3px] [&_>_div:first-child_span]:[color:var(--text-muted)] [&_>_div:first-child_span]:[font-size:0.7rem] min-[620px]:[flex-direction:row] min-[620px]:[justify-content:space-between] min-[620px]:[align-items:center]">
           <div>
             <strong>
               {formatDate(locale, new Date(selectedDay + "T12:00:00Z"), {
@@ -810,7 +810,7 @@ export default async function ProgressPage({
                 : t("progress.noActivity")}
             </span>
           </div>
-          <div className="day-detail-metrics">
+          <div className="day-detail-metrics [display:flex] [flex-wrap:wrap] [gap:6px] [&_span]:[padding:5px_8px] [&_span]:[border:1px_solid_var(--border)] [&_span]:[border-radius:999px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.68rem]">
             <span>
               {t("progress.reviewed", {
                 count: formatNumber(locale, selectedActivity?.reviewed ?? 0),
@@ -845,12 +845,12 @@ export default async function ProgressPage({
         </div>
       </section>
 
-      <section className="progress-actions">
-        <Link href="/rescue" className="button button-primary">
+      <section className="progress-actions [display:flex] [flex-direction:column] [gap:9px] min-[620px]:[flex-direction:row]">
+        <Link href="/rescue" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
           {t("progress.rescueWeak")}{" "}
           <ArrowRight className="rtl-mirror" size={17} />
         </Link>
-        <Link href="/mistakes" className="button button-secondary">
+        <Link href="/mistakes" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
           {t("progress.reviewMistakes")}
         </Link>
       </section>

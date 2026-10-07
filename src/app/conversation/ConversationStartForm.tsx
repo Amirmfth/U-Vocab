@@ -35,8 +35,8 @@ export function ConversationStartForm({
   }, [router, state]);
 
   return (
-    <form action={action} className="panel conversation-start-form">
-      <div className="field">
+    <form action={action} className="panel conversation-start-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[&_>_.field:first-of-type]:[grid-column:1_/_-1] min-[620px]:[&_>_.conversation-toggle]:[grid-column:1_/_-1] min-[620px]:[&_>_.status-notice]:[grid-column:1_/_-1] min-[620px]:[&_>_.button]:[grid-column:1_/_-1] [border-radius:18px] [&.loading-hub-form]:[display:flex] [&.loading-hub-form]:[flex-direction:column] min-[620px]:[&.loading-hub-form]:[display:grid] min-[620px]:[&.loading-hub-form]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[&.loading-hub-form_>_.field:first-child]:[grid-column:1_/_-1] min-[620px]:[&.loading-hub-form_>_.loading-form-submit]:[grid-column:1_/_-1]">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="conversation-mode-trigger">{t("conversation.mode")}</label>
         <ActivitySelect
           id="conversation-mode"
@@ -58,10 +58,10 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor={kind + "-topic"}>
           {t("conversation.topic")}{" "}
-          <span className="muted">({t("reading.optional")})</span>
+          <span className="muted [color:var(--text-muted)]">({t("reading.optional")})</span>
         </label>
         <input
           id={kind + "-topic"}
@@ -75,7 +75,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor={kind + "-target-count"}>{t("conversation.targets")}</label>
         <ActivitySelect
           id={kind + "-target-count"}
@@ -90,7 +90,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor={kind + "-tone-trigger"}>{t("conversation.tone")}</label>
         <ActivitySelect
           id={kind + "-tone"}
@@ -126,7 +126,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor={kind + "-formality-trigger"}>{t("conversation.formality")}</label>
         <ActivitySelect
           id={kind + "-formality"}
@@ -153,7 +153,7 @@ export function ConversationStartForm({
       </div>
 
       {kind === "MISSION" ? (
-        <label className="conversation-toggle">
+        <label className="conversation-toggle [min-height:54px] [display:flex] [align-items:flex-start] [gap:10px] [padding:11px_0] [cursor:pointer] [&_input]:[width:18px] [&_input]:[height:18px] [&_input]:[margin-top:2px] [&_span]:[display:flex] [&_span]:[flex-direction:column] [&_span]:[gap:3px] [&_small]:[color:var(--text-muted)] [&_small]:[line-height:1.4]">
           <input type="checkbox" name="revealTargets" />
           <span>
             <strong>{t("conversation.showTargets")}</strong>

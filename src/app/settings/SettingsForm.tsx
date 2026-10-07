@@ -35,8 +35,8 @@ export function SettingsForm({
   ];
 
   return (
-    <form action={action} className="panel form-panel">
-      <div className="field">
+    <form action={action} className="panel form-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:680px] [border-radius:18px]">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="translation-trigger">{t("settings.translation")}</label>
         <ActivitySelect
           defaultValue={preference}
@@ -50,9 +50,9 @@ export function SettingsForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="currentLevel-trigger">{t("settings.currentLanguageLevel", { language: languageLabel })}</label>
-        <span className="muted">{t("settings.currentLevelHelp")}</span>
+        <span className="muted [color:var(--text-muted)]">{t("settings.currentLevelHelp")}</span>
         <ActivitySelect
           defaultValue={currentLevel}
           id="currentLevel"
@@ -61,9 +61,9 @@ export function SettingsForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="targetLevel-trigger">{t("settings.targetLanguageLevel", { language: languageLabel })}</label>
-        <span className="muted">{t("settings.targetLevelHelp")}</span>
+        <span className="muted [color:var(--text-muted)]">{t("settings.targetLevelHelp")}</span>
         <ActivitySelect
           defaultValue={targetLevel}
           id="targetLevel"

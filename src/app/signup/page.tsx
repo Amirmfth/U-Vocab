@@ -13,9 +13,9 @@ export default async function SignupPage({
   const { t } = await getServerTranslator();
 
   return (
-    <main className="login-page">
+    <main className="login-page [min-height:100dvh] [display:grid] [place-items:center] [padding:24px_16px]">
       <SignupForm returnTo={returnTo} />
-      <p className="muted">
+      <p className="muted [color:var(--text-muted)]">
         {t("auth.alreadyHave")}{" "}
         <Link href={"/login?returnTo=" + encodeURIComponent(returnTo)}>
           {t("auth.signIn")}

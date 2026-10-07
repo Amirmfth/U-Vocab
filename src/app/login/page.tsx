@@ -16,9 +16,9 @@ export default async function LoginPage({
   const { t } = await getServerTranslator();
 
   return (
-    <main className="login-page">
+    <main className="login-page [min-height:100dvh] [display:grid] [place-items:center] [padding:24px_16px]">
       <LoginForm returnTo={returnTo} passwordReset={params.reset === "1"} />
-      <p className="muted">
+      <p className="muted [color:var(--text-muted)]">
         {t("auth.newTo")}{" "}
         <Link href={"/signup?returnTo=" + encodeURIComponent(returnTo)}>
           {t("auth.createAccount")}

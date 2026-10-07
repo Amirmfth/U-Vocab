@@ -184,33 +184,33 @@ export default async function GrammarConceptPage({
   const richLesson = lesson?.success ? lesson.data : null;
 
   return (
-    <main className="page grammar-detail">
-      <Link href="/grammar" className="back-link">
+    <main className="page grammar-detail [display:flex] [flex-direction:column] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [gap:18px]">
+      <Link href="/grammar" className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
         <ArrowLeft className="rtl-mirror" size={16} />
         {t("grammar.detail.back")}
       </Link>
 
-      <section className="grammar-detail-hero">
-        <div className="word-meta">
-          <span className={"grammar-state grammar-state-" + status.toLowerCase()}>
+      <section className="grammar-detail-hero [display:flex] [flex-direction:column] [gap:14px] [padding:14px_0_2px] [&_h1]:[margin:3px_0_0] [&_h1]:[max-width:820px] [&_h1]:[font-size:clamp(2.25rem,_11vw,_4.8rem)] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560]">
+        <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
+          <span className={"grammar-state [min-height:25px] [display:inline-flex] [align-items:center] [width:fit-content] [padding:0_8px] [border:1px_solid_var(--border)] [border-radius:999px] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.62rem] [color:var(--text-soft)] [background:var(--surface-raised)] [&.grammar-state-needs_attention]:[border-color:rgba(255,_107,_122,_0.28)] [&.grammar-state-needs_attention]:[color:#ffc2c9] [&.grammar-state-needs_attention]:[background:var(--danger-soft)] [&.grammar-state-learning]:[border-color:rgba(139,_124,_255,_0.28)] [&.grammar-state-learning]:[color:#d7d2ff] [&.grammar-state-learning]:[background:var(--primary-soft)] [&.grammar-state-strong]:[border-color:rgba(73,_201,_139,_0.25)] [&.grammar-state-strong]:[color:#b8f2d4] [&.grammar-state-strong]:[background:var(--success-soft)] [&.grammar-state-assumed]:[border-color:var(--border)] [&.grammar-state-assumed]:[color:var(--text-muted)] grammar-state-" + status.toLowerCase()}>
             {t(statusKeys[status])}
           </span>
-          <span className="badge">{concept.introducedAt}</span>
+          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{concept.introducedAt}</span>
           {concept.expectedBy && concept.expectedBy !== concept.introducedAt ? (
-            <span className="badge">
+            <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
               {t("grammar.detail.expectedBy", { level: concept.expectedBy })}
             </span>
           ) : null}
         </div>
-        <p className="eyebrow">{t(categoryKeys[concept.category])}</p>
+        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t(categoryKeys[concept.category])}</p>
         <h1 className="learning-content" lang="en" dir="ltr">
           {concept.title}
         </h1>
-        <p className="page-description learning-content" lang="en" dir="ltr">
+        <p className="page-description learning-content [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]" lang="en" dir="ltr">
           {concept.shortDescription}
         </p>
 
-        <div className="grammar-detail-actions">
+        <div className="grammar-detail-actions [display:flex] [flex-direction:column] [gap:8px] [&_form]:[display:contents] min-[620px]:[flex-direction:row] min-[620px]:[&_.button]:[width:auto]">
           <TeachGrammarSheet
             grammarConceptId={concept.id}
             label={concept.title}
@@ -220,7 +220,7 @@ export default async function GrammarConceptPage({
             <form action={startGrammarConceptAction}>
               <input type="hidden" name="grammarConceptId" value={concept.id} />
               <input type="hidden" name="slug" value={concept.slug} />
-              <button className="button button-primary" type="submit">
+              <button className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="submit">
                 <BookOpenCheck size={17} />
                 {status === "LEARNING"
                   ? t("grammar.detail.continue")
@@ -230,7 +230,7 @@ export default async function GrammarConceptPage({
           ) : null}
           <Link
             href={"/practice?grammar=" + concept.slug}
-            className="button button-secondary"
+            className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
           >
             <Brain size={17} />
             {t("grammar.detail.openPractice")}
@@ -239,10 +239,10 @@ export default async function GrammarConceptPage({
       </section>
 
       {progress ? (
-        <section className="panel grammar-profile-card">
-          <div className="section-heading">
+        <section className="panel grammar-profile-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:flex] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem]">
+          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
             <div>
-              <p className="eyebrow">{t("grammar.detail.profile")}</p>
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.profile")}</p>
               <h2>
                 {progress.source === "DECLARED_LEVEL"
                   ? t("grammar.detail.assumedFromLevel")
@@ -252,7 +252,7 @@ export default async function GrammarConceptPage({
             <Sparkles size={19} />
           </div>
           {progress.evidenceCount > 0 ? (
-            <div className="grammar-dimensions">
+            <div className="grammar-dimensions [display:grid] [grid-template-columns:1fr] [gap:7px] [&_>_div]:[min-height:52px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[padding:9px_11px] [&_>_div]:[border:1px_solid_var(--border)] [&_>_div]:[border-radius:12px] [&_>_div]:[background:var(--surface-raised)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.72rem] [&_strong]:[color:var(--text-soft)] [&_strong]:[font-size:0.72rem] min-[620px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))]">
               <div>
                 <span>{t("grammar.detail.understanding")}</span>
                 <strong>{dimensionLabel(t, progress.understanding)}</strong>
@@ -269,13 +269,13 @@ export default async function GrammarConceptPage({
               </div>
             </div>
           ) : (
-            <p className="muted">{t("grammar.detail.noEvidence")}</p>
+            <p className="muted [color:var(--text-muted)]">{t("grammar.detail.noEvidence")}</p>
           )}
         </section>
       ) : null}
 
-      <section className="panel grammar-canonical-reference">
-        <p className="eyebrow">{t("grammar.detail.canonical")}</p>
+      <section className="panel grammar-canonical-reference [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:grid] [gap:12px] [&_>_h2]:[margin:0] [&_>_h2]:[font-size:1.08rem] [&_>_p]:[margin:0] [&_>_p]:[color:var(--text-soft)] [&_>_p]:[line-height:1.65] [&_details]:[border-top:1px_solid_var(--border)] [&_details]:[padding-top:10px] [&_summary]:[cursor:pointer] [&_summary]:[color:var(--text-soft)] [&_summary]:[font-weight:650] [&_summary]:[font-size:0.78rem] [&_details_>_*:not(summary)]:[margin-top:10px]">
+        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.canonical")}</p>
         <h2>{t("grammar.detail.curriculumDefinition")}</h2>
         <p className="learning-content" lang="en" dir="ltr">
           {concept.explanation || concept.shortDescription}
@@ -283,7 +283,7 @@ export default async function GrammarConceptPage({
         {rules.length ? (
           <details>
             <summary>{t("grammar.detail.canonicalRules")}</summary>
-            <ol className="grammar-rule-list">
+            <ol className="grammar-rule-list [margin:0] [color:var(--text-soft)] [line-height:1.62] [padding-left:20px] [&_li_+_li]:[margin-top:8px]">
               {rules.map((rule) => (
                 <li key={rule} className="learning-content" dir="auto">
                   {rule}
@@ -295,9 +295,9 @@ export default async function GrammarConceptPage({
         {examples.length ? (
           <details>
             <summary>{t("grammar.detail.canonicalExamples")}</summary>
-            <div className="grammar-example-list">
+            <div className="grammar-example-list [display:grid] [grid-template-columns:1fr] [gap:8px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
               {examples.map((example) => (
-                <div className="grammar-example learning-content" dir="auto" key={example}>
+                <div className="grammar-example learning-content [padding:14px_15px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface)] [font-size:0.94rem] [line-height:1.55]" dir="auto" key={example}>
                   {example}
                 </div>
               ))}
@@ -315,9 +315,9 @@ export default async function GrammarConceptPage({
         />
       ) : (
         <>
-          <div className="grammar-detail-grid">
-            <section className="panel grammar-teaching-card">
-              <p className="eyebrow">{t("grammar.detail.whyMatters")}</p>
+          <div className="grammar-detail-grid [display:grid] [grid-template-columns:1fr] [gap:10px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+            <section className="panel grammar-teaching-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:flex] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem] [&_>_p:last-child]:[margin:0] [&_>_p:last-child]:[color:var(--text-soft)] [&_>_p:last-child]:[line-height:1.62]">
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.whyMatters")}</p>
               <h2 className="learning-content" lang="en" dir="ltr">
                 {concept.title}
               </h2>
@@ -326,10 +326,10 @@ export default async function GrammarConceptPage({
               </p>
             </section>
             {rules.length ? (
-              <section className="panel grammar-teaching-card">
-                <p className="eyebrow">{t("grammar.detail.pattern")}</p>
+              <section className="panel grammar-teaching-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:flex] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem] [&_>_p:last-child]:[margin:0] [&_>_p:last-child]:[color:var(--text-soft)] [&_>_p:last-child]:[line-height:1.62]">
+                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.pattern")}</p>
                 <h2>{t("grammar.detail.rules")}</h2>
-                <ol className="grammar-rule-list">
+                <ol className="grammar-rule-list [margin:0] [color:var(--text-soft)] [line-height:1.62] [padding-left:20px] [&_li_+_li]:[margin-top:8px]">
                   {rules.map((rule) => (
                     <li key={rule} className="learning-content" dir="auto">
                       {rule}
@@ -339,18 +339,18 @@ export default async function GrammarConceptPage({
               </section>
             ) : null}
           </div>
-          <section className="panel grammar-lesson-missing">
-            <p className="eyebrow">{t("grammar.detail.fullLesson")}</p>
+          <section className="panel grammar-lesson-missing [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:grid] [gap:12px] [&_>_h2]:[margin:0] [&_>_h2]:[font-size:1.08rem]">
+            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.fullLesson")}</p>
             <h2>{t("grammar.detail.lessonMissing")}</h2>
-            <p className="muted">{t("grammar.detail.lessonMissingHelp")}</p>
+            <p className="muted [color:var(--text-muted)]">{t("grammar.detail.lessonMissingHelp")}</p>
           </section>
         </>
       )}
 
-      <section className="panel grammar-watch-card">
+      <section className="panel grammar-watch-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem] [&_p]:[margin:0] [&_p]:[color:var(--text-soft)] [&_p]:[line-height:1.62] [display:grid] [grid-template-columns:24px_minmax(0,_1fr)] [align-items:start] [&_>_svg]:[color:var(--danger)] [&_ul]:[margin:10px_0_0] [&_ul]:[padding-left:18px] [&_ul]:[color:var(--text-muted)]">
         <CircleAlert size={20} />
         <div>
-          <p className="eyebrow">{t("grammar.detail.quickWarning")}</p>
+          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.quickWarning")}</p>
           <h2>{t("grammar.detail.commonMistakes")}</h2>
           <p>{t(watchForKey(concept.category))}</p>
           {!richLesson && exceptions.length ? (
@@ -366,15 +366,15 @@ export default async function GrammarConceptPage({
       </section>
 
       {concept.prerequisites.length || concept.parent || concept.children.length ? (
-        <section className="page-section">
-          <div className="section-heading">
+        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
+          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
             <div>
-              <p className="eyebrow">{t("grammar.detail.connections")}</p>
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.connections")}</p>
               <h2>{t("grammar.detail.whereFits")}</h2>
             </div>
             <Layers3 size={19} />
           </div>
-          <div className="grammar-connection-list">
+          <div className="grammar-connection-list [display:grid] [grid-template-columns:1fr] [gap:8px] [&_a]:[min-height:58px] [&_a]:[display:flex] [&_a]:[flex-direction:column] [&_a]:[justify-content:center] [&_a]:[gap:3px] [&_a]:[padding:10px_12px] [&_a]:[border:1px_solid_var(--border)] [&_a]:[border-radius:13px] [&_a]:[background:var(--surface)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.65rem] [&_strong]:[font-size:0.8rem] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))]">
             {concept.parent ? (
               <Link href={"/grammar/" + concept.parent.slug}>
                 <span>{t("grammar.detail.parent")}</span>
@@ -415,17 +415,17 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {vocabulary.length ? (
-        <section className="page-section">
-          <div className="section-heading">
+        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
+          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
             <div>
-              <p className="eyebrow">{t("grammar.detail.yourVocabulary")}</p>
+              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.yourVocabulary")}</p>
               <h2>{t("grammar.detail.reuseWords")}</h2>
             </div>
           </div>
-          <p className="muted grammar-vocab-note">
+          <p className="muted grammar-vocab-note [color:var(--text-muted)] [margin:-4px_0_0] [max-width:720px] [font-size:0.72rem] [line-height:1.5]">
             {t("grammar.detail.vocabHelp")}
           </p>
-          <div className="grammar-vocab-grid">
+          <div className="grammar-vocab-grid [display:grid] [grid-template-columns:1fr] [gap:8px] [&_a]:[min-height:58px] [&_a]:[display:flex] [&_a]:[flex-direction:column] [&_a]:[justify-content:center] [&_a]:[gap:3px] [&_a]:[padding:10px_12px] [&_a]:[border:1px_solid_var(--border)] [&_a]:[border-radius:13px] [&_a]:[background:var(--surface)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.65rem] [&_strong]:[font-size:0.8rem] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))]">
             {vocabulary.map((item) => (
               <Link href={"/vocabulary/" + item.lexeme.id} key={item.id}>
                 <strong className="learning-content" lang={language.code} dir="ltr">
@@ -454,14 +454,14 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {concept.evidence.length ? (
-        <details className="grammar-evidence-disclosure">
+        <details className="grammar-evidence-disclosure [padding:0] [overflow:hidden] [&_>_summary]:[min-height:62px] [&_>_summary]:[display:flex] [&_>_summary]:[align-items:center] [&_>_summary]:[padding:12px_14px] [&_>_summary]:[list-style:none] [&_>_summary::-webkit-details-marker]:[display:none] [&_summary_span]:[display:flex] [&_summary_span]:[flex-direction:column] [&_summary_span]:[gap:3px] [&_summary_strong]:[color:var(--text)] [&_summary_strong]:[font-size:0.85rem] [&_summary_small]:[color:var(--text-muted)] [&_summary_small]:[font-size:0.65rem]">
           <summary>
             <span>
               <strong>{t("grammar.detail.evidenceWhy")}</strong>
               <small>{t("grammar.detail.evidenceHelp")}</small>
             </span>
           </summary>
-          <div className="grammar-evidence-list">
+          <div className="grammar-evidence-list [padding:0_14px_14px] [&_>_div]:[padding:10px_0] [&_>_div]:[border-top:1px_solid_var(--border)] [&_>_div_>_div]:[display:flex] [&_>_div_>_div]:[justify-content:space-between] [&_>_div_>_div]:[gap:12px] [&_strong]:[font-size:0.68rem] [&_span]:[font-size:0.68rem] [&_small]:[font-size:0.68rem] [&_span]:[color:var(--text-muted)] [&_small]:[color:var(--text-muted)]">
             {concept.evidence.map((item) => (
               <div key={item.id}>
                 <div>
@@ -496,8 +496,8 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {concept.outgoingRelations.length ? (
-        <section className="grammar-related">
-          <p className="eyebrow">{t("grammar.detail.related")}</p>
+        <section className="grammar-related [display:flex] [flex-wrap:wrap] [align-items:center] [gap:8px] [&_>_p]:[width:100%] [&_a]:[min-height:38px] [&_a]:[display:inline-flex] [&_a]:[align-items:center] [&_a]:[gap:6px] [&_a]:[padding:0_10px] [&_a]:[border:1px_solid_var(--border)] [&_a]:[border-radius:999px] [&_a]:[color:var(--text-soft)] [&_a]:[font-size:0.7rem]">
+          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.related")}</p>
           {concept.outgoingRelations.map((relation) => (
             <Link href={"/grammar/" + relation.target.slug} key={relation.id}>
               <span className="learning-content" lang="en" dir="ltr">

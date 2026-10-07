@@ -15,8 +15,8 @@ export function TranslationModeControl({
   const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
 
   return (
-    <div className="translation-switch-wrap">
-      <div className="translation-switch" aria-label="Translation language">
+    <div className="translation-switch-wrap [display:inline-flex] [flex-direction:column] [gap:3px] [align-items:flex-end]">
+      <div className="translation-switch [display:inline-flex] [gap:3px] [padding:3px] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface)] [&_button]:[min-height:36px] [&_button]:[padding:0_10px] [&_button]:[border:0] [&_button]:[border-radius:8px] [&_button]:[background:transparent] [&_button]:[color:var(--text-muted)] [&_button]:[cursor:pointer] [&_button]:[font-size:0.72rem] [&_button]:[font-weight:650] [&_button.is-active]:[background:var(--surface-soft)] [&_button.is-active]:[color:var(--text)] [&_button:disabled]:[cursor:wait] [&_button:disabled]:[opacity:0.65]" aria-label="Translation language">
         {([
           ["ENGLISH", "EN"],
           ["PERSIAN", "FA"],
@@ -46,7 +46,7 @@ export function TranslationModeControl({
         ))}
       </div>
       <span
-        className={"translation-switch-status " + (status === "error" ? "is-error" : "")}
+        className={"translation-switch-status [min-height:12px] [color:var(--text-muted)] [font-size:0.62rem] [line-height:1] [&.is-error]:[color:var(--danger)] " + (status === "error" ? "is-error" : "")}
         aria-live="polite"
       >
         {pending ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Failed" : ""}

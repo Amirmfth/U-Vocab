@@ -14,8 +14,8 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
   const [state, action] = useActionState(createTopicPack, initialState);
 
   return (
-    <form action={action} className="panel form-panel">
-      <div className="field">
+    <form action={action} className="panel form-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:680px] [border-radius:18px]">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="topic">Topic or situation</label>
         <input
           id="topic"
@@ -25,8 +25,8 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
         />
       </div>
 
-      <div className="form-grid">
-        <div className="field">
+      <div className="form-grid [display:grid] [grid-template-columns:1fr] [gap:12px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="level-trigger">Level</label>
           <ActivitySelect
             defaultValue={defaultLevel}
@@ -39,7 +39,7 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
           />
         </div>
 
-        <div className="field">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="size-trigger">Words</label>
           <ActivitySelect
             defaultValue="12"
@@ -61,7 +61,7 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
         <StatusNotice tone="success">
           {state.message}
           {state.packId ? (
-            <Link href={"/topic-packs/" + state.packId} className="status-link">
+            <Link href={"/topic-packs/" + state.packId} className="status-link [display:inline-flex] [align-items:center] [gap:6px]">
               Open <ArrowRight size={15} />
             </Link>
           ) : null}

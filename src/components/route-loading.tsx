@@ -11,33 +11,33 @@ type LoadingVariant =
   | "writing"
   | "writing-session"
   | "reading"
-  | "reading-detail"
+  | "reading-detail [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:0] [&_h2]:[font-size:1.35rem] [&_h2]:[letter-spacing:-0.035em] min-[760px]:[position:sticky] min-[760px]:[top:30px]"
   | "speaking"
   | "conversation"
   | "cards";
 
 function HeaderSkeleton({ compact = true }: { compact?: boolean }) {
   return (
-    <section className={"page-header " + (compact ? "compact" : "")}>
-      <div className="skeleton skeleton-kicker" />
-      <div className="skeleton skeleton-title" />
-      <div className="skeleton skeleton-copy" />
+    <section className={"page-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)] " + (compact ? "compact" : "")}>
+      <div className="skeleton skeleton-kicker [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:90px] [height:12px]" />
+      <div className="skeleton skeleton-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(88%,_560px)] [height:54px]" />
+      <div className="skeleton skeleton-copy [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(96%,_620px)] [height:18px]" />
     </section>
   );
 }
 
 function LoadingCollection({ count = 3 }: { count?: number }) {
   return (
-    <section className="page-section" aria-hidden="true">
-      <div className="skeleton loading-section-heading" />
-      <div className="collection-list">
+    <section className="page-section [display:flex] [flex-direction:column] [gap:12px]" aria-hidden="true">
+      <div className="skeleton loading-section-heading [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:130px] [height:25px]" />
+      <div className="collection-list [display:flex] [flex-direction:column]">
         {Array.from({ length: count }, (_, index) => (
-          <div className="collection-row loading-collection-row" key={index}>
-            <div className="skeleton-stack">
-              <div className="skeleton loading-collection-title" />
-              <div className="skeleton loading-collection-meta" />
+          <div className="collection-row loading-collection-row [border-bottom:1px_solid_var(--border)] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [align-items:center] [gap:12px] [padding:11px_2px] [&_strong]:[display:block] [&_span]:[display:block] [&_span]:[margin-top:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.76rem] min-[940px]:[&:hover]:[background:var(--surface)] [min-height:68px]" key={index}>
+            <div className="skeleton-stack [display:flex] [flex-direction:column] [gap:12px]">
+              <div className="skeleton loading-collection-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(55vw,_250px)] [height:18px]" />
+              <div className="skeleton loading-collection-meta [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(68vw,_320px)] [height:13px]" />
             </div>
-            <div className="skeleton loading-collection-arrow" />
+            <div className="skeleton loading-collection-arrow [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:18px] [height:18px]" />
           </div>
         ))}
       </div>
@@ -47,9 +47,9 @@ function LoadingCollection({ count = 3 }: { count?: number }) {
 
 function LoadingField({ name }: { name?: string }) {
   return (
-    <div className="field loading-field-group" aria-label={name}>
-      <div className="skeleton loading-setting-label" />
-      <div className="skeleton loading-setting-control" />
+    <div className="field loading-field-group [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560] [display:flex] [flex-direction:column] [gap:8px] [min-width:0]" aria-label={name}>
+      <div className="skeleton loading-setting-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(70%,_115px)] [height:14px]" />
+      <div className="skeleton loading-setting-control [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:100%] [height:48px] [border-radius:12px]" />
     </div>
   );
 }
@@ -63,21 +63,21 @@ export function RouteLoading({
   const loading = (surface: string) => t("loading.surface", { surface });
   if (variant === "home") {
     return (
-      <main className="page core-loading" aria-busy="true" aria-label={loading(t("nav.home"))}>
-        <section className="home-focus loading-home-hero">
-          <div className="skeleton skeleton-kicker" />
-          <div className="skeleton loading-hero-title" />
-          <div className="skeleton skeleton-copy" />
-          <div className="skeleton loading-primary-action" />
+      <main className="page core-loading [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true" aria-label={loading(t("nav.home"))}>
+        <section className="home-focus loading-home-hero [padding-top:24px] [max-width:720px] [&_.hero-actions]:[margin-top:24px] [display:flex] [flex-direction:column] [gap:12px] [padding:12px_0_2px] [&_h1]:[margin:0] [&_h1]:[max-width:760px] [&_h1]:[font-size:clamp(2.35rem,_12vw,_5.4rem)] [&_h1]:[line-height:0.94] [&_h1]:[letter-spacing:-0.06em] [&_h1]:[font-weight:560] [&_.page-description]:[max-width:600px] [min-height:205px] min-[940px]:[padding-top:28px]">
+          <div className="skeleton skeleton-kicker [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:90px] [height:12px]" />
+          <div className="skeleton loading-hero-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(86%,_480px)] [height:58px]" />
+          <div className="skeleton skeleton-copy [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(96%,_620px)] [height:18px]" />
+          <div className="skeleton loading-primary-action [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_240px)] [height:50px] [border-radius:14px]" />
         </section>
-        <section className="home-metrics loading-metrics">
+        <section className="home-metrics loading-metrics [border-top:1px_solid_var(--border)] [border-bottom:1px_solid_var(--border)] [&_a]:[display:flex] [&_a]:[flex-direction:column] [&_a]:[gap:2px] [&_a]:[padding:16px_10px] [&_a]:[color:var(--text-muted)] [&_a_+_a]:[border-left:1px_solid_var(--border)] [&_strong]:[color:var(--text)] [display:grid] [grid-template-columns:repeat(3,_minmax(0,_1fr))] [border-block:1px_solid_var(--border)] [&_>_a]:[min-width:0] [&_>_a]:[min-height:74px] [&_>_a]:[display:flex] [&_>_a]:[flex-direction:column] [&_>_a]:[justify-content:center] [&_>_a]:[gap:4px] [&_>_a]:[padding:12px_10px] [&_>_a_+_a]:[border-left:1px_solid_var(--border)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_strong]:[font-size:clamp(1.1rem,_5vw,_1.55rem)] [&_strong]:[font-variant-numeric:tabular-nums] [&_span]:[overflow:hidden] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.66rem] [&_span]:[line-height:1.25] [&_span]:[text-overflow:ellipsis]">
           {Array.from({ length: 3 }, (_, index) => (
-            <div className="skeleton loading-metric" key={index} />
+            <div className="skeleton loading-metric [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:68px] [border-radius:0]" key={index} />
           ))}
         </section>
-        <section className="home-next-grid">
-          <div className="skeleton loading-action-row" />
-          <div className="skeleton loading-action-row" />
+        <section className="home-next-grid [display:grid] [grid-template-columns:1fr] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))] [gap:8px] min-[940px]:[gap:12px]">
+          <div className="skeleton loading-action-row [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:78px] [border-radius:14px]" />
+          <div className="skeleton loading-action-row [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:78px] [border-radius:14px]" />
         </section>
       </main>
     );
@@ -85,30 +85,30 @@ export function RouteLoading({
 
   if (variant === "words") {
     return (
-      <main className="page core-loading vocabulary-page" aria-busy="true" aria-label={loading(t("vocab.title"))}>
-        <section className="page-header compact library-header" aria-hidden="true">
-          <div className="skeleton loading-vocabulary-title" />
-          <div className="skeleton loading-add-word" />
+      <main className="page core-loading vocabulary-page [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [&_.library-header]:[flex-direction:row] [&_.library-header]:[align-items:center] [&_.library-header]:[justify-content:space-between] [&_.library-header]:[gap:20px] [&_.library-header]:[padding-top:18px] [&_.library-header]:[padding-bottom:10px] [&_.library-header_h1]:[margin:0] [&_.library-header_h1]:[min-width:0] [&_.library-header_h1]:[font-size:clamp(1.65rem,_7vw,_3rem)] [&_.library-header_.button]:[width:auto] [&_.library-header_.button]:[flex:0_0_auto] [&_.library-header-actions]:[align-items:stretch] [&_.library-primary-actions]:[gap:8px] [&_.ia-subnav]:[padding-block:2px] [&_.library-tools]:[gap:10px] [&_.filter-chip-row]:[padding-bottom:4px] [&_.vocabulary-list]:[margin-top:2px] [&_.vocabulary-list]:[border-top-color:var(--border-strong)] [&_.vocabulary-row]:[min-height:82px] [&_.vocabulary-row]:[padding-block:14px] [&_.vocabulary-row]:[background:transparent] [&_.vocabulary-row]:[content-visibility:auto] [&_.vocabulary-row]:[contain-intrinsic-size:auto_82px] [&_.vocabulary-row]:[transition:background_140ms_ease,_border-color_140ms_ease,_transform_140ms_ease] [&_.vocabulary-row:nth-child(even)]:[background:transparent] [&_.vocabulary-row_.word]:[font-size:1.08rem] [&_.vocabulary-row_.word]:[font-weight:650] [&_.vocabulary-row_.word]:[letter-spacing:-0.025em] [&_.translation-line]:[margin-top:5px] [&_.translation-line_span]:[color:var(--text-soft)] [&_.translation-line_span]:[font-size:0.78rem] [&_.vocabulary-row-meta]:[min-width:78px] [&_.vocabulary-row-meta]:[gap:5px] [&_.vocabulary-row-meta_>_span:first-child]:[color:var(--text-muted)] [&_.vocabulary-row-meta_>_span:first-child]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_.vocabulary-row-meta_>_span:first-child]:[font-size:0.62rem] [&_.row-signal]:[border-color:var(--border-strong)] [&_.row-signal]:[background:rgba(255,_255,_255,_0.025)] [&_.vocabulary-row-meta_strong]:[margin-top:1px] [&_.vocabulary-row-meta_strong]:[color:var(--text)] [&_.vocabulary-row-meta_strong]:[font-size:0.7rem] [&_.mastery-line]:[opacity:0.82] min-[620px]:[&_.library-header-actions]:[align-items:flex-end] min-[620px]:[&_.vocabulary-row]:[min-height:88px] min-[620px]:[&_.vocabulary-row]:[padding:15px_10px] min-[940px]:[&_.library-header]:[padding-top:30px] min-[940px]:[&_.vocabulary-row]:[margin-inline:-12px] min-[940px]:[&_.vocabulary-row]:[padding-inline:12px] min-[940px]:[&_.vocabulary-row]:[border-bottom-color:rgba(42,42,49,0.78)] min-[940px]:[&_.vocabulary-row]:[border-radius:12px] min-[940px]:[&_.vocabulary-row:hover]:[z-index:1] min-[940px]:[&_.vocabulary-row:hover]:[border-color:transparent] min-[940px]:[&_.vocabulary-row:hover]:[background:var(--surface)] min-[940px]:[&_.vocabulary-row:hover]:[transform:translateX(2px)]" aria-busy="true" aria-label={loading(t("vocab.title"))}>
+        <section className="page-header compact library-header [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [display:flex] [flex-direction:column] [&_h1]:[margin-bottom:4px] [&.compact_h1]:[margin-bottom:4px] min-[620px]:[flex-direction:row] min-[620px]:[align-items:end] min-[620px]:[justify-content:space-between] min-[620px]:[&_.button]:[width:auto] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)] [max-width:none]" aria-hidden="true">
+          <div className="skeleton loading-vocabulary-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(38vw,_280px)] [height:48px]" />
+          <div className="skeleton loading-add-word [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:120px] [height:44px] [border-radius:12px]" />
         </section>
-        <div className="skeleton loading-search" />
-        <div className="vocabulary-controls-row" aria-hidden="true">
-          <div className="loading-language-switch">
-            <div className="skeleton" />
-            <div className="skeleton" />
-            <div className="skeleton" />
+        <div className="skeleton loading-search [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:48px] [border-radius:14px]" />
+        <div className="vocabulary-controls-row [display:flex] [align-items:center] [justify-content:space-between] [gap:10px] [&_.translation-switch]:[flex:0_1_auto] [&_.translation-switch]:[min-width:0] [&_.filter-builder]:[flex:0_0_auto]" aria-hidden="true">
+          <div className="loading-language-switch [display:flex] [gap:3px] [padding:3px] [border:1px_solid_var(--border)] [border-radius:11px] [&_.skeleton]:[width:43px] [&_.skeleton]:[height:36px] [&_.skeleton]:[border-radius:8px] [&_.skeleton:last-child]:[width:55px]">
+            <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
+            <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
+            <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
           </div>
-          <div className="skeleton loading-add-filter" />
+          <div className="skeleton loading-add-filter [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:112px] [height:44px] [border-radius:11px]" />
         </div>
-        <div className="skeleton loading-list-count" aria-hidden="true" />
-        <div className="vocabulary-list">
+        <div className="skeleton loading-list-count [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:120px] [height:14px] [margin-top:2px]" aria-hidden="true" />
+        <div className="vocabulary-list [display:flex] [flex-direction:column] [border-top:1px_solid_var(--border)]">
           {Array.from({ length: 7 }, (_, index) => (
-            <div className="vocabulary-row loading-vocabulary-row" key={index} aria-hidden="true">
-              <div className="vocabulary-row-main skeleton-stack">
-                <div className="skeleton loading-row-word" />
-                <div className="skeleton loading-row-translation" />
+            <div className="vocabulary-row loading-vocabulary-row [&:nth-child(even)]:[background:rgb(22,_22,_22)] min-[940px]:[&:hover]:[background:var(--surface)] [position:relative] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [gap:8px_12px] [padding:12px_2px_13px] [border-bottom:1px_solid_var(--border)] [background:transparent] [&_.word]:[overflow:hidden] [&_.word]:[font-size:1.04rem] [&_.word]:[line-height:1.25] [&_.word]:[text-overflow:ellipsis] [&_.word]:[white-space:nowrap] [&_.mastery-line]:[grid-column:1_/_-1] [&_.mastery-line]:[height:3px] [&_.mastery-line]:[margin-top:-2px] [min-height:82px] [&_.skeleton-stack]:[gap:9px] min-[620px]:[min-height:84px] min-[620px]:[padding-inline:8px]" key={index} aria-hidden="true">
+              <div className="vocabulary-row-main skeleton-stack [display:flex] [flex-direction:column] [gap:12px] [min-width:0]">
+                <div className="skeleton loading-row-word [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(55vw,_220px)] [height:23px]" />
+                <div className="skeleton loading-row-translation [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(45vw,_170px)] [height:14px]" />
               </div>
-              <div className="skeleton loading-row-meta" />
-              <div className="skeleton loading-row-mastery" />
+              <div className="skeleton loading-row-meta [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:88px] [height:17px]" />
+              <div className="skeleton loading-row-mastery [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [grid-column:1_/_-1] [height:4px] [border-radius:999px]" />
             </div>
           ))}
         </div>
@@ -118,52 +118,52 @@ export function RouteLoading({
 
   if (variant === "word") {
     return (
-      <main className="page core-loading word-detail-page" aria-busy="true" aria-label={loading(t("loading.word"))}>
-        <section className="page-header word-identity-hero" aria-hidden="true">
-          <div className="word-detail-topline">
-            <div className="loading-word-badges">
-              <div className="skeleton" /><div className="skeleton" /><div className="skeleton" />
+      <main className="page core-loading word-detail-page [display:flex] [flex-direction:column] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [gap:18px] [&_.word-detail-topline]:[display:grid] [&_.word-detail-topline]:[grid-template-columns:minmax(0,_1fr)_auto] [&_.word-detail-topline]:[align-items:start] [&_.word-detail-topline]:[gap:12px] [&_.word-detail-topline_.word-meta]:[min-width:0] [&_.word-primary-actions]:[margin-top:2px] [&_.word-quick-actions]:[gap:7px] [&_.word-quick-actions_>_*]:[min-height:var(--tap-target)] [&_.word-detail-grid]:[gap:10px] [&_.word-detail-card]:[border-color:var(--border)] [&_.word-detail-card]:[background:var(--surface)] [&_.word-detail-card_.eyebrow]:[margin-bottom:2px] [&_.lesson-meaning]:[font-size:1.18rem] [&_.mastery-row]:[gap:6px] [&_.intelligence-panel]:[border-color:var(--border)] [&_.example-card]:[min-height:150px] [&_.example-card_>_strong]:[font-size:1rem] [&_.example-card_>_strong]:[line-height:1.6] [&_.relation-chip]:[transition:border-color_140ms_ease,_background_140ms_ease,_transform_140ms_ease] min-[620px]:[&_.word-primary-actions]:[align-items:flex-start] min-[940px]:[&_.word-detail-grid]:[grid-template-columns:minmax(0,_1.15fr)_minmax(300px,_0.85fr)] min-[940px]:[&_.word-detail-grid]:[align-items:start] min-[940px]:[&_.word-detail-disclosure]:[grid-column:1_/_-1] min-[940px]:[&_.relation-chip:hover]:[border-color:var(--border-strong)] min-[940px]:[&_.relation-chip:hover]:[background:var(--surface-soft)] min-[940px]:[&_.relation-chip:hover]:[transform:translateY(-1px)]" aria-busy="true" aria-label={loading(t("loading.word"))}>
+        <section className="page-header word-identity-hero [display:flex] [flex-direction:column] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [padding-top:16px] [position:relative] [gap:14px] [overflow:hidden] [padding:20px] [border:1px_solid_var(--border)] [border-radius:var(--radius-lg)] [background:radial-gradient(circle_at_100%_0%,_rgba(139,_124,_255,_0.11),_transparent_40%),_linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [&_h1]:[max-width:900px] [&_h1]:[font-size:clamp(2.2rem,_8vw,_4.6rem)] [&_h1]:[line-height:1.02] [&_h1]:[letter-spacing:-0.065em] [&_h1]:[overflow-wrap:anywhere] [&_.page-description]:[color:var(--text-muted)] [&_.page-description]:[font-size:0.82rem] min-[620px]:[padding:26px] min-[940px]:[padding:30px]" aria-hidden="true">
+          <div className="word-detail-topline [display:flex] [flex-direction:column] [gap:10px] min-[620px]:[flex-direction:row] min-[620px]:[align-items:center] min-[620px]:[justify-content:space-between] max-[619px]:[align-items:flex-start] max-[619px]:[&_.word-meta]:[gap:5px] max-[619px]:[&_.badge:nth-child(n_+_3)]:[display:none]">
+            <div className="loading-word-badges [display:flex] [flex-wrap:wrap] [gap:7px] [&_.skeleton]:[width:65px] [&_.skeleton]:[height:26px] [&_.skeleton]:[border-radius:8px] [&_.skeleton:nth-child(2)]:[width:82px]">
+              <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
             </div>
-            <div className="loading-language-switch loading-language-switch--word">
-              <div className="skeleton" /><div className="skeleton" />
+            <div className="loading-language-switch loading-language-switch--word [display:flex] [gap:3px] [padding:3px] [border:1px_solid_var(--border)] [border-radius:11px] [&_.skeleton]:[width:43px] [&_.skeleton]:[height:36px] [&_.skeleton]:[border-radius:8px] [&_.skeleton:last-child]:[width:43px]">
+              <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
             </div>
           </div>
-          <div className="skeleton loading-word-title" />
-          <div className="word-hero-meanings"><div className="skeleton loading-word-meaning" /></div>
+          <div className="skeleton loading-word-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(75%,_450px)] [height:clamp(40px,_9vw,_70px)]" />
+          <div className="word-hero-meanings [margin-top:4px] [padding-top:18px] [border-top:1px_solid_var(--border)]"><div className="skeleton loading-word-meaning [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(65%,_330px)] [height:29px]" /></div>
         </section>
-        <nav className="word-detail-actions" aria-hidden="true">
-          <div className="skeleton loading-word-action" />
-          <div className="skeleton loading-word-action" />
+        <nav className="word-detail-actions [display:flex] [flex-wrap:wrap] [gap:8px] [&_>_.button]:[flex:1_1_165px] [&_>_.button]:[min-height:var(--tap-target)] [&_>_.word-quick-action-button]:[flex:1_1_165px] [&_>_.word-quick-action-button]:[min-height:var(--tap-target)]" aria-hidden="true">
+          <div className="skeleton loading-word-action [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [flex:1_1_165px] [height:44px] [border-radius:12px]" />
+          <div className="skeleton loading-word-action [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [flex:1_1_165px] [height:44px] [border-radius:12px]" />
         </nav>
-        <section className="page-section" aria-hidden="true">
-          <div className="skeleton loading-section-heading" />
-          <div className="loading-example-grid">
-            <div className="skeleton loading-example-card" />
-            <div className="skeleton loading-example-card" />
+        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]" aria-hidden="true">
+          <div className="skeleton loading-section-heading [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:130px] [height:25px]" />
+          <div className="loading-example-grid [display:grid] [gap:12px] min-[700px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+            <div className="skeleton loading-example-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:150px] [border-radius:14px]" />
+            <div className="skeleton loading-example-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:150px] [border-radius:14px]" />
           </div>
         </section>
-        <div className="skeleton loading-word-disclosure" aria-hidden="true" />
-        <div className="skeleton loading-word-disclosure" aria-hidden="true" />
+        <div className="skeleton loading-word-disclosure [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:70px] [border-radius:14px]" aria-hidden="true" />
+        <div className="skeleton loading-word-disclosure [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:70px] [border-radius:14px]" aria-hidden="true" />
       </main>
     );
   }
 
   if (variant === "review") {
     return (
-      <main className="page core-loading review-landing review-page" aria-busy="true" aria-label={loading(t("nav.review"))}>
-        <section className="review-hero">
-          <div className="skeleton-stack">
-            <div className="skeleton loading-hero-title" />
-            <div className="skeleton skeleton-copy" />
+      <main className="page core-loading review-landing review-page [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [max-width:860px] [margin-inline:auto] [&_.review-hero]:[gap:20px] [&_.review-hero]:[padding:20px] [&_.review-hero]:[border:1px_solid_var(--border)] [&_.review-hero]:[border-radius:var(--radius-lg)] [&_.review-hero]:[background:radial-gradient(circle_at_100%_0%,_rgba(139,_124,_255,_0.12),_transparent_45%),_var(--surface)] [&_.review-hero_h1]:[margin-top:6px] [&_.review-hero_h1]:[font-size:clamp(2.6rem,_13vw,_5.6rem)] [&_.review-hero_p:not(.eyebrow)]:[max-width:540px] [&_.review-start]:[min-height:52px] [&_.review-queue-summary]:[border-color:var(--border-strong)] [&_.review-queue-summary]:[background:transparent] [&_.review-queue-summary_>_div]:[min-height:78px] [&_.review-queue-summary_strong]:[font-size:1.45rem] [&_.review-queue-summary_strong]:[letter-spacing:-0.05em] [&_.review-mode-list]:[gap:0] [&_.review-mode-list_>_a]:[min-height:70px] [&_.review-mode-list_>_a]:[transition:background_140ms_ease,_color_140ms_ease,_transform_140ms_ease] [&_.review-mode-list_>_a:active]:[transform:scale(0.995)] min-[620px]:[&_.review-hero]:[padding:24px] min-[940px]:[padding-top:22px] min-[940px]:[&_.review-hero]:[padding:28px] min-[940px]:[&_.review-mode-list]:[display:grid] min-[940px]:[&_.review-mode-list]:[grid-template-columns:repeat(3,_minmax(0,_1fr))] min-[940px]:[&_.review-mode-list]:[gap:10px] min-[940px]:[&_.review-mode-list]:[border:0] min-[940px]:[&_.review-mode-list_>_a]:[min-height:112px] min-[940px]:[&_.review-mode-list_>_a]:[grid-template-columns:30px_minmax(0,_1fr)] min-[940px]:[&_.review-mode-list_>_a]:[align-content:center] min-[940px]:[&_.review-mode-list_>_a]:[padding:16px] min-[940px]:[&_.review-mode-list_>_a]:[border:1px_solid_var(--border)]! min-[940px]:[&_.review-mode-list_>_a]:[border-radius:16px] min-[940px]:[&_.review-mode-list_>_a]:[background:var(--surface)] min-[940px]:[&_.review-mode-list_>_a_>_svg:last-child]:[grid-column:2] min-[940px]:[&_.review-mode-list_>_a_>_svg:last-child]:[margin-top:3px] min-[940px]:[&_.review-mode-list_>_a:hover]:[border-color:var(--border-strong)]! min-[940px]:[&_.review-mode-list_>_a:hover]:[background:var(--surface-raised)] min-[940px]:[&_.review-mode-list_>_a:hover]:[transform:translateY(-2px)]" aria-busy="true" aria-label={loading(t("nav.review"))}>
+        <section className="review-hero [display:flex] [flex-direction:column] [gap:16px] [padding:14px_0_4px] [&_h1]:[margin:4px_0_0] [&_h1]:[font-size:clamp(2.3rem,_12vw,_5rem)] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] [&_p:not(.eyebrow)]:[margin:9px_0_0] [&_p:not(.eyebrow)]:[max-width:600px] [&_p:not(.eyebrow)]:[color:var(--text-soft)] [&_p:not(.eyebrow)]:[line-height:1.55] min-[620px]:[flex-direction:row] min-[620px]:[align-items:end] min-[620px]:[justify-content:space-between]">
+          <div className="skeleton-stack [display:flex] [flex-direction:column] [gap:12px]">
+            <div className="skeleton loading-hero-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(86%,_480px)] [height:58px]" />
+            <div className="skeleton skeleton-copy [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(96%,_620px)] [height:18px]" />
           </div>
-          <div className="skeleton loading-primary-action" />
+          <div className="skeleton loading-primary-action [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_240px)] [height:50px] [border-radius:14px]" />
         </section>
-        <section className="practice-lanes review-mode-grid" aria-hidden="true">
+        <section className="practice-lanes review-mode-grid [&_.practice-lane]:[position:relative] [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]" aria-hidden="true">
           {Array.from({ length: 2 }, (_, index) => (
-            <div className="practice-lane loading-mode-card" key={index}>
-              <div className="skeleton loading-count-badge" />
-              <div className="skeleton loading-card-icon" />
-              <div className="skeleton loading-card-label" />
+            <div className="practice-lane loading-mode-card [min-height:140px] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:12px] [padding:14px] [border:1px_solid_var(--border)] [border-radius:18px] [background:var(--surface)] [position:relative]" key={index}>
+              <div className="skeleton loading-count-badge [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [position:absolute] [top:12px] [right:12px] [width:24px] [height:24px] [border-radius:999px]" />
+              <div className="skeleton loading-card-icon [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:58px] [height:58px] [border-radius:17px]" />
+              <div className="skeleton loading-card-label [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:86px] [max-width:80%] [height:17px] [border-radius:6px]" />
             </div>
           ))}
         </section>
@@ -173,12 +173,12 @@ export function RouteLoading({
 
   if (variant === "practice") {
     return (
-      <main className="page core-loading practice-hub" aria-busy="true" aria-label={loading(t("nav.practice"))}>
-        <section className="practice-lanes" aria-hidden="true">
+      <main className="page core-loading practice-hub [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true" aria-label={loading(t("nav.practice"))}>
+        <section className="practice-lanes [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]" aria-hidden="true">
           {Array.from({ length: 5 }, (_, index) => (
-            <div className={"practice-lane loading-mode-card" + (index === 0 ? " practice-lane-grammar" : "")} key={index}>
-              <div className="skeleton loading-card-icon" />
-              <div className="skeleton loading-card-label" />
+            <div className={"practice-lane loading-mode-card [min-height:140px] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:12px] [padding:14px] [border:1px_solid_var(--border)] [border-radius:18px] [background:var(--surface)] [position:relative]" + (index === 0 ? " practice-lane-grammar [grid-column:1_/_-1]" : "")} key={index}>
+              <div className="skeleton loading-card-icon [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:58px] [height:58px] [border-radius:17px]" />
+              <div className="skeleton loading-card-label [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:86px] [max-width:80%] [height:17px] [border-radius:6px]" />
             </div>
           ))}
         </section>
@@ -188,13 +188,13 @@ export function RouteLoading({
 
   if (variant === "writing") {
     return (
-      <main className="page core-loading writing-hub" aria-busy="true" aria-label={loading(t("nav.writing"))}>
-        <section className="page-header compact practice-workbench-header" aria-hidden="true"><div className="skeleton loading-hub-title" /></section>
-        <section className="panel writing-start-form loading-hub-form" aria-hidden="true">
-          <div className="writing-settings-row"><LoadingField name={t("writing.mode")} /><LoadingField name={t("writing.level")} /></div>
-          <div className="writing-settings-row"><LoadingField name={t("writing.type")} /><LoadingField name={t("writing.targetLength")} /></div>
-          <div className="field writing-topic-field loading-field-group"><div className="skeleton loading-setting-label" /><div className="skeleton loading-setting-control" /></div>
-          <div className="skeleton loading-form-submit" />
+      <main className="page core-loading writing-hub [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [max-width:920px] [&_.writing-start-form]:[max-width:880px] [&_.writing-start-form]:[gap:16px] [&_.writing-start-form]:[padding:18px] [&_.writing-start-form]:[border-color:var(--border-strong)] [&_.writing-start-form]:[background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent_70%),_var(--surface)] [&_.writing-start-form_.button]:[min-height:52px] [&_.collection-list]:[border-top:1px_solid_var(--border)] [&_.collection-row]:[min-height:68px] [&_.collection-row]:[padding-inline:4px] min-[620px]:[&_.writing-start-form]:[padding:22px] min-[940px]:[padding-top:12px] min-[940px]:[&_.writing-start-form]:[display:grid] min-[940px]:[&_.writing-start-form]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[&_.writing-start-form_>_.writing-settings-row]:[grid-column:1_/_-1] min-[940px]:[&_.writing-start-form_>_.field]:[grid-column:1_/_-1] min-[940px]:[&_.writing-start-form_>_.status-notice]:[grid-column:1_/_-1] min-[940px]:[&_.writing-start-form_>_.button]:[grid-column:1_/_-1]" aria-busy="true" aria-label={loading(t("nav.writing"))}>
+        <section className="page-header compact practice-workbench-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [max-width:var(--content-reading)] [padding-top:20px] [&_h1]:[font-size:clamp(2.5rem,_12vw,_5rem)]" aria-hidden="true"><div className="skeleton loading-hub-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(75%,_340px)] [height:50px] [&.wide]:[width:min(90%,_570px)]" /></section>
+        <section className="panel writing-start-form loading-hub-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [flex-direction:column] min-[620px]:[&_>_.status-notice]:[grid-column:1_/_-1] min-[620px]:[&_>_.button]:[grid-column:1_/_-1] [border-radius:18px] [padding:15px] [display:grid] [gap:18px] [&.loading-hub-form]:[display:flex] [&.loading-hub-form]:[flex-direction:column] min-[940px]:[&.loading-hub-form]:[display:grid] min-[940px]:[&.loading-hub-form]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[&.loading-hub-form_>_*]:[grid-column:1_/_-1]" aria-hidden="true">
+          <div className="writing-settings-row [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]"><LoadingField name={t("writing.mode")} /><LoadingField name={t("writing.level")} /></div>
+          <div className="writing-settings-row [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]"><LoadingField name={t("writing.type")} /><LoadingField name={t("writing.targetLength")} /></div>
+          <div className="field writing-topic-field loading-field-group [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560] [grid-column:1_/_-1] [display:flex] [flex-direction:column] [gap:8px] [min-width:0]"><div className="skeleton loading-setting-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(70%,_115px)] [height:14px]" /><div className="skeleton loading-setting-control [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:100%] [height:48px] [border-radius:12px]" /></div>
+          <div className="skeleton loading-form-submit [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_220px)] [height:44px] [border-radius:12px]" />
         </section>
         <LoadingCollection />
       </main>
@@ -203,17 +203,17 @@ export function RouteLoading({
 
   if (variant === "reading") {
     return (
-      <main className="page core-loading reading-hub generated-reading-hub" aria-busy="true" aria-label={loading(t("nav.reading"))}>
-        <section className="page-header compact practice-workbench-header" aria-hidden="true"><div className="skeleton loading-hub-title wide" /></section>
-        <section className="panel story-form reading-generation-form loading-hub-form" aria-hidden="true">
-          <div className="form-grid story-settings-grid"><LoadingField name={t("reading.length")} /><LoadingField name={t("reading.grammarFocus")} /></div>
+      <main className="page core-loading reading-hub generated-reading-hub [display:flex] [flex-direction:column] [--reading-measure:68ch] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [max-width:920px] [&_.reading-form]:[max-width:880px] [&_.reading-form]:[gap:16px] [&_.reading-form]:[padding:18px] [&_.reading-form]:[border-color:var(--border-strong)] [&_.reading-form]:[background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent_70%),_var(--surface)] [&_.reading-form_.button]:[min-height:52px] [&_.collection-list]:[border-top:1px_solid_var(--border)] [&_.collection-row]:[min-height:68px] [&_.collection-row]:[padding-inline:4px] min-[620px]:[&_.reading-form]:[padding:22px] min-[940px]:[padding-top:12px]" aria-busy="true" aria-label={loading(t("nav.reading"))}>
+        <section className="page-header compact practice-workbench-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [max-width:var(--content-reading)] [padding-top:20px] [&_h1]:[font-size:clamp(2.5rem,_12vw,_5rem)]" aria-hidden="true"><div className="skeleton loading-hub-title wide [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(75%,_340px)] [height:50px] [&.wide]:[width:min(90%,_570px)]" /></section>
+        <section className="panel story-form reading-generation-form loading-hub-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:780px] [border-radius:18px] [display:grid] [gap:18px]" aria-hidden="true">
+          <div className="form-grid story-settings-grid [display:grid] [gap:12px] [grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]"><LoadingField name={t("reading.length")} /><LoadingField name={t("reading.grammarFocus")} /></div>
           <LoadingField name={t("reading.topic")} />
-          <fieldset className="target-picker story-target-picker loading-target-picker">
-            <legend><span className="skeleton loading-setting-label" /></legend>
-            <div className="story-word-search skeleton loading-setting-control" />
-            <div className="skeleton loading-target-hint" />
+          <fieldset className="target-picker story-target-picker loading-target-picker [margin:0] [&_legend]:[margin-bottom:8px] [&_legend]:[color:var(--text-soft)] [&_legend]:[font-size:0.83rem] [&_legend]:[font-weight:560] [&_.story-picker-hint]:[margin:10px_0_0] [display:grid] [gap:12px] [padding:16px] [border:1px_solid_var(--border)] [border-radius:14px] [&_legend_.skeleton]:[display:block]">
+            <legend><span className="skeleton loading-setting-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(70%,_115px)] [height:14px]" /></legend>
+            <div className="story-word-search skeleton loading-setting-control [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [display:flex] [align-items:center] [gap:9px] [padding:0_12px] [border:1px_solid_var(--border)] [background:var(--surface-raised)] [color:var(--text-muted)] [&_input]:[min-height:46px] [&_input]:[border:0] [&_input]:[padding:0] [&_input]:[background:transparent] [&:focus-within]:[border-color:var(--primary)] [width:100%] [height:48px] [border-radius:12px]" />
+            <div className="skeleton loading-target-hint [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_370px)] [height:15px]" />
           </fieldset>
-          <div className="skeleton loading-form-submit" />
+          <div className="skeleton loading-form-submit [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_220px)] [height:44px] [border-radius:12px]" />
         </section>
         <LoadingCollection />
       </main>
@@ -222,114 +222,114 @@ export function RouteLoading({
 
   if (variant === "speaking") {
     return (
-      <main className="page core-loading" aria-busy="true" aria-label={loading(t("practice.speaking"))}>
-        <section className="page-header compact" aria-hidden="true"><div className="skeleton loading-hub-title" /></section>
-        <section className="panel conversation-start-form loading-hub-form" aria-hidden="true">
+      <main className="page core-loading [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true" aria-label={loading(t("practice.speaking"))}>
+        <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]" aria-hidden="true"><div className="skeleton loading-hub-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(75%,_340px)] [height:50px] [&.wide]:[width:min(90%,_570px)]" /></section>
+        <section className="panel conversation-start-form loading-hub-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [flex-direction:column] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[&_>_.field:first-of-type]:[grid-column:1_/_-1] min-[620px]:[&_>_.conversation-toggle]:[grid-column:1_/_-1] min-[620px]:[&_>_.status-notice]:[grid-column:1_/_-1] min-[620px]:[&_>_.button]:[grid-column:1_/_-1] [border-radius:18px] [display:grid] [gap:18px] [&.loading-hub-form]:[display:flex] [&.loading-hub-form]:[flex-direction:column] min-[620px]:[&.loading-hub-form]:[display:grid] min-[620px]:[&.loading-hub-form]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[&.loading-hub-form_>_.field:first-child]:[grid-column:1_/_-1] min-[620px]:[&.loading-hub-form_>_.loading-form-submit]:[grid-column:1_/_-1]" aria-hidden="true">
           <LoadingField name={t("writing.mode")} />
           <LoadingField name={t("conversation.topic")} />
           <LoadingField name={t("conversation.targets")} />
           <LoadingField name={t("conversation.tone")} />
           <LoadingField name={t("conversation.formality")} />
-          <div className="skeleton loading-form-submit" />
+          <div className="skeleton loading-form-submit [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_220px)] [height:44px] [border-radius:12px]" />
         </section>
         <LoadingCollection />
       </main>
     );
   }
 
-  if (variant === "reading-detail") {
+  if (variant === "reading-detail [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:0] [&_h2]:[font-size:1.35rem] [&_h2]:[letter-spacing:-0.035em] min-[760px]:[position:sticky] min-[760px]:[top:30px]") {
     return (
-      <main className="page core-loading generated-reading-page" aria-busy="true" aria-label={loading(t("loading.readingDetail"))}>
-        <section className="page-header compact reading-document-header" aria-hidden="true">
-          <div className="skeleton loading-back-link" />
-          <div className="loading-meta-badges"><div className="skeleton" /><div className="skeleton" /></div>
-          <div className="skeleton loading-document-title" />
+      <main className="page core-loading generated-reading-page [display:flex] [flex-direction:column] [--reading-measure:68ch] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true" aria-label={loading(t("loading.readingDetail"))}>
+        <section className="page-header compact reading-document-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [max-width:860px] [&_h1]:[font-size:clamp(2.25rem,_9vw,_4.4rem)]" aria-hidden="true">
+          <div className="skeleton loading-back-link [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:90px] [height:18px]" />
+          <div className="loading-meta-badges [display:flex] [flex-wrap:wrap] [gap:7px] [&_.skeleton]:[width:63px] [&_.skeleton]:[height:25px] [&_.skeleton]:[border-radius:8px] [&_.skeleton:nth-child(even)]:[width:85px]"><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /></div>
+          <div className="skeleton loading-document-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(82%,_510px)] [height:52px]" />
         </section>
-        <article className="panel generated-reading-text loading-reading-document" aria-hidden="true">
-          <div className="loading-reading-paragraphs">
+        <article className="panel generated-reading-text loading-reading-document [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [max-width:var(--reading-measure)] [margin-inline:auto] [padding:clamp(22px,_4vw,_40px)] [font-size:clamp(1.03rem,_2vw,_1.14rem)] [line-height:1.8] [&_p_+_p]:[margin-top:1.15em] max-[720px]:[padding:18px] max-[720px]:[line-height:1.72] [border-radius:18px] [min-height:340px] [&_.reading-target-word]:[display:inline] [&_.reading-target-word]:[padding:0_2px] [&_.reading-target-word]:[border:0] [&_.reading-target-word]:[border-radius:4px] [&_.reading-target-word]:[background:color-mix(in_srgb,_var(--primary)_22%,_transparent)] [&_.reading-target-word]:[color:var(--primary-strong)] [&_.reading-target-word]:[font:inherit] [&_.reading-target-word]:[font-weight:680] [&_.reading-target-word]:[line-height:inherit] [&_.reading-target-word]:[cursor:pointer] [&_.reading-target-word]:[box-decoration-break:clone] [&_.reading-target-word:hover]:[background:color-mix(in_srgb,_var(--primary)_36%,_transparent)] [&_.reading-target-word[aria-expanded=true]]:[background:color-mix(in_srgb,_var(--primary)_36%,_transparent)]" aria-hidden="true">
+          <div className="loading-reading-paragraphs [display:grid] [gap:24px]">
             {Array.from({ length: 3 }, (_, paragraph) => (
-              <div className="loading-generated-paragraphs" key={paragraph}>
-                {Array.from({ length: 4 }, (_, line) => <div className="skeleton" key={line} />)}
+              <div className="loading-generated-paragraphs [display:grid] [gap:11px] [&_.skeleton]:[width:100%] [&_.skeleton]:[height:15px] [&_.skeleton:nth-child(3n)]:[width:68%] [&_.skeleton:nth-child(5n)]:[width:86%]" key={paragraph}>
+                {Array.from({ length: 4 }, (_, line) => <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" key={line} />)}
               </div>
             ))}
           </div>
         </article>
-        <section className="panel reading-language-notes loading-reading-notes" aria-hidden="true">
-          <div className="skeleton loading-section-heading" />
-          <div className="skeleton loading-scenario" />
-          <div className="skeleton loading-note-row" />
+        <section className="panel reading-language-notes loading-reading-notes [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [max-width:860px] [margin-inline:auto] [&_blockquote]:[margin:10px_0] [&_blockquote]:[padding-inline-start:12px] [&_blockquote]:[border-inline-start:2px_solid_var(--border)] [&_blockquote]:[color:var(--text-muted)] [border-radius:18px] [display:grid] [gap:15px]" aria-hidden="true">
+          <div className="skeleton loading-section-heading [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:130px] [height:25px]" />
+          <div className="skeleton loading-scenario [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_520px)] [height:18px] [&.short]:[width:min(65%,_340px)]" />
+          <div className="skeleton loading-note-row [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:52px] [border-radius:11px]" />
         </section>
-        <section className="panel reading-assessment loading-reading-assessment" aria-hidden="true">
-          <div className="loading-reading-assessment-head"><div className="skeleton loading-setting-label" /><div className="skeleton loading-section-heading" /></div>
+        <section className="panel reading-assessment loading-reading-assessment [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [max-width:860px] [margin-inline:auto] [border-radius:18px] [display:grid] [gap:22px]" aria-hidden="true">
+          <div className="loading-reading-assessment-head [display:grid] [gap:8px]"><div className="skeleton loading-setting-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(70%,_115px)] [height:14px]" /><div className="skeleton loading-section-heading [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:130px] [height:25px]" /></div>
           {Array.from({ length: 2 }, (_, index) => (
-            <div className="reading-question loading-reading-question" key={index}>
-              <div className="loading-question-heading"><div className="skeleton loading-question-number" /><div className="skeleton-stack"><div className="skeleton loading-question-type" /><div className="skeleton loading-question-title" /></div></div>
-              <div className="reading-question-options">
-                {Array.from({ length: 4 }, (_, option) => <div className="skeleton loading-question-option" key={option} />)}
+            <div className="reading-question loading-reading-question [border:0] [border-top:1px_solid_var(--border)] [&_legend]:[flex-wrap:wrap] [&_legend]:[font-weight:650] [display:grid] [min-width:0] [gap:15px] [padding:19px_0_0] [&_legend]:[width:100%] [&_legend]:[display:flex] [&_legend]:[align-items:flex-start] [&_legend]:[gap:11px] [&_legend]:[padding:0] [&:has(.reading-answer-feedback.is-wrong)_.reading-question-option:has(input:checked):not(.is-correct)]:[border-color:var(--danger)] [&:has(.reading-answer-feedback.is-wrong)_.reading-question-option:has(input:checked):not(.is-correct)]:[background:var(--danger-soft)]" key={index}>
+              <div className="loading-question-heading [display:flex] [align-items:flex-start] [gap:12px] [&_.skeleton-stack]:[flex:1] [&_.skeleton-stack]:[gap:9px]"><div className="skeleton loading-question-number [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:34px] [height:34px] [border-radius:10px]" /><div className="skeleton-stack [display:flex] [flex-direction:column] [gap:12px]"><div className="skeleton loading-question-type [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:100px] [height:22px] [border-radius:8px]" /><div className="skeleton loading-question-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_450px)] [height:20px]" /></div></div>
+              <div className="reading-question-options [display:grid] [&_label]:[display:flex] [&_label]:[gap:10px] [&_label]:[align-items:flex-start] [&_label]:[padding:10px_12px] [&_label]:[border:1px_solid_var(--border)] [&_label]:[border-radius:12px] [&_label]:[cursor:pointer] max-[720px]:[&_label]:[padding:11px] [gap:9px]">
+                {Array.from({ length: 4 }, (_, option) => <div className="skeleton loading-question-option [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:52px] [border-radius:12px]" key={option} />)}
               </div>
             </div>
           ))}
-          <div className="skeleton loading-form-submit" />
+          <div className="skeleton loading-form-submit [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_220px)] [height:44px] [border-radius:12px]" />
         </section>
-        <section className="panel reading-language-summary loading-reading-summary" aria-hidden="true">
-          <div className="skeleton loading-section-heading" />
-          <div className="loading-target-chips"><div className="skeleton" /><div className="skeleton" /><div className="skeleton" /></div>
+        <section className="panel reading-language-summary loading-reading-summary [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [max-width:860px] [margin-inline:auto] [border-radius:18px] [display:grid] [gap:15px]" aria-hidden="true">
+          <div className="skeleton loading-section-heading [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:130px] [height:25px]" />
+          <div className="loading-target-chips [display:flex] [flex-wrap:wrap] [gap:7px] [&_.skeleton]:[width:85px] [&_.skeleton]:[height:28px] [&_.skeleton]:[border-radius:999px]"><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /></div>
         </section>
-        <section className="panel story-summary loading-reading-summary" aria-hidden="true"><div className="skeleton loading-section-heading" /><div className="skeleton loading-scenario" /><div className="skeleton loading-scenario short" /></section>
+        <section className="panel story-summary loading-reading-summary [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_p]:[line-height:1.65] [border-radius:18px] [display:grid] [gap:15px]" aria-hidden="true"><div className="skeleton loading-section-heading [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:130px] [height:25px]" /><div className="skeleton loading-scenario [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_520px)] [height:18px] [&.short]:[width:min(65%,_340px)]" /><div className="skeleton loading-scenario short [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_520px)] [height:18px] [&.short]:[width:min(65%,_340px)]" /></section>
       </main>
     );
   }
 
   if (variant === "conversation") {
     return (
-      <main className="page core-loading conversation-page" aria-busy="true" aria-label={loading(t("loading.speakingSession"))}>
-        <section className="page-header compact" aria-hidden="true">
-          <div className="skeleton loading-back-link" />
-          <div className="word-meta loading-meta-badges">{Array.from({ length: 5 }, (_, index) => <div className="skeleton" key={index} />)}</div>
-          <div className="skeleton loading-document-title" />
-          <div className="skeleton loading-scenario" />
-          <div className="mission-objective loading-mission-objective"><div className="skeleton loading-objective-icon" /><div className="skeleton-stack"><div className="skeleton loading-objective-label" /><div className="skeleton loading-objective-copy" /></div></div>
+      <main className="page core-loading conversation-page [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true" aria-label={loading(t("loading.speakingSession"))}>
+        <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]" aria-hidden="true">
+          <div className="skeleton loading-back-link [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:90px] [height:18px]" />
+          <div className="word-meta loading-meta-badges [align-items:center] [display:flex] [flex-wrap:wrap] [gap:7px] [&_.skeleton]:[width:63px] [&_.skeleton]:[height:25px] [&_.skeleton]:[border-radius:8px] [&_.skeleton:nth-child(even)]:[width:85px]">{Array.from({ length: 5 }, (_, index) => <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" key={index} />)}</div>
+          <div className="skeleton loading-document-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(82%,_510px)] [height:52px]" />
+          <div className="skeleton loading-scenario [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_520px)] [height:18px] [&.short]:[width:min(65%,_340px)]" />
+          <div className="mission-objective loading-mission-objective [display:flex] [gap:10px] [padding:12px_13px] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface-raised)] [&_>_svg]:[flex:0_0_auto] [&_>_svg]:[margin-top:2px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45] [align-items:center]"><div className="skeleton loading-objective-icon [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:18px] [height:18px]" /><div className="skeleton-stack [display:flex] [flex-direction:column] [gap:12px]"><div className="skeleton loading-objective-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:75px] [height:14px]" /><div className="skeleton loading-objective-copy [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(65vw,_310px)] [height:15px]" /></div></div>
         </section>
-        <section className="conversation-targets loading-conversation-targets" aria-hidden="true">
-          {Array.from({ length: 3 }, (_, index) => <div className="skeleton" key={index} />)}
+        <section className="conversation-targets loading-conversation-targets [overflow-x:auto] [padding-bottom:3px] [display:flex] [flex-wrap:wrap] [gap:8px] [&_.skeleton]:[width:120px] [&_.skeleton]:[height:43px] [&_.skeleton]:[border-radius:11px]" aria-hidden="true">
+          {Array.from({ length: 3 }, (_, index) => <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" key={index} />)}
         </section>
-        <section className="conversation-chat loading-conversation-chat" aria-hidden="true">
-          <div className="conversation-messages">
-            <div className="conversation-message is-assistant loading-conversation-message"><div className="skeleton loading-avatar" /><div className="skeleton loading-message" /></div>
-            <div className="conversation-message is-user loading-conversation-message"><div className="skeleton loading-avatar" /><div className="skeleton loading-message response" /></div>
+        <section className="conversation-chat loading-conversation-chat [display:flex] [flex-direction:column] [gap:14px] [width:100%] [max-width:860px] [margin-inline:auto] [min-height:330px]" aria-hidden="true">
+          <div className="conversation-messages [display:flex] [flex-direction:column] [gap:18px] [padding:12px_2px_112px] min-[620px]:[padding-bottom:128px]">
+            <div className="conversation-message is-assistant loading-conversation-message [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.62rem] [&_>_span]:[font-weight:650] [&_>_span]:[text-transform:uppercase] [&_>_span]:[letter-spacing:0.08em] [&_>_p]:[margin:0] [&_>_p]:[padding:11px_13px] [&_>_p]:[border-radius:14px] [&_>_p]:[line-height:1.55] [&_>_p]:[white-space:pre-wrap] [&.is-assistant]:[align-self:flex-start] [&.is-assistant_>_p]:[border:1px_solid_var(--border)] [&.is-assistant_>_p]:[background:var(--surface)] [&.is-user]:[align-self:flex-end] [&.is-user_>_p]:[background:var(--primary)] [&.is-user_>_p]:[color:white] [width:100%] [max-width:none] [display:flex] [flex-direction:row] [gap:10px] [&.is-user]:[flex-direction:row-reverse] [&.is-user]:[align-items:flex-start] [&.is-user_.conversation-avatar]:[border-color:color-mix(in_srgb,_var(--primary)_42%,_var(--border))] [&.is-user_.conversation-avatar]:[background:var(--primary-soft)] [&.is-user_.conversation-avatar]:[color:var(--primary-strong)] [&.is-user_.conversation-bubble]:[align-items:flex-end] [&.is-user_.conversation-bubble_>_p]:[border-color:transparent] [&.is-user_.conversation-bubble_>_p]:[border-radius:18px_18px_6px_18px] [&.is-user_.conversation-bubble_>_p]:[background:var(--primary)] [&.is-user_.conversation-bubble_>_p]:[color:white] [align-items:flex-start]"><div className="skeleton loading-avatar [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:36px] [height:36px] [border-radius:50%] [flex:0_0_auto]" /><div className="skeleton loading-message [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(72%,_350px)] [height:58px] [border-radius:14px] [&.response]:[width:min(60%,_270px)]" /></div>
+            <div className="conversation-message is-user loading-conversation-message [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.62rem] [&_>_span]:[font-weight:650] [&_>_span]:[text-transform:uppercase] [&_>_span]:[letter-spacing:0.08em] [&_>_p]:[margin:0] [&_>_p]:[padding:11px_13px] [&_>_p]:[border-radius:14px] [&_>_p]:[line-height:1.55] [&_>_p]:[white-space:pre-wrap] [&.is-assistant]:[align-self:flex-start] [&.is-assistant_>_p]:[border:1px_solid_var(--border)] [&.is-assistant_>_p]:[background:var(--surface)] [&.is-user]:[align-self:flex-end] [&.is-user_>_p]:[background:var(--primary)] [&.is-user_>_p]:[color:white] [width:100%] [max-width:none] [display:flex] [flex-direction:row] [gap:10px] [&.is-user]:[flex-direction:row-reverse] [&.is-user]:[align-items:flex-start] [&.is-user_.conversation-avatar]:[border-color:color-mix(in_srgb,_var(--primary)_42%,_var(--border))] [&.is-user_.conversation-avatar]:[background:var(--primary-soft)] [&.is-user_.conversation-avatar]:[color:var(--primary-strong)] [&.is-user_.conversation-bubble]:[align-items:flex-end] [&.is-user_.conversation-bubble_>_p]:[border-color:transparent] [&.is-user_.conversation-bubble_>_p]:[border-radius:18px_18px_6px_18px] [&.is-user_.conversation-bubble_>_p]:[background:var(--primary)] [&.is-user_.conversation-bubble_>_p]:[color:white] [align-items:flex-start]"><div className="skeleton loading-avatar [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:36px] [height:36px] [border-radius:50%] [flex:0_0_auto]" /><div className="skeleton loading-message response [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(72%,_350px)] [height:58px] [border-radius:14px] [&.response]:[width:min(60%,_270px)]" /></div>
           </div>
-          <div className="conversation-composer loading-conversation-composer"><div className="skeleton loading-chat-input" /><div className="skeleton loading-chat-send" /></div>
+          <div className="conversation-composer loading-conversation-composer [flex-direction:column] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:minmax(0,_1fr)_auto] min-[620px]:[align-items:end] min-[620px]:[&_textarea]:[min-height:64px] [position:sticky] [bottom:calc(var(--mobile-nav-height)_+_10px)] [z-index:12] [grid-template-columns:minmax(0,_1fr)_44px] [padding:8px_8px_6px_14px] [border:1px_solid_var(--border-strong)] [border-radius:20px] [background:color-mix(in_srgb,_var(--surface-raised)_96%,_transparent)] [box-shadow:var(--shadow)] [backdrop-filter:blur(16px)] [&_textarea]:[min-height:44px] [&_textarea]:[max-height:150px] [&_textarea]:[padding:10px_0_7px] [&_textarea]:[resize:none] [&_textarea]:[border:0] [&_textarea]:[background:transparent] [&_textarea]:[box-shadow:none] [&_textarea:focus]:[box-shadow:none] min-[620px]:[bottom:18px] [display:flex] [gap:8px] [align-items:end]"><div className="skeleton loading-chat-input [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [flex:1] [height:60px] [border-radius:12px]" /><div className="skeleton loading-chat-send [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:44px] [height:44px] [border-radius:11px]" /></div>
         </section>
-        <div className="skeleton loading-conversation-finish" aria-hidden="true" />
+        <div className="skeleton loading-conversation-finish [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_180px)] [height:44px] [border-radius:12px]" aria-hidden="true" />
       </main>
     );
   }
 
   if (variant === "writing-session") {
     return (
-      <main className="page core-loading writing-session-page" aria-busy="true" aria-label={loading(t("loading.writingTask"))}>
-        <section className="page-header compact writing-session-header" aria-hidden="true">
-          <div className="skeleton loading-back-link" />
-          <div className="word-meta loading-meta-badges">{Array.from({ length: 3 }, (_, index) => <div className="skeleton" key={index} />)}</div>
-          <div className="skeleton loading-document-title" />
+      <main className="page core-loading writing-session-page [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [max-width:980px] [&_.writing-task]:[max-width:820px] [&_.writing-task]:[padding:18px] [&_.writing-task]:[background:var(--surface)] [&_.writing-task_pre]:[font-size:0.94rem] [&_.writing-task_pre]:[line-height:1.7] [&_.writing-editor]:[max-width:900px] [&_.writing-editor]:[gap:12px] [&_.writing-editor_textarea]:[min-height:52dvh] [&_.writing-editor_textarea]:[padding:16px] [&_.writing-editor_textarea]:[border-color:var(--border-strong)] [&_.writing-editor_textarea]:[border-radius:18px] [&_.writing-editor_textarea]:[background:linear-gradient(180deg,_rgba(255,255,255,0.018),_transparent_18rem),_#0d0d10] [&_.writing-editor_textarea]:[font-size:1.03rem] [&_.writing-editor_textarea]:[line-height:1.75] [&_.writing-editor_textarea:focus]:[background:#101014] [&_.writing-editor-footer]:[border-color:var(--border-strong)] [&_.writing-editor-footer]:[box-shadow:0_14px_34px_rgba(0,0,0,0.26)] [&_.writing-score-grid]:[border-color:var(--border-strong)] [&_.writing-score-grid]:[border-radius:18px] [&_.writing-score-grid]:[background:var(--surface)] [&_.writing-score-grid_>_div]:[min-height:74px] [&_.writing-score-grid_>_div]:[justify-content:center] [&_.writing-score-grid_>_div]:[padding:14px] [&_.writing-score-grid_strong]:[font-size:1.35rem] [&_.writing-summary]:[max-width:820px] [&_.improved-writing]:[max-width:820px] [&_.writing-feedback-section]:[max-width:900px] min-[620px]:[&_.writing-editor_textarea]:[min-height:56vh] min-[620px]:[&_.writing-editor_textarea]:[padding:20px] min-[940px]:[&_.writing-editor]:[max-width:920px] min-[940px]:[&_.writing-editor-footer]:[position:static] min-[940px]:[&_.writing-editor-footer]:[padding:0] min-[940px]:[&_.writing-editor-footer]:[border:0] min-[940px]:[&_.writing-editor-footer]:[background:transparent] min-[940px]:[&_.writing-editor-footer]:[box-shadow:none] min-[940px]:[&_.writing-editor-footer]:[backdrop-filter:none]" aria-busy="true" aria-label={loading(t("loading.writingTask"))}>
+        <section className="page-header compact writing-session-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [max-width:820px] [&_h1]:[font-size:clamp(2.2rem,_9vw,_4.2rem)] [&_h1]:[line-height:0.98]" aria-hidden="true">
+          <div className="skeleton loading-back-link [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:90px] [height:18px]" />
+          <div className="word-meta loading-meta-badges [align-items:center] [display:flex] [flex-wrap:wrap] [gap:7px] [&_.skeleton]:[width:63px] [&_.skeleton]:[height:25px] [&_.skeleton]:[border-radius:8px] [&_.skeleton:nth-child(even)]:[width:85px]">{Array.from({ length: 3 }, (_, index) => <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" key={index} />)}</div>
+          <div className="skeleton loading-document-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(82%,_510px)] [height:52px]" />
         </section>
-        <section className="panel writing-task loading-writing-task" aria-hidden="true"><div className="skeleton loading-setting-label" /><div className="skeleton loading-task-line" /><div className="skeleton loading-task-line short" /><div className="loading-target-chips"><div className="skeleton" /><div className="skeleton" /><div className="skeleton" /></div></section>
-        <section className="writing-editor loading-writing-editor-shell" aria-hidden="true">
-          <div className="writing-editor-heading"><div className="skeleton loading-setting-label" /><div className="skeleton loading-scenario" /></div>
-          <div className="skeleton loading-writing-editor" />
-          <div className="writing-editor-footer loading-writing-footer"><div className="skeleton loading-word-count" /><div className="skeleton loading-form-submit" /></div>
+        <section className="panel writing-task loading-writing-task [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [flex-direction:column] [&_pre]:[margin:0] [&_pre]:[white-space:pre-wrap] [&_pre]:[font:inherit] [&_pre]:[line-height:1.6] [&_pre]:[color:var(--text-soft)] [border-radius:18px] [display:grid] [gap:12px]" aria-hidden="true"><div className="skeleton loading-setting-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(70%,_115px)] [height:14px]" /><div className="skeleton loading-task-line [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_650px)] [height:17px] [&.short]:[width:min(60%,_400px)]" /><div className="skeleton loading-task-line short [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_650px)] [height:17px] [&.short]:[width:min(60%,_400px)]" /><div className="loading-target-chips [display:flex] [flex-wrap:wrap] [gap:7px] [&_.skeleton]:[width:85px] [&_.skeleton]:[height:28px] [&_.skeleton]:[border-radius:999px]"><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /></div></section>
+        <section className="writing-editor loading-writing-editor-shell [flex-direction:column] [&_textarea]:[resize:vertical] [&_textarea]:[font-size:1rem] [&_textarea]:[line-height:1.65] [&_textarea]:[min-height:48dvh] [&_textarea]:[padding:14px] [display:grid] [gap:12px]" aria-hidden="true">
+          <div className="writing-editor-heading [display:flex] [flex-direction:column] [gap:3px] [&_label]:[color:var(--text)] [&_label]:[font-size:0.9rem] [&_label]:[font-weight:650] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.72rem]"><div className="skeleton loading-setting-label [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(70%,_115px)] [height:14px]" /><div className="skeleton loading-scenario [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(90%,_520px)] [height:18px] [&.short]:[width:min(65%,_340px)]" /></div>
+          <div className="skeleton loading-writing-editor [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [min-height:48dvh] [border-radius:16px]" />
+          <div className="writing-editor-footer loading-writing-footer [flex-direction:column] [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_>_span]:[font-size:0.74rem] [&_>_span.is-under]:[color:var(--warning)] min-[620px]:[flex-direction:row] min-[620px]:[align-items:center] min-[620px]:[justify-content:space-between] [position:sticky] [bottom:calc(96px_+_env(safe-area-inset-bottom))] [z-index:4] [padding:9px] [border:1px_solid_var(--border)] [border-radius:15px] [background:rgba(17,_17,_20,_0.94)] [backdrop-filter:blur(14px)] [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] max-[380px]:[&_.loading-form-submit]:[width:140px] min-[620px]:[position:static] min-[620px]:[padding:0] min-[620px]:[border:0] min-[620px]:[background:transparent] min-[620px]:[backdrop-filter:none]"><div className="skeleton loading-word-count [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:125px] [height:15px]" /><div className="skeleton loading-form-submit [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(100%,_220px)] [height:44px] [border-radius:12px]" /></div>
         </section>
       </main>
     );
   }
 
   return (
-    <main className="page core-loading" aria-busy="true" aria-label={t("common.loading")}>
+    <main className="page core-loading [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true" aria-label={t("common.loading")}>
       <HeaderSkeleton />
-      <section className="stats-grid">
-        <div className="skeleton skeleton-card" />
-        <div className="skeleton skeleton-card" />
-        <div className="skeleton skeleton-card" />
+      <section className="stats-grid [display:grid] [grid-template-columns:1fr] [gap:12px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[grid-template-columns:repeat(4,_minmax(0,_1fr))]">
+        <div className="skeleton skeleton-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:112px] [border-radius:var(--radius-lg)]" />
+        <div className="skeleton skeleton-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:112px] [border-radius:var(--radius-lg)]" />
+        <div className="skeleton skeleton-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:112px] [border-radius:var(--radius-lg)]" />
       </section>
     </main>
   );

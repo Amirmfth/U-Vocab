@@ -108,7 +108,7 @@ export function ReadingText({
   }, [active]);
 
   return (
-    <article className="panel generated-reading-text learning-content" lang="de" dir="ltr">
+    <article className="panel generated-reading-text learning-content [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [max-width:var(--reading-measure)] [margin-inline:auto] [padding:clamp(22px,_4vw,_40px)] [font-size:clamp(1.03rem,_2vw,_1.14rem)] [line-height:1.8] [&_p_+_p]:[margin-top:1.15em] max-[720px]:[padding:18px] max-[720px]:[line-height:1.72] [border-radius:18px] [&_.reading-target-word]:[display:inline] [&_.reading-target-word]:[padding:0_2px] [&_.reading-target-word]:[border:0] [&_.reading-target-word]:[border-radius:4px] [&_.reading-target-word]:[background:color-mix(in_srgb,_var(--primary)_22%,_transparent)] [&_.reading-target-word]:[color:var(--primary-strong)] [&_.reading-target-word]:[font:inherit] [&_.reading-target-word]:[font-weight:680] [&_.reading-target-word]:[line-height:inherit] [&_.reading-target-word]:[cursor:pointer] [&_.reading-target-word]:[box-decoration-break:clone] [&_.reading-target-word:hover]:[background:color-mix(in_srgb,_var(--primary)_36%,_transparent)] [&_.reading-target-word[aria-expanded=true]]:[background:color-mix(in_srgb,_var(--primary)_36%,_transparent)]" lang="de" dir="ltr">
       {content.split(/\n{2,}/u).map((paragraph, paragraphIndex) => {
         if (!pattern) return <p key={paragraphIndex}>{paragraph}</p>;
         const pieces: React.ReactNode[] = [];
@@ -149,13 +149,13 @@ export function ReadingText({
       {active
         ? createPortal(
             <div
-              className="reading-word-popover"
+              className="reading-word-popover [position:fixed] [z-index:90] [width:min(280px,_calc(100vw_-_24px))] [max-height:min(300px,_calc(100dvh_-_24px))] [overflow:auto] [display:grid] [gap:9px] [padding:15px] [border:1px_solid_var(--border-strong)] [border-radius:14px] [background:var(--surface-raised)] [box-shadow:var(--shadow)] [font-size:0.86rem] [line-height:1.4] [&_p]:[margin:0] [&_p]:[overflow-wrap:anywhere] [&_.text-link]:[margin-top:2px] [&_.text-link]:[font-size:0.78rem]"
               ref={popoverRef}
               role="dialog"
               aria-label={t("reading.detail.meaningOf", { word: active.target.lemma })}
               style={{ top: active.top, insetInlineStart: active.inlineStart }}
             >
-              <div className="reading-word-popover-head">
+              <div className="reading-word-popover-head [display:grid] [gap:3px] [&_strong]:[color:var(--text)] [&_strong]:[font-size:1rem] [&_small]:[color:var(--text-muted)]">
                 <strong className="learning-content" lang="de" dir="ltr">{formatLexemeLabel(active.target)}</strong>
                 <small>
                   {partOfSpeechKeys[active.target.partOfSpeech] ? t(partOfSpeechKeys[active.target.partOfSpeech]) : active.target.partOfSpeech.toLowerCase().replaceAll("_", " ")}
@@ -168,7 +168,7 @@ export function ReadingText({
                     {translation.text}
                   </p>
                 ))}
-              <Link href={`/vocabulary/${active.target.id}`} className="text-link">{t("reading.detail.openWord")}</Link>
+              <Link href={`/vocabulary/${active.target.id}`} className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]">{t("reading.detail.openWord")}</Link>
             </div>,
             document.body,
           )

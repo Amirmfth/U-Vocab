@@ -20,7 +20,7 @@ export function MistakeRefreshButton() {
   const t = useTranslations();
 
   return (
-    <div className="mistake-refresh">
+    <div className="mistake-refresh [display:flex] [flex-direction:column] [gap:8px]">
       <form action={action}>
         <ActionButton
           variant="secondary"

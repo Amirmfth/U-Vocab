@@ -187,7 +187,7 @@ export function ReviewSession({
   }, [card, pendingCount, queue.isFetching, queueData.dueCount, sessionStats.reviewed]);
   const saveErrorNotice =
     saveErrors.size > 0 ? (
-      <div className="optimistic-error" role="alert">
+      <div className="optimistic-error [width:min(100%,_760px)] [margin-inline:auto] [display:grid] [grid-template-columns:20px_minmax(0,_1fr)_auto] [align-items:center] [gap:9px] [padding:10px_12px] [border:1px_solid_rgba(239,_91,_91,_0.35)] [border-radius:13px] [background:rgba(239,_91,_91,_0.08)] [color:var(--text-soft)] [font-size:0.74rem] [&_>_svg]:[color:var(--danger)] [&_.text-button]:[min-height:36px] max-[480px]:[grid-template-columns:20px_minmax(0,_1fr)] max-[480px]:[&_.text-button]:[grid-column:2] max-[480px]:[&_.text-button]:[justify-self:start]" role="alert">
         <AlertCircle size={17} />
         <span>
           {t.plural(
@@ -198,7 +198,7 @@ export function ReviewSession({
           {saveErrors.values().next().value?.message}
         </span>
         <button
-          className="text-button"
+          className="text-button [min-height:38px] [display:inline-flex] [align-items:center] [gap:6px] [border:0] [background:transparent] [color:var(--text-muted)] [cursor:pointer]"
           onClick={() => {
             for (const { input } of saveErrors.values()) review.mutate(input);
           }}
@@ -224,20 +224,20 @@ export function ReviewSession({
 
   if (!card && (pendingCount > 0 || queue.isFetching || queueData.dueCount > 0)) {
     return (
-      <main className="page review-session-shell">
-        <header className="review-session-topbar">
-          <Link href="/review" className="text-link">{t("nav.review")}</Link>
+      <main className="page review-session-shell [display:flex] [flex-direction:column] [min-height:calc(100dvh_-_180px)] [justify-content:center] [gap:10px] [&_.learning-card]:[margin-inline:auto] [&_.learning-card]:[padding:16px] [&_.learning-prompt]:[margin-block:10px_16px] [&_.grade-grid]:[position:sticky] [&_.grade-grid]:[bottom:calc(96px_+_env(safe-area-inset-bottom))] [&_.grade-grid]:[z-index:4] [&_.grade-grid]:[padding:7px] [&_.grade-grid]:[border:1px_solid_var(--border)] [&_.grade-grid]:[border-radius:15px] [&_.grade-grid]:[background:rgba(17,_17,_20,_0.94)] [&_.grade-grid]:[box-shadow:var(--shadow)] [&_.grade-grid]:[backdrop-filter:blur(14px)] [&_.grade-grid_.button]:[min-height:50px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] min-[940px]:[&_.grade-grid]:[position:static] min-[940px]:[&_.grade-grid]:[padding:0] min-[940px]:[&_.grade-grid]:[border:0] min-[940px]:[&_.grade-grid]:[background:transparent] min-[940px]:[&_.grade-grid]:[box-shadow:none] min-[940px]:[&_.grade-grid]:[backdrop-filter:none]">
+        <header className="review-session-topbar [width:min(100%,_760px)] [margin:0_auto] [display:flex] [align-items:center] [justify-content:space-between] [color:var(--text-muted)] [font-size:0.72rem]">
+          <Link href="/review" className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]">{t("nav.review")}</Link>
           <span>{t("review.remaining", { count: formatNumber(locale, queueData.dueCount) })}</span>
         </header>
         {saveErrorNotice}
-        <section className="panel optimistic-next-card" aria-live="polite">
-          <div className="skeleton skeleton-kicker" />
-          <div className="skeleton skeleton-title" />
-          <div className="skeleton skeleton-card" />
+        <section className="panel optimistic-next-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [width:min(100%,_760px)] [margin-inline:auto] [display:flex] [flex-direction:column] [gap:12px] [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.72rem]" aria-live="polite">
+          <div className="skeleton skeleton-kicker [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:90px] [height:12px]" />
+          <div className="skeleton skeleton-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(88%,_560px)] [height:54px]" />
+          <div className="skeleton skeleton-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:112px] [border-radius:var(--radius-lg)]" />
           <span>{t("review.loadingNext")}</span>
           {queue.isError ? (
             <button
-              className="button button-secondary"
+              className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
               type="button"
               onClick={() => void queue.refetch()}
             >
@@ -251,21 +251,21 @@ export function ReviewSession({
 
   if (!card) {
     return (
-      <main className="page review-session-shell">
+      <main className="page review-session-shell [display:flex] [flex-direction:column] [min-height:calc(100dvh_-_180px)] [justify-content:center] [gap:10px] [&_.learning-card]:[margin-inline:auto] [&_.learning-card]:[padding:16px] [&_.learning-prompt]:[margin-block:10px_16px] [&_.grade-grid]:[position:sticky] [&_.grade-grid]:[bottom:calc(96px_+_env(safe-area-inset-bottom))] [&_.grade-grid]:[z-index:4] [&_.grade-grid]:[padding:7px] [&_.grade-grid]:[border:1px_solid_var(--border)] [&_.grade-grid]:[border-radius:15px] [&_.grade-grid]:[background:rgba(17,_17,_20,_0.94)] [&_.grade-grid]:[box-shadow:var(--shadow)] [&_.grade-grid]:[backdrop-filter:blur(14px)] [&_.grade-grid_.button]:[min-height:50px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] min-[940px]:[&_.grade-grid]:[position:static] min-[940px]:[&_.grade-grid]:[padding:0] min-[940px]:[&_.grade-grid]:[border:0] min-[940px]:[&_.grade-grid]:[background:transparent] min-[940px]:[&_.grade-grid]:[box-shadow:none] min-[940px]:[&_.grade-grid]:[backdrop-filter:none]">
         {saveErrorNotice}
-        <section className="empty-state compact-empty">
+        <section className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
           <strong>
             {saveErrors.size > 0 ? t("review.needSaving") : t("review.complete")}
           </strong>
-          <span className="muted">
+          <span className="muted [color:var(--text-muted)]">
             {t("review.sessionStats", {
               reviewed: formatNumber(locale, sessionStats.reviewed),
               again: formatNumber(locale, sessionStats.again),
             })}
           </span>
-          <div className="ia-empty-actions">
-            <Link href="/review" className="button button-primary">{t("review.back")}</Link>
-            <Link href="/practice" className="button button-secondary">{t("nav.practice")}</Link>
+          <div className="ia-empty-actions [display:flex] [flex-direction:column] [gap:8px] min-[620px]:[flex-direction:row] min-[620px]:[align-items:center]">
+            <Link href="/review" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">{t("review.back")}</Link>
+            <Link href="/practice" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">{t("nav.practice")}</Link>
           </div>
         </section>
       </main>
@@ -273,9 +273,9 @@ export function ReviewSession({
   }
 
   return (
-    <main className="page review-session-shell">
-      <header className="review-session-topbar">
-        <Link href="/review" className="text-link">{t("nav.review")}</Link>
+    <main className="page review-session-shell [display:flex] [flex-direction:column] [min-height:calc(100dvh_-_180px)] [justify-content:center] [gap:10px] [&_.learning-card]:[margin-inline:auto] [&_.learning-card]:[padding:16px] [&_.learning-prompt]:[margin-block:10px_16px] [&_.grade-grid]:[position:sticky] [&_.grade-grid]:[bottom:calc(96px_+_env(safe-area-inset-bottom))] [&_.grade-grid]:[z-index:4] [&_.grade-grid]:[padding:7px] [&_.grade-grid]:[border:1px_solid_var(--border)] [&_.grade-grid]:[border-radius:15px] [&_.grade-grid]:[background:rgba(17,_17,_20,_0.94)] [&_.grade-grid]:[box-shadow:var(--shadow)] [&_.grade-grid]:[backdrop-filter:blur(14px)] [&_.grade-grid_.button]:[min-height:50px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] min-[940px]:[&_.grade-grid]:[position:static] min-[940px]:[&_.grade-grid]:[padding:0] min-[940px]:[&_.grade-grid]:[border:0] min-[940px]:[&_.grade-grid]:[background:transparent] min-[940px]:[&_.grade-grid]:[box-shadow:none] min-[940px]:[&_.grade-grid]:[backdrop-filter:none]">
+      <header className="review-session-topbar [width:min(100%,_760px)] [margin:0_auto] [display:flex] [align-items:center] [justify-content:space-between] [color:var(--text-muted)] [font-size:0.72rem]">
+        <Link href="/review" className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]">{t("nav.review")}</Link>
         <span>
           {t("review.remaining", { count: formatNumber(locale, queueData.dueCount) })}
           {pendingCount > 0

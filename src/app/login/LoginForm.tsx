@@ -59,21 +59,21 @@ export function LoginForm({
   }
 
   return (
-    <form onSubmit={submit} className="panel login-card">
-      <div className="login-icon" aria-hidden="true">
+    <form onSubmit={submit} className="panel login-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:min(100%,_420px)] [display:flex] [flex-direction:column] [gap:18px] [&_h1]:[margin:4px_0_8px] [&_h1]:[font-size:clamp(1.8rem,_8vw,_2.6rem)] [&_h1]:[letter-spacing:-0.045em] [&_p]:[margin:0] [&_p]:[line-height:1.5] [border-radius:18px]">
+      <div className="login-icon [width:42px] [height:42px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface-raised)] [color:var(--primary-strong)]" aria-hidden="true">
         <LockKeyhole size={22} />
       </div>
       <div>
-        <p className="eyebrow">{t("auth.account")}</p>
+        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("auth.account")}</p>
         <h1>{t("auth.signInTitle")}</h1>
-        <p className="muted">{t("auth.signInHelp")}</p>
+        <p className="muted [color:var(--text-muted)]">{t("auth.signInHelp")}</p>
       </div>
 
       {passwordReset ? (
         <StatusNotice tone="success">{t("auth.passwordUpdated")}</StatusNotice>
       ) : null}
 
-      <label className="field">
+      <label className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <span>{t("auth.email")}</span>
         <input
           name="email"
@@ -84,7 +84,7 @@ export function LoginForm({
           onChange={(event) => setEmail(event.target.value)}
         />
       </label>
-      <label className="field">
+      <label className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <span>{t("auth.password")}</span>
         <input
           name="password"
@@ -105,19 +105,19 @@ export function LoginForm({
             "&returnTo=" +
             encodeURIComponent(returnTo)
           }
-          className="text-link"
+          className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]"
         >
           {t("auth.resendVerification")}
         </Link>
       ) : null}
 
-      <button className="button button-primary" type="submit" disabled={pending}>
+      <button className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="submit" disabled={pending}>
         {pending ? t("auth.signingIn") : t("auth.signIn")}
       </button>
 
       <Link
         href={"/forgot-password?returnTo=" + encodeURIComponent(returnTo)}
-        className="text-link"
+        className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]"
       >
         {t("auth.forgotPassword")}
       </Link>

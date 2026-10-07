@@ -22,12 +22,12 @@ export function UiLocaleForm({ locale }: { locale: UiLocale }) {
   }, [router, state.status]);
 
   return (
-    <form action={action} className="panel form-panel">
-      <div className="field">
+    <form action={action} className="panel form-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:680px] [border-radius:18px]">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="uiLocale-trigger">
           <Languages size={17} aria-hidden="true" /> {t("settings.uiLanguage")}
         </label>
-        <span className="muted">{t("settings.uiLanguageHelp")}</span>
+        <span className="muted [color:var(--text-muted)]">{t("settings.uiLanguageHelp")}</span>
         <ActivitySelect
           defaultValue={locale}
           id="uiLocale"

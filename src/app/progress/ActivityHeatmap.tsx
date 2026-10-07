@@ -52,8 +52,8 @@ export function ActivityHeatmap({
   keys.reverse();
 
   return (
-    <div className="heatmap-scroll">
-      <div className="activity-heatmap" aria-label={t(dayCount <= 7 ? "progress.heatmapAria7" : "progress.heatmapAria")}>
+    <div className="heatmap-scroll [width:100%] [overflow-x:auto] [padding:3px_0_8px]">
+      <div className="activity-heatmap [width:max-content] [display:grid] [grid-auto-flow:column] [grid-template-rows:repeat(7,_11px)] [grid-auto-columns:11px] [gap:3px]" aria-label={t(dayCount <= 7 ? "progress.heatmapAria7" : "progress.heatmapAria")}>
         {keys.map((date) => {
           const day = lookup.get(date);
           const count = day
@@ -75,7 +75,7 @@ export function ActivityHeatmap({
               key={date}
               href={"/progress?range=" + range + "&day=" + date}
               className={
-                "heatmap-cell heatmap-level-" +
+                "heatmap-cell heatmap-level [width:11px] [height:11px] [border-radius:2px] [background:var(--surface-soft)] [outline:1px_solid_transparent] [transition:transform_120ms_ease,_outline-color_120ms_ease] [&.heatmap-level-1]:[background:rgba(139,_124,_255,_0.24)] [&.heatmap-level-2]:[background:rgba(139,_124,_255,_0.42)] [&.heatmap-level-3]:[background:rgba(139,_124,_255,_0.68)] [&.heatmap-level-4]:[background:var(--primary-strong)] [&:hover]:[outline-color:var(--text-soft)] [&:hover]:[transform:scale(1.18)] [&:focus-visible]:[outline-color:var(--text-soft)] [&:focus-visible]:[transform:scale(1.18)] [&.is-selected]:[outline:2px_solid_var(--text)] [&.is-selected]:[outline-offset:1px] heatmap-level-" +
                 intensity(day) +
                 (selectedDay === date ? " is-selected" : "")
               }

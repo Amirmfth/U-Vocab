@@ -29,9 +29,9 @@ export function WritingStartForm({
   }, [router, state]);
 
   return (
-    <form action={action} className="panel writing-start-form">
-      <div className="writing-settings-row">
-        <div className="field">
+    <form action={action} className="panel writing-start-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [display:flex] [flex-direction:column] [gap:14px] min-[620px]:[&_>_.status-notice]:[grid-column:1_/_-1] min-[620px]:[&_>_.button]:[grid-column:1_/_-1] [border-radius:18px] [padding:15px] [&.loading-hub-form]:[display:flex] [&.loading-hub-form]:[flex-direction:column] min-[940px]:[&.loading-hub-form]:[display:grid] min-[940px]:[&.loading-hub-form]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[&.loading-hub-form_>_*]:[grid-column:1_/_-1]">
+      <div className="writing-settings-row [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="writing-mode-trigger">{t("writing.mode")}</label>
           <ActivitySelect
             id="writing-mode"
@@ -44,7 +44,7 @@ export function WritingStartForm({
           />
         </div>
 
-        <div className="field">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="writing-level-trigger">{t("writing.level")}</label>
           <ActivitySelect
             id="writing-level"
@@ -58,8 +58,8 @@ export function WritingStartForm({
         </div>
       </div>
 
-      <div className="writing-settings-row">
-        <div className="field">
+      <div className="writing-settings-row [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="writing-type-trigger">{t("writing.type")}</label>
           <ActivitySelect
             id="writing-type"
@@ -76,7 +76,7 @@ export function WritingStartForm({
           />
         </div>
 
-        <div className="field">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="writing-length-trigger">{t("writing.targetLength")}</label>
           <ActivitySelect
             id="writing-length"
@@ -99,7 +99,7 @@ export function WritingStartForm({
       </div>
 
       {targetLength === "CUSTOM" ? (
-        <div className="field">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="writing-custom-words">{t("writing.customTarget")}</label>
           <input
             id="writing-custom-words"
@@ -112,7 +112,7 @@ export function WritingStartForm({
         </div>
       ) : null}
 
-      <div className="field writing-topic-field">
+      <div className="field writing-topic-field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560] [grid-column:1_/_-1]">
         <label htmlFor="writing-topic">{t("writing.topic")}</label>
         <input
           id="writing-topic"

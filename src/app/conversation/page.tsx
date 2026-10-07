@@ -26,7 +26,7 @@ export default async function ConversationPage({ searchParams }: {
   });
 
   return (
-    <main className="page">
+    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
       <PersistedFirstUseGuide
         userId={user.id}
         guide={FIRST_USE_GUIDES.conversation}
@@ -35,20 +35,20 @@ export default async function ConversationPage({ searchParams }: {
         items={[t("guidance.conversation.item1")]}
         dismissLabel={t("guidance.dismiss")}
       />
-      <section className="page-header compact">
+      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
         <h1>{t("conversation.title")}</h1>
       </section>
 
       <ConversationStartForm initialMode={params.mode === "MISSION" ? "MISSION" : "PRACTICE"} />
 
       {sessions.length ? (
-        <section className="page-section">
-          <h2 className="section-title">{t("conversation.recent")}</h2>
-          <div className="collection-list">
+        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
+          <h2 className="section-title [margin:0_0_10px] [font-size:1rem] [color:var(--text-soft)] [letter-spacing:-0.02em]">{t("conversation.recent")}</h2>
+          <div className="collection-list [display:flex] [flex-direction:column]">
             {sessions.map((session) => (
               <Link
                 href={"/conversation/" + session.id}
-                className="collection-row"
+                className="collection-row [border-bottom:1px_solid_var(--border)] [min-height:64px] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [align-items:center] [gap:12px] [padding:11px_2px] [&_strong]:[display:block] [&_span]:[display:block] [&_span]:[margin-top:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.76rem] min-[940px]:[&:hover]:[background:var(--surface)]"
                 key={session.id}
               >
                 <div>
@@ -66,7 +66,7 @@ export default async function ConversationPage({ searchParams }: {
           </div>
         </section>
       ) : (
-        <div className="empty-state compact-empty">
+        <div className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
           <MessageCircle size={21} />
           <strong>{t("conversation.none")}</strong>
         </div>

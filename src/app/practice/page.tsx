@@ -22,7 +22,7 @@ import { FIRST_USE_GUIDES } from "@/lib/first-use-guidance";
 
 function PracticeHub({ t, userId }: { t: Translator; userId: string }) {
   return (
-    <main className="page practice-hub">
+    <main className="page practice-hub [display:flex] [flex-direction:column] [gap:16px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
       <PersistedFirstUseGuide
         userId={userId}
         guide={FIRST_USE_GUIDES.practice}
@@ -32,7 +32,7 @@ function PracticeHub({ t, userId }: { t: Translator; userId: string }) {
         dismissLabel={t("guidance.dismiss")}
       />
 
-      <nav className="practice-lanes" aria-label={t("practice.skills")}>
+      <nav className="practice-lanes [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:12px]" aria-label={t("practice.skills")}>
         {PRACTICE_HUB_DESTINATIONS.map((destination) => {
           const icon: AnimatedAppIconName =
             destination.href === "/writing"
@@ -43,11 +43,11 @@ function PracticeHub({ t, userId }: { t: Translator; userId: string }) {
                   ? "conversation"
                   : "drill";
           return (
-            <Link key={destination.href} href={destination.href} className="practice-lane">
-              <span className="practice-lane-icon">
+            <Link key={destination.href} href={destination.href} className="practice-lane [min-height:140px] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:12px] [padding:14px] [border:1px_solid_var(--border)] [border-radius:18px] [background:var(--surface)]">
+              <span className="practice-lane-icon [width:58px] [height:58px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:17px] [background:var(--surface-raised)] [color:var(--primary-strong)]">
                 <AnimatedAppIcon name={icon} size={36} />
               </span>
-              <span className="practice-lane-copy">
+              <span className="practice-lane-copy [min-width:0] [display:flex] [flex-direction:column] [align-items:center] [text-align:center] [&_strong]:[font-size:1rem]">
                 <strong>{t(destination.labelKey)}</strong>
               </span>
             </Link>
@@ -70,9 +70,9 @@ export default async function PracticePage({
   if(params.mixed==="1") redirect("/practice?drill=1");
   if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub t={t} userId={user.id}/>;
 
-  return <Suspense key={JSON.stringify(params)} fallback={<main className="page focus-page" aria-busy="true">
-    <div className="focus-meta"><Link href="/practice">{t("nav.practice")}</Link></div>
-    <div className="skeleton loading-home-hero" aria-label={t("loading.surface", { surface: t("nav.practice") })} />
+  return <Suspense key={JSON.stringify(params)} fallback={<main className="page focus-page [display:flex] [flex-direction:column] [width:100%] [max-width:780px] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]" aria-busy="true">
+    <div className="focus-meta [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [min-height:40px] [color:var(--text-muted)] [font-size:0.78rem]"><Link href="/practice">{t("nav.practice")}</Link></div>
+    <div className="skeleton loading-home-hero [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [min-height:205px]" aria-label={t("loading.surface", { surface: t("nav.practice") })} />
   </main>}>
     <PracticeSession params={params} userId={user.id} t={t} />
   </Suspense>;
@@ -97,18 +97,18 @@ async function PracticeSession({ params, userId, t }: {
     });
 
     if(!grammarExercises.length){
-      return <main className="page focus-page">
-        <section className="empty-state compact-empty">
+      return <main className="page focus-page [display:flex] [flex-direction:column] [width:100%] [max-width:780px] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+        <section className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
           <strong>{t("practice.noGrammar")}</strong>
-          <p className="muted">{t("practice.noGrammarHelp")}</p>
-          <Link href="/grammar" className="button button-primary">{t("practice.chooseGrammar")}</Link>
-          <Link href="/practice" className="text-link">{t("practice.back")}</Link>
+          <p className="muted [color:var(--text-muted)]">{t("practice.noGrammarHelp")}</p>
+          <Link href="/grammar" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">{t("practice.chooseGrammar")}</Link>
+          <Link href="/practice" className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]">{t("practice.back")}</Link>
         </section>
       </main>;
     }
 
-    return <main className="page focus-page">
-      <div className="focus-meta">
+    return <main className="page focus-page [display:flex] [flex-direction:column] [width:100%] [max-width:780px] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+      <div className="focus-meta [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [min-height:40px] [color:var(--text-muted)] [font-size:0.78rem]">
         <Link href="/grammar">{t("nav.grammar")}</Link>
         <span className={params.grammar==="1"?undefined:"learning-content"} lang={params.grammar==="1"?undefined:course.targetLanguage==="GERMAN"?"de":course.targetLanguage==="FRENCH"?"fr":"en"} dir={params.grammar==="1"?undefined:"ltr"}>{params.grammar==="1"?t("practice.recommended"):grammarExercises[0].lemma}</span>
       </div>
@@ -153,11 +153,11 @@ async function PracticeSession({ params, userId, t }: {
   ]);
 
   if(!items.length){
-    return <main className="page focus-page">
-      <section className="empty-state compact-empty">
+    return <main className="page focus-page [display:flex] [flex-direction:column] [width:100%] [max-width:780px] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+      <section className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
         <strong>{params.lexeme?t("practice.wordNotFound"):t("practice.addToStart")}</strong>
-        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>{t("nav.addWord")}</Link>:null}
-        <Link href="/practice" className="text-link">{t("practice.back")}</Link>
+        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"><Plus size={18}/>{t("nav.addWord")}</Link>:null}
+        <Link href="/practice" className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]">{t("practice.back")}</Link>
       </section>
     </main>;
   }
@@ -216,11 +216,11 @@ async function PracticeSession({ params, userId, t }: {
   }
 
   if(!params.lexeme&&!exercises.length){
-    return <main className="page focus-page">
-      <section className="empty-state compact-empty">
+    return <main className="page focus-page [display:flex] [flex-direction:column] [width:100%] [max-width:780px] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+      <section className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
         <strong>{t("practice.notEnoughChoices")}</strong>
-        <p className="muted">{t("practice.addMore")}</p>
-        <Link href="/vocabulary/new" className="button button-primary"><Plus size={18}/>{t("nav.addWord")}</Link>
+        <p className="muted [color:var(--text-muted)]">{t("practice.addMore")}</p>
+        <Link href="/vocabulary/new" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"><Plus size={18}/>{t("nav.addWord")}</Link>
       </section>
     </main>;
   }
@@ -253,8 +253,8 @@ async function PracticeSession({ params, userId, t }: {
     }
   }
 
-  return <main className="page focus-page">
-    <div className="focus-meta">
+  return <main className="page focus-page [display:flex] [flex-direction:column] [width:100%] [max-width:780px] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+    <div className="focus-meta [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [min-height:40px] [color:var(--text-muted)] [font-size:0.78rem]">
       <Link href="/practice">{t("nav.practice")}</Link>
       <span className={params.lexeme?"learning-content":undefined} lang={params.lexeme?(course.targetLanguage==="GERMAN"?"de":course.targetLanguage==="FRENCH"?"fr":"en"):undefined} dir={params.lexeme?"ltr":undefined}>{params.lexeme?items[0].lexeme.lemma:t("practice.vocabulary")}</span>
     </div>

@@ -21,7 +21,7 @@ export function MistakeResolveButton({ mistakeId }: { mistakeId: string }) {
   }
 
   return (
-    <div className="mistake-resolve">
+    <div className="mistake-resolve [display:flex] [flex-direction:column] [gap:7px]">
       <form action={action}>
         <input type="hidden" name="mistakeId" value={mistakeId} />
         <ActionButton variant="secondary" pendingLabel={t("mistakes.resolving")}>

@@ -23,16 +23,16 @@ function ReadingGenerationPreview({ navigating }: { navigating: boolean }) {
 
   return (
     <div
-      className="reading-generation-preview"
+      className="reading-generation-preview [display:grid] [gap:14px] [padding:18px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_>_strong]:[font-size:0.88rem]"
       role="status"
       aria-live="polite"
       aria-label={t("reading.generatingLabel")}
     >
       <strong>{pending ? t("reading.generating") : t("reading.opening")}</strong>
-      <div className="skeleton loading-generated-title" aria-hidden="true" />
-      <div className="loading-generated-paragraphs" aria-hidden="true">
-        <div className="skeleton" /><div className="skeleton" /><div className="skeleton" />
-        <div className="skeleton" /><div className="skeleton" />
+      <div className="skeleton loading-generated-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(80%,_390px)] [height:30px]" aria-hidden="true" />
+      <div className="loading-generated-paragraphs [display:grid] [gap:11px] [&_.skeleton]:[width:100%] [&_.skeleton]:[height:15px] [&_.skeleton:nth-child(3n)]:[width:68%] [&_.skeleton:nth-child(5n)]:[width:86%]" aria-hidden="true">
+        <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
+        <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
       </div>
     </div>
   );
@@ -84,10 +84,10 @@ export function ReadingForm({
     : [];
 
   return (
-    <form action={action} className="panel story-form reading-generation-form">
+    <form action={action} className="panel story-form reading-generation-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:780px] [display:grid] [gap:18px] [border-radius:18px]">
       <input type="hidden" name="requestId" value={requestId} />
-      <div className="form-grid story-settings-grid">
-        <div className="field">
+      <div className="form-grid story-settings-grid [display:grid] [gap:12px] [grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="reading-length-trigger">{t("reading.length")}</label>
           <ActivitySelect
             defaultValue="MEDIUM"
@@ -100,7 +100,7 @@ export function ReadingForm({
             ]}
           />
         </div>
-        <div className="field">
+        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
           <label htmlFor="grammar-focus-trigger">{t("reading.grammarFocus")}</label>
           <ActivitySelect
             defaultValue=""
@@ -117,9 +117,9 @@ export function ReadingForm({
         </div>
       </div>
 
-      <div className="field">
+      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
         <label htmlFor="reading-topic">
-          {t("reading.topic")} <span className="muted">({t("reading.optional")})</span>
+          {t("reading.topic")} <span className="muted [color:var(--text-muted)]">({t("reading.optional")})</span>
         </label>
         <input
           id="reading-topic"
@@ -130,7 +130,7 @@ export function ReadingForm({
       </div>
 
       {targetLevel !== currentLevel ? (
-        <label className="reading-stretch-option">
+        <label className="reading-stretch-option [display:flex] [align-items:flex-start] [gap:10px] [padding:12px_14px] [border:1px_solid_var(--border)] [border-radius:14px] [&_span]:[display:grid] [&_span]:[gap:3px] [&_small]:[color:var(--text-muted)]">
           <input type="checkbox" name="stretch" />
           <span>
             <strong>{t("reading.stretch", { level: targetLevel })}</strong>
@@ -139,15 +139,15 @@ export function ReadingForm({
         </label>
       ) : null}
 
-      <fieldset className="target-picker story-target-picker">
+      <fieldset className="target-picker story-target-picker [margin:0] [padding:0] [border:0] [&_legend]:[margin-bottom:8px] [&_legend]:[color:var(--text-soft)] [&_legend]:[font-size:0.83rem] [&_legend]:[font-weight:560] [&_.story-picker-hint]:[margin:10px_0_0]">
         <legend>
-          {t("reading.vocabFocus")} <span className="muted">· {t("reading.optional")}</span>
+          {t("reading.vocabFocus")} <span className="muted [color:var(--text-muted)]">· {t("reading.optional")}</span>
         </legend>
         {selectedIds.map((id) => (
           <input key={id} type="hidden" name="targetIds" value={id} />
         ))}
 
-        <div className="story-word-search">
+        <div className="story-word-search [display:flex] [align-items:center] [gap:9px] [padding:0_12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [color:var(--text-muted)] [&_input]:[min-height:46px] [&_input]:[border:0] [&_input]:[padding:0] [&_input]:[background:transparent] [&:focus-within]:[border-color:var(--primary)]">
           <Search size={18} aria-hidden="true" />
           <input
             aria-label={t("reading.searchVocabulary")}
@@ -159,12 +159,12 @@ export function ReadingForm({
         </div>
 
         {matches.length ? (
-          <div className="story-search-results" role="listbox">
+          <div className="story-search-results [display:grid] [gap:6px] [margin-top:8px]" role="listbox">
             {matches.map((target) => {
               const selected = selectedIds.includes(target.lexemeId);
               return (
                 <button
-                  className="story-search-result"
+                  className="story-search-result [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [width:100%] [padding:10px_12px] [border:1px_solid_var(--border)] [border-radius:12px] [background:var(--surface-raised)] [color:var(--text)] [text-align:left] [&_>_span:first-child]:[display:grid] [&_>_span:first-child]:[gap:2px] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.78rem] [&:disabled]:[opacity:0.58]"
                   key={target.lexemeId}
                   type="button"
                   disabled={selected}
@@ -182,7 +182,7 @@ export function ReadingForm({
                     </strong>
                     <small>{target.state.toLowerCase()}</small>
                   </span>
-                  <span className="story-result-action">
+                  <span className="story-result-action [display:inline-flex] [align-items:center] [gap:4px] [color:var(--primary-strong)] [font-size:0.8rem] [font-weight:650]">
                     {selected ? t("reading.added") : <><Plus size={15} /> {t("reading.add")}</>}
                   </span>
                 </button>
@@ -192,9 +192,9 @@ export function ReadingForm({
         ) : null}
 
         {selectedTargets.length ? (
-          <div className="story-selected-targets">
+          <div className="story-selected-targets [display:flex] [flex-wrap:wrap] [gap:8px] [margin-top:14px]">
             {selectedTargets.map((target) => (
-              <span className="story-selected-target" key={target.lexemeId}>
+              <span className="story-selected-target [display:inline-flex] [align-items:center] [gap:5px] [padding:6px_8px_6px_10px] [border-radius:999px] [background:var(--primary-soft)] [color:var(--primary-strong)] [font-size:0.82rem] [font-weight:650] [&_button]:[display:inline-flex] [&_button]:[padding:1px] [&_button]:[border:0] [&_button]:[background:transparent] [&_button]:[color:inherit] [&_button]:[cursor:pointer]" key={target.lexemeId}>
                 <span className="learning-content" lang={targetLanguage} dir="ltr">
                   {target.label}
                 </span>
@@ -213,7 +213,7 @@ export function ReadingForm({
             ))}
           </div>
         ) : (
-          <p className="story-picker-hint">{t("reading.autoTargets")}</p>
+          <p className="story-picker-hint [color:var(--text-muted)] [font-size:0.78rem]">{t("reading.autoTargets")}</p>
         )}
       </fieldset>
 

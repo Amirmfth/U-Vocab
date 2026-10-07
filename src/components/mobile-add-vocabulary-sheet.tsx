@@ -75,16 +75,16 @@ export function MobileAddVocabularySheet({
     <AnimatePresence>
       {isOpen ? (
         <motion.div
-          key="mobile-add-sheet"
-          id="mobile-add-sheet"
-          className="mobile-add-sheet"
+          key="mobile-add-sheet [position:fixed] [z-index:100] [inset:0] [display:flex] [align-items:flex-end] min-[940px]:[display:none]"
+          id="mobile-add-sheet [position:fixed] [z-index:100] [inset:0] [display:flex] [align-items:flex-end] min-[940px]:[display:none]"
+          className="mobile-add-sheet [position:fixed] [z-index:100] [inset:0] [display:flex] [align-items:flex-end] min-[940px]:[display:none]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="mobile-add-sheet-title"
         >
           <motion.button
             aria-label={t("common.close")}
-            className="mobile-add-sheet-backdrop"
+            className="mobile-add-sheet-backdrop [position:absolute] [inset:0] [border:0] [background:rgba(0,_0,_0,_0.58)] [backdrop-filter:blur(3px)]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -95,21 +95,21 @@ export function MobileAddVocabularySheet({
           <motion.section
             ref={panelRef}
             tabIndex={-1}
-            key="mobile-add-sheet-panel"
-            className="mobile-add-sheet-panel"
+            key="mobile-add-sheet-panel [position:relative] [width:100%] [max-height:min(88dvh,_760px)] [min-height:60dvh] [overflow-y:auto] [padding:10px_16px_calc(24px_+_env(safe-area-inset-bottom))] [border-radius:26px_26px_0_0] [background:var(--surface)] [box-shadow:0_-18px_50px_rgba(0,_0,_0,_0.36)] [&_.import-workspace]:[max-width:none] [&_.form-panel]:[max-width:none] [overscroll-behavior:contain]"
+            className="mobile-add-sheet-panel [position:relative] [width:100%] [max-height:min(88dvh,_760px)] [min-height:60dvh] [overflow-y:auto] [padding:10px_16px_calc(24px_+_env(safe-area-inset-bottom))] [border-radius:26px_26px_0_0] [background:var(--surface)] [box-shadow:0_-18px_50px_rgba(0,_0,_0,_0.36)] [&_.import-workspace]:[max-width:none] [&_.form-panel]:[max-width:none] [overscroll-behavior:contain]"
             initial={reduceMotion ? false : { opacity: 0, y: 44 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 44 }}
             transition={{ type: "spring", stiffness: 360, damping: 32, mass: 0.8 }}
           >
-            <div className="mobile-add-sheet-handle" aria-hidden="true" />
-            <header className="mobile-add-sheet-header">
+            <div className="mobile-add-sheet-handle [width:38px] [height:4px] [margin:0_auto_14px] [border-radius:999px] [background:var(--border-strong)]" aria-hidden="true" />
+            <header className="mobile-add-sheet-header [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:16px] [margin-bottom:12px] [&_h2]:[margin:4px_0_0] [&_h2]:[font-size:1.45rem] [&_h2]:[letter-spacing:-0.04em]">
               <div>
                 <h2 id="mobile-add-sheet-title">{t("common.addVocabulary")}</h2>
               </div>
               <button
                 ref={closeButtonRef}
-                className="icon-button"
+                className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]"
                 type="button"
                 onClick={onClose}
                 aria-label={t("common.close")}

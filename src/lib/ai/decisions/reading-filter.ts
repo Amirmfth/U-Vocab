@@ -66,7 +66,7 @@ export async function filterReadingCandidatesWithDecisions(input: {
   const result = await runNativeDecision({
     userId: input.userId,
     userCourseId: input.userCourseId,
-    operation: "reading_analysis",
+    operation: "reading_candidate_filter",
     evidence: {
       targetLanguage: input.targetLanguageCode,
       targetLevel: input.targetLevel,

@@ -1,4 +1,4 @@
-name: Bootstrap Tailwind lockfile
+name: Tailwind migration audit
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  bootstrap:
+  audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,15 +17,6 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install Tailwind build dependencies
-        run: npm install --save-dev tailwindcss@4.3.3 @tailwindcss/postcss@4.3.3 postcss@^8.5.6
-      - name: Commit lockfile
-        run: |
-          if git diff --quiet -- package.json package-lock.json; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json
-          git commit -m "chore(ui): install Tailwind CSS"
-          git push
+      - run: npm ci
+      - name: Audit CSS to Tailwind migration
+        run: node scripts/migrate-tailwind-ui.mjs --dry-run

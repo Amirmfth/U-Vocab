@@ -3,6 +3,19 @@ import type { RelationType, VocabularyState } from "@prisma/client";
 import { aiRoute } from "../routing";
 import { getDecisionCache, putDecisionCache } from "./cache";
 import { runStructuredDecision } from "./run-decision";
+import {
+  FIVE_LEVEL_SCORE,
+  choiceAnswer,
+  normalizedScore,
+  runNativeDecision,
+  scoreAnswer,
+  type DecisionQuestion,
+} from "./native";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./mode";
 
 export const LEXICAL_EDGE_CANDIDATE_LIMIT = 12;
 export const LEXICAL_EDGE_SELECTION_LIMIT = 5;
@@ -68,6 +81,59 @@ export function reconcileLexicalEdges<T extends { id: string }>(
   return selected;
 }
 
+function lexicalQuestions(candidates: LexicalEdgeCandidate[]): DecisionQuestion[] {
+  const purposes = lexicalEdgePurposeSchema.options.map((value) => ({
+    value,
+    description: value.replaceAll("_", " ").toLowerCase(),
+  }));
+  return candidates.flatMap((candidate) => [
+    {
+      type: "score" as const,
+      name: "relevance:" + candidate.relationId,
+      instructions:
+        "How pedagogically useful is relation " + candidate.relationId +
+        " for this learner now? Prefer confusion resolution, active production, useful collocations, word families, grammar support, and level fit.",
+      levels: [...FIVE_LEVEL_SCORE],
+    },
+    {
+      type: "choice" as const,
+      name: "purpose:" + candidate.relationId,
+      instructions:
+        "What is the primary pedagogical purpose of relation " +
+        candidate.relationId + " for this learner now?",
+      choices: purposes,
+    },
+  ]);
+}
+
+function decisionFromNative(
+  candidates: LexicalEdgeCandidate[],
+  answers: Map<string, any>,
+): LexicalEdgeDecision {
+  return {
+    selected: candidates
+      .map((candidate) => {
+        const priority = normalizedScore(
+          scoreAnswer(answers, "relevance:" + candidate.relationId),
+        );
+        const purpose = choiceAnswer(answers, "purpose:" + candidate.relationId);
+        if (priority === null || !purpose || typeof purpose.choice !== "string") {
+          return null;
+        }
+        const parsedPurpose = lexicalEdgePurposeSchema.safeParse(purpose.choice);
+        if (!parsedPurpose.success) return null;
+        return {
+          relationId: candidate.relationId,
+          priority,
+          purpose: parsedPurpose.data,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
+      .sort((a, b) => b.priority - a.priority)
+      .slice(0, LEXICAL_EDGE_SELECTION_LIMIT),
+  };
+}
+
 export async function rerankLexicalEdges<T extends { id: string }>(input: {
   userId: string;
   userCourseId: string;
@@ -87,11 +153,13 @@ export async function rerankLexicalEdges<T extends { id: string }>(input: {
 }) {
   const boundedCandidates = input.candidates.slice(0, LEXICAL_EDGE_CANDIDATE_LIMIT);
   const boundedRelations = input.relations.slice(0, LEXICAL_EDGE_CANDIDATE_LIMIT);
+  const legacyEnabled = process.env.AI_LEXICAL_EDGE_RERANK_ENABLED === "true";
+  const mode = decisionRolloutMode(
+    "OPENAI_DECISIONS_LEXICAL_EDGES_MODE",
+    legacyEnabled,
+  );
 
-  if (
-    !boundedCandidates.length ||
-    process.env.AI_LEXICAL_EDGE_RERANK_ENABLED !== "true"
-  ) {
+  if (!boundedCandidates.length || (!legacyEnabled && mode === "off")) {
     return {
       relations: boundedRelations.slice(0, LEXICAL_EDGE_SELECTION_LIMIT),
       usedAI: false,
@@ -110,17 +178,17 @@ export async function rerankLexicalEdges<T extends { id: string }>(input: {
     },
     candidates: boundedCandidates,
   };
-
   const dimensions = {
     sourceLexemeId: input.sourceLexemeId,
     surface: input.surface,
     relationIds: boundedCandidates.map((candidate) => candidate.relationId),
+    mode: shouldUseNativeDecision(mode) ? "decisions" : "responses",
   };
 
   const cached = await getDecisionCache<LexicalEdgeDecision>({
     userCourseId: input.userCourseId,
     operation: "lexical_edge_rerank",
-    model: route.model,
+    model: shouldUseNativeDecision(mode) ? "gpt-6-luna" : route.model,
     dimensions,
     source: payload,
   });
@@ -133,22 +201,66 @@ export async function rerankLexicalEdges<T extends { id: string }>(input: {
     };
   }
 
-  const result = await runStructuredDecision({
-    userId: input.userId,
-    userCourseId: input.userCourseId,
-    operation: "lexical_edge_rerank",
-    schema: lexicalEdgeRerankSchema,
-    schemaName: "lexical_edge_rerank",
-    system:
-      "Choose the supplied lexical relationships that are most pedagogically useful for this learner now. Prefer relationships that resolve confusion, support active production, strengthen useful collocations or word families, and fit the learner level. You may only select supplied relation IDs.",
-    payload,
-    metadata: {
-      candidateCount: boundedCandidates.length,
-      surface: input.surface,
-    },
-  });
+  const nativePromise = shouldRunNativeDecision(mode)
+    ? runNativeDecision({
+        userId: input.userId,
+        userCourseId: input.userCourseId,
+        operation: "lexical_edge_rerank",
+        evidence: payload,
+        questions: lexicalQuestions(boundedCandidates),
+        metadata: {
+          shadow: mode === "shadow",
+          candidateCount: boundedCandidates.length,
+          surface: input.surface,
+        },
+      })
+    : Promise.resolve(null);
+  const legacyPromise =
+    mode === "on"
+      ? Promise.resolve(null)
+      : runStructuredDecision({
+          userId: input.userId,
+          userCourseId: input.userCourseId,
+          operation: "lexical_edge_rerank",
+          schema: lexicalEdgeRerankSchema,
+          schemaName: "lexical_edge_rerank",
+          system:
+            "Choose only supplied lexical relationships that are most pedagogically useful for this learner now.",
+          payload,
+          metadata: { candidateCount: boundedCandidates.length, surface: input.surface },
+        });
 
-  if (result.status !== "ok") {
+  const [nativeResult, legacyResult] = await Promise.all([nativePromise, legacyPromise]);
+  let decision: LexicalEdgeDecision | null = null;
+  let model = route.model;
+  let fallback = false;
+
+  if (shouldUseNativeDecision(mode) && nativeResult?.status === "ok") {
+    decision = decisionFromNative(boundedCandidates, nativeResult.answers);
+    model = nativeResult.response.model;
+  } else if (legacyResult?.status === "ok") {
+    decision = legacyResult.data;
+    model = legacyResult.model;
+    fallback = shouldUseNativeDecision(mode);
+  } else if (shouldUseNativeDecision(mode)) {
+    const fallbackResult = await runStructuredDecision({
+      userId: input.userId,
+      userCourseId: input.userCourseId,
+      operation: "lexical_edge_rerank",
+      schema: lexicalEdgeRerankSchema,
+      schemaName: "lexical_edge_rerank",
+      system: "Select only supplied relationship IDs.",
+      payload,
+      metadata: { candidateCount: boundedCandidates.length, decisionsFallback: true },
+    });
+    if (fallbackResult.status === "ok") {
+      decision = fallbackResult.data;
+      model = fallbackResult.model;
+      fallback = true;
+    }
+  }
+
+  if (!decision) {
     return {
       relations: boundedRelations.slice(0, LEXICAL_EDGE_SELECTION_LIMIT),
       usedAI: false,
@@ -159,17 +271,17 @@ export async function rerankLexicalEdges<T extends { id: string }>(input: {
   await putDecisionCache({
     userCourseId: input.userCourseId,
     operation: "lexical_edge_rerank",
-    model: result.model,
+    model,
     dimensions,
     source: payload,
-    payload: result.data,
+    payload: decision,
     ttlSeconds: CACHE_TTL_SECONDS,
   });
 
   return {
-    relations: reconcileLexicalEdges(boundedRelations, result.data),
+    relations: reconcileLexicalEdges(boundedRelations, decision),
     usedAI: true,
-    fallback: false,
+    fallback,
     cached: false,
   };
 }

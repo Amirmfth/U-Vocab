@@ -459,6 +459,23 @@ const unresolved = [...classUtilities.keys()]
   .filter((className) => allSourceText.includes(className))
   .sort();
 
+const unresolvedOccurrences = unresolved.map((className) => ({
+  className,
+  matches: sourceFiles.flatMap((file) => {
+    const text = dryRun ? sourceBefore.get(file) : fs.readFileSync(file, "utf8");
+    return text
+      .split("\n")
+      .map((line, index) => ({ line, index }))
+      .filter(({ line }) => line.includes(className))
+      .slice(0, 8)
+      .map(({ line, index }) => ({
+        file: path.relative(ROOT, file),
+        line: index + 1,
+        snippet: line.trim().slice(0, 240),
+      }));
+  }).slice(0, 12),
+}));
+
 const report = {
   cssFiles: CSS_FILES,
   semanticClasses: classUtilities.size,
@@ -468,6 +485,7 @@ const report = {
   modifiedFiles: modifiedFiles.length,
   expandedClasses: expandedClasses.size,
   unresolvedClassesReferencedInSource: unresolved,
+  unresolvedOccurrences,
   unsupportedMedia: [...unsupportedMedia],
   retainedGlobalCssLines: globals.split("\n").length,
 };

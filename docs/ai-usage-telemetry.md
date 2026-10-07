@@ -160,3 +160,8 @@ The telemetry introduced by #48 remains complementary: performance events answer
 ## Personalization and routing telemetry
 
 Centrally routed AI usage now records a `routeReason` metadata value when applicable. New decision operations are `recommendation_rerank`, `lexical_edge_rerank`, and `daily_session_plan`. Their normal `AiUsageEvent` rows can be used to calculate calls per user/day, token and dollar cost, success/error rate, and p50/p95 duration without storing raw prompts or learner text.
+
+
+## Decisions endpoint telemetry
+
+Native Decisions events set `endpoint=decisions` and record question counts, refusal count, retry count, and compute units when returned. Zero output tokens are valid and expected for Decisions. Use operation/prompt-version/model plus this endpoint metadata to compare cost and p50/p95 latency with Responses baselines.

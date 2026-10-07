@@ -463,7 +463,7 @@ const unresolved = [...classUtilities.keys()]
 const dynamicPrefixes = new Set();
 for (const file of sourceFiles) {
   const text = dryRun ? sourceBefore.get(file) : fs.readFileSync(file, "utf8");
-  for (const match of text.matchAll(/["'`]([A-Za-z0-9_-]{4,}[-]{1,2})["'`]?\s*\+/g)) {
+  for (const match of text.matchAll(/([A-Za-z0-9_-]{4,}[-]{1,2})["'`]\s*\+/g)) {
     dynamicPrefixes.add(match[1]);
   }
   for (const match of text.matchAll(/`([^\`$]*[A-Za-z0-9_-]{4,}[-]{1,2})\$\{/g)) {

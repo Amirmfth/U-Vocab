@@ -366,8 +366,10 @@ for (const file of sourceFiles) {
       const tokens = node.text.trim().split(/\s+/g);
       if (
         tokens.length > 0 &&
-        tokens.every((token) => classUtilities.has(token)) &&
-        tokens.some((token) => token.includes("-"))
+        tokens.every((token) => /^[A-Za-z0-9_-]+$/.test(token)) &&
+        tokens.some(
+          (token) => token.includes("-") && classUtilities.has(token),
+        )
       ) {
         const start = node.getStart(sourceFile) + 1;
         const end = node.getEnd() - 1;
@@ -458,6 +460,26 @@ const unresolved = [...classUtilities.keys()]
   .filter((className) => allSourceText.includes(className))
   .sort();
 
+const dynamicPrefixes = new Set();
+for (const file of sourceFiles) {
+  const text = dryRun ? sourceBefore.get(file) : fs.readFileSync(file, "utf8");
+  for (const match of text.matchAll(/["'`]([A-Za-z0-9_-]{4,}[-]{1,2})["'`]?\s*\+/g)) {
+    dynamicPrefixes.add(match[1]);
+  }
+  for (const match of text.matchAll(/`([^\`$]*[A-Za-z0-9_-]{4,}[-]{1,2})\$\{/g)) {
+    const token = match[1].trim().split(/\s+/).at(-1);
+    if (token) dynamicPrefixes.add(token);
+  }
+}
+const dynamicFamilies = [...dynamicPrefixes]
+  .map((prefix) => ({
+    prefix,
+    matchingClasses: [...classUtilities.keys()]
+      .filter((className) => className.startsWith(prefix))
+      .sort(),
+  }))
+  .filter((item) => item.matchingClasses.length);
+
 const unresolvedOccurrences = unresolved.map((className) => ({
   className,
   matches: sourceFiles.flatMap((file) => {
@@ -485,6 +507,7 @@ const report = {
   expandedClasses: expandedClasses.size,
   unresolvedClassesReferencedInSource: unresolved,
   unresolvedOccurrences,
+  dynamicFamilies,
   unsupportedMedia: [...unsupportedMedia],
   retainedGlobalCssLines: globals.split("\n").length,
 };

@@ -100,8 +100,7 @@ function addStyle(anchor, key, token, order) {
 function declarationToken(selector, anchor, declaration, mediaConditions) {
   let selectorWithHook =
     selector.slice(0, anchor.index) +
-    "&." +
-    anchor.name +
+    "&" +
     selector.slice(anchor.index + anchor.length);
 
   selectorWithHook = stripSelectorQuotes(selectorWithHook);
@@ -118,6 +117,7 @@ function declarationToken(selector, anchor, declaration, mediaConditions) {
 
   const value = escapeArbitraryValue(declaration.value);
   const important = declaration.important ? "!" : "";
+  const variant = selectorWithHook === "&" ? "" : "[" + selectorWithHook + "]:";
   return {
     key:
       prefix +
@@ -127,9 +127,8 @@ function declarationToken(selector, anchor, declaration, mediaConditions) {
       declaration.prop,
     token:
       prefix +
+      variant +
       "[" +
-      selectorWithHook +
-      "]:[" +
       declaration.prop +
       ":" +
       value +

@@ -228,10 +228,109 @@ const classUtilities = new Map(
 const sourceFiles = walkFiles(path.join(ROOT, "src")).filter((file) =>
   SOURCE_EXTENSIONS.has(path.extname(file)),
 );
+const sourceBefore = new Map(
+  sourceFiles.map((file) => [file, fs.readFileSync(file, "utf8")]),
+);
+
+function classExpressionLiteralTexts(sourceFile) {
+  const values = [];
+  function collect(node) {
+    if (
+      ts.isStringLiteral(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node) ||
+      ts.isTemplateHead(node) ||
+      ts.isTemplateMiddle(node) ||
+      ts.isTemplateTail(node)
+    ) {
+      values.push(node.text);
+      return;
+    }
+    ts.forEachChild(node, collect);
+  }
+  function visit(node) {
+    if (
+      ts.isJsxAttribute(node) &&
+      node.name.getText(sourceFile) === "className" &&
+      node.initializer
+    ) {
+      if (ts.isStringLiteral(node.initializer)) values.push(node.initializer.text);
+      else if (ts.isJsxExpression(node.initializer) && node.initializer.expression) {
+        collect(node.initializer.expression);
+      }
+      return;
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
+  return values;
+}
+
+const dynamicClassPrefixes = new Set();
+for (const file of sourceFiles) {
+  const content = sourceBefore.get(file);
+  const kind = file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.JSX;
+  const sourceFile = ts.createSourceFile(
+    file,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    kind,
+  );
+  for (const value of classExpressionLiteralTexts(sourceFile)) {
+    for (const token of value.trim().split(/\s+/g)) {
+      if (/^[A-Za-z0-9_-]{4,}-{1,2}$/.test(token)) {
+        dynamicClassPrefixes.add(token);
+      }
+    }
+  }
+}
+
+function splitResponsivePrefix(token) {
+  let rest = token;
+  let prefix = "";
+  while (true) {
+    const match = /^(min-\[[^\]]+\]:|max-\[[^\]]+\]:|motion-reduce:)/.exec(rest);
+    if (!match) break;
+    prefix += match[1];
+    rest = rest.slice(match[1].length);
+  }
+  return { prefix, rest };
+}
+
+const dynamicFamilies = [];
+for (const prefix of [...dynamicClassPrefixes].sort()) {
+  const matchingClasses = [...classUtilities.keys()]
+    .filter((className) => className.startsWith(prefix))
+    .sort();
+  if (!matchingClasses.length) continue;
+
+  const baseHook = prefix.replace(/-+$/, "");
+  const baseUtilities = [...(classUtilities.get(baseHook) ?? [])];
+  const seen = new Set(baseUtilities);
+
+  for (const modifierClass of matchingClasses) {
+    for (const token of classUtilities.get(modifierClass) ?? []) {
+      const parts = splitResponsivePrefix(token);
+      if (!/^\[[^\]]+:.+\]!?$/.test(parts.rest)) continue;
+      const wrapped =
+        parts.prefix +
+        "[&." +
+        modifierClass +
+        "]:" +
+        parts.rest;
+      if (!seen.has(wrapped)) {
+        seen.add(wrapped);
+        baseUtilities.push(wrapped);
+      }
+    }
+  }
+
+  classUtilities.set(baseHook, baseUtilities);
+  dynamicFamilies.push({ prefix, baseHook, matchingClasses });
+}
 
 const expandedClasses = new Set();
 const modifiedFiles = [];
-const sourceBefore = new Map(sourceFiles.map((file) => [file, fs.readFileSync(file, "utf8")]));
 
 function expandClassText(text) {
   if (!text.trim()) return text;
@@ -240,7 +339,17 @@ function expandClassText(text) {
   const core = text.slice(leading.length, text.length - trailing.length || undefined);
   if (!core) return text;
 
-  const original = core.split(/\s+/g);
+  const rawTokens = core.split(/\s+/g);
+  const original = [];
+  for (const token of rawTokens) {
+    if (dynamicClassPrefixes.has(token)) {
+      const baseHook = token.replace(/-+$/, "");
+      if (!rawTokens.includes(baseHook) && !original.includes(baseHook)) {
+        original.push(baseHook);
+      }
+    }
+    original.push(token);
+  }
   const extras = [];
   const seen = new Set(original);
   for (const token of original) {
@@ -459,26 +568,6 @@ const unresolved = [...classUtilities.keys()]
   .filter((className) => !expandedClasses.has(className))
   .filter((className) => allSourceText.includes(className))
   .sort();
-
-const dynamicPrefixes = new Set();
-for (const file of sourceFiles) {
-  const text = dryRun ? sourceBefore.get(file) : fs.readFileSync(file, "utf8");
-  for (const match of text.matchAll(/([A-Za-z0-9_-]{4,}[-]{1,2})["'`]\s*\+/g)) {
-    dynamicPrefixes.add(match[1]);
-  }
-  for (const match of text.matchAll(/`([^\`$]*[A-Za-z0-9_-]{4,}[-]{1,2})\$\{/g)) {
-    const token = match[1].trim().split(/\s+/).at(-1);
-    if (token) dynamicPrefixes.add(token);
-  }
-}
-const dynamicFamilies = [...dynamicPrefixes]
-  .map((prefix) => ({
-    prefix,
-    matchingClasses: [...classUtilities.keys()]
-      .filter((className) => className.startsWith(prefix))
-      .sort(),
-  }))
-  .filter((item) => item.matchingClasses.length);
 
 const unresolvedOccurrences = unresolved.map((className) => ({
   className,

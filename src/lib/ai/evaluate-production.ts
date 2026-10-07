@@ -12,6 +12,12 @@ import {
 } from "./evaluation-intelligence";
 import type { TargetLanguage } from "@prisma/client";
 import { targetLanguageConfig } from "@/lib/languages";
+import { evaluateProductionWithDecisions } from "./decisions/production-evaluator";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./decisions/mode";
 
 export const productionEvaluationSchema = z.object({
   correct: z.boolean(),
@@ -26,7 +32,7 @@ export const productionEvaluationSchema = z.object({
 
 export type ProductionEvaluation = z.infer<typeof productionEvaluationSchema>;
 
-export async function evaluateVocabularyProduction(input: {
+async function evaluateVocabularyProductionWithResponses(input: {
   userId: string;
   userCourseId?: string;
   targetLanguage?: TargetLanguage;
@@ -111,4 +117,51 @@ export async function evaluateVocabularyProduction(input: {
     }
     throw error;
   }
+}
+
+
+export async function evaluateVocabularyProduction(input: {
+  userId: string;
+  userCourseId?: string;
+  targetLanguage?: TargetLanguage;
+  evaluationLocale?: EvaluationLocale;
+  exerciseType: string;
+  exercisePrompt: string;
+  expected?: string;
+  lemma: string;
+  partOfSpeech: string;
+  patterns: string[];
+  examples: string[];
+  answer: string;
+}) {
+  const mode = decisionRolloutMode(
+    "OPENAI_DECISIONS_PRODUCTION_EVAL_MODE",
+    false,
+  );
+
+  if (!shouldRunNativeDecision(mode)) {
+    return evaluateVocabularyProductionWithResponses(input);
+  }
+
+  if (mode === "shadow") {
+    const [legacy, native] = await Promise.all([
+      evaluateVocabularyProductionWithResponses(input),
+      evaluateProductionWithDecisions(input),
+    ]);
+    if (native.status === "ok") {
+      console.info("Decisions production shadow comparison", {
+        sameCorrectness: native.data.correct === legacy.correct,
+        nativeConfidence: native.data.confidence,
+        legacyConfidence: legacy.confidence,
+      });
+    }
+    return legacy;
+  }
+
+  const native = await evaluateProductionWithDecisions(input);
+  if (shouldUseNativeDecision(mode) && native.status === "ok") {
+    return native.data;
+  }
+
+  return evaluateVocabularyProductionWithResponses(input);
 }

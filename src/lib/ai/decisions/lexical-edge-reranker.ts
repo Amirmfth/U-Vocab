@@ -10,6 +10,7 @@ import {
   runNativeDecision,
   scoreAnswer,
   type DecisionQuestion,
+  type DecisionAnswerMap,
 } from "./native";
 import {
   decisionRolloutMode,
@@ -108,7 +109,7 @@ function lexicalQuestions(candidates: LexicalEdgeCandidate[]): DecisionQuestion[
 
 function decisionFromNative(
   candidates: LexicalEdgeCandidate[],
-  answers: Map<string, any>,
+  answers: DecisionAnswerMap,
 ): LexicalEdgeDecision {
   return {
     selected: candidates

@@ -61,6 +61,11 @@ export type DecisionAnswer =
   | DecisionScoreAnswer
   | DecisionRefusalAnswer;
 
+export type DecisionAnswerMap = Map<
+  string,
+  Exclude<DecisionAnswer, DecisionRefusalAnswer>
+>;
+
 export type NativeDecisionResponse = {
   model: string;
   answers: DecisionAnswer[];
@@ -217,7 +222,7 @@ export async function runNativeDecision(input: {
   }
 }
 
-export function answerMap(answers: DecisionAnswer[]) {
+export function answerMap(answers: DecisionAnswer[]): DecisionAnswerMap {
   return new Map(
     answers
       .filter((answer): answer is Exclude<DecisionAnswer, DecisionRefusalAnswer> =>

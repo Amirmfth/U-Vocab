@@ -363,7 +363,20 @@ function expandClassText(text) {
     }
   }
   if (!extras.length) return text;
-  return leading + [...original, ...extras].join(" ") + trailing;
+
+  const trailingDynamicPrefix =
+    rawTokens.length > 0 && dynamicClassPrefixes.has(rawTokens.at(-1))
+      ? rawTokens.at(-1)
+      : null;
+  const ordered = trailingDynamicPrefix
+    ? [
+        ...original.filter((token) => token !== trailingDynamicPrefix),
+        ...extras,
+        trailingDynamicPrefix,
+      ]
+    : [...original, ...extras];
+
+  return leading + ordered.join(" ") + trailing;
 }
 
 function literalReplacement(sourceFile, node, contentStart, contentEnd, replacements) {

@@ -6,6 +6,12 @@ import { createAIUsageRecorder } from "./usage-recorder";
 import { startOperation } from "@/lib/performance";
 import type { TargetLanguage } from "@prisma/client";
 import { targetLanguageConfig } from "@/lib/languages";
+import { filterReadingCandidatesWithDecisions } from "./decisions/reading-filter";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./decisions/mode";
 
 export const readingAnalysisSchema = z.object({
   title: z.string().nullable(),
@@ -46,6 +52,21 @@ export async function analyzeReadingText(input: {
   targetLevel: string;
 }) {
   const language = targetLanguageConfig(input.targetLanguage);
+  const mode = decisionRolloutMode("OPENAI_DECISIONS_READING_FILTER_MODE", false);
+  let candidates = input.candidates;
+  if (shouldRunNativeDecision(mode)) {
+    const filtered = await filterReadingCandidatesWithDecisions({
+      userId: input.userId,
+      userCourseId: input.userCourseId,
+      targetLanguageCode: language.code,
+      targetLevel: input.targetLevel,
+      excerpt: input.text,
+      candidates: input.candidates,
+    });
+    if (shouldUseNativeDecision(mode) && filtered.status === "ok") {
+      candidates = filtered.candidates;
+    }
+  }
   const route = aiRoute("reading_analysis");
   const perf = startOperation("ai.reading_analysis", { model: route.model, inputChars: input.text.length, targetLevel: input.targetLevel, targetLanguage: language.code });
   const usageRecorder = createAIUsageRecorder({
@@ -53,7 +74,7 @@ export async function analyzeReadingText(input: {
     userCourseId: input.userCourseId,
     operation: "reading_analysis",
     model: route.model,
-    metadata: { inputChars: input.text.length, originalTextChars: input.originalTextChars, candidateCount: input.candidates.length, targetLevel: input.targetLevel, targetLanguage: language.code, lengthBucket: input.originalTextChars < 2000 ? "short" : input.originalTextChars < 8000 ? "medium" : "long" },
+    metadata: { inputChars: input.text.length, originalTextChars: input.originalTextChars, candidateCount: candidates.length, originalCandidateCount: input.candidates.length, targetLevel: input.targetLevel, targetLanguage: language.code, lengthBucket: input.originalTextChars < 2000 ? "short" : input.originalTextChars < 8000 ? "medium" : "long" },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -69,7 +90,7 @@ export async function analyzeReadingText(input: {
           role: "user",
           content: JSON.stringify({
             targetLevel: input.targetLevel,
-            candidates: input.candidates,
+            candidates,
             excerpt: input.text,
           }),
         },

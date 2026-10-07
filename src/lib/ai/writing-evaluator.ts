@@ -7,6 +7,12 @@ import { startOperation } from "@/lib/performance";
 import { evaluationLanguageInstruction, type EvaluationLocale } from "@/lib/evaluation-locale";
 import type { TargetLanguage } from "@prisma/client";
 import { targetLanguageConfig } from "@/lib/languages";
+import { evaluateWritingWithDecisions } from "./decisions/writing-preflight";
+import {
+  decisionRolloutMode,
+  shouldRunNativeDecision,
+  shouldUseNativeDecision,
+} from "./decisions/mode";
 import {
   evaluatorMistakeSchema,
   masteryEvidenceSchema,
@@ -120,20 +126,40 @@ export async function evaluateWriting(input: {
   };
 }) {
   const language = targetLanguageConfig(input.targetLanguage);
-  const route = aiRoute("writing_evaluation", {
-    complexity: writingEvaluationComplexity({
-      draftChars: input.draft.length,
-      level: input.level,
-      targetCount: input.requiredTargets.length,
-    }),
+  const decisionMode = decisionRolloutMode(
+    "OPENAI_DECISIONS_WRITING_MODE",
+    false,
+  );
+  const writingDecision = shouldRunNativeDecision(decisionMode)
+    ? await evaluateWritingWithDecisions({
+        userId: input.userId,
+        userCourseId: input.userCourseId,
+        targetLanguage: input.targetLanguage,
+        level: input.level,
+        task: input.task,
+        draft: input.draft,
+        targetWords: input.targetWords,
+        repeatedWords: input.repeatedWords,
+        requiredTargets: input.requiredTargets,
+      })
+    : null;
+  const heuristicComplexity = writingEvaluationComplexity({
+    draftChars: input.draft.length,
+    level: input.level,
+    targetCount: input.requiredTargets.length,
   });
+  const complexity =
+    shouldUseNativeDecision(decisionMode) && writingDecision?.status === "ok"
+      ? writingDecision.data.complexity
+      : heuristicComplexity;
+  const route = aiRoute("writing_evaluation", { complexity });
   const perf = startOperation("ai.writing_evaluation", { model: route.model, draftChars: input.draft.length, targetCount: input.requiredTargets.length, level: input.level });
   const usageRecorder = createAIUsageRecorder({
     userId: input.userId,
     userCourseId: input.userCourseId,
     operation: "writing_evaluation",
     model: route.model,
-    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.requiredTargets.length, targetLanguage: language.code, routeReason: route.reason },
+    metadata: { level: input.level, mode: input.mode, draftWords: input.draft.trim() ? input.draft.trim().split(/\s+/u).length : 0, targetCount: input.requiredTargets.length, targetLanguage: language.code, routeReason: route.reason, decisionsMode: decisionMode, semanticComplexity: complexity },
   });
   try {
     const response = await perf.span("provider", () => getOpenAI().responses.parse({
@@ -172,11 +198,21 @@ export async function evaluateWriting(input: {
       (observation) => allowedGrammarIds.has(observation.grammarConceptId),
     );
 
-    const targetUsageById = new Map(
+    const responseTargetUsageById = new Map(
       response.output_parsed.targetUsage.map((usage) => [usage.lexemeId, usage]),
     );
+    const decisionTargetUsageById =
+      shouldUseNativeDecision(decisionMode) && writingDecision?.status === "ok"
+        ? new Map(
+            writingDecision.data.targetUsage.map((usage) => [
+              usage.lexemeId,
+              usage,
+            ]),
+          )
+        : null;
     const targetUsage = input.requiredTargets.map((target) =>
-      targetUsageById.get(target.lexemeId) ?? {
+      decisionTargetUsageById?.get(target.lexemeId) ??
+      responseTargetUsageById.get(target.lexemeId) ?? {
         lexemeId: target.lexemeId,
         used: false,
         correct: false,
@@ -189,11 +225,19 @@ export async function evaluateWriting(input: {
       },
     );
 
-    return {
+    const decisionScores =
+      shouldUseNativeDecision(decisionMode) && writingDecision?.status === "ok"
+        ? writingDecision.data.scores
+        : null;
+    const scored = {
       ...response.output_parsed,
+      ...(decisionScores ?? {}),
       grammarObservations,
       targetUsage,
-      overall: calculateWritingOverall(response.output_parsed),
+    };
+    return {
+      ...scored,
+      overall: calculateWritingOverall(scored),
     };
   } catch (error) {
     perf.fail(error);

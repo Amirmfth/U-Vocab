@@ -1,4 +1,4 @@
-name: Tailwind migration audit
+name: Apply Tailwind migration
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  audit:
+  migrate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,5 +18,16 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Audit CSS to Tailwind migration
-        run: node scripts/migrate-tailwind-ui.mjs --dry-run
+      - name: Apply CSS to Tailwind migration
+        run: |
+          if [ ! -f src/app/core-experience.css ]; then
+            echo "Migration already applied."
+            exit 0
+          fi
+          node scripts/migrate-tailwind-ui.mjs
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor(ui): migrate application styles to Tailwind"
+          git push

@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeDeterministicPlan, validateSessionDecision } from "./session-planner";
+import {
+  allocateSessionByPriority,
+  normalizeDeterministicPlan,
+  validateSessionDecision,
+} from "./session-planner";
 
 const items = [
   { activity: "DUE_REVIEW" as const, title: "Review", href: "/review", plannedMinutes: 6 },
@@ -53,4 +57,29 @@ test("deterministic fallback never exceeds the requested duration", () => {
   const result = normalizeDeterministicPlan(items, 10);
   assert.ok(result.length <= 5);
   assert.equal(result.reduce((sum, item) => sum + item.plannedMinutes, 0), 10);
+});
+
+
+test("native Decisions priorities are converted to minutes deterministically", () => {
+  const priorities = new Map([
+    ["DUE_REVIEW" as const, 0.95],
+    ["PRODUCTION" as const, 0.8],
+    ["GRAMMAR" as const, 0.55],
+    ["FINAL_CHALLENGE" as const, 0.25],
+  ]);
+  const first = allocateSessionByPriority({
+    deterministicItems: items,
+    requestedMinutes: 15,
+    dueCount: 10,
+    priorities,
+  });
+  const second = allocateSessionByPriority({
+    deterministicItems: items,
+    requestedMinutes: 15,
+    dueCount: 10,
+    priorities,
+  });
+  assert.deepEqual(first, second);
+  assert.equal(first.reduce((sum, item) => sum + item.plannedMinutes, 0), 15);
+  assert.equal(first[0].activity, "DUE_REVIEW");
 });

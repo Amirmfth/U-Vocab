@@ -190,10 +190,10 @@ export async function GrammarProgressPanel({
   }
 
   return (
-    <section className="panel grammar-progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid gap-4.5 mb-5.5 rounded-uv-r6d27d54c6c">
-      <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+    <section className="panel grammar-progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4.5 mb-5.5 rounded-uv-r6d27d54c6c">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.grammar.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.grammar.eyebrow")}</p>
           <h2>
             {currentLevel} → {targetLevel}
           </h2>
@@ -201,9 +201,9 @@ export async function GrammarProgressPanel({
         <GraduationCap size={20} />
       </div>
 
-      <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">{t("progress.grammar.description")}</p>
+      <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">{t("progress.grammar.description")}</p>
 
-      <div className="grammar-progress-status-grid grid uv-grid-template-columns-dd0b1a1848 gap-2 uv-vcbb57f4d35:grid uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:p-3 uv-vcbb57f4d35:uv-border-8d7f82f403 uv-vcbb57f4d35:rounded-uv-r0939007802 uv-veda02a0adb:text-uv-fffcebd47f5 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff1713651e0 uv-min620:uv-grid-template-columns-259802fd7a">
+      <div className="grammar-progress-status-grid grid grid-template-columns-repeat-2-minmax-0-1fr gap-2 in-div:grid in-div:gap-0.75 in-div:p-3 in-div:border-1px-solid-border-2 in-div:rounded-uv-r0939007802 in-strong-2:text-uv-fffcebd47f5 in-span:text-uv-text-muted in-span:text-uv-ff1713651e0 uv-min620:grid-template-columns-repeat-5-minmax-0-1fr">
         {(
           [
             "STRONG",
@@ -236,9 +236,9 @@ export async function GrammarProgressPanel({
       </div>
 
       {!compact && byLevel.length ? (
-        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.byLevel")}</h3>
-          <div className="grammar-profile-breakdown grid gap-2 uv-vcbb57f4d35:grid uv-vcbb57f4d35:uv-grid-template-columns-f06dd92ea5 uv-vcbb57f4d35:uv-gap-be0270db3f uv-vcbb57f4d35:uv-padding-10ff753f5f uv-vcbb57f4d35:uv-border-top-8d7f82f403 uv-veda02a0adb:capitalize uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f58b84cc6f5 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-f58b84cc6f5 uv-v982220ddd5:uv-grid-column-93b665dfb5">
+          <div className="grammar-profile-breakdown grid gap-2 in-div:grid in-div:grid-template-columns-minmax-0-1fr-auto in-div:gap-3px-10px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-strong-2:capitalize in-span:text-uv-text-muted in-span:text-uv-f58b84cc6f5 in-small:text-uv-text-muted in-small:text-uv-f58b84cc6f5 in-small:grid-column-1-1">
             {byLevel.map((group) => (
               <div key={group.label}>
                 <strong>{group.label}</strong>
@@ -255,9 +255,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && byCategory.length ? (
-        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.byCategory")}</h3>
-          <div className="grammar-profile-breakdown grid gap-2 uv-vcbb57f4d35:grid uv-vcbb57f4d35:uv-grid-template-columns-f06dd92ea5 uv-vcbb57f4d35:uv-gap-be0270db3f uv-vcbb57f4d35:uv-padding-10ff753f5f uv-vcbb57f4d35:uv-border-top-8d7f82f403 uv-veda02a0adb:capitalize uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f58b84cc6f5 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-f58b84cc6f5 uv-v982220ddd5:uv-grid-column-93b665dfb5">
+          <div className="grammar-profile-breakdown grid gap-2 in-div:grid in-div:grid-template-columns-minmax-0-1fr-auto in-div:gap-3px-10px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-strong-2:capitalize in-span:text-uv-text-muted in-span:text-uv-f58b84cc6f5 in-small:text-uv-text-muted in-small:text-uv-f58b84cc6f5 in-small:grid-column-1-1">
             {byCategory.map((group) => (
               <div key={group.category}>
                 <strong>{t(categoryKeys[group.category])}</strong>
@@ -274,12 +274,12 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && weaknesses.length ? (
-        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.needsAttention")}</h3>
           <div className="collection-list flex flex-col">
             {weaknesses.map((item) => (
               <Link
-                className="collection-row uv-border-bottom-8d7f82f403 min-h-16 grid uv-grid-template-columns-f06dd92ea5 items-center gap-3 uv-padding-c9f5e3c335 uv-veda02a0adb:block uv-v36c0309a03:block uv-v36c0309a03:mt-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
+                className="collection-row border-1px-solid-border min-h-16 grid grid-template-columns-minmax-0-1fr-auto items-center gap-3 padding-11px-2px in-strong-2:block in-span:block in-span:mt-0.75 in-span:text-uv-text-muted in-span:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
                 href={"/practice?grammar=" + item.grammarConcept.slug}
                 key={item.id}
               >
@@ -305,9 +305,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && transitions.length ? (
-        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.recentChanges")}</h3>
-          <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
+          <div className="weakness-list flex flex-col in-div:min-h-10.5 in-div:flex in-div:items-center in-div:justify-between in-div:gap-3 in-div:border-1px-solid-border in-div-last-child:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-strong-2:text-uv-text-muted in-strong-2:font-font-geist-mono-geist-mono-monospace">
             {transitions.map((transition) => (
               <div key={transition.id}>
                 <span className="learning-content" lang="en" dir="ltr">
@@ -326,9 +326,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && recentEvidence.length ? (
-        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.recentEvidence")}</h3>
-          <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
+          <div className="weakness-list flex flex-col in-div:min-h-10.5 in-div:flex in-div:items-center in-div:justify-between in-div:gap-3 in-div:border-1px-solid-border in-div-last-child:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-strong-2:text-uv-text-muted in-strong-2:font-font-geist-mono-geist-mono-monospace">
             {recentEvidence.slice(0, 5).map((evidence) => (
               <div key={evidence.id}>
                 <span>
@@ -351,7 +351,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      <Link href="/grammar" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
+      <Link href="/grammar" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
         {t("progress.grammar.openProfile")}{" "}
         <ArrowRight className="rtl-mirror" size={16} />
       </Link>

@@ -52,8 +52,8 @@ export function ActivityHeatmap({
   keys.reverse();
 
   return (
-    <div className="heatmap-scroll w-full overflow-x-auto uv-padding-fe30849572">
-      <div className="activity-heatmap w-max grid uv-grid-auto-flow-aa60230ab0 uv-grid-template-rows-aab036a98e uv-grid-auto-columns-4bd46d4017 gap-0.75" aria-label={t(dayCount <= 7 ? "progress.heatmapAria7" : "progress.heatmapAria")}>
+    <div className="heatmap-scroll w-full overflow-x-auto padding-3px-0-8px">
+      <div className="activity-heatmap w-max grid grid-auto-flow-column grid-template-rows-repeat-7-11px grid-auto-columns-11px gap-0.75" aria-label={t(dayCount <= 7 ? "progress.heatmapAria7" : "progress.heatmapAria")}>
         {keys.map((date) => {
           const day = lookup.get(date);
           const count = day
@@ -75,7 +75,7 @@ export function ActivityHeatmap({
               key={date}
               href={"/progress?range=" + range + "&day=" + date}
               className={
-                "heatmap-cell heatmap-level w-2.75 h-2.75 rounded-uv-ra0179b92f3 bg-uv-surface-soft uv-outline-bdc43f584d uv-transition-1b8e537267 uv-vaa682ffe01:bg-uv-c7978809be5 uv-vd2d630e022:bg-uv-cdedb452cb4 uv-v4492fe04fe:bg-uv-c45f6640f64 uv-v86dd054dc8:bg-uv-primary-strong hover:outline-uv-text-soft hover:uv-transform-1906d1542a focus-visible:outline-uv-text-soft focus-visible:uv-transform-1906d1542a uv-v48f8f87023:uv-outline-edcab5d466 uv-v48f8f87023:uv-outline-offset-9e0741c052 heatmap-level-" +
+                "heatmap-cell heatmap-level w-2.75 h-2.75 rounded-uv-ra0179b92f3 bg-uv-surface-soft outline-1px-solid-transparent transition-transform-120ms-ease-outline-color-120ms-ease in-heatmap-level-1:bg-uv-c7978809be5 in-heatmap-level-2:bg-uv-cdedb452cb4 in-heatmap-level-3:bg-uv-c45f6640f64 in-heatmap-level-4:bg-uv-primary-strong hover:outline-uv-text-soft hover:transform-scale-1p18 focus-visible:outline-uv-text-soft focus-visible:transform-scale-1p18 in-is-selected:outline-2px-solid-text in-is-selected:outline-offset-1px heatmap-level-" +
                 intensity(day) +
                 (selectedDay === date ? " is-selected" : "")
               }

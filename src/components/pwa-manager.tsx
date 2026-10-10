@@ -179,21 +179,21 @@ export function PwaManager() {
   return (
     <>
       {offline ? (
-        <div className="pwa-connectivity fixed uv-z-index-b888b29826 uv-top-95733511cd uv-left-b46da6ec37 uv-transform-9fc1c118d6 inline-flex items-center gap-2 uv-max-width-d2dbda58ca uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-red9ab892c5 bg-uv-cec7f8cbea6 text-uv-text-soft uv-box-shadow-4ee177db8b text-uv-f5f68d82942" role="status">
+        <div className="pwa-connectivity fixed z-index-80 top-max-10px-env-safe-area-inset-top left-50pct transform-translatex-50pct inline-flex items-center gap-2 max-width-calc-100vw-24px padding-8px-12px border-1px-solid-border-2 rounded-uv-red9ab892c5 bg-uv-cec7f8cbea6 text-uv-text-soft box-shadow-shadow text-uv-f5f68d82942" role="status">
           <WifiOff size={15} />
           <span>{t("pwa.offlineBanner")}</span>
         </div>
       ) : null}
 
       {waiting ? (
-        <aside className="pwa-update fixed uv-z-index-2d0c8af807 uv-inset-4ef3e57216 flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 uv-border-488f4b382f rounded-uv-r6d27d54c6c bg-uv-cfc0f1d21e4 uv-box-shadow-4ee177db8b uv-backdrop-filter-ee1e0ecb9e uv-vcbb57f4d35:grid uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:min-w-0 uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:text-uv-f5f68d82942 uv-v36c0309a03:uv-line-height-a26f83404b uv-vcded88c612:w-auto uv-vcded88c612:min-w-31 uv-min900:uv-inset-inline-d4d626e5fe uv-min900:bottom-6 uv-min900:uv-width-e83f4f51d7 uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" role="status" aria-live="polite">
+        <aside className="pwa-update fixed z-index-90 inset-auto-12px-calc-86px-env-safe-area-inset-bottom-12px flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 border-1px-solid-border-strong rounded-uv-r6d27d54c6c bg-uv-cfc0f1d21e4 box-shadow-shadow backdrop-filter-blur-18px in-div:grid in-div:gap-0.75 in-div:min-w-0 in-span:text-uv-text-soft in-span:text-uv-f5f68d82942 in-span:line-height-1p4 in-button-2:w-auto in-button-2:min-w-31 uv-min900:inset-inline-auto-24px uv-min900:bottom-6 uv-min900:width-min-520px-calc-100vw-48px uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" role="status" aria-live="polite">
           <div>
             <strong>{t("pwa.updateTitle")}</strong>
             <span>{dirty ? t("pwa.updateUnsaved") : t("pwa.updateBody")}</span>
           </div>
           <button
             type="button"
-            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
+            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
             onClick={applyUpdate}
             disabled={dirty}
           >
@@ -204,19 +204,19 @@ export function PwaManager() {
       ) : null}
 
       {installPrompt ? (
-        <aside className="pwa-install fixed uv-z-index-2d0c8af807 uv-inset-4ef3e57216 flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 uv-border-488f4b382f rounded-uv-r6d27d54c6c bg-uv-cfc0f1d21e4 uv-box-shadow-4ee177db8b uv-backdrop-filter-ee1e0ecb9e uv-v0fee2d502c:grid uv-v0fee2d502c:gap-0.75 uv-v0fee2d502c:min-w-0 uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:text-uv-f5f68d82942 uv-v36c0309a03:uv-line-height-a26f83404b uv-vcded88c612:w-auto uv-vcded88c612:min-w-31 uv-min900:uv-inset-inline-d4d626e5fe uv-min900:bottom-6 uv-min900:uv-width-e83f4f51d7 uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" aria-label={t("pwa.installTitle")}>
+        <aside className="pwa-install fixed z-index-90 inset-auto-12px-calc-86px-env-safe-area-inset-bottom-12px flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 border-1px-solid-border-strong rounded-uv-r6d27d54c6c bg-uv-cfc0f1d21e4 box-shadow-shadow backdrop-filter-blur-18px in-div-first-child:grid in-div-first-child:gap-0.75 in-div-first-child:min-w-0 in-span:text-uv-text-soft in-span:text-uv-f5f68d82942 in-span:line-height-1p4 in-button-2:w-auto in-button-2:min-w-31 uv-min900:inset-inline-auto-24px uv-min900:bottom-6 uv-min900:width-min-520px-calc-100vw-48px uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" aria-label={t("pwa.installTitle")}>
           <div>
             <strong>{t("pwa.installTitle")}</strong>
             <span>{t("pwa.installBody")}</span>
           </div>
-          <div className="pwa-install-actions flex gap-2 items-center uv-max560:uv-vcded88c612:uv-flex-356a192b79">
-            <button type="button" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" onClick={install}>
+          <div className="pwa-install-actions flex gap-2 items-center uv-max560:in-button-2:flex-1">
+            <button type="button" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={install}>
               <Download size={16} />
               {t("pwa.installAction")}
             </button>
             <button
               type="button"
-              className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383"
+              className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft min-height-tap-target"
               aria-label={t("pwa.installDismiss")}
               onClick={() => {
                 try {

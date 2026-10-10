@@ -35,8 +35,8 @@ export function ConversationStartForm({
   }, [router, state]);
 
   return (
-    <form action={action} className="panel conversation-start-form uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-min620:grid uv-min620:uv-grid-template-columns-dd0b1a1848 uv-min620:uv-vbec331cd32:uv-grid-column-93b665dfb5 uv-min620:uv-vc6a3ba666c:uv-grid-column-93b665dfb5 uv-min620:uv-vae41d3c771:uv-grid-column-93b665dfb5 uv-min620:uv-ve7e0cd887c:uv-grid-column-93b665dfb5 rounded-uv-r6d27d54c6c uv-v6e1e91da2a:flex uv-v6e1e91da2a:flex-col uv-min620:uv-v6e1e91da2a:grid uv-min620:uv-v6e1e91da2a:uv-grid-template-columns-dd0b1a1848 uv-min620:uv-vdb44acc009:uv-grid-column-93b665dfb5 uv-min620:uv-v4fd50aab40:uv-grid-column-93b665dfb5">
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+    <form action={action} className="panel conversation-start-form border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 uv-min620:grid uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min620:in-field-first-of-type:grid-column-1-1 uv-min620:in-conversation-toggle:grid-column-1-1 uv-min620:in-status-notice:grid-column-1-1 uv-min620:in-button:grid-column-1-1 rounded-uv-r6d27d54c6c in-loading-hub-form:flex in-loading-hub-form:flex-col uv-min620:in-loading-hub-form:grid uv-min620:in-loading-hub-form:grid-template-columns-repeat-2-minmax-0-1fr uv-min620:in-loading-hub-form-field-first-child:grid-column-1-1 uv-min620:in-loading-hub-form-loading-form-submit:grid-column-1-1">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="conversation-mode-trigger">{t("conversation.mode")}</label>
         <ActivitySelect
           id="conversation-mode"
@@ -58,7 +58,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor={kind + "-topic"}>
           {t("conversation.topic")}{" "}
           <span className="muted text-uv-text-muted">({t("reading.optional")})</span>
@@ -75,7 +75,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor={kind + "-target-count"}>{t("conversation.targets")}</label>
         <ActivitySelect
           id={kind + "-target-count"}
@@ -90,7 +90,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor={kind + "-tone-trigger"}>{t("conversation.tone")}</label>
         <ActivitySelect
           id={kind + "-tone"}
@@ -126,7 +126,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor={kind + "-formality-trigger"}>{t("conversation.formality")}</label>
         <ActivitySelect
           id={kind + "-formality"}
@@ -153,7 +153,7 @@ export function ConversationStartForm({
       </div>
 
       {kind === "MISSION" ? (
-        <label className="conversation-toggle min-h-13.5 flex items-start gap-2.5 uv-padding-3da39b7f2e cursor-pointer uv-vcf5ce320fa:w-4.5 uv-vcf5ce320fa:h-4.5 uv-vcf5ce320fa:mt-0.5 uv-v36c0309a03:flex uv-v36c0309a03:flex-col uv-v36c0309a03:gap-0.75 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:uv-line-height-a26f83404b">
+        <label className="conversation-toggle min-h-13.5 flex items-start gap-2.5 padding-11px-0 cursor-pointer in-input:w-4.5 in-input:h-4.5 in-input:mt-0.5 in-span:flex in-span:flex-col in-span:gap-0.75 in-small:text-uv-text-muted in-small:line-height-1p4">
           <input type="checkbox" name="revealTargets" />
           <span>
             <strong>{t("conversation.showTargets")}</strong>

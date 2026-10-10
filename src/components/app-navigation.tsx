@@ -87,7 +87,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:uv-padding-e76eae74a0 uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:uv-transition-bce4a9f76d uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:uv-v14ef0811e9:text-uv-text uv-min940:uv-v14ef0811e9:bg-uv-cbdfd7cd038 uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
+      className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:padding-0-11px uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:transition-background-150ms-ease-color-150ms-ease uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:in-is-active:text-uv-text uv-min940:in-is-active:bg-uv-cbdfd7cd038 min-height-tap-target " + (isActive ? "is-active" : "")}
       aria-current={isActive ? (pathname === href ? "page" : "location") : undefined}
       aria-label={
         section === "review" && dueCount
@@ -99,7 +99,7 @@ function NavLink({
       <span>{label}</span>
       {section === "review" && dueCount ? (
         <span
-          className="review-nav-badge min-w-5 h-5 ml-auto uv-padding-5335c6828f inline-flex items-center justify-center rounded-uv-red9ab892c5 bg-uv-primary-strong text-uv-c39fe93f0de text-uv-f2311a7d95c uv-weight-750 uv-line-height-356a192b79"
+          className="review-nav-badge min-w-5 h-5 ml-auto padding-0-5px inline-flex items-center justify-center rounded-uv-red9ab892c5 bg-uv-primary-strong text-uv-c39fe93f0de text-uv-f2311a7d95c font-750 line-height-1"
           title={t("nav.reviewsDue", { count: formattedDueCount ?? dueCount })}
         >
           {dueCount > 99 ? formatNumber(locale, 99) + "+" : formattedDueCount}
@@ -161,15 +161,15 @@ export function AppNavigation({
 
   return (
     <>
-      <header className="mobile-header fixed uv-inset-b8cc3b4645 uv-z-index-e1822db470 uv-height-30fe4268f5 uv-padding-ce098359fd flex items-center justify-between uv-border-bottom-d07d4bb668 bg-uv-c06b07fb064 uv-backdrop-filter-ee1e0ecb9e uv-min940:hidden">
-        <Link href="/vocabulary" className="brand inline-flex items-center gap-2.25 uv-weight-620 uv-letter-spacing-235f37bdea" aria-label={t("nav.brandWords")}>
-          <span className="brand-mark w-7.5 h-7.5 grid uv-place-items-305047e96e rounded-uv-r933cc73310 uv-background-6217892e56 uv-color-528cef87d0 uv-box-shadow-a1161bbdbc">U</span>
+      <header className="mobile-header fixed inset-0-0-auto-0 z-index-50 height-calc-60px-env-safe-area-inset-top padding-env-safe-area-inset-top-16px-0 flex items-center justify-between border-1px-solid-rgb-255-255-255-0p06 bg-uv-c06b07fb064 backdrop-filter-blur-18px uv-min940:hidden">
+        <Link href="/vocabulary" className="brand inline-flex items-center gap-2.25 font-620 letter-spacing-0p02em-2" aria-label={t("nav.brandWords")}>
+          <span className="brand-mark w-7.5 h-7.5 grid place-items-center rounded-uv-r933cc73310 bg-linear-gradient-145deg-primary-strong-hex-6657ee color-white box-shadow-inset-0-1px-0-rgb-255-255-255-0p25">U</span>
           <span>U-Vocab</span>
         </Link>
         <div className="mobile-header-actions flex gap-2">
           <button
             type="button"
-            className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383"
+            className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft min-height-tap-target"
             aria-label={t("nav.addWord")}
             aria-expanded={isAddSheetOpen}
             aria-controls="mobile-add-sheet [position:fixed] [z-index:100] [inset:0] [display:flex] [align-items:flex-end] min-[940px]:[display:none]"
@@ -180,20 +180,20 @@ export function AppNavigation({
           >
             <AnimatedAppIcon name="add" size={20} />
           </button>
-          <Link href="/settings" className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383" aria-label={t("nav.settings")}>
+          <Link href="/settings" className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft min-height-tap-target" aria-label={t("nav.settings")}>
             <AnimatedAppIcon name="settings" size={19} />
           </Link>
         </div>
       </header>
 
-      <aside className="desktop-sidebar hidden uv-min940:fixed uv-min940:uv-inset-8a0ae26192 uv-min940:uv-z-index-e1822db470 uv-min940:w-60.5 uv-min940:flex uv-min940:flex-col uv-min940:uv-padding-3e6175ce44 uv-min940:uv-border-right-8d7f82f403 uv-min940:bg-uv-c22c77a4653">
-        <Link href="/vocabulary" className="brand sidebar-brand inline-flex items-center gap-2.25 uv-weight-620 uv-letter-spacing-235f37bdea uv-min940:uv-padding-cf4e33fcb4" aria-label={t("nav.brandWords")}>
-          <span className="brand-mark w-7.5 h-7.5 grid uv-place-items-305047e96e rounded-uv-r933cc73310 uv-background-6217892e56 uv-color-528cef87d0 uv-box-shadow-a1161bbdbc">U</span>
+      <aside className="desktop-sidebar hidden uv-min940:fixed uv-min940:inset-0-auto-0-0 uv-min940:z-index-50 uv-min940:w-60.5 uv-min940:flex uv-min940:flex-col uv-min940:padding-24px-16px uv-min940:border-1px-solid-border-4 uv-min940:bg-uv-c22c77a4653">
+        <Link href="/vocabulary" className="brand sidebar-brand inline-flex items-center gap-2.25 font-620 letter-spacing-0p02em-2 uv-min940:padding-0-8px-24px" aria-label={t("nav.brandWords")}>
+          <span className="brand-mark w-7.5 h-7.5 grid place-items-center rounded-uv-r933cc73310 bg-linear-gradient-145deg-primary-strong-hex-6657ee color-white box-shadow-inset-0-1px-0-rgb-255-255-255-0p25">U</span>
           <span>U-Vocab</span>
         </Link>
 
         <nav className="sidebar-nav uv-min940:flex uv-min940:flex-col uv-min940:gap-1.25" aria-label={t("nav.main")}>
-          <p className="nav-eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold uv-min940:uv-padding-6338b38ab4">{t("common.learn")}</p>
+          <p className="nav-eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold uv-min940:padding-0-10px-7px">{t("common.learn")}</p>
           {primary.map((item) => (
             <NavLink
               key={item.section}
@@ -207,8 +207,8 @@ export function AppNavigation({
           ))}
         </nav>
 
-        <div className="sidebar-secondary mt-auto flex flex-col gap-1.25 pt-6 uv-border-top-8d7f82f403 uv-v62842742dd:mt-2.5">
-          <p className="nav-eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold uv-min940:uv-padding-6338b38ab4">{t("common.insights")}</p>
+        <div className="sidebar-secondary mt-auto flex flex-col gap-1.25 pt-6 border-1px-solid-border-3 in-sidebar-add:mt-2.5">
+          <p className="nav-eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold uv-min940:padding-0-10px-7px">{t("common.insights")}</p>
           {insights.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
@@ -216,7 +216,7 @@ export function AppNavigation({
               <Link
                 key={item.href}
                 href={item.href}
-                className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:uv-padding-e76eae74a0 uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:uv-transition-bce4a9f76d uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:uv-v14ef0811e9:text-uv-text uv-min940:uv-v14ef0811e9:bg-uv-cbdfd7cd038 uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
+                className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:padding-0-11px uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:transition-background-150ms-ease-color-150ms-ease uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:in-is-active:text-uv-text uv-min940:in-is-active:bg-uv-cbdfd7cd038 min-height-tap-target " + (isActive ? "is-active" : "")}
                 aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
                 <AnimatedAppIcon name={item.icon} size={18} />
@@ -224,7 +224,7 @@ export function AppNavigation({
               </Link>
             );
           })}
-          <p className="nav-eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold uv-min940:uv-padding-6338b38ab4">{t("common.account")}</p>
+          <p className="nav-eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold uv-min940:padding-0-10px-7px">{t("common.account")}</p>
           {system.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
@@ -232,7 +232,7 @@ export function AppNavigation({
               <Link
                 key={item.href}
                 href={item.href}
-                className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:uv-padding-e76eae74a0 uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:uv-transition-bce4a9f76d uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:uv-v14ef0811e9:text-uv-text uv-min940:uv-v14ef0811e9:bg-uv-cbdfd7cd038 uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
+                className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:padding-0-11px uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:transition-background-150ms-ease-color-150ms-ease uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:in-is-active:text-uv-text uv-min940:in-is-active:bg-uv-cbdfd7cd038 min-height-tap-target " + (isActive ? "is-active" : "")}
                 aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
                 <AnimatedAppIcon name={item.icon} size={18} />
@@ -240,7 +240,7 @@ export function AppNavigation({
               </Link>
             );
           })}
-          <Link href="/vocabulary/new" className="sidebar-add uv-min940:min-h-11 uv-min940:mt-auto uv-min940:flex uv-min940:items-center uv-min940:justify-center uv-min940:gap-2 uv-min940:rounded-uv-r233710a71e uv-min940:bg-uv-text uv-min940:text-uv-c39fe93f0de uv-min940:text-uv-f8bb1a95a21 uv-min940:uv-weight-650">
+          <Link href="/vocabulary/new" className="sidebar-add uv-min940:min-h-11 uv-min940:mt-auto uv-min940:flex uv-min940:items-center uv-min940:justify-center uv-min940:gap-2 uv-min940:rounded-uv-r233710a71e uv-min940:bg-uv-text uv-min940:text-uv-c39fe93f0de uv-min940:text-uv-f8bb1a95a21 uv-min940:font-650">
             <AnimatedAppIcon name="add" size={18} />
             {t("nav.addWord")}
           </Link>
@@ -248,7 +248,7 @@ export function AppNavigation({
       </aside>
 
       {!isPrimary && owner.section ? (
-        <nav className="section-context-nav hidden uv-min940:fixed uv-min940:uv-z-index-af3e133428 uv-min940:top-6 uv-min940:right-9 uv-min940:flex uv-min940:items-center uv-min940:gap-1.75 uv-min940:uv-max-width-f65a3e8425 uv-min940:uv-padding-1eec12de18 uv-min940:uv-border-8d7f82f403 uv-min940:rounded-uv-red9ab892c5 uv-min940:bg-uv-c20ef9fea58 uv-min940:uv-backdrop-filter-bab5c12c11 uv-min940:text-uv-text-muted uv-min940:text-uv-f78eb7000a9 uv-min940:uv-v99777dc5b4:text-uv-primary-strong uv-min940:uv-v99777dc5b4:font-semibold uv-min940:uv-veda02a0adb:overflow-hidden uv-min940:uv-veda02a0adb:text-uv-text-soft uv-min940:uv-veda02a0adb:uv-text-overflow-900198081b uv-min940:uv-veda02a0adb:whitespace-nowrap" aria-label={t("nav.sectionContext")}>
+        <nav className="section-context-nav hidden uv-min940:fixed uv-min940:z-index-40 uv-min940:top-6 uv-min940:right-9 uv-min940:flex uv-min940:items-center uv-min940:gap-1.75 uv-min940:max-width-calc-100vw-330px uv-min940:padding-7px-10px uv-min940:border-1px-solid-border-2 uv-min940:rounded-uv-red9ab892c5 uv-min940:bg-uv-c20ef9fea58 uv-min940:backdrop-filter-blur-12px uv-min940:text-uv-text-muted uv-min940:text-uv-f78eb7000a9 uv-min940:in-a:text-uv-primary-strong uv-min940:in-a:font-semibold uv-min940:in-strong-2:overflow-hidden uv-min940:in-strong-2:text-uv-text-soft uv-min940:in-strong-2:text-overflow-ellipsis uv-min940:in-strong-2:whitespace-nowrap" aria-label={t("nav.sectionContext")}>
           <Link href={LEARNING_SECTIONS[owner.section].href}>
             {t(
               owner.section === "words"
@@ -271,7 +271,7 @@ export function AppNavigation({
         </nav>
       ) : null}
 
-      <nav className="mobile-bottom-nav fixed uv-z-index-e1822db470 uv-inset-1c88d7d0e2 grid uv-grid-template-columns-50678a67eb gap-0.5 p-2.25 uv-border-fbc4d8b2cf rounded-uv-r998b02c207 bg-uv-cd13dd822fd uv-box-shadow-b29865e499 uv-backdrop-filter-220f98ca33 uv-min940:hidden" aria-label={t("nav.mobile")}>
+      <nav className="mobile-bottom-nav fixed z-index-50 inset-auto-10px-max-10px-env-safe-area-inset-bottom-10px grid grid-template-columns-repeat-4-1fr gap-0.5 p-2.25 border-1px-solid-rgb-255-255-255-0p08 rounded-uv-r998b02c207 bg-uv-cd13dd822fd box-shadow-0-18px-50px-rgb-0-0-0-0p4 backdrop-filter-blur-20px uv-min940:hidden" aria-label={t("nav.mobile")}>
         {primary.map((item) => {
           const isActive = sectionForPath(pathname) === item.section;
           const formattedDueCount = dueCount ? formatNumber(locale, dueCount) : null;
@@ -279,14 +279,14 @@ export function AppNavigation({
             <Link
               key={item.section}
               href={item.href}
-              className={"mobile-nav-item flex flex-col items-center justify-center gap-1 rounded-uv-rd65225386d text-uv-text-muted text-uv-ff7862da171 uv-transition-be257b436b active:uv-transform-6161c738a7 uv-v14ef0811e9:text-uv-primary uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
+              className={"mobile-nav-item flex flex-col items-center justify-center gap-1 rounded-uv-rd65225386d text-uv-text-muted text-uv-ff7862da171 transition-color-160ms-ease-transform-160ms-ease active:transform-scale-0p96 in-is-active:text-uv-primary min-height-tap-target " + (isActive ? "is-active" : "")}
               aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
             >
-              <span className="mobile-nav-icon relative inline-flex uv-v5c2228c20d:absolute uv-v5c2228c20d:-top-2 uv-v5c2228c20d:left-3.5 uv-v5c2228c20d:min-w-4 uv-v5c2228c20d:h-4 uv-v5c2228c20d:px-0.75 uv-v5c2228c20d:text-uv-fd95043f679">
+              <span className="mobile-nav-icon relative inline-flex in-review-nav-badge:absolute in-review-nav-badge:-top-2 in-review-nav-badge:left-3.5 in-review-nav-badge:min-w-4 in-review-nav-badge:h-4 in-review-nav-badge:px-0.75 in-review-nav-badge:text-uv-fd95043f679">
                 <AnimatedAppIcon name={item.icon} size={25} />
                 {item.section === "review" && dueCount ? (
                   <span
-                    className="review-nav-badge min-w-5 h-5 ml-auto uv-padding-5335c6828f inline-flex items-center justify-center rounded-uv-red9ab892c5 bg-uv-primary-strong text-uv-c39fe93f0de text-uv-f2311a7d95c uv-weight-750 uv-line-height-356a192b79"
+                    className="review-nav-badge min-w-5 h-5 ml-auto padding-0-5px inline-flex items-center justify-center rounded-uv-red9ab892c5 bg-uv-primary-strong text-uv-c39fe93f0de text-uv-f2311a7d95c font-750 line-height-1"
                     aria-label={t("nav.reviewsDue", { count: formattedDueCount ?? dueCount })}
                   >
                     {dueCount > 99 ? formatNumber(locale, 99) + "+" : formattedDueCount}

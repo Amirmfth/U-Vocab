@@ -35,8 +35,8 @@ export function SettingsForm({
   ];
 
   return (
-    <form action={action} className="panel form-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 w-full max-w-uv-74487d394e rounded-uv-r6d27d54c6c">
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+    <form action={action} className="panel form-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 w-full max-w-uv-74487d394e rounded-uv-r6d27d54c6c">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="translation-trigger">{t("settings.translation")}</label>
         <ActivitySelect
           defaultValue={preference}
@@ -50,7 +50,7 @@ export function SettingsForm({
         />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="currentLevel-trigger">{t("settings.currentLanguageLevel", { language: languageLabel })}</label>
         <span className="muted text-uv-text-muted">{t("settings.currentLevelHelp")}</span>
         <ActivitySelect
@@ -61,7 +61,7 @@ export function SettingsForm({
         />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="targetLevel-trigger">{t("settings.targetLanguageLevel", { language: languageLabel })}</label>
         <span className="muted text-uv-text-muted">{t("settings.targetLevelHelp")}</span>
         <ActivitySelect

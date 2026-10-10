@@ -108,7 +108,7 @@ export function ReadingText({
   }, [active]);
 
   return (
-    <article className="panel generated-reading-text learning-content uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 uv-max-width-ff0948b971 mx-auto uv-padding-3adff930ea text-uv-fe2022883cc uv-line-height-93ec1d5b0e uv-v3696a6f5e9:uv-margin-top-03a660ae63 uv-max720:p-4.5 uv-max720:uv-line-height-3d827c0dc2 rounded-uv-r6d27d54c6c uv-v3aa23311a7:inline uv-v3aa23311a7:uv-padding-a03728e684 uv-v3aa23311a7:border-0 uv-v3aa23311a7:rounded-uv-r5e0d704b33 uv-v3aa23311a7:uv-background-19dd733243 uv-v3aa23311a7:text-uv-primary-strong uv-v3aa23311a7:uv-font-3e26d67509 uv-v3aa23311a7:uv-weight-680 uv-v3aa23311a7:uv-line-height-3e26d67509 uv-v3aa23311a7:cursor-pointer uv-v3aa23311a7:uv-box-decoration-break-5e0072329d uv-vf10a1b1a22:uv-background-53af3ed932 uv-vdd060a9ceb:uv-background-53af3ed932" lang="de" dir="ltr">
+    <article className="panel generated-reading-text learning-content border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 max-width-reading-measure mx-auto padding-clamp-22px-4vw-40px text-uv-fe2022883cc line-height-1p8 in-p-p:margin-top-1p15em uv-max720:p-4.5 uv-max720:line-height-1p72 rounded-uv-r6d27d54c6c in-reading-target-word:inline in-reading-target-word:padding-0-2px in-reading-target-word:border-0 in-reading-target-word:rounded-uv-r5e0d704b33 in-reading-target-word:bg-color-mix-in-srgb-primary-22pct-transparent in-reading-target-word:text-uv-primary-strong in-reading-target-word:font-inherit in-reading-target-word:font-680 in-reading-target-word:line-height-inherit in-reading-target-word:cursor-pointer in-reading-target-word:box-decoration-break-clone in-reading-target-word-hover:bg-color-mix-in-srgb-primary-36pct-transparent in-reading-target-word-aria-expanded-true:bg-color-mix-in-srgb-primary-36pct-transparent" lang="de" dir="ltr">
       {content.split(/\n{2,}/u).map((paragraph, paragraphIndex) => {
         if (!pattern) return <p key={paragraphIndex}>{paragraph}</p>;
         const pieces: React.ReactNode[] = [];
@@ -149,13 +149,13 @@ export function ReadingText({
       {active
         ? createPortal(
             <div
-              className="reading-word-popover fixed uv-z-index-2d0c8af807 uv-width-a5dde6895c uv-max-height-ff42f1ab80 overflow-auto grid gap-2.25 p-3.75 uv-border-488f4b382f rounded-uv-rd65225386d bg-uv-surface-raised uv-box-shadow-4ee177db8b text-uv-f9601fe81a7 uv-line-height-a26f83404b uv-vb19eb067c9:m-0 uv-vb19eb067c9:uv-overflow-wrap-112c2a063a uv-vffc37e4c0f:mt-0.5 uv-vffc37e4c0f:text-uv-fe9d5fd6635"
+              className="reading-word-popover fixed z-index-90 width-min-280px-calc-100vw-24px max-height-min-300px-calc-100dvh-24px overflow-auto grid gap-2.25 p-3.75 border-1px-solid-border-strong rounded-uv-rd65225386d bg-uv-surface-raised box-shadow-shadow text-uv-f9601fe81a7 line-height-1p4 in-p-2:m-0 in-p-2:overflow-wrap-anywhere in-text-link:mt-0.5 in-text-link:text-uv-fe9d5fd6635"
               ref={popoverRef}
               role="dialog"
               aria-label={t("reading.detail.meaningOf", { word: active.target.lemma })}
               style={{ top: active.top, insetInlineStart: active.inlineStart }}
             >
-              <div className="reading-word-popover-head grid gap-0.75 uv-veda02a0adb:text-uv-text uv-veda02a0adb:text-uv-f19feeb881c uv-v982220ddd5:text-uv-text-muted">
+              <div className="reading-word-popover-head grid gap-0.75 in-strong-2:text-uv-text in-strong-2:text-uv-f19feeb881c in-small:text-uv-text-muted">
                 <strong className="learning-content" lang="de" dir="ltr">{formatLexemeLabel(active.target)}</strong>
                 <small>
                   {partOfSpeechKeys[active.target.partOfSpeech] ? t(partOfSpeechKeys[active.target.partOfSpeech]) : active.target.partOfSpeech.toLowerCase().replaceAll("_", " ")}
@@ -168,7 +168,7 @@ export function ReadingText({
                     {translation.text}
                   </p>
                 ))}
-              <Link href={`/vocabulary/${active.target.id}`} className="text-link text-uv-primary-strong uv-weight-560 inline-flex items-center gap-1.5">{t("reading.detail.openWord")}</Link>
+              <Link href={`/vocabulary/${active.target.id}`} className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5">{t("reading.detail.openWord")}</Link>
             </div>,
             document.body,
           )

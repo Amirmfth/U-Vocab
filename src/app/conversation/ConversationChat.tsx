@@ -458,19 +458,19 @@ export function ConversationChat({
   const voiceUnavailable = !voiceEnabled || remainingMinutes <= 0;
 
   return (
-    <section className="conversation-chat flex flex-col gap-3.5 w-full max-w-uv-a9051779da mx-auto uv-min-height-e5ba4e032a">
-      <div className="conversation-messages flex flex-col gap-4.5 uv-padding-784a5bb832 uv-min620:pb-32" aria-live="polite">
+    <section className="conversation-chat flex flex-col gap-3.5 w-full max-w-uv-a9051779da mx-auto min-height-56vh">
+      <div className="conversation-messages flex flex-col gap-4.5 padding-12px-2px-112px uv-min620:pb-32" aria-live="polite">
         {messages.map((message) => {
           const isUser = message.role === "USER";
           return (
             <article
-              className={"conversation-message uv-v22810335d8:text-uv-text-muted uv-v22810335d8:text-uv-f174ef476a0 uv-v22810335d8:uv-weight-650 uv-v22810335d8:uppercase uv-v22810335d8:uv-letter-spacing-f49b9114de uv-v026f084606:m-0 uv-v026f084606:uv-padding-2e9fc07eac uv-v026f084606:rounded-uv-rd65225386d uv-v026f084606:uv-line-height-05c248da4c uv-v026f084606:whitespace-pre-wrap uv-v37d0b116c1:self-start uv-v8b6b40051e:uv-border-8d7f82f403 uv-v8b6b40051e:bg-uv-surface uv-ve7c06fc78f:self-end uv-v123b211084:bg-uv-primary uv-v123b211084:uv-color-528cef87d0 w-full max-w-none flex flex-row items-start gap-2.5 uv-ve7c06fc78f:flex-row-reverse uv-ve7c06fc78f:items-start uv-v8bf3f97875:uv-border-color-1affe77f6c uv-v8bf3f97875:bg-uv-cbdfd7cd038 uv-v8bf3f97875:text-uv-primary-strong uv-v541011a805:items-end uv-vfbb80649de:border-transparent uv-vfbb80649de:rounded-uv-rb907f29c2a uv-vfbb80649de:bg-uv-primary uv-vfbb80649de:uv-color-528cef87d0 " + (isUser ? "is-user" : "is-assistant")}
+              className={"conversation-message in-span-2:text-uv-text-muted in-span-2:text-uv-f174ef476a0 in-span-2:font-650 in-span-2:uppercase in-span-2:letter-spacing-0p08em in-p:m-0 in-p:padding-11px-13px in-p:rounded-uv-rd65225386d in-p:line-height-1p55 in-p:whitespace-pre-wrap in-is-assistant:self-start in-is-assistant-p:border-1px-solid-border-2 in-is-assistant-p:bg-uv-surface in-is-user:self-end in-is-user-p:bg-uv-primary in-is-user-p:color-white w-full max-w-none flex flex-row items-start gap-2.5 in-is-user:flex-row-reverse in-is-user:items-start in-is-user-conversation-avatar:border-color-mix-in-srgb-primary-42pct-border in-is-user-conversation-avatar:bg-uv-cbdfd7cd038 in-is-user-conversation-avatar:text-uv-primary-strong in-is-user-conversation-bubble:items-end in-is-user-conversation-bubble-p:border-transparent in-is-user-conversation-bubble-p:rounded-uv-rb907f29c2a in-is-user-conversation-bubble-p:bg-uv-primary in-is-user-conversation-bubble-p:color-white " + (isUser ? "is-user" : "is-assistant")}
               key={message.id}
             >
-              <div className="conversation-avatar w-8 h-8 uv-flex-f51e933a89 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-rb46da6ec37 bg-uv-surface-raised text-uv-text-muted" aria-hidden="true">
+              <div className="conversation-avatar w-8 h-8 flex-0-0-32px grid place-items-center border-1px-solid-border-2 rounded-uv-rb46da6ec37 bg-uv-surface-raised text-uv-text-muted" aria-hidden="true">
                 {isUser ? <UserRound size={17} /> : <Bot size={17} />}
               </div>
-              <div className="conversation-bubble min-w-0 uv-max-width-e8b1b45390 flex flex-col gap-1.25 uv-v22810335d8:px-0.75 uv-v22810335d8:text-uv-text-muted uv-v22810335d8:text-uv-f78eb7000a9 uv-v22810335d8:uv-weight-650 uv-v026f084606:m-0 uv-v026f084606:uv-padding-2c82595ddd uv-v026f084606:uv-border-8d7f82f403 uv-v026f084606:rounded-uv-rdc43399a6e uv-v026f084606:bg-uv-surface uv-v026f084606:text-uv-text uv-v026f084606:uv-line-height-fe7a9b32f9 uv-v026f084606:whitespace-pre-wrap uv-min620:uv-max-width-bdcfb10a63">
+              <div className="conversation-bubble min-w-0 max-width-min-82pct-680px flex flex-col gap-1.25 in-span-2:px-0.75 in-span-2:text-uv-text-muted in-span-2:text-uv-f78eb7000a9 in-span-2:font-650 in-p:m-0 in-p:padding-11px-14px in-p:border-1px-solid-border-2 in-p:rounded-uv-rdc43399a6e in-p:bg-uv-surface in-p:text-uv-text in-p:line-height-1p58 in-p:whitespace-pre-wrap uv-min620:max-width-min-76pct-700px">
                 <span>{isUser ? t("conversation.you") : tutorLabel}</span>
                 <p className="learning-content" lang={lang} dir={dir}>
                   {message.content || (streaming && !isUser ? "…" : "")}
@@ -482,8 +482,8 @@ export function ConversationChat({
         <div ref={endRef} />
       </div>
 
-      <form className="conversation-composer flex-col uv-min620:grid uv-min620:uv-grid-template-columns-f06dd92ea5 uv-min620:items-end uv-min620:uv-v3c40c23539:min-h-16 sticky uv-bottom-af4098e1ca uv-z-index-7b52009b64 grid uv-grid-template-columns-9ec3f125f4 gap-2 items-end uv-padding-40a2f0cf13 uv-border-488f4b382f rounded-uv-r998b02c207 uv-background-283a8f83ba uv-box-shadow-4ee177db8b uv-backdrop-filter-44b1307bc7 uv-v3c40c23539:min-h-11 uv-v3c40c23539:max-h-37.5 uv-v3c40c23539:uv-padding-766138ac4d uv-v3c40c23539:resize-none uv-v3c40c23539:border-0 uv-v3c40c23539:bg-transparent uv-v3c40c23539:uv-box-shadow-71f8e7976e uv-vfeb3f72e04:uv-box-shadow-71f8e7976e uv-min620:bottom-4.5" onSubmit={submit}>
-        <div className="conversation-composer-input grid uv-grid-template-columns-c3b0b81963 gap-2 items-end uv-v3c40c23539:m-0 uv-max560:uv-grid-template-columns-f06dd92ea5 uv-max560:uv-v3c40c23539:uv-grid-row-1cff6f63e0">
+      <form className="conversation-composer flex-col uv-min620:grid uv-min620:grid-template-columns-minmax-0-1fr-auto uv-min620:items-end uv-min620:in-textarea:min-h-16 sticky bottom-calc-mobile-nav-height-10px z-index-12 grid grid-template-columns-minmax-0-1fr-44px gap-2 items-end padding-8px-8px-6px-14px border-1px-solid-border-strong rounded-uv-r998b02c207 bg-color-mix-in-srgb-surface-raised-96pct-transparent box-shadow-shadow backdrop-filter-blur-16px in-textarea:min-h-11 in-textarea:max-h-37.5 in-textarea:padding-10px-0-7px in-textarea:resize-none in-textarea:border-0 in-textarea:bg-transparent in-textarea:box-shadow-none in-textarea-focus:box-shadow-none uv-min620:bottom-4.5" onSubmit={submit}>
+        <div className="conversation-composer-input grid grid-template-columns-minmax-0-1fr-auto-auto gap-2 items-end in-textarea:m-0 uv-max560:grid-template-columns-minmax-0-1fr-auto uv-max560:in-textarea:grid-row-1-span-2">
           <textarea
             ref={textareaRef}
             rows={2}
@@ -507,11 +507,11 @@ export function ConversationChat({
             }}
           />
 
-          <div className="conversation-voice-controls flex gap-1.5 uv-max560:uv-grid-column-da4b9237ba uv-max560:uv-grid-row-356a192b79 uv-max560:self-start uv-max560:mt-1">
+          <div className="conversation-voice-controls flex gap-1.5 uv-max560:grid-column-2 uv-max560:grid-row-1 uv-max560:self-start uv-max560:mt-1">
             {!recording ? (
               <button
                 type="button"
-                className="conversation-mic-button w-12 h-12 uv-display-c5d9aaf66e uv-place-items-305047e96e uv-flex-71f8e7976e uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed uv-vedeafcbfd0:text-uv-danger uv-vedeafcbfd0:uv-border-color-7e8e763970 uv-vedeafcbfd0:bg-uv-c8b3083dabe"
+                className="conversation-mic-button w-12 h-12 display-inline-grid place-items-center flex-none border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed in-is-recording:text-uv-danger in-is-recording:border-color-mix-in-srgb-danger-45pct-border in-is-recording:bg-uv-c8b3083dabe"
                 onClick={startRecording}
                 disabled={
                   streaming ||
@@ -533,7 +533,7 @@ export function ConversationChat({
               <>
                 <button
                   type="button"
-                  className="conversation-mic-button is-recording w-12 h-12 uv-display-c5d9aaf66e uv-place-items-305047e96e uv-flex-71f8e7976e uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed uv-vedeafcbfd0:text-uv-danger uv-vedeafcbfd0:uv-border-color-7e8e763970 uv-vedeafcbfd0:bg-uv-c8b3083dabe"
+                  className="conversation-mic-button is-recording w-12 h-12 display-inline-grid place-items-center flex-none border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed in-is-recording:text-uv-danger in-is-recording:border-color-mix-in-srgb-danger-45pct-border in-is-recording:bg-uv-c8b3083dabe"
                   onClick={stopRecording}
                   aria-label={t("conversation.voice.stop")}
                 >
@@ -541,7 +541,7 @@ export function ConversationChat({
                 </button>
                 <button
                   type="button"
-                  className="conversation-mic-button w-12 h-12 uv-display-c5d9aaf66e uv-place-items-305047e96e uv-flex-71f8e7976e uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed uv-vedeafcbfd0:text-uv-danger uv-vedeafcbfd0:uv-border-color-7e8e763970 uv-vedeafcbfd0:bg-uv-c8b3083dabe"
+                  className="conversation-mic-button w-12 h-12 display-inline-grid place-items-center flex-none border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed in-is-recording:text-uv-danger in-is-recording:border-color-mix-in-srgb-danger-45pct-border in-is-recording:bg-uv-c8b3083dabe"
                   onClick={cancelRecording}
                   aria-label={t("conversation.voice.cancel")}
                 >
@@ -553,7 +553,7 @@ export function ConversationChat({
 
           <button
             type="submit"
-            className="conversation-send-button w-11 h-11 grid uv-place-items-305047e96e border-0 rounded-uv-rb46da6ec37 bg-uv-primary uv-color-528cef87d0 cursor-pointer uv-transition-886729f578 uv-v999cdc25ee:uv-transform-4693dc4baa disabled:opacity-42 disabled:cursor-not-allowed uv-max560:uv-grid-column-da4b9237ba"
+            className="conversation-send-button w-11 h-11 grid place-items-center border-0 rounded-uv-rb46da6ec37 bg-uv-primary color-white cursor-pointer transition-transform-140ms-ease-opacity-140ms-ease in-hover-not-disabled:transform-translatey-1px disabled:opacity-42 disabled:cursor-not-allowed uv-max560:grid-column-2"
             disabled={!canSend}
             aria-busy={streaming}
             aria-label={streaming ? t("conversation.tutorReplying") : t("conversation.send")}
@@ -565,7 +565,7 @@ export function ConversationChat({
 
         {recording ? (
           <div className="conversation-recording-status flex items-center gap-2 min-h-6 text-uv-f5f68d82942 text-uv-text-soft" role="status">
-            <span className="conversation-recording-dot w-2.25 h-2.25 rounded-uv-rb46da6ec37 bg-uv-danger uv-box-shadow-7ded488c40" />
+            <span className="conversation-recording-dot w-2.25 h-2.25 rounded-uv-rb46da6ec37 bg-uv-danger box-shadow-0-0-0-4px-danger-soft" />
             <strong>{t("conversation.voice.recording")}</strong>
             <span>
               {elapsedSeconds}s / {CONVERSATION_AUDIO.maxDurationSeconds}s
@@ -575,13 +575,13 @@ export function ConversationChat({
 
         {transcribing ? (
           <div className="conversation-recording-status flex items-center gap-2 min-h-6 text-uv-f5f68d82942 text-uv-text-soft" role="status">
-            <span className="conversation-transcribing-spinner w-3.25 h-3.25 uv-border-641cdc601e border-t-uv-primary rounded-uv-rb46da6ec37 uv-animation-88fe13492d" />
+            <span className="conversation-transcribing-spinner w-3.25 h-3.25 border-2px-solid-border-strong border-t-uv-primary rounded-uv-rb46da6ec37 animation-conversation-spin-p8s-linear-infinite" />
             <span>{t("conversation.voice.transcribing")}</span>
           </div>
         ) : null}
 
         {pendingTranscript ? (
-          <div className="conversation-transcript-choice grid gap-2.5 p-3 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v0fee2d502c:grid uv-v0fee2d502c:gap-0.75 uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:text-uv-fdbd07cbfaa uv-v36c0309a03:uv-line-height-2792cf2449 uv-vaff5733806:flex uv-vaff5733806:flex-wrap uv-vaff5733806:gap-2 uv-vcded88c612:w-auto uv-vcded88c612:min-h-10" role="status">
+          <div className="conversation-transcript-choice grid gap-2.5 p-3 border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-div-first-child:grid in-div-first-child:gap-0.75 in-span:text-uv-text-soft in-span:text-uv-fdbd07cbfaa in-span:line-height-1p45 in-div-last-child:flex in-div-last-child:flex-wrap in-div-last-child:gap-2 in-button-2:w-auto in-button-2:min-h-10" role="status">
             <div>
               <strong>{t("conversation.voice.draftExistsTitle")}</strong>
               <span>{t("conversation.voice.draftExistsBody")}</span>
@@ -589,21 +589,21 @@ export function ConversationChat({
             <div>
               <button
                 type="button"
-                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
+                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
                 onClick={() => applyPendingTranscript("append")}
               >
                 {t("conversation.voice.append")}
               </button>
               <button
                 type="button"
-                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
+                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
                 onClick={() => applyPendingTranscript("replace")}
               >
                 {t("conversation.voice.replace")}
               </button>
               <button
                 type="button"
-                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
+                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
                 onClick={() => setPendingTranscript(null)}
               >
                 {t("conversation.voice.discard")}
@@ -613,12 +613,12 @@ export function ConversationChat({
         ) : null}
 
         {voiceError ? (
-          <div className="conversation-voice-error flex items-center gap-2 min-h-6 text-uv-f5f68d82942 justify-between text-uv-danger uv-vffc37e4c0f:border-0 uv-vffc37e4c0f:bg-transparent uv-vffc37e4c0f:inline-flex uv-vffc37e4c0f:items-center uv-vffc37e4c0f:gap-1.25 uv-vffc37e4c0f:cursor-pointer uv-vffc37e4c0f:whitespace-nowrap" role="alert">
+          <div className="conversation-voice-error flex items-center gap-2 min-h-6 text-uv-f5f68d82942 justify-between text-uv-danger in-text-link:border-0 in-text-link:bg-transparent in-text-link:inline-flex in-text-link:items-center in-text-link:gap-1.25 in-text-link:cursor-pointer in-text-link:whitespace-nowrap" role="alert">
             <span>{voiceError}</span>
             {retryBlob && retryRequestId ? (
               <button
                 type="button"
-                className="text-link text-uv-primary-strong uv-weight-560 inline-flex items-center gap-1.5"
+                className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5"
                 onClick={retryTranscription}
                 disabled={transcribing}
               >
@@ -630,7 +630,7 @@ export function ConversationChat({
         ) : null}
 
         <div className="conversation-composer-footer flex items-center gap-2 min-h-6 text-uv-f5f68d82942 justify-between text-uv-text-muted uv-max560:items-start uv-max560:flex-col">
-          <span className="conversation-composer-hint uv-grid-column-93b665dfb5 uv-padding-7c5bf472f0 text-uv-text-muted text-uv-f174ef476a0">{t("conversation.composerHint")}</span>
+          <span className="conversation-composer-hint grid-column-1-1 padding-0-2px-2px text-uv-text-muted text-uv-f174ef476a0">{t("conversation.composerHint")}</span>
           <span className="conversation-voice-quota text-end uv-max560:text-start">
             {voiceEnabled
               ? t("conversation.voice.remaining", {

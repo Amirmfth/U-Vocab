@@ -29,9 +29,9 @@ export function WritingStartForm({
   }, [router, state]);
 
   return (
-    <form action={action} className="panel writing-start-form uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 flex flex-col gap-3.5 uv-min620:uv-vae41d3c771:uv-grid-column-93b665dfb5 uv-min620:uv-ve7e0cd887c:uv-grid-column-93b665dfb5 rounded-uv-r6d27d54c6c p-3.75 uv-v6e1e91da2a:flex uv-v6e1e91da2a:flex-col uv-min940:uv-v6e1e91da2a:grid uv-min940:uv-v6e1e91da2a:uv-grid-template-columns-dd0b1a1848 uv-min940:uv-v32b17cd1ae:uv-grid-column-93b665dfb5">
-      <div className="writing-settings-row grid uv-grid-template-columns-dd0b1a1848 gap-3">
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+    <form action={action} className="panel writing-start-form border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 uv-min620:in-status-notice:grid-column-1-1 uv-min620:in-button:grid-column-1-1 rounded-uv-r6d27d54c6c p-3.75 in-loading-hub-form:flex in-loading-hub-form:flex-col uv-min940:in-loading-hub-form:grid uv-min940:in-loading-hub-form:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:in-loading-hub-form-descendants:grid-column-1-1">
+      <div className="writing-settings-row grid grid-template-columns-repeat-2-minmax-0-1fr gap-3">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="writing-mode-trigger">{t("writing.mode")}</label>
           <ActivitySelect
             id="writing-mode"
@@ -44,7 +44,7 @@ export function WritingStartForm({
           />
         </div>
 
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="writing-level-trigger">{t("writing.level")}</label>
           <ActivitySelect
             id="writing-level"
@@ -58,8 +58,8 @@ export function WritingStartForm({
         </div>
       </div>
 
-      <div className="writing-settings-row grid uv-grid-template-columns-dd0b1a1848 gap-3">
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="writing-settings-row grid grid-template-columns-repeat-2-minmax-0-1fr gap-3">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="writing-type-trigger">{t("writing.type")}</label>
           <ActivitySelect
             id="writing-type"
@@ -76,7 +76,7 @@ export function WritingStartForm({
           />
         </div>
 
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="writing-length-trigger">{t("writing.targetLength")}</label>
           <ActivitySelect
             id="writing-length"
@@ -99,7 +99,7 @@ export function WritingStartForm({
       </div>
 
       {targetLength === "CUSTOM" ? (
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="writing-custom-words">{t("writing.customTarget")}</label>
           <input
             id="writing-custom-words"
@@ -112,7 +112,7 @@ export function WritingStartForm({
         </div>
       ) : null}
 
-      <div className="field writing-topic-field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560 uv-grid-column-93b665dfb5">
+      <div className="field writing-topic-field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560 grid-column-1-1">
         <label htmlFor="writing-topic">{t("writing.topic")}</label>
         <input
           id="writing-topic"

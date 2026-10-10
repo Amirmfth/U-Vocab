@@ -88,14 +88,14 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   if(!current){
     const correct=history.filter((item)=>item.correct).length;
     const skills=[...new Set(history.map((item)=>item.skill))];
-    return <section className="panel practice-complete uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-4 rounded-uv-r6d27d54c6c">
-      <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("practice.sessionComplete")}</p>
+    return <section className="panel practice-complete border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-4 rounded-uv-r6d27d54c6c">
+      <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("practice.sessionComplete")}</p>
       <h1>{t("practice.correctCount",{ correct:formatNumber(locale,correct),total:formatNumber(locale,history.length) })}</h1>
       <p className="muted text-uv-text-muted">{t("practice.practiced",{ skills:skills.join(", ")||t("practice.vocabulary").toLowerCase() })}</p>
       <div className="ia-empty-actions flex flex-col gap-2 uv-min620:flex-row uv-min620:items-center">
-        <Link className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> {t("practice.anotherSet")}</Link>
-        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" href="/grammar">{t("practice.backGrammar")}</Link>:<Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" href="/review">{t("practice.reviewDue")}</Link>}
-        <Link className="text-link text-uv-primary-strong uv-weight-560 inline-flex items-center gap-1.5" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?t("practice.back"):t("practice.backWords")}</Link>
+        <Link className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> {t("practice.anotherSet")}</Link>
+        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" href="/grammar">{t("practice.backGrammar")}</Link>:<Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" href="/review">{t("practice.reviewDue")}</Link>}
+        <Link className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?t("practice.back"):t("practice.backWords")}</Link>
       </div>
     </section>;
   }
@@ -104,29 +104,29 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   const success=result?.status==="success";
 
   return <div className="practice-session-stage flex flex-col gap-3">
-    <div className="practice-progress grid uv-grid-template-columns-bf99fa7d2d items-center gap-2.5 text-uv-text-muted text-uv-fbcf5b95460">
+    <div className="practice-progress grid grid-template-columns-auto-minmax-0-1fr items-center gap-2.5 text-uv-text-muted text-uv-fbcf5b95460">
       <span>{formatNumber(locale,Math.min(index+1,queue.length))} / {formatNumber(locale,queue.length)}</span>
-      <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft uv-v22810335d8:block uv-v22810335d8:h-full uv-v22810335d8:rounded-uv-r3e26d67509 uv-v22810335d8:bg-uv-primary"><span style={{ width:progress+"%" }}/></div>
+      <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-uv-r3e26d67509 in-span-2:bg-uv-primary"><span style={{ width:progress+"%" }}/></div>
     </div>
 
     <AnimatePresence mode="wait" initial={false}>
       <motion.section
         key={current.id}
-        className="panel learning-card practice-session-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 w-full max-w-uv-c078f10a0b uv-vbc4e530e94:text-uv-f128d50102f flex flex-col gap-4 uv-v8cd0743a41:flex uv-v8cd0743a41:flex-col uv-v8cd0743a41:gap-3 uv-vcf5ce320fa:min-h-12.5 rounded-uv-r6d27d54c6c"
+        className="panel learning-card practice-session-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 w-full max-w-uv-c078f10a0b in-learning-prompt:text-uv-f128d50102f flex flex-col gap-4 in-form:flex in-form:flex-col in-form:gap-3 in-input:min-h-12.5 rounded-uv-r6d27d54c6c"
         initial={reduceMotion?false:{ opacity:0,x:28,scale:.99 }}
         animate={{ opacity:1,x:0,scale:1 }}
         exit={reduceMotion?{ opacity:0 }:{ opacity:0,x:-34,scale:.985 }}
         transition={{ duration:reduceMotion?0:.2,ease:"easeOut" }}
       >
-        <div className="learning-card-head flex items-center justify-between gap-3 uv-va472f14696:text-uv-fe9d5fd6635">
+        <div className="learning-card-head flex items-center justify-between gap-3 in-muted-2:text-uv-fe9d5fd6635">
           <span className="exercise-type text-uv-text-muted text-uv-f63777cce16 capitalize">{current.exercise.type.replaceAll("_"," ").toLowerCase()}</span>
           <span className="muted learning-content text-uv-text-muted" lang="de" dir="ltr">{current.lemma}{current.retry?" · "+t("practice.retryLabel"):""}</span>
         </div>
 
-        <h1 className="learning-prompt learning-content m-0 text-uv-fb5d06bc327 uv-line-height-8e007eaa50 uv-letter-spacing-b22247dbaf uv-weight-560" dir="auto">{current.exercise.prompt}</h1>
+        <h1 className="learning-prompt learning-content m-0 text-uv-fb5d06bc327 line-height-1p25 letter-spacing-0p035em font-560" dir="auto">{current.exercise.prompt}</h1>
 
         {current.exercise.interaction==="choice"?(
-          <div className="practice-choice-grid grid uv-grid-template-columns-6a5c4d4d49 gap-2.5 uv-min620:uv-grid-template-columns-dd0b1a1848" role="group" aria-label={t("practice.answerChoices")}>
+          <div className="practice-choice-grid grid grid-template-columns-1fr gap-2.5 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr" role="group" aria-label={t("practice.answerChoices")}>
             {current.exercise.options?.map((option)=>{
               const isExpected=success&&option===current.exercise.expected;
               const isSelected=selected===option;
@@ -135,7 +135,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
                 key={option}
                 type="button"
                 className={[
-                  "practice-option min-h-14.5 w-full flex items-center justify-between gap-3 uv-padding-b0f44c163d uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface text-uv-text text-left cursor-pointer uv-transition-792ccfb84f uv-v999cdc25ee:border-uv-border-strong uv-v999cdc25ee:bg-uv-surface-raised uv-v999cdc25ee:uv-transform-4693dc4baa uv-v8b31ac2bd7:border-uv-border-strong uv-v8b31ac2bd7:bg-uv-surface-raised uv-v8b31ac2bd7:uv-transform-4693dc4baa disabled:cursor-default uv-v48f8f87023:border-uv-border-strong uv-v48f8f87023:bg-uv-surface-raised uv-vc1297541ff:border-uv-success uv-vc1297541ff:bg-uv-cafddaf6a65 uv-vfbdf4ae9ba:border-uv-danger uv-vfbdf4ae9ba:bg-uv-c8b3083dabe uv-vefd2d335a6:text-uv-success uv-vd980f564fa:text-uv-danger",
+                  "practice-option min-h-14.5 w-full flex items-center justify-between gap-3 padding-13px-15px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-uv-text text-left cursor-pointer transition-transform-140ms-ease-border-color-140ms-ease-backgro in-hover-not-disabled:border-uv-border-strong in-hover-not-disabled:bg-uv-surface-raised in-hover-not-disabled:transform-translatey-1px in-focus-visible-not-disabled:border-uv-border-strong in-focus-visible-not-disabled:bg-uv-surface-raised in-focus-visible-not-disabled:transform-translatey-1px disabled:cursor-default in-is-selected:border-uv-border-strong in-is-selected:bg-uv-surface-raised in-is-correct:border-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-wrong:border-uv-danger in-is-wrong:bg-uv-c8b3083dabe in-is-correct-svg:text-uv-success in-is-wrong-svg:text-uv-danger",
                   isExpected?"is-correct":"",
                   isWrong?"is-wrong":"",
                   isSelected?"is-selected":"",
@@ -150,11 +150,11 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           </div>
         ):(
           <form onSubmit={(event)=>{ event.preventDefault();submit(answer); }}>
-            <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+            <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
               <label htmlFor="practice-answer">{t("practice.yourAnswer")}</label>
               <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={success} autoFocus autoComplete="off" dir="auto"/>
             </div>
-            <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" type="submit" disabled={success||!answer.trim()}>
+            <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="submit" disabled={success||!answer.trim()}>
               <Check size={18}/>{t("practice.checkAnswer")}
             </button>
           </form>
@@ -163,7 +163,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
         {saveError?<StatusNotice tone="error">{saveError}</StatusNotice>:null}
         {result?.status==="error"?<StatusNotice tone="error">{result.message}</StatusNotice>:null}
         {result?.status==="success"?(
-          <div className={"practice-instant-feedback min-h-10.5 flex items-center gap-2.25 uv-padding-df857c6c31 rounded-uv-r0939007802 text-uv-text-muted bg-uv-surface-raised uv-vc1297541ff:text-uv-success uv-vc1297541ff:bg-uv-cafddaf6a65 uv-vfbdf4ae9ba:text-uv-danger uv-vfbdf4ae9ba:bg-uv-c8b3083dabe uv-v22810335d8:flex uv-v22810335d8:flex-col uv-v22810335d8:gap-0.5 uv-v982220ddd5:text-uv-text-muted "+(result.correct?"is-correct":"is-wrong")} role="status">
+          <div className={"practice-instant-feedback min-h-10.5 flex items-center gap-2.25 padding-10px-12px rounded-uv-r0939007802 text-uv-text-muted bg-uv-surface-raised in-is-correct:text-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-wrong:text-uv-danger in-is-wrong:bg-uv-c8b3083dabe in-span-2:flex in-span-2:flex-col in-span-2:gap-0.5 in-small:text-uv-text-muted "+(result.correct?"is-correct":"is-wrong")} role="status">
             {result.correct?<CheckCircle2 size={18}/>:<XCircle size={18}/>}
             <span>
               <strong>{result.correct?t("practice.correct"):t("practice.notQuite")}</strong>

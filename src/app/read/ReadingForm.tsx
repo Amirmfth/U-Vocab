@@ -16,13 +16,13 @@ export function ReadingForm() {
   const [state, action] = useActionState(createReadingDocument, initialState);
 
   return (
-    <form action={action} className="panel reading-form uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 flex flex-col gap-3.5 w-full max-w-uv-c078f10a0b rounded-uv-r6d27d54c6c p-3.75 uv-v3c40c23539:uv-min-height-92341db0b5">
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+    <form action={action} className="panel reading-form border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 w-full max-w-uv-c078f10a0b rounded-uv-r6d27d54c6c p-3.75 in-textarea:min-height-38dvh">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="title">Title <span className="muted text-uv-text-muted">(optional)</span></label>
         <input id="title" name="title" placeholder="Article, email, transcript…" autoComplete="off" />
       </div>
 
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="content">German text</label>
         <textarea
           id="content"

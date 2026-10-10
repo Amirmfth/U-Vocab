@@ -14,8 +14,8 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
   const [state, action] = useActionState(createTopicPack, initialState);
 
   return (
-    <form action={action} className="panel form-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 w-full max-w-uv-74487d394e rounded-uv-r6d27d54c6c">
-      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+    <form action={action} className="panel form-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 w-full max-w-uv-74487d394e rounded-uv-r6d27d54c6c">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
         <label htmlFor="topic">Topic or situation</label>
         <input
           id="topic"
@@ -25,8 +25,8 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
         />
       </div>
 
-      <div className="form-grid grid uv-grid-template-columns-6a5c4d4d49 gap-3 uv-min620:uv-grid-template-columns-dd0b1a1848">
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+      <div className="form-grid grid grid-template-columns-1fr gap-3 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="level-trigger">Level</label>
           <ActivitySelect
             defaultValue={defaultLevel}
@@ -39,7 +39,7 @@ export function TopicPackForm({ defaultLevel }: { defaultLevel: string }) {
           />
         </div>
 
-        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+        <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
           <label htmlFor="size-trigger">Words</label>
           <ActivitySelect
             defaultValue="12"

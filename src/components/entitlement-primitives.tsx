@@ -13,7 +13,7 @@ export function QuotaRemaining({
   remaining: number | string;
 }) {
   return (
-    <div className="quota-remaining grid uv-gap-f3b3ec19c5 uv-padding-ee84419642 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface uv-v22810335d8:text-uv-c7dbd63a13e uv-v69dadb8fcd:text-uv-c7dbd63a13e uv-ve6b262f465:text-uv-fa23d8869ee uv-ve6b262f465:uv-font-variant-numeric-3032cae0ba">
+    <div className="quota-remaining grid gap-0p2rem padding-0p9rem border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface in-span-2:text-uv-c7dbd63a13e in-small-2:text-uv-c7dbd63a13e in-strong:text-uv-fa23d8869ee in-strong:font-tabular-nums">
       <span>{label}</span>
       <strong>{remaining}</strong>
       <small>{used} / {limit}</small>
@@ -23,7 +23,7 @@ export function QuotaRemaining({
 
 export function UpgradeCta({ label }: { label: string }) {
   return (
-    <Link href="/settings#subscription" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
+    <Link href="/settings#subscription" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
       <Sparkles size={17} />
       {label}
     </Link>
@@ -40,7 +40,7 @@ export function LockedFeature({
   upgradeLabel: string;
 }) {
   return (
-    <section className="panel locked-feature uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid uv-gap-19feeb881c uv-grid-template-columns-738a8da05d items-center uv-vb19eb067c9:uv-margin-350b4d9b2a uv-max640:uv-grid-template-columns-7089a0cef9 uv-max640:uv-vcded88c612:uv-grid-column-93b665dfb5 uv-max640:uv-vcded88c612:w-full uv-max640:uv-vcded88c612:justify-center rounded-uv-r6d27d54c6c">
+    <section className="panel locked-feature border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-1rem grid-template-columns-auto-minmax-0-1fr-auto items-center in-p-2:margin-0p25rem-0-0 uv-max640:grid-template-columns-auto-minmax-0-1fr-2 uv-max640:in-button-2:grid-column-1-1 uv-max640:in-button-2:w-full uv-max640:in-button-2:justify-center rounded-uv-r6d27d54c6c">
       <LockKeyhole size={20} />
       <div>
         <strong>{title}</strong>
@@ -61,7 +61,7 @@ export function LimitReached({
   upgradeLabel: string;
 }) {
   return (
-    <section className="panel limit-reached uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid uv-gap-19feeb881c uv-grid-template-columns-738a8da05d items-center uv-vb19eb067c9:uv-margin-350b4d9b2a uv-max640:uv-grid-template-columns-7089a0cef9 uv-max640:uv-vcded88c612:uv-grid-column-93b665dfb5 uv-max640:uv-vcded88c612:w-full uv-max640:uv-vcded88c612:justify-center rounded-uv-r6d27d54c6c" role="status">
+    <section className="panel limit-reached border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-1rem grid-template-columns-auto-minmax-0-1fr-auto items-center in-p-2:margin-0p25rem-0-0 uv-max640:grid-template-columns-auto-minmax-0-1fr-2 uv-max640:in-button-2:grid-column-1-1 uv-max640:in-button-2:w-full uv-max640:in-button-2:justify-center rounded-uv-r6d27d54c6c" role="status">
       <LockKeyhole size={20} />
       <div>
         <strong>{title}</strong>

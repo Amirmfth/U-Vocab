@@ -40,30 +40,30 @@ export function ReadingAssessment({
   const { locale, t } = useI18n();
 
   return (
-    <form action={action} className="panel reading-assessment uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 max-w-uv-a9051779da mx-auto rounded-uv-r6d27d54c6c grid gap-5.5">
+    <form action={action} className="panel reading-assessment border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 max-w-uv-a9051779da mx-auto rounded-uv-r6d27d54c6c grid gap-5.5">
       <input type="hidden" name="readingId" value={readingId} />
-      <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("reading.assessment.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("reading.assessment.eyebrow")}</p>
           <h2>{t("reading.assessment.title")}</h2>
         </div>
       </div>
 
       <div className="reading-question-list grid gap-5.5">
         {questions.map((question, index) => (
-          <fieldset className="reading-question grid border-0 uv-border-top-8d7f82f403 uv-v73883af7e9:flex-wrap uv-v73883af7e9:uv-weight-650 min-w-0 gap-3.75 uv-padding-4942d7b936 uv-v73883af7e9:w-full uv-v73883af7e9:flex uv-v73883af7e9:items-start uv-v73883af7e9:gap-2.75 uv-v73883af7e9:p-0 uv-v6d5e74b2a3:border-uv-danger uv-v6d5e74b2a3:bg-uv-c8b3083dabe" key={index}>
+          <fieldset className="reading-question grid border-0 border-1px-solid-border-3 in-legend:flex-wrap in-legend:font-650 min-w-0 gap-3.75 padding-19px-0-0 in-legend:w-full in-legend:flex in-legend:items-start in-legend:gap-2.75 in-legend:p-0 in-has-reading-answer-feedback-is-wrong-reading-question-o:border-uv-danger in-has-reading-answer-feedback-is-wrong-reading-question-o:bg-uv-c8b3083dabe" key={index}>
             <legend>
-              <span className="reading-question-number w-8.5 h-8.5 uv-flex-bade52be50 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r933cc73310 text-uv-text-muted uv-font-family-320794573f text-uv-ff1713651e0">{formatNumber(locale, index + 1, { minimumIntegerDigits: 2, useGrouping: false })}</span>
-              <span className="reading-question-heading grid gap-2 min-w-0 uv-vb3d336d01c:w-fit uv-veda02a0adb:text-uv-text uv-veda02a0adb:text-uv-fde89c2b680 uv-veda02a0adb:uv-line-height-2792cf2449">
-                <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{t(typeKeys[question.type])}</span>
+              <span className="reading-question-number w-8.5 h-8.5 flex-0-0-34px grid place-items-center border-1px-solid-border-2 rounded-uv-r933cc73310 text-uv-text-muted font-font-geist-mono-geist-mono-monospace text-uv-ff1713651e0">{formatNumber(locale, index + 1, { minimumIntegerDigits: 2, useGrouping: false })}</span>
+              <span className="reading-question-heading grid gap-2 min-w-0 in-badge:w-fit in-strong-2:text-uv-text in-strong-2:text-uv-fde89c2b680 in-strong-2:line-height-1p45">
+                <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{t(typeKeys[question.type])}</span>
                 <strong className="learning-content" dir="auto">{question.question}</strong>
               </span>
             </legend>
-            <div className="reading-question-options grid uv-v586b3820a5:flex uv-v586b3820a5:gap-2.5 uv-v586b3820a5:items-start uv-v586b3820a5:uv-padding-df857c6c31 uv-v586b3820a5:uv-border-8d7f82f403 uv-v586b3820a5:rounded-uv-r0939007802 uv-v586b3820a5:cursor-pointer uv-max720:uv-v586b3820a5:p-2.75 gap-2.25">
+            <div className="reading-question-options grid in-label:flex in-label:gap-2.5 in-label:items-start in-label:padding-10px-12px in-label:border-1px-solid-border-2 in-label:rounded-uv-r0939007802 in-label:cursor-pointer uv-max720:in-label:p-2.75 gap-2.25">
               {question.options.map((option, optionIndex) => (
                 <label
                   className={
-                    "reading-question-option min-h-13 flex items-center gap-3 uv-padding-00c5ba1734 uv-border-8d7f82f403 rounded-uv-r0939007802 bg-uv-surface-raised cursor-pointer uv-transition-9909c190bf hover:border-uv-border-strong uv-v4928998ccc:border-uv-primary uv-v4928998ccc:bg-uv-cbdfd7cd038 uv-vc1297541ff:border-uv-success uv-vc1297541ff:bg-uv-cafddaf6a65 uv-v7e7ec2d1ab:border-uv-success uv-v7e7ec2d1ab:text-uv-success uv-v58bc5748c6:uv-outline-78a43235ea uv-v58bc5748c6:uv-outline-offset-a0179b92f3 uv-vcf5ce320fa:absolute uv-vcf5ce320fa:opacity-0 uv-vcf5ce320fa:w-0.25 uv-vcf5ce320fa:h-0.25 uv-v0e7cad6300:border-uv-primary uv-v0e7cad6300:text-uv-primary-strong" +
+                    "reading-question-option min-h-13 flex items-center gap-3 padding-10px-13px border-1px-solid-border-2 rounded-uv-r0939007802 bg-uv-surface-raised cursor-pointer transition-border-color-140ms-ease-background-140ms-ease hover:border-uv-border-strong in-has-input-checked:border-uv-primary in-has-input-checked:bg-uv-cbdfd7cd038 in-is-correct:border-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-correct-reading-option-letter:border-uv-success in-is-correct-reading-option-letter:text-uv-success in-has-input-focus-visible:outline-2px-solid-primary-strong in-has-input-focus-visible:outline-offset-2px in-input:absolute in-input:opacity-0 in-input:w-0.25 in-input:h-0.25 in-has-input-checked-reading-option-letter:border-uv-primary in-has-input-checked-reading-option-letter:text-uv-primary-strong" +
                     (state.status === "success" && optionIndex === question.correctIndex ? " is-correct" : "")
                   }
                   key={optionIndex}
@@ -74,13 +74,13 @@ export function ReadingAssessment({
                     value={optionIndex}
                     required
                   />
-                  <span className="reading-option-letter w-6.75 h-6.75 uv-flex-09568740f0 grid uv-place-items-305047e96e uv-border-488f4b382f rounded-uv-r9bc5fefa1a text-uv-text-muted uv-font-family-320794573f text-uv-f58b84cc6f5" aria-hidden="true">{String.fromCharCode(65 + optionIndex)}</span>
-                  <span className="reading-option-text learning-content text-uv-text-soft uv-line-height-2792cf2449" dir="auto">{option}</span>
+                  <span className="reading-option-letter w-6.75 h-6.75 flex-0-0-27px grid place-items-center border-1px-solid-border-strong rounded-uv-r9bc5fefa1a text-uv-text-muted font-font-geist-mono-geist-mono-monospace text-uv-f58b84cc6f5" aria-hidden="true">{String.fromCharCode(65 + optionIndex)}</span>
+                  <span className="reading-option-text learning-content text-uv-text-soft line-height-1p45" dir="auto">{option}</span>
                 </label>
               ))}
             </div>
             {state.status === "success" ? (
-              <p className={state.correct?.[index] ? "reading-answer-feedback is-correct m-0 uv-padding-2e9fc07eac rounded-uv-r933cc73310 text-uv-f845cf53f3a uv-line-height-aa8f289ebe uv-vc1297541ff:bg-uv-cafddaf6a65 uv-vc1297541ff:text-uv-success uv-vfbdf4ae9ba:bg-uv-c8b3083dabe uv-vfbdf4ae9ba:text-uv-danger" : "reading-answer-feedback is-wrong m-0 uv-padding-2e9fc07eac rounded-uv-r933cc73310 text-uv-f845cf53f3a uv-line-height-aa8f289ebe uv-vc1297541ff:bg-uv-cafddaf6a65 uv-vc1297541ff:text-uv-success uv-vfbdf4ae9ba:bg-uv-c8b3083dabe uv-vfbdf4ae9ba:text-uv-danger"}>
+              <p className={state.correct?.[index] ? "reading-answer-feedback is-correct m-0 padding-11px-13px rounded-uv-r933cc73310 text-uv-f845cf53f3a line-height-1p5 in-is-correct:bg-uv-cafddaf6a65 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8b3083dabe in-is-wrong:text-uv-danger" : "reading-answer-feedback is-wrong m-0 padding-11px-13px rounded-uv-r933cc73310 text-uv-f845cf53f3a line-height-1p5 in-is-correct:bg-uv-cafddaf6a65 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8b3083dabe in-is-wrong:text-uv-danger"}>
                 {state.correct?.[index] ? t("reading.assessment.correct") : t("reading.assessment.notQuite")}{" "}
                 <span className="learning-content" dir="auto">{question.explanation}</span>
               </p>

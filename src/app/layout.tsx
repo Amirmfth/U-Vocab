@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body>
         <I18nProvider locale={locale}>
-          <a className="skip-link fixed uv-z-index-9f9af02958 uv-top-95733511cd left-3 uv-padding-00c5ba1734 uv-border-488f4b382f rounded-uv-r0939007802 bg-uv-text text-uv-bg text-uv-f6c2d68ddb8 font-bold uv-transform-77924e0e6e uv-transition-f271694b07 focus:uv-transform-602912b724" href="#main-content">
+          <a className="skip-link fixed z-index-200 top-max-10px-env-safe-area-inset-top left-3 padding-10px-13px border-1px-solid-border-strong rounded-uv-r0939007802 bg-uv-text text-uv-bg text-uv-f6c2d68ddb8 font-bold transform-translatey-160pct transition-transform-140ms-ease focus:transform-translatey-0" href="#main-content">
             {t("layout.skipToContent")}
           </a>
           {authenticated ? <WebVitals /> : null}
@@ -96,7 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div
               id="main-content"
               tabIndex={-1}
-              className={authenticated ? "app-shell w-full max-w-uv-47cb1166bf uv-margin-ddbc4f5b25 uv-padding-80602a2787 uv-min620:px-6 uv-min940:uv-padding-aa8e12aa90" : "auth-shell min-h-dvh w-full"}
+              className={authenticated ? "app-shell w-full max-w-uv-47cb1166bf margin-0-auto padding-calc-72px-env-safe-area-inset-top-16px-calc-104px-env-s uv-min620:px-6 uv-min940:padding-28px-36px-64px" : "auth-shell min-h-dvh w-full"}
             >
               <PageTransition>{children}</PageTransition>
             </div>

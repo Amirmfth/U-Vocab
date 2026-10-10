@@ -30,17 +30,17 @@ export function CourseManagement({
   );
 
   return (
-    <section className="panel course-management uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid gap-4 rounded-uv-r6d27d54c6c">
-      <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+    <section className="panel course-management border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4 rounded-uv-r6d27d54c6c">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("settings.coursesEyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("settings.coursesEyebrow")}</p>
           <h2>{t("settings.coursesTitle")}</h2>
         </div>
         <Languages size={20} />
       </div>
       <p className="muted text-uv-text-muted">{t("settings.coursesHelp")}</p>
 
-      <div className="course-management-list grid gap-2 uv-v8cd0743a41:m-0">
+      <div className="course-management-list grid gap-2 in-form:m-0">
         {courses.map((course) => {
           const language = targetLanguageConfig(course.targetLanguage);
           const active = course.id === activeCourseId;
@@ -49,7 +49,7 @@ export function CourseManagement({
               <input type="hidden" name="courseId" value={course.id} />
               <button
                 type="submit"
-                className={"course-management-row w-full min-h-14.5 flex items-center justify-between gap-4 uv-padding-277e98e510 uv-border-8d7f82f403 rounded-uv-r0939007802 bg-uv-surface-soft text-uv-text text-start cursor-pointer uv-v386ffa8f69:grid uv-v386ffa8f69:gap-0.75 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff1713651e0 uv-vfedd56ae40:text-uv-text-muted uv-vfedd56ae40:text-uv-ff1713651e0 uv-v14ef0811e9:border-uv-primary disabled:cursor-default disabled:opacity-100 " + (active ? "is-active" : "")}
+                className={"course-management-row w-full min-h-14.5 flex items-center justify-between gap-4 padding-12px-14px border-1px-solid-border-2 rounded-uv-r0939007802 bg-uv-surface-soft text-uv-text text-start cursor-pointer in-span-first-child:grid in-span-first-child:gap-0.75 in-small:text-uv-text-muted in-small:text-uv-ff1713651e0 in-span-last-child:text-uv-text-muted in-span-last-child:text-uv-ff1713651e0 in-is-active:border-uv-primary disabled:cursor-default disabled:opacity-100 " + (active ? "is-active" : "")}
                 disabled={active || !language.enabled}
                 aria-current={active ? "true" : undefined}
               >
@@ -72,7 +72,7 @@ export function CourseManagement({
             {availableToCreate.map((language) => (
               <form action={createCourseAction} key={language}>
                 <input type="hidden" name="targetLanguage" value={language} />
-                <button type="submit" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
+                <button type="submit" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
                   <Plus size={17} />
                   {t("settings.addCourse", {
                     language: languageLabel(t, language),

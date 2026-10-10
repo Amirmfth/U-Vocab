@@ -14,7 +14,7 @@ export default async function VerifyEmailPage({
   const { t } = await getServerTranslator();
 
   return (
-    <main className="login-page min-h-dvh grid uv-place-items-305047e96e uv-padding-3e6175ce44">
+    <main className="login-page min-h-dvh grid place-items-center padding-24px-16px">
       <VerifyEmailForm
         email={email}
         returnTo={returnTo}

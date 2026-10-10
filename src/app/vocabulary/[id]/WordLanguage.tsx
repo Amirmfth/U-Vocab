@@ -43,7 +43,7 @@ export function WordLanguageSwitch() {
   const t = useTranslations();
   if (!context) throw new Error("Word language control is missing.");
   return (
-    <div className="translation-switch inline-flex gap-0.75 p-0.75 uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface uv-v513a7112a0:min-h-9 uv-v513a7112a0:uv-padding-4d5c65a39c uv-v513a7112a0:border-0 uv-v513a7112a0:rounded-uv-r9bc5fefa1a uv-v513a7112a0:bg-transparent uv-v513a7112a0:text-uv-text-muted uv-v513a7112a0:cursor-pointer uv-v513a7112a0:text-uv-ff1713651e0 uv-v513a7112a0:uv-weight-650 uv-v169acfe1bb:bg-uv-surface-soft uv-v169acfe1bb:text-uv-text uv-v2497b722ae:cursor-wait uv-v2497b722ae:opacity-65" aria-label={t("word.translationLanguage")}>
+    <div className="translation-switch inline-flex gap-0.75 p-0.75 border-1px-solid-border-2 rounded-uv-r4bd46d4017 bg-uv-surface in-button-3:min-h-9 in-button-3:padding-0-10px in-button-3:border-0 in-button-3:rounded-uv-r9bc5fefa1a in-button-3:bg-transparent in-button-3:text-uv-text-muted in-button-3:cursor-pointer in-button-3:text-uv-ff1713651e0 in-button-3:font-650 in-button-is-active:bg-uv-surface-soft in-button-is-active:text-uv-text in-button-disabled-2:cursor-wait in-button-disabled-2:opacity-65" aria-label={t("word.translationLanguage")}>
       {(["ENGLISH", "PERSIAN"] as const).map((mode) => (
         <button
           type="button"
@@ -87,7 +87,7 @@ export function WordMeaning({
 
   return (
     <p
-      className={"word-hero-meaning uv-flex-5c1e62cd55 min-w-0 m-0 text-uv-f4ecc9f8683 uv-weight-580 uv-line-height-2792cf2449 uv-v36d7f56673:text-right uv-v17d7ee9feb:text-left word-hero-meaning--" + fallback.language + " learning-content"}
+      className={"word-hero-meaning flex-1-1-220px min-w-0 m-0 text-uv-f4ecc9f8683 font-580 line-height-1p45 in-word-hero-meaning-fa:text-right in-word-hero-meaning-en:text-left word-hero-meaning--" + fallback.language + " learning-content"}
       dir={fallback.language === "fa" ? "rtl" : "ltr"}
       lang={fallback.language}
     >

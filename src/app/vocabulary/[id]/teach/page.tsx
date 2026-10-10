@@ -75,25 +75,25 @@ export default async function TeachWordPage({
 
   return (
     <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+      <section className="page-header compact flex flex-col padding-24px-0-4px in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 gap-2 pt-4 in-h1:text-uv-fce2aeaeade">
         <Link href={"/vocabulary/" + word.id} className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
           <ArrowLeft className="rtl-mirror" size={16} />
           {t("word.lesson.back")}
         </Link>
-        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">
+        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">
           {t("word.lesson.eyebrow", { level: course.targetLevel })}
         </p>
         <h1 className="learning-content" lang={targetLanguageCode} dir="ltr">
           {formatLexemeLabel(word)}
         </h1>
-        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a">{t("word.lesson.description")}</p>
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("word.lesson.description")}</p>
       </section>
 
-      <section className="lesson-grid grid uv-grid-template-columns-6a5c4d4d49 gap-3 uv-min700:uv-grid-template-columns-dd0b1a1848">
-        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+      <section className="lesson-grid grid grid-template-columns-1fr gap-3 uv-min700:grid-template-columns-repeat-2-minmax-0-1fr">
+        <article className="panel lesson-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em in-h3:margin-0-0-6px in-h3:text-uv-fde89c2b680 in-h3:letter-spacing-0p02em-2 in-p-2:line-height-1p58 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.meaningStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.lesson.meaningStep")}</p>
               <h2>{t("word.lesson.meaningTitle")}</h2>
             </div>
             <BookOpenCheck size={20} />
@@ -102,7 +102,7 @@ export default async function TeachWordPage({
           {visibleMeanings.map((translation) => (
             <p
               key={translation.kind + ":" + translation.language + ":" + translation.text}
-              className="lesson-meaning learning-content uv-margin-397bb87e55 text-uv-f24126b21bc uv-line-height-aa8f289ebe"
+              className="lesson-meaning learning-content margin-5px-0 text-uv-f24126b21bc line-height-1p5"
               lang={translation.language === "fa" ? "fa" : "en"}
               dir={translation.language === "fa" ? "rtl" : "ltr"}
             >
@@ -111,10 +111,10 @@ export default async function TeachWordPage({
           ))}
         </article>
 
-        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+        <article className="panel lesson-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em in-h3:margin-0-0-6px in-h3:text-uv-fde89c2b680 in-h3:letter-spacing-0p02em-2 in-p-2:line-height-1p58 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.patternStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.lesson.patternStep")}</p>
               <h2>{t("word.lesson.patternTitle")}</h2>
             </div>
             <Brain size={20} />
@@ -122,7 +122,7 @@ export default async function TeachWordPage({
 
           {word.patterns.length ? (
             word.patterns.map((pattern) => (
-              <div className="lesson-pattern uv-padding-d53d738632 uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-vb19eb067c9:uv-margin-66a0389558" key={pattern.id}>
+              <div className="lesson-pattern padding-13px-0 border-1px-solid-border last:border-0-3 in-p-2:margin-6px-0-0" key={pattern.id}>
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {pattern.pattern}
                 </strong>
@@ -138,10 +138,10 @@ export default async function TeachWordPage({
           )}
         </article>
 
-        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+        <article className="panel lesson-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em in-h3:margin-0-0-6px in-h3:text-uv-fde89c2b680 in-h3:letter-spacing-0p02em-2 in-p-2:line-height-1p58 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.contextStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.lesson.contextStep")}</p>
               <h2>{t("word.lesson.contextTitle")}</h2>
             </div>
             <BookOpenCheck size={20} />
@@ -149,7 +149,7 @@ export default async function TeachWordPage({
 
           <div className="lesson-examples flex flex-col gap-2.5">
             {word.examples.slice(0, 4).map((example) => (
-              <div className="lesson-example flex flex-col gap-1.25 uv-padding-e93fc48d3c uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f6c2d68ddb8 uv-v36c0309a03:uv-line-height-aa8f289ebe" key={example.id}>
+              <div className="lesson-example flex flex-col gap-1.25 padding-13px-14px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-span:text-uv-text-muted in-span:text-uv-f6c2d68ddb8 in-span:line-height-1p5" key={example.id}>
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {example.targetText}
                 </strong>
@@ -170,10 +170,10 @@ export default async function TeachWordPage({
           </div>
         </article>
 
-        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+        <article className="panel lesson-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em in-h3:margin-0-0-6px in-h3:text-uv-fde89c2b680 in-h3:letter-spacing-0p02em-2 in-p-2:line-height-1p58 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.connectionsStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.lesson.connectionsStep")}</p>
               <h2>{t("word.lesson.connectionsTitle")}</h2>
             </div>
             <Network size={20} />
@@ -185,7 +185,7 @@ export default async function TeachWordPage({
                 <Link
                   key={relation.id}
                   href={"/vocabulary/" + relation.target.id}
-                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:font-semibold uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff7862da171"
+                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-uv-ff7862da171"
                 >
                   <span className="learning-content" lang={targetLanguageCode} dir="ltr">
                     {relation.target.lemma}
@@ -204,10 +204,10 @@ export default async function TeachWordPage({
         </article>
       </section>
 
-      <section className="lesson-production uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce flex flex-col gap-3 uv-vb0069fed3b:max-w-none">
-        <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
+      <section className="lesson-production in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em flex flex-col gap-3 in-learning-card:max-w-none">
+        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
           <div>
-            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.produceStep")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.lesson.produceStep")}</p>
             <h2>{t("word.lesson.produceTitle")}</h2>
           </div>
           <Brain size={20} />
@@ -224,9 +224,9 @@ export default async function TeachWordPage({
         />
       </section>
 
-      <section className="panel lesson-footer-actions uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce flex flex-col gap-4 uv-vb19eb067c9:mb-0 uv-min700:flex-row uv-min700:items-center uv-min700:justify-between rounded-uv-r6d27d54c6c">
+      <section className="panel lesson-footer-actions border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em flex flex-col gap-4 in-p-2:mb-0 uv-min700:flex-row uv-min700:items-center uv-min700:justify-between rounded-uv-r6d27d54c6c">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.retainStep")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.lesson.retainStep")}</p>
           <h2>{t("word.lesson.retainTitle")}</h2>
           <p className="muted text-uv-text-muted">{t("word.lesson.retainHelp")}</p>
         </div>

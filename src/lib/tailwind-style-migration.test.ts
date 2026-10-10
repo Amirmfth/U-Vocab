@@ -55,6 +55,7 @@ test("all JSX className values use named Tailwind utilities and variants", () =>
     function visit(node: ts.Node) {
       if (
         ts.isJsxAttribute(node) &&
+        ts.isIdentifier(node.name) &&
         node.name.text === "className" &&
         node.initializer
       ) {

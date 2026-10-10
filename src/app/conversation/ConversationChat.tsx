@@ -458,19 +458,19 @@ export function ConversationChat({
   const voiceUnavailable = !voiceEnabled || remainingMinutes <= 0;
 
   return (
-    <section className="conversation-chat [display:flex] [flex-direction:column] [gap:14px] [width:100%] [max-width:860px] [margin-inline:auto] [min-height:56vh]">
-      <div className="conversation-messages [display:flex] [flex-direction:column] [gap:18px] [padding:12px_2px_112px] min-[620px]:[padding-bottom:128px]" aria-live="polite">
+    <section className="conversation-chat flex flex-col gap-3.5 w-full max-w-uv-a9051779da mx-auto uv-min-height-e5ba4e032a">
+      <div className="conversation-messages flex flex-col gap-4.5 uv-padding-784a5bb832 uv-min620:pb-32" aria-live="polite">
         {messages.map((message) => {
           const isUser = message.role === "USER";
           return (
             <article
-              className={"conversation-message [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.62rem] [&_>_span]:[font-weight:650] [&_>_span]:[text-transform:uppercase] [&_>_span]:[letter-spacing:0.08em] [&_>_p]:[margin:0] [&_>_p]:[padding:11px_13px] [&_>_p]:[border-radius:14px] [&_>_p]:[line-height:1.55] [&_>_p]:[white-space:pre-wrap] [&.is-assistant]:[align-self:flex-start] [&.is-assistant_>_p]:[border:1px_solid_var(--border)] [&.is-assistant_>_p]:[background:var(--surface)] [&.is-user]:[align-self:flex-end] [&.is-user_>_p]:[background:var(--primary)] [&.is-user_>_p]:[color:white] [width:100%] [max-width:none] [display:flex] [flex-direction:row] [align-items:flex-start] [gap:10px] [&.is-user]:[flex-direction:row-reverse] [&.is-user]:[align-items:flex-start] [&.is-user_.conversation-avatar]:[border-color:color-mix(in_srgb,_var(--primary)_42%,_var(--border))] [&.is-user_.conversation-avatar]:[background:var(--primary-soft)] [&.is-user_.conversation-avatar]:[color:var(--primary-strong)] [&.is-user_.conversation-bubble]:[align-items:flex-end] [&.is-user_.conversation-bubble_>_p]:[border-color:transparent] [&.is-user_.conversation-bubble_>_p]:[border-radius:18px_18px_6px_18px] [&.is-user_.conversation-bubble_>_p]:[background:var(--primary)] [&.is-user_.conversation-bubble_>_p]:[color:white] " + (isUser ? "is-user" : "is-assistant")}
+              className={"conversation-message uv-v22810335d8:text-uv-text-muted uv-v22810335d8:text-uv-f174ef476a0 uv-v22810335d8:uv-weight-650 uv-v22810335d8:uppercase uv-v22810335d8:uv-letter-spacing-f49b9114de uv-v026f084606:m-0 uv-v026f084606:uv-padding-2e9fc07eac uv-v026f084606:rounded-uv-rd65225386d uv-v026f084606:uv-line-height-05c248da4c uv-v026f084606:whitespace-pre-wrap uv-v37d0b116c1:self-start uv-v8b6b40051e:uv-border-8d7f82f403 uv-v8b6b40051e:bg-uv-surface uv-ve7c06fc78f:self-end uv-v123b211084:bg-uv-primary uv-v123b211084:uv-color-528cef87d0 w-full max-w-none flex flex-row items-start gap-2.5 uv-ve7c06fc78f:flex-row-reverse uv-ve7c06fc78f:items-start uv-v8bf3f97875:uv-border-color-1affe77f6c uv-v8bf3f97875:bg-uv-cbdfd7cd038 uv-v8bf3f97875:text-uv-primary-strong uv-v541011a805:items-end uv-vfbb80649de:border-transparent uv-vfbb80649de:rounded-uv-rb907f29c2a uv-vfbb80649de:bg-uv-primary uv-vfbb80649de:uv-color-528cef87d0 " + (isUser ? "is-user" : "is-assistant")}
               key={message.id}
             >
-              <div className="conversation-avatar [width:32px] [height:32px] [flex:0_0_32px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:50%] [background:var(--surface-raised)] [color:var(--text-muted)]" aria-hidden="true">
+              <div className="conversation-avatar w-8 h-8 uv-flex-f51e933a89 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-rb46da6ec37 bg-uv-surface-raised text-uv-text-muted" aria-hidden="true">
                 {isUser ? <UserRound size={17} /> : <Bot size={17} />}
               </div>
-              <div className="conversation-bubble [min-width:0] [max-width:min(82%,_680px)] [display:flex] [flex-direction:column] [gap:5px] [&_>_span]:[padding-inline:3px] [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.68rem] [&_>_span]:[font-weight:650] [&_>_p]:[margin:0] [&_>_p]:[padding:11px_14px] [&_>_p]:[border:1px_solid_var(--border)] [&_>_p]:[border-radius:18px_18px_18px_6px] [&_>_p]:[background:var(--surface)] [&_>_p]:[color:var(--text)] [&_>_p]:[line-height:1.58] [&_>_p]:[white-space:pre-wrap] min-[620px]:[max-width:min(76%,_700px)]">
+              <div className="conversation-bubble min-w-0 uv-max-width-e8b1b45390 flex flex-col gap-1.25 uv-v22810335d8:px-0.75 uv-v22810335d8:text-uv-text-muted uv-v22810335d8:text-uv-f78eb7000a9 uv-v22810335d8:uv-weight-650 uv-v026f084606:m-0 uv-v026f084606:uv-padding-2c82595ddd uv-v026f084606:uv-border-8d7f82f403 uv-v026f084606:rounded-uv-rdc43399a6e uv-v026f084606:bg-uv-surface uv-v026f084606:text-uv-text uv-v026f084606:uv-line-height-fe7a9b32f9 uv-v026f084606:whitespace-pre-wrap uv-min620:uv-max-width-bdcfb10a63">
                 <span>{isUser ? t("conversation.you") : tutorLabel}</span>
                 <p className="learning-content" lang={lang} dir={dir}>
                   {message.content || (streaming && !isUser ? "…" : "")}
@@ -482,8 +482,8 @@ export function ConversationChat({
         <div ref={endRef} />
       </div>
 
-      <form className="conversation-composer [flex-direction:column] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:minmax(0,_1fr)_auto] min-[620px]:[align-items:end] min-[620px]:[&_textarea]:[min-height:64px] [position:sticky] [bottom:calc(var(--mobile-nav-height)_+_10px)] [z-index:12] [display:grid] [grid-template-columns:minmax(0,_1fr)_44px] [gap:8px] [align-items:end] [padding:8px_8px_6px_14px] [border:1px_solid_var(--border-strong)] [border-radius:20px] [background:color-mix(in_srgb,_var(--surface-raised)_96%,_transparent)] [box-shadow:var(--shadow)] [backdrop-filter:blur(16px)] [&_textarea]:[min-height:44px] [&_textarea]:[max-height:150px] [&_textarea]:[padding:10px_0_7px] [&_textarea]:[resize:none] [&_textarea]:[border:0] [&_textarea]:[background:transparent] [&_textarea]:[box-shadow:none] [&_textarea:focus]:[box-shadow:none] min-[620px]:[bottom:18px]" onSubmit={submit}>
-        <div className="conversation-composer-input [display:grid] [grid-template-columns:minmax(0,_1fr)_auto_auto] [gap:8px] [align-items:end] [&_textarea]:[margin:0] max-[560px]:[grid-template-columns:minmax(0,_1fr)_auto] max-[560px]:[&_textarea]:[grid-row:1_/_span_2]">
+      <form className="conversation-composer flex-col uv-min620:grid uv-min620:uv-grid-template-columns-f06dd92ea5 uv-min620:items-end uv-min620:uv-v3c40c23539:min-h-16 sticky uv-bottom-af4098e1ca uv-z-index-7b52009b64 grid uv-grid-template-columns-9ec3f125f4 gap-2 items-end uv-padding-40a2f0cf13 uv-border-488f4b382f rounded-uv-r998b02c207 uv-background-283a8f83ba uv-box-shadow-4ee177db8b uv-backdrop-filter-44b1307bc7 uv-v3c40c23539:min-h-11 uv-v3c40c23539:max-h-37.5 uv-v3c40c23539:uv-padding-766138ac4d uv-v3c40c23539:resize-none uv-v3c40c23539:border-0 uv-v3c40c23539:bg-transparent uv-v3c40c23539:uv-box-shadow-71f8e7976e uv-vfeb3f72e04:uv-box-shadow-71f8e7976e uv-min620:bottom-4.5" onSubmit={submit}>
+        <div className="conversation-composer-input grid uv-grid-template-columns-c3b0b81963 gap-2 items-end uv-v3c40c23539:m-0 uv-max560:uv-grid-template-columns-f06dd92ea5 uv-max560:uv-v3c40c23539:uv-grid-row-1cff6f63e0">
           <textarea
             ref={textareaRef}
             rows={2}
@@ -507,11 +507,11 @@ export function ConversationChat({
             }}
           />
 
-          <div className="conversation-voice-controls [display:flex] [gap:6px] max-[560px]:[grid-column:2] max-[560px]:[grid-row:1] max-[560px]:[align-self:start] max-[560px]:[margin-top:4px]">
+          <div className="conversation-voice-controls flex gap-1.5 uv-max560:uv-grid-column-da4b9237ba uv-max560:uv-grid-row-356a192b79 uv-max560:self-start uv-max560:mt-1">
             {!recording ? (
               <button
                 type="button"
-                className="conversation-mic-button [width:48px] [height:48px] [display:inline-grid] [place-items:center] [flex:none] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [color:var(--text-soft)] [cursor:pointer] [&:disabled]:[opacity:.45] [&:disabled]:[cursor:not-allowed] [&.is-recording]:[color:var(--danger)] [&.is-recording]:[border-color:color-mix(in_srgb,_var(--danger)_45%,_var(--border))] [&.is-recording]:[background:var(--danger-soft)]"
+                className="conversation-mic-button w-12 h-12 uv-display-c5d9aaf66e uv-place-items-305047e96e uv-flex-71f8e7976e uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed uv-vedeafcbfd0:text-uv-danger uv-vedeafcbfd0:uv-border-color-7e8e763970 uv-vedeafcbfd0:bg-uv-c8b3083dabe"
                 onClick={startRecording}
                 disabled={
                   streaming ||
@@ -533,7 +533,7 @@ export function ConversationChat({
               <>
                 <button
                   type="button"
-                  className="conversation-mic-button is-recording [width:48px] [height:48px] [display:inline-grid] [place-items:center] [flex:none] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [color:var(--text-soft)] [cursor:pointer] [&:disabled]:[opacity:.45] [&:disabled]:[cursor:not-allowed] [&.is-recording]:[color:var(--danger)] [&.is-recording]:[border-color:color-mix(in_srgb,_var(--danger)_45%,_var(--border))] [&.is-recording]:[background:var(--danger-soft)]"
+                  className="conversation-mic-button is-recording w-12 h-12 uv-display-c5d9aaf66e uv-place-items-305047e96e uv-flex-71f8e7976e uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed uv-vedeafcbfd0:text-uv-danger uv-vedeafcbfd0:uv-border-color-7e8e763970 uv-vedeafcbfd0:bg-uv-c8b3083dabe"
                   onClick={stopRecording}
                   aria-label={t("conversation.voice.stop")}
                 >
@@ -541,7 +541,7 @@ export function ConversationChat({
                 </button>
                 <button
                   type="button"
-                  className="conversation-mic-button [width:48px] [height:48px] [display:inline-grid] [place-items:center] [flex:none] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [color:var(--text-soft)] [cursor:pointer] [&:disabled]:[opacity:.45] [&:disabled]:[cursor:not-allowed] [&.is-recording]:[color:var(--danger)] [&.is-recording]:[border-color:color-mix(in_srgb,_var(--danger)_45%,_var(--border))] [&.is-recording]:[background:var(--danger-soft)]"
+                  className="conversation-mic-button w-12 h-12 uv-display-c5d9aaf66e uv-place-items-305047e96e uv-flex-71f8e7976e uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-soft cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed uv-vedeafcbfd0:text-uv-danger uv-vedeafcbfd0:uv-border-color-7e8e763970 uv-vedeafcbfd0:bg-uv-c8b3083dabe"
                   onClick={cancelRecording}
                   aria-label={t("conversation.voice.cancel")}
                 >
@@ -553,7 +553,7 @@ export function ConversationChat({
 
           <button
             type="submit"
-            className="conversation-send-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:0] [border-radius:50%] [background:var(--primary)] [color:white] [cursor:pointer] [transition:transform_140ms_ease,_opacity_140ms_ease] [&:hover:not(:disabled)]:[transform:translateY(-1px)] [&:disabled]:[opacity:0.42] [&:disabled]:[cursor:not-allowed] max-[560px]:[grid-column:2]"
+            className="conversation-send-button w-11 h-11 grid uv-place-items-305047e96e border-0 rounded-uv-rb46da6ec37 bg-uv-primary uv-color-528cef87d0 cursor-pointer uv-transition-886729f578 uv-v999cdc25ee:uv-transform-4693dc4baa disabled:opacity-42 disabled:cursor-not-allowed uv-max560:uv-grid-column-da4b9237ba"
             disabled={!canSend}
             aria-busy={streaming}
             aria-label={streaming ? t("conversation.tutorReplying") : t("conversation.send")}
@@ -564,8 +564,8 @@ export function ConversationChat({
         </div>
 
         {recording ? (
-          <div className="conversation-recording-status [display:flex] [align-items:center] [gap:8px] [min-height:24px] [font-size:.78rem] [color:var(--text-soft)]" role="status">
-            <span className="conversation-recording-dot [width:9px] [height:9px] [border-radius:50%] [background:var(--danger)] [box-shadow:0_0_0_4px_var(--danger-soft)]" />
+          <div className="conversation-recording-status flex items-center gap-2 min-h-6 text-uv-f5f68d82942 text-uv-text-soft" role="status">
+            <span className="conversation-recording-dot w-2.25 h-2.25 rounded-uv-rb46da6ec37 bg-uv-danger uv-box-shadow-7ded488c40" />
             <strong>{t("conversation.voice.recording")}</strong>
             <span>
               {elapsedSeconds}s / {CONVERSATION_AUDIO.maxDurationSeconds}s
@@ -574,14 +574,14 @@ export function ConversationChat({
         ) : null}
 
         {transcribing ? (
-          <div className="conversation-recording-status [display:flex] [align-items:center] [gap:8px] [min-height:24px] [font-size:.78rem] [color:var(--text-soft)]" role="status">
-            <span className="conversation-transcribing-spinner [width:13px] [height:13px] [border:2px_solid_var(--border-strong)] [border-top-color:var(--primary)] [border-radius:50%] [animation:conversation-spin_.8s_linear_infinite]" />
+          <div className="conversation-recording-status flex items-center gap-2 min-h-6 text-uv-f5f68d82942 text-uv-text-soft" role="status">
+            <span className="conversation-transcribing-spinner w-3.25 h-3.25 uv-border-641cdc601e border-t-uv-primary rounded-uv-rb46da6ec37 uv-animation-88fe13492d" />
             <span>{t("conversation.voice.transcribing")}</span>
           </div>
         ) : null}
 
         {pendingTranscript ? (
-          <div className="conversation-transcript-choice [display:grid] [gap:10px] [padding:12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_>_div:first-child]:[display:grid] [&_>_div:first-child]:[gap:3px] [&_span]:[color:var(--text-soft)] [&_span]:[font-size:.8rem] [&_span]:[line-height:1.45] [&_>_div:last-child]:[display:flex] [&_>_div:last-child]:[flex-wrap:wrap] [&_>_div:last-child]:[gap:8px] [&_.button]:[width:auto] [&_.button]:[min-height:40px]" role="status">
+          <div className="conversation-transcript-choice grid gap-2.5 p-3 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v0fee2d502c:grid uv-v0fee2d502c:gap-0.75 uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:text-uv-fdbd07cbfaa uv-v36c0309a03:uv-line-height-2792cf2449 uv-vaff5733806:flex uv-vaff5733806:flex-wrap uv-vaff5733806:gap-2 uv-vcded88c612:w-auto uv-vcded88c612:min-h-10" role="status">
             <div>
               <strong>{t("conversation.voice.draftExistsTitle")}</strong>
               <span>{t("conversation.voice.draftExistsBody")}</span>
@@ -589,21 +589,21 @@ export function ConversationChat({
             <div>
               <button
                 type="button"
-                className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                 onClick={() => applyPendingTranscript("append")}
               >
                 {t("conversation.voice.append")}
               </button>
               <button
                 type="button"
-                className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                 onClick={() => applyPendingTranscript("replace")}
               >
                 {t("conversation.voice.replace")}
               </button>
               <button
                 type="button"
-                className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                 onClick={() => setPendingTranscript(null)}
               >
                 {t("conversation.voice.discard")}
@@ -613,12 +613,12 @@ export function ConversationChat({
         ) : null}
 
         {voiceError ? (
-          <div className="conversation-voice-error [display:flex] [align-items:center] [gap:8px] [min-height:24px] [font-size:.78rem] [justify-content:space-between] [color:var(--danger)] [&_.text-link]:[border:0] [&_.text-link]:[background:transparent] [&_.text-link]:[display:inline-flex] [&_.text-link]:[align-items:center] [&_.text-link]:[gap:5px] [&_.text-link]:[cursor:pointer] [&_.text-link]:[white-space:nowrap]" role="alert">
+          <div className="conversation-voice-error flex items-center gap-2 min-h-6 text-uv-f5f68d82942 justify-between text-uv-danger uv-vffc37e4c0f:border-0 uv-vffc37e4c0f:bg-transparent uv-vffc37e4c0f:inline-flex uv-vffc37e4c0f:items-center uv-vffc37e4c0f:gap-1.25 uv-vffc37e4c0f:cursor-pointer uv-vffc37e4c0f:whitespace-nowrap" role="alert">
             <span>{voiceError}</span>
             {retryBlob && retryRequestId ? (
               <button
                 type="button"
-                className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]"
+                className="text-link text-uv-primary-strong uv-weight-560 inline-flex items-center gap-1.5"
                 onClick={retryTranscription}
                 disabled={transcribing}
               >
@@ -629,9 +629,9 @@ export function ConversationChat({
           </div>
         ) : null}
 
-        <div className="conversation-composer-footer [display:flex] [align-items:center] [gap:8px] [min-height:24px] [font-size:.78rem] [justify-content:space-between] [color:var(--text-muted)] max-[560px]:[align-items:flex-start] max-[560px]:[flex-direction:column]">
-          <span className="conversation-composer-hint [grid-column:1_/_-1] [padding:0_2px_2px] [color:var(--text-muted)] [font-size:0.62rem]">{t("conversation.composerHint")}</span>
-          <span className="conversation-voice-quota [text-align:end] max-[560px]:[text-align:start]">
+        <div className="conversation-composer-footer flex items-center gap-2 min-h-6 text-uv-f5f68d82942 justify-between text-uv-text-muted uv-max560:items-start uv-max560:flex-col">
+          <span className="conversation-composer-hint uv-grid-column-93b665dfb5 uv-padding-7c5bf472f0 text-uv-text-muted text-uv-f174ef476a0">{t("conversation.composerHint")}</span>
+          <span className="conversation-voice-quota text-end uv-max560:text-start">
             {voiceEnabled
               ? t("conversation.voice.remaining", {
                   remaining: remainingMinutes,
@@ -643,7 +643,7 @@ export function ConversationChat({
       </form>
 
       {error ? (
-        <p className="conversation-error [margin:0] [color:var(--danger)] [font-size:0.75rem]" role="alert">
+        <p className="conversation-error m-0 text-uv-danger text-uv-f823f1262bd" role="alert">
           {error}
         </p>
       ) : null}

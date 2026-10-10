@@ -63,8 +63,8 @@ export default async function ReadingPage() {
   ]);
 
   return (
-    <main className="page reading-hub generated-reading-hub [display:flex] [flex-direction:column] [--reading-measure:68ch] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [max-width:920px] [&_.reading-form]:[max-width:880px] [&_.reading-form]:[gap:16px] [&_.reading-form]:[padding:18px] [&_.reading-form]:[border-color:var(--border-strong)] [&_.reading-form]:[background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent_70%),_var(--surface)] [&_.reading-form_.button]:[min-height:52px] [&_.collection-list]:[border-top:1px_solid_var(--border)] [&_.collection-row]:[min-height:68px] [&_.collection-row]:[padding-inline:4px] min-[620px]:[&_.reading-form]:[padding:22px] min-[940px]:[padding-top:12px]">
-      <section className="page-header compact practice-workbench-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [max-width:var(--content-reading)] [padding-top:20px] [&_h1]:[font-size:clamp(2.5rem,_12vw,_5rem)]">
+    <main className="page reading-hub generated-reading-hub flex flex-col uv---reading-measure-51f5a1cba8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6 w-full max-w-uv-2e0eb67d1b uv-v79f14f97ec:max-w-uv-e83c9a8a13 uv-v79f14f97ec:gap-4 uv-v79f14f97ec:p-4.5 uv-v79f14f97ec:border-uv-border-strong uv-v79f14f97ec:uv-background-21ade80306 uv-v21375cf224:min-h-13 uv-v1506e77c3f:uv-border-top-8d7f82f403 uv-vfb6c9a8dbe:min-h-17 uv-vfb6c9a8dbe:px-1 uv-min620:uv-v79f14f97ec:p-5.5 uv-min940:pt-3">
+      <section className="page-header compact practice-workbench-header flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 uv-max-width-5a165b8e65 pt-5 uv-v3bccf64584:text-uv-fe7a9e3765c">
         <h1>{t("reading.title", { language: languageLabel })}</h1>
       </section>
 
@@ -90,13 +90,13 @@ export default async function ReadingPage() {
           }))}
       />
 
-      <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
-        <h2 className="section-title [margin:0_0_10px] [font-size:1rem] [color:var(--text-soft)] [letter-spacing:-0.02em]">{t("reading.recent")}</h2>
+      <section className="page-section flex flex-col gap-3">
+        <h2 className="section-title uv-margin-83bba30fc1 text-uv-f19feeb881c text-uv-text-soft uv-letter-spacing-235f37bdea">{t("reading.recent")}</h2>
         {readings.length ? (
-          <div className="collection-list [display:flex] [flex-direction:column]">
+          <div className="collection-list flex flex-col">
             {readings.map((reading) => (
               <Link
-                className="collection-row [border-bottom:1px_solid_var(--border)] [min-height:64px] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [align-items:center] [gap:12px] [padding:11px_2px] [&_strong]:[display:block] [&_span]:[display:block] [&_span]:[margin-top:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.76rem] min-[940px]:[&:hover]:[background:var(--surface)]"
+                className="collection-row uv-border-bottom-8d7f82f403 min-h-16 grid uv-grid-template-columns-f06dd92ea5 items-center gap-3 uv-padding-c9f5e3c335 uv-veda02a0adb:block uv-v36c0309a03:block uv-v36c0309a03:mt-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
                 href={"/reading/" + reading.id}
                 key={reading.id}
                 prefetch
@@ -132,7 +132,7 @@ export default async function ReadingPage() {
             ))}
           </div>
         ) : (
-          <div className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
+          <div className="empty-state compact-empty flex flex-col gap-3 items-start uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
             <BookOpenText size={22} />
             <strong>{t("reading.none")}</strong>
           </div>

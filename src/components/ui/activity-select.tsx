@@ -52,36 +52,36 @@ export function ActivitySelect({
   }, []);
 
   return (
-    <div className="activity-select [position:relative] [width:100%]" ref={rootRef}>
+    <div className="activity-select relative w-full" ref={rootRef}>
       <input type="hidden" id={id} name={name} value={selected.value} />
       <button
         aria-controls={listboxId}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className="activity-select-trigger [width:100%] [min-height:48px] [display:flex] [align-items:center] [gap:12px] [padding:11px_13px_11px_14px] [border:1px_solid_var(--border)] [border-radius:14px] [background:#0d0d10] [color:var(--text)] [cursor:pointer] [text-align:left] [transition:border-color_180ms_ease,_box-shadow_180ms_ease,_background_180ms_ease] [&:hover]:[border-color:var(--border-strong)] [&:hover]:[background:#101014] [&:focus-visible]:[outline:none] [&:focus-visible]:[border-color:var(--primary)] [&:focus-visible]:[box-shadow:0_0_0_3px_rgba(139,_124,_255,_0.12)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:not-allowed] [&_svg]:[flex:0_0_auto] [&_svg]:[color:var(--text-muted)] [&_svg]:[transform:rotate(180deg)] [&_svg]:[transition:transform_280ms_cubic-bezier(0.4,_0,_0.2,_1),_color_180ms_ease] [&_svg.is-open]:[color:var(--primary-strong)] [&_svg.is-open]:[transform:rotate(0deg)]"
+        className="activity-select-trigger w-full min-h-12 flex items-center gap-3 uv-padding-2ec9052789 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-cdae29b0797 text-uv-text cursor-pointer text-left uv-transition-3ef91150eb hover:border-uv-border-strong hover:bg-uv-cfcbfb23a40 focus-visible:outline-none focus-visible:border-uv-primary focus-visible:uv-box-shadow-d49874f3e7 disabled:uv-opacity-8ecc5701b7 disabled:cursor-not-allowed uv-vf69988b1be:uv-flex-18ba0b6e31 uv-vf69988b1be:text-uv-text-muted uv-vf69988b1be:uv-transform-14214c0e93 uv-vf69988b1be:uv-transition-9d520833e8 uv-vf73fcca4c0:text-uv-primary-strong uv-vf73fcca4c0:uv-transform-595c37b5a2"
         disabled={disabled}
         id={id + "-trigger"}
         onClick={() => setIsOpen((open) => !open)}
         type="button"
       >
-        <span className="activity-select-copy [min-width:0] [display:flex] [flex:1] [flex-direction:column] [gap:2px]">
-          <span className="activity-select-value [font-size:0.9rem] [font-weight:600] [line-height:1.25]">{selected.label}</span>
+        <span className="activity-select-copy min-w-0 flex uv-flex-356a192b79 flex-col gap-0.5">
+          <span className="activity-select-value text-uv-fee84419642 font-semibold uv-line-height-8e007eaa50">{selected.label}</span>
           {selected.description ? (
-            <span className="activity-select-description [color:var(--text-muted)] [font-size:0.72rem] [line-height:1.35]">{selected.description}</span>
+            <span className="activity-select-description text-uv-text-muted text-uv-ff1713651e0 uv-line-height-ec0a69ff34">{selected.description}</span>
           ) : null}
         </span>
         <ChevronUp aria-hidden="true" className={isOpen ? "is-open" : ""} size={19} />
       </button>
 
-      <div className={isOpen ? "activity-select-menu is-open [display:grid] [grid-template-rows:0fr] [opacity:0] [transition:grid-template-rows_260ms_cubic-bezier(0.4,_0,_0.2,_1),_opacity_180ms_ease] [&.is-open]:[grid-template-rows:1fr] [&.is-open]:[opacity:1]" : "activity-select-menu [display:grid] [grid-template-rows:0fr] [opacity:0] [transition:grid-template-rows_260ms_cubic-bezier(0.4,_0,_0.2,_1),_opacity_180ms_ease] [&.is-open]:[grid-template-rows:1fr] [&.is-open]:[opacity:1]"}>
-        <div className="activity-select-menu-inner [position:relative] [z-index:20] [min-height:0] [overflow:hidden] [&_>_div]:[max-height:min(280px,_42dvh)] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_>_div]:[margin-top:7px] [&_>_div]:[overflow-y:auto] [&_>_div]:[padding:5px] [&_>_div]:[border:1px_solid_var(--border)] [&_>_div]:[border-radius:16px] [&_>_div]:[background:var(--surface-raised)] [&_>_div]:[box-shadow:var(--shadow)]">
+      <div className={isOpen ? "activity-select-menu is-open grid uv-grid-template-rows-b2586e2789 opacity-0 uv-transition-8d4ddab00a uv-ve7ef4d7544:uv-grid-template-rows-6a5c4d4d49 uv-ve7ef4d7544:opacity-100" : "activity-select-menu grid uv-grid-template-rows-b2586e2789 opacity-0 uv-transition-8d4ddab00a uv-ve7ef4d7544:uv-grid-template-rows-6a5c4d4d49 uv-ve7ef4d7544:opacity-100"}>
+        <div className="activity-select-menu-inner relative uv-z-index-91032ad7bb min-h-0 overflow-hidden uv-vcbb57f4d35:uv-max-height-8aa6583a40 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:mt-1.75 uv-vcbb57f4d35:overflow-y-auto uv-vcbb57f4d35:p-1.25 uv-vcbb57f4d35:uv-border-8d7f82f403 uv-vcbb57f4d35:rounded-uv-r4678bd4d8a uv-vcbb57f4d35:bg-uv-surface-raised uv-vcbb57f4d35:uv-box-shadow-4ee177db8b">
           <div aria-label={t("common.options")} id={listboxId} role="listbox">
             {options.map((option) => {
               const isSelected = option.value === selected.value;
               return (
                 <button
                   aria-selected={isSelected}
-                  className={isSelected ? "activity-select-option is-selected [width:100%] [min-height:46px] [display:flex] [align-items:center] [gap:10px] [padding:10px_11px] [border:0] [border-radius:11px] [background:transparent] [color:var(--text-soft)] [cursor:pointer] [text-align:left] [transition:background_160ms_ease,_color_160ms_ease,_transform_160ms_ease] [&:hover]:[outline:none] [&:hover]:[background:var(--surface-soft)] [&:hover]:[color:var(--text)] [&:focus-visible]:[outline:none] [&:focus-visible]:[background:var(--surface-soft)] [&:focus-visible]:[color:var(--text)] [&:active]:[transform:scale(0.985)] [&.is-selected]:[background:var(--primary-soft)] [&.is-selected]:[color:var(--text)]" : "activity-select-option [width:100%] [min-height:46px] [display:flex] [align-items:center] [gap:10px] [padding:10px_11px] [border:0] [border-radius:11px] [background:transparent] [color:var(--text-soft)] [cursor:pointer] [text-align:left] [transition:background_160ms_ease,_color_160ms_ease,_transform_160ms_ease] [&:hover]:[outline:none] [&:hover]:[background:var(--surface-soft)] [&:hover]:[color:var(--text)] [&:focus-visible]:[outline:none] [&:focus-visible]:[background:var(--surface-soft)] [&:focus-visible]:[color:var(--text)] [&:active]:[transform:scale(0.985)] [&.is-selected]:[background:var(--primary-soft)] [&.is-selected]:[color:var(--text)]"}
+                  className={isSelected ? "activity-select-option is-selected w-full min-h-11.5 flex items-center gap-2.5 uv-padding-3cf03e44f1 border-0 rounded-uv-r4bd46d4017 bg-transparent text-uv-text-soft cursor-pointer text-left uv-transition-684a940bdf hover:outline-none hover:bg-uv-surface-soft hover:text-uv-text focus-visible:outline-none focus-visible:bg-uv-surface-soft focus-visible:text-uv-text active:uv-transform-bcd93e0f45 uv-v48f8f87023:bg-uv-cbdfd7cd038 uv-v48f8f87023:text-uv-text" : "activity-select-option w-full min-h-11.5 flex items-center gap-2.5 uv-padding-3cf03e44f1 border-0 rounded-uv-r4bd46d4017 bg-transparent text-uv-text-soft cursor-pointer text-left uv-transition-684a940bdf hover:outline-none hover:bg-uv-surface-soft hover:text-uv-text focus-visible:outline-none focus-visible:bg-uv-surface-soft focus-visible:text-uv-text active:uv-transform-bcd93e0f45 uv-v48f8f87023:bg-uv-cbdfd7cd038 uv-v48f8f87023:text-uv-text"}
                   key={option.value}
                   onClick={() => {
                     setValue(option.value);
@@ -91,11 +91,11 @@ export function ActivitySelect({
                   role="option"
                   type="button"
                 >
-                  <span className="activity-select-option-copy [min-width:0] [display:flex] [flex:1] [flex-direction:column] [gap:2px] [&_>_span]:[font-size:0.9rem] [&_>_span]:[font-weight:600] [&_>_span]:[line-height:1.25] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.72rem] [&_small]:[line-height:1.35]">
+                  <span className="activity-select-option-copy min-w-0 flex uv-flex-356a192b79 flex-col gap-0.5 uv-v22810335d8:text-uv-fee84419642 uv-v22810335d8:font-semibold uv-v22810335d8:uv-line-height-8e007eaa50 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff1713651e0 uv-v982220ddd5:uv-line-height-ec0a69ff34">
                     <span>{option.label}</span>
                     {option.description ? <small>{option.description}</small> : null}
                   </span>
-                  {isSelected ? <span className="activity-select-check [flex:0_0_auto] [color:var(--primary-strong)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.66rem]">{t("common.selected")}</span> : null}
+                  {isSelected ? <span className="activity-select-check uv-flex-18ba0b6e31 text-uv-primary-strong uv-font-family-320794573f text-uv-ff7862da171">{t("common.selected")}</span> : null}
                 </button>
               );
             })}

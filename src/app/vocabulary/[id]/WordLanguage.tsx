@@ -43,7 +43,7 @@ export function WordLanguageSwitch() {
   const t = useTranslations();
   if (!context) throw new Error("Word language control is missing.");
   return (
-    <div className="translation-switch [display:inline-flex] [gap:3px] [padding:3px] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface)] [&_button]:[min-height:36px] [&_button]:[padding:0_10px] [&_button]:[border:0] [&_button]:[border-radius:8px] [&_button]:[background:transparent] [&_button]:[color:var(--text-muted)] [&_button]:[cursor:pointer] [&_button]:[font-size:0.72rem] [&_button]:[font-weight:650] [&_button.is-active]:[background:var(--surface-soft)] [&_button.is-active]:[color:var(--text)] [&_button:disabled]:[cursor:wait] [&_button:disabled]:[opacity:0.65]" aria-label={t("word.translationLanguage")}>
+    <div className="translation-switch inline-flex gap-0.75 p-0.75 uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface uv-v513a7112a0:min-h-9 uv-v513a7112a0:uv-padding-4d5c65a39c uv-v513a7112a0:border-0 uv-v513a7112a0:rounded-uv-r9bc5fefa1a uv-v513a7112a0:bg-transparent uv-v513a7112a0:text-uv-text-muted uv-v513a7112a0:cursor-pointer uv-v513a7112a0:text-uv-ff1713651e0 uv-v513a7112a0:uv-weight-650 uv-v169acfe1bb:bg-uv-surface-soft uv-v169acfe1bb:text-uv-text uv-v2497b722ae:cursor-wait uv-v2497b722ae:opacity-65" aria-label={t("word.translationLanguage")}>
       {(["ENGLISH", "PERSIAN"] as const).map((mode) => (
         <button
           type="button"
@@ -87,7 +87,7 @@ export function WordMeaning({
 
   return (
     <p
-      className={"word-hero-meaning [flex:1_1_220px] [min-width:0] [margin:0] [font-size:clamp(1.12rem,_2.7vw,_1.65rem)] [font-weight:580] [line-height:1.45] [&.word-hero-meaning--fa]:[text-align:right] [&.word-hero-meaning--en]:[text-align:left] word-hero-meaning--" + fallback.language + " learning-content"}
+      className={"word-hero-meaning uv-flex-5c1e62cd55 min-w-0 m-0 text-uv-f4ecc9f8683 uv-weight-580 uv-line-height-2792cf2449 uv-v36d7f56673:text-right uv-v17d7ee9feb:text-left word-hero-meaning--" + fallback.language + " learning-content"}
       dir={fallback.language === "fa" ? "rtl" : "ltr"}
       lang={fallback.language}
     >
@@ -106,11 +106,11 @@ export function WordExampleMeaning({
   const { language, targetLanguageCode } = useWordLanguage();
   if (language === "PERSIAN") {
     return persian
-      ? <p className="muted learning-content [color:var(--text-muted)]" lang="fa" dir="rtl">{persian}</p>
+      ? <p className="muted learning-content text-uv-text-muted" lang="fa" dir="rtl">{persian}</p>
       : null;
   }
   if (targetLanguageCode === "en") return null;
   return english
-    ? <p className="muted learning-content [color:var(--text-muted)]" lang="en" dir="ltr">{english}</p>
+    ? <p className="muted learning-content text-uv-text-muted" lang="en" dir="ltr">{english}</p>
     : null;
 }

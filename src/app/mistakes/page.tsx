@@ -106,10 +106,10 @@ export default async function MistakesPage() {
   const patternCount = clusters.length + grammarGroups.length;
 
   return (
-    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
+    <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
         <h1>{t("mistakes.title")}</h1>
-        <p className="muted [color:var(--text-muted)]">
+        <p className="muted text-uv-text-muted">
           {t("mistakes.openSummary", {
             mistakes: formatNumber(locale, total),
             patterns: formatNumber(locale, patternCount),
@@ -119,21 +119,21 @@ export default async function MistakesPage() {
       </section>
 
       {grammarGroups.length ? (
-        <section className="mistake-cluster-list [display:flex] [flex-direction:column] [gap:12px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <section className="mistake-cluster-list flex flex-col gap-3">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("mistakes.grammarEyebrow")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("mistakes.grammarEyebrow")}</p>
               <h2>{t("mistakes.grammarTitle")}</h2>
             </div>
             <Brain size={20} />
           </div>
           {grammarGroups.map((group) => (
-            <article className="panel mistake-cluster [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:16px] [border-radius:18px]" key={group.concept.id}>
-              <div className="mistake-cluster-head [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:14px] [&_h2]:[margin:8px_0_0] [&_h2]:[font-size:1.08rem] [&_h2]:[letter-spacing:-0.025em] [&_h2]:[text-transform:capitalize] [&_>_svg]:[color:var(--text-muted)] [&_>_svg]:[flex:0_0_auto]">
+            <article className="panel mistake-cluster uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-4 rounded-uv-r6d27d54c6c" key={group.concept.id}>
+              <div className="mistake-cluster-head flex items-start justify-between gap-3.5 uv-vd552c26874:uv-margin-86ddfb81a1 uv-vd552c26874:text-uv-f44eab8f17b uv-vd552c26874:uv-letter-spacing-8b899f0f19 uv-vd552c26874:capitalize uv-v872d6ea02a:text-uv-text-muted uv-v872d6ea02a:uv-flex-18ba0b6e31">
                 <div>
-                  <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-                    <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{group.concept.introducedAt}</span>
-                    <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+                  <div className="word-meta flex flex-wrap gap-1.75 items-center">
+                    <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{group.concept.introducedAt}</span>
+                    <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
                       {t.plural(
                         {
                           one: "mistakes.occurrences.one",
@@ -151,13 +151,13 @@ export default async function MistakesPage() {
                 <Layers3 size={20} />
               </div>
 
-              <div className="mistake-pattern-items [display:flex] [flex-direction:column] [border-top:1px_solid_var(--border)]">
+              <div className="mistake-pattern-items flex flex-col uv-border-top-8d7f82f403">
                 {group.items.slice(0, 4).map((mistake) => (
-                  <div className="mistake-pattern-row [display:flex] [flex-direction:column] [gap:12px] [padding:14px_0] [border-bottom:1px_solid_var(--border)] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:minmax(0,_1fr)_auto] min-[620px]:[align-items:center]" key={mistake.id}>
-                    <div className="mistake-copy [&_h2]:[margin:7px_0] [&_h2]:[font-size:1.12rem] [&_h2]:[letter-spacing:-0.025em] [min-width:0] [&_>_strong]:[display:block] [&_>_strong]:[margin-bottom:7px] [&_p]:[margin:5px_0] [&_p]:[line-height:1.45]">
+                  <div className="mistake-pattern-row flex flex-col gap-3 uv-padding-612d1e1532 uv-border-bottom-8d7f82f403 uv-min620:grid uv-min620:uv-grid-template-columns-f06dd92ea5 uv-min620:items-center" key={mistake.id}>
+                    <div className="mistake-copy uv-vd552c26874:uv-margin-cbc0e486e3 uv-vd552c26874:text-uv-f4b3c2ac5f6 uv-vd552c26874:uv-letter-spacing-8b899f0f19 min-w-0 uv-ve6b262f465:block uv-ve6b262f465:mb-1.75 uv-vb19eb067c9:uv-margin-397bb87e55 uv-vb19eb067c9:uv-line-height-2792cf2449">
                       {mistake.actual ? (
                         <p>
-                          <span className="muted [color:var(--text-muted)]">{t("mistakes.youWrote")}</span>{" "}
+                          <span className="muted text-uv-text-muted">{t("mistakes.youWrote")}</span>{" "}
                           <span className="learning-content" lang="de" dir="ltr">
                             {mistake.actual}
                           </span>
@@ -165,18 +165,18 @@ export default async function MistakesPage() {
                       ) : null}
                       {mistake.expected ? (
                         <p>
-                          <span className="muted [color:var(--text-muted)]">{t("mistakes.expected")}</span>{" "}
+                          <span className="muted text-uv-text-muted">{t("mistakes.expected")}</span>{" "}
                           <span className="learning-content" lang="de" dir="ltr">
                             {mistake.expected}
                           </span>
                         </p>
                       ) : null}
                       {mistake.explanation ? (
-                        <p className="muted learning-content [color:var(--text-muted)]" dir="auto">
+                        <p className="muted learning-content text-uv-text-muted" dir="auto">
                           {mistake.explanation}
                         </p>
                       ) : null}
-                      <small className="muted [color:var(--text-muted)]">
+                      <small className="muted text-uv-text-muted">
                         {mistakeKeys[mistake.type]
                           ? t(mistakeKeys[mistake.type])
                           : mistake.type.replaceAll("_", " ").toLowerCase()}{" "}
@@ -189,7 +189,7 @@ export default async function MistakesPage() {
               </div>
 
               <Link
-                className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                 href={"/practice?grammar=" + group.concept.slug}
               >
                 <Brain size={17} />
@@ -203,20 +203,20 @@ export default async function MistakesPage() {
       ) : null}
 
       {clusters.length ? (
-        <section className="mistake-cluster-list [display:flex] [flex-direction:column] [gap:12px]">
+        <section className="mistake-cluster-list flex flex-col gap-3">
           {clusters.map((cluster) => {
             const primary = cluster.items[0];
             return (
-              <article className="panel mistake-cluster [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:16px] [border-radius:18px]" key={cluster.key}>
-                <div className="mistake-cluster-head [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:14px] [&_h2]:[margin:8px_0_0] [&_h2]:[font-size:1.08rem] [&_h2]:[letter-spacing:-0.025em] [&_h2]:[text-transform:capitalize] [&_>_svg]:[color:var(--text-muted)] [&_>_svg]:[flex:0_0_auto]">
+              <article className="panel mistake-cluster uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-4 rounded-uv-r6d27d54c6c" key={cluster.key}>
+                <div className="mistake-cluster-head flex items-start justify-between gap-3.5 uv-vd552c26874:uv-margin-86ddfb81a1 uv-vd552c26874:text-uv-f44eab8f17b uv-vd552c26874:uv-letter-spacing-8b899f0f19 uv-vd552c26874:capitalize uv-v872d6ea02a:text-uv-text-muted uv-v872d6ea02a:uv-flex-18ba0b6e31">
                   <div>
-                    <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-                      <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+                    <div className="word-meta flex flex-wrap gap-1.75 items-center">
+                      <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
                         {cluster.items.length > 1
                           ? t("mistakes.semanticCluster")
                           : t("mistakes.singlePattern")}
                       </span>
-                      <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+                      <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
                         {t.plural(
                           {
                             one: "mistakes.occurrences.one",
@@ -234,10 +234,10 @@ export default async function MistakesPage() {
                   <Layers3 size={20} />
                 </div>
 
-                <div className="mistake-pattern-items [display:flex] [flex-direction:column] [border-top:1px_solid_var(--border)]">
+                <div className="mistake-pattern-items flex flex-col uv-border-top-8d7f82f403">
                   {cluster.items.map((mistake) => (
-                    <div className="mistake-pattern-row [display:flex] [flex-direction:column] [gap:12px] [padding:14px_0] [border-bottom:1px_solid_var(--border)] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:minmax(0,_1fr)_auto] min-[620px]:[align-items:center]" key={mistake.id}>
-                      <div className="mistake-copy [&_h2]:[margin:7px_0] [&_h2]:[font-size:1.12rem] [&_h2]:[letter-spacing:-0.025em] [min-width:0] [&_>_strong]:[display:block] [&_>_strong]:[margin-bottom:7px] [&_p]:[margin:5px_0] [&_p]:[line-height:1.45]">
+                    <div className="mistake-pattern-row flex flex-col gap-3 uv-padding-612d1e1532 uv-border-bottom-8d7f82f403 uv-min620:grid uv-min620:uv-grid-template-columns-f06dd92ea5 uv-min620:items-center" key={mistake.id}>
+                      <div className="mistake-copy uv-vd552c26874:uv-margin-cbc0e486e3 uv-vd552c26874:text-uv-f4b3c2ac5f6 uv-vd552c26874:uv-letter-spacing-8b899f0f19 min-w-0 uv-ve6b262f465:block uv-ve6b262f465:mb-1.75 uv-vb19eb067c9:uv-margin-397bb87e55 uv-vb19eb067c9:uv-line-height-2792cf2449">
                         <strong
                           className="learning-content"
                           lang="de"
@@ -247,7 +247,7 @@ export default async function MistakesPage() {
                         </strong>
                         {mistake.actual ? (
                           <p>
-                            <span className="muted [color:var(--text-muted)]">{t("mistakes.youWrote")}</span>{" "}
+                            <span className="muted text-uv-text-muted">{t("mistakes.youWrote")}</span>{" "}
                             <span className="learning-content" lang="de" dir="ltr">
                               {mistake.actual}
                             </span>
@@ -255,18 +255,18 @@ export default async function MistakesPage() {
                         ) : null}
                         {mistake.expected ? (
                           <p>
-                            <span className="muted [color:var(--text-muted)]">{t("mistakes.expected")}</span>{" "}
+                            <span className="muted text-uv-text-muted">{t("mistakes.expected")}</span>{" "}
                             <span className="learning-content" lang="de" dir="ltr">
                               {mistake.expected}
                             </span>
                           </p>
                         ) : null}
                         {mistake.explanation ? (
-                          <p className="muted learning-content [color:var(--text-muted)]" dir="auto">
+                          <p className="muted learning-content text-uv-text-muted" dir="auto">
                             {mistake.explanation}
                           </p>
                         ) : null}
-                        <small className="muted [color:var(--text-muted)]">
+                        <small className="muted text-uv-text-muted">
                           {mistakeKeys[mistake.type]
                             ? t(mistakeKeys[mistake.type])
                             : mistake.type.replaceAll("_", " ").toLowerCase()}{" "}
@@ -281,7 +281,7 @@ export default async function MistakesPage() {
 
                 {primary.lexemeId ? (
                   <Link
-                    className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                    className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                     href={"/practice?lexeme=" + primary.lexemeId}
                   >
                     <Brain size={17} />
@@ -295,7 +295,7 @@ export default async function MistakesPage() {
       ) : null}
 
       {!clusters.length && !grammarGroups.length ? (
-        <div className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
+        <div className="empty-state compact-empty flex flex-col gap-3 items-start uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
           <strong>{t("mistakes.none")}</strong>
         </div>
       ) : null}

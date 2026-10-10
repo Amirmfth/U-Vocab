@@ -47,9 +47,9 @@ function ReadingDetail({
 }) {
   return (
     <>
-      <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-        <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{selected.partOfSpeech}</span>
-        <span className={"badge reading-state [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em] [&.reading-state-known]:[color:var(--text-soft)] [&.reading-state-learning]:[color:#f5c77e] [&.reading-state-unknown]:[color:var(--primary-strong)] reading-state-" + selected.state.toLocaleLowerCase()}>
+      <div className="word-meta flex flex-wrap gap-1.75 items-center">
+        <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{selected.partOfSpeech}</span>
+        <span className={"badge reading-state min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6 uv-v40eaf30c5d:text-uv-text-soft uv-v3bc17d51bf:text-uv-cf9b86be2da uv-vf290eea127:text-uv-primary-strong reading-state-" + selected.state.toLocaleLowerCase()}>
           {selected.state.toLocaleLowerCase()}
         </span>
       </div>
@@ -58,7 +58,7 @@ function ReadingDetail({
         {formatLexemeLabel(selected)}
       </h2>
 
-      <div className="reading-meanings [&_p]:[margin:5px_0] [&_p]:[line-height:1.55]">
+      <div className="reading-meanings uv-vb19eb067c9:uv-margin-397bb87e55 uv-vb19eb067c9:uv-line-height-05c248da4c">
         {selected.translations
           .filter((translation) => {
             if (translationPreference === "BOTH") return true;
@@ -68,7 +68,7 @@ function ReadingDetail({
           .map((translation) => (
             <p
               key={translation.language + translation.text}
-              className={translation.language === "fa" ? "rtl [direction:rtl] [text-align:right]" : undefined}
+              className={translation.language === "fa" ? "rtl uv-direction-dbc9052979 text-right" : undefined}
             >
               {translation.text}
             </p>
@@ -76,23 +76,23 @@ function ReadingDetail({
       </div>
 
       {selected.patterns.length ? (
-        <div className="reading-detail-section [&_p]:[margin:5px_0] [&_p]:[line-height:1.55] [padding-top:12px] [border-top:1px_solid_var(--border)]">
-          <span className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">PATTERN</span>
+        <div className="reading-detail-section uv-vb19eb067c9:uv-margin-397bb87e55 uv-vb19eb067c9:uv-line-height-05c248da4c pt-3 uv-border-top-8d7f82f403">
+          <span className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">PATTERN</span>
           {selected.patterns.map((pattern) => (
             <div key={pattern.pattern}>
               <strong>{pattern.pattern}</strong>
-              {pattern.explanation ? <p className="muted [color:var(--text-muted)]">{pattern.explanation}</p> : null}
+              {pattern.explanation ? <p className="muted text-uv-text-muted">{pattern.explanation}</p> : null}
             </div>
           ))}
         </div>
       ) : null}
 
       {selected.collocations.length ? (
-        <div className="reading-detail-section [&_p]:[margin:5px_0] [&_p]:[line-height:1.55] [padding-top:12px] [border-top:1px_solid_var(--border)]">
-          <span className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">COLLOCATIONS</span>
-          <div className="relation-list [display:flex] [flex-wrap:wrap] [gap:8px]">
+        <div className="reading-detail-section uv-vb19eb067c9:uv-margin-397bb87e55 uv-vb19eb067c9:uv-line-height-05c248da4c pt-3 uv-border-top-8d7f82f403">
+          <span className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">COLLOCATIONS</span>
+          <div className="relation-list flex flex-wrap gap-2">
             {selected.collocations.map((collocation) => (
-              <span className="relation-chip [min-height:48px] [min-width:110px] [display:inline-flex] [flex-direction:column] [justify-content:center] [gap:3px] [padding:8px_12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_span]:[font-weight:600] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.66rem]" key={collocation}>
+              <span className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:font-semibold uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff7862da171" key={collocation}>
                 <span>{collocation}</span>
               </span>
             ))}
@@ -101,8 +101,8 @@ function ReadingDetail({
       ) : null}
 
       {selected.examples[0] ? (
-        <div className="reading-detail-section [&_p]:[margin:5px_0] [&_p]:[line-height:1.55] [padding-top:12px] [border-top:1px_solid_var(--border)]">
-          <span className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">EXAMPLE</span>
+        <div className="reading-detail-section uv-vb19eb067c9:uv-margin-397bb87e55 uv-vb19eb067c9:uv-line-height-05c248da4c pt-3 uv-border-top-8d7f82f403">
+          <span className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">EXAMPLE</span>
           <p>{selected.examples[0].german}</p>
         </div>
       ) : null}
@@ -110,7 +110,7 @@ function ReadingDetail({
       {selected.state === "UNKNOWN" ? (
         <AddReadingLexemeForm documentId={documentId} lexemeId={selected.lexemeId} />
       ) : (
-        <Link href={"/vocabulary/" + selected.lexemeId} className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
+        <Link href={"/vocabulary/" + selected.lexemeId} className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
           <BookOpenCheck size={17} />
           Open word
         </Link>
@@ -227,18 +227,18 @@ export function ReadingViewer({
   }, [content, items]);
 
   return (
-    <div className="reading-layout [display:grid] [grid-template-columns:1fr] [gap:14px] [align-items:start] min-[760px]:[grid-template-columns:minmax(0,_1.7fr)_minmax(250px,_0.8fr)] min-[760px]:[gap:24px]">
-      <article className="reading-text-panel [min-width:0]">
-        <div className="reading-legend [display:flex] [flex-wrap:wrap] [gap:12px] [margin-bottom:12px] [color:var(--text-muted)] [font-size:0.72rem] [&_span]:[display:inline-flex] [&_span]:[align-items:center] [&_span]:[gap:6px]">
-          <span><i className="legend-dot known [width:8px] [height:8px] [border-radius:999px] [display:inline-block] [&.known]:[background:#5e636f] [&.learning]:[background:var(--warning)] [&.unknown]:[background:var(--primary-strong)]" /> known</span>
-          <span><i className="legend-dot learning [width:8px] [height:8px] [border-radius:999px] [display:inline-block] [&.known]:[background:#5e636f] [&.learning]:[background:var(--warning)] [&.unknown]:[background:var(--primary-strong)]" /> learning</span>
-          <span><i className="legend-dot unknown [width:8px] [height:8px] [border-radius:999px] [display:inline-block] [&.known]:[background:#5e636f] [&.learning]:[background:var(--warning)] [&.unknown]:[background:var(--primary-strong)]" /> unknown</span>
+    <div className="reading-layout grid uv-grid-template-columns-6a5c4d4d49 gap-3.5 items-start uv-min760:uv-grid-template-columns-fef45c2a2b uv-min760:gap-6">
+      <article className="reading-text-panel min-w-0">
+        <div className="reading-legend flex flex-wrap gap-3 mb-3 text-uv-text-muted text-uv-ff1713651e0 uv-v36c0309a03:inline-flex uv-v36c0309a03:items-center uv-v36c0309a03:gap-1.5">
+          <span><i className="legend-dot known w-2 h-2 rounded-uv-red9ab892c5 inline-block uv-v62a9d16506:bg-uv-ceb5d327b54 uv-vff7d05c727:bg-uv-warning uv-v3714481b42:bg-uv-primary-strong" /> known</span>
+          <span><i className="legend-dot learning w-2 h-2 rounded-uv-red9ab892c5 inline-block uv-v62a9d16506:bg-uv-ceb5d327b54 uv-vff7d05c727:bg-uv-warning uv-v3714481b42:bg-uv-primary-strong" /> learning</span>
+          <span><i className="legend-dot unknown w-2 h-2 rounded-uv-red9ab892c5 inline-block uv-v62a9d16506:bg-uv-ceb5d327b54 uv-vff7d05c727:bg-uv-warning uv-v3714481b42:bg-uv-primary-strong" /> unknown</span>
         </div>
-        <div className="reading-text [white-space:pre-wrap] [color:var(--text-soft)] [font-size:clamp(1.05rem,_3.8vw,_1.22rem)] [line-height:2]">{rendered}</div>
+        <div className="reading-text whitespace-pre-wrap text-uv-text-soft text-uv-fe3296cd469 uv-line-height-da4b9237ba">{rendered}</div>
       </article>
 
       {selected ? (
-        <aside className="panel reading-detail reading-detail-desktop [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [flex-direction:column] [gap:14px] [&_h2]:[margin:0] [&_h2]:[font-size:1.35rem] [&_h2]:[letter-spacing:-0.035em] min-[760px]:[position:sticky] min-[760px]:[top:30px] min-[760px]:[display:flex] [border-radius:18px] [display:none] min-[940px]:[display:flex] min-[940px]:[position:sticky] min-[940px]:[top:28px] min-[940px]:[max-height:calc(100dvh_-_56px)] min-[940px]:[overflow-y:auto] min-[940px]:[overscroll-behavior:contain]">
+        <aside className="panel reading-detail reading-detail-desktop uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex-col gap-3.5 uv-vd552c26874:m-0 uv-vd552c26874:text-uv-f3951047c34 uv-vd552c26874:uv-letter-spacing-b22247dbaf uv-min760:sticky uv-min760:top-7.5 uv-min760:flex rounded-uv-r6d27d54c6c hidden uv-min940:flex uv-min940:sticky uv-min940:top-7 uv-min940:uv-max-height-0330ea2289 uv-min940:overflow-y-auto uv-min940:overscroll-contain">
           <ReadingDetail
             documentId={documentId}
             selected={selected}
@@ -246,9 +246,9 @@ export function ReadingViewer({
           />
         </aside>
       ) : (
-        <aside className="panel reading-detail reading-detail-desktop [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [flex-direction:column] [gap:14px] [&_h2]:[margin:0] [&_h2]:[font-size:1.35rem] [&_h2]:[letter-spacing:-0.035em] min-[760px]:[position:sticky] min-[760px]:[top:30px] min-[760px]:[display:flex] [border-radius:18px] [display:none] min-[940px]:[display:flex] min-[940px]:[position:sticky] min-[940px]:[top:28px] min-[940px]:[max-height:calc(100dvh_-_56px)] min-[940px]:[overflow-y:auto] min-[940px]:[overscroll-behavior:contain]">
+        <aside className="panel reading-detail reading-detail-desktop uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex-col gap-3.5 uv-vd552c26874:m-0 uv-vd552c26874:text-uv-f3951047c34 uv-vd552c26874:uv-letter-spacing-b22247dbaf uv-min760:sticky uv-min760:top-7.5 uv-min760:flex rounded-uv-r6d27d54c6c hidden uv-min940:flex uv-min940:sticky uv-min940:top-7 uv-min940:uv-max-height-0330ea2289 uv-min940:overflow-y-auto uv-min940:overscroll-contain">
           <Plus size={18} />
-          <p className="muted [color:var(--text-muted)]">Select highlighted vocabulary to inspect it.</p>
+          <p className="muted text-uv-text-muted">Select highlighted vocabulary to inspect it.</p>
         </aside>
       )}
 
@@ -257,7 +257,7 @@ export function ReadingViewer({
           <>
             <motion.button
               aria-label="Close word details"
-              className="reading-detail-backdrop [position:fixed] [z-index:69] [inset:0] [border:0] [background:rgba(0,_0,_0,_0.56)] [backdrop-filter:blur(2px)] min-[940px]:[display:none]"
+              className="reading-detail-backdrop fixed uv-z-index-a72b20062e inset-0 border-0 bg-uv-c53e6311db9 uv-backdrop-filter-3d54fe1e26 uv-min940:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -271,20 +271,20 @@ export function ReadingViewer({
               animate={{ opacity: 1, y: 0 }}
               aria-label={`Details for ${selected.lemma}`}
               aria-modal="true"
-              className="panel reading-detail reading-detail-mobile [border:1px_solid_var(--border)] [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:0] [&_h2]:[font-size:1.35rem] [&_h2]:[letter-spacing:-0.035em] min-[760px]:[position:sticky] min-[760px]:[top:30px] min-[760px]:[display:none] [position:fixed] [z-index:70] [inset:auto_10px_calc(82px_+_env(safe-area-inset-bottom))_10px] [width:auto] [max-height:min(66dvh,_620px)] [overflow-y:auto] [overscroll-behavior:contain] [padding:10px_16px_18px] [border-color:var(--border-strong)] [border-radius:22px] [background:var(--surface)] [box-shadow:0_24px_70px_rgba(0,0,0,0.5)] min-[940px]:[display:none]"
+              className="panel reading-detail reading-detail-mobile uv-border-8d7f82f403 flex flex-col gap-3.5 uv-vd552c26874:m-0 uv-vd552c26874:text-uv-f3951047c34 uv-vd552c26874:uv-letter-spacing-b22247dbaf uv-min760:sticky uv-min760:top-7.5 uv-min760:hidden fixed uv-z-index-b7103ca278 uv-inset-dfaa8d6342 w-auto uv-max-height-e53102cc3c overflow-y-auto overscroll-contain uv-padding-5c5a34ecdc border-uv-border-strong rounded-uv-r42d92f3218 bg-uv-surface uv-box-shadow-c873b34949 uv-min940:hidden"
               exit={{ opacity: 0, y: 28 }}
               initial={reduceMotion ? false : { opacity: 0, y: 28 }}
               key="reading-mobile-detail"
               role="dialog"
               transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
             >
-              <div className="reading-sheet-handle [width:38px] [height:4px] [margin:0_auto_7px] [border-radius:999px] [background:var(--border-strong)]" aria-hidden="true" />
-              <div className="reading-sheet-header [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [min-height:44px] [margin-bottom:3px] [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-size:0.7rem] [&_>_span]:[font-weight:650] [&_>_span]:[letter-spacing:0.05em] [&_>_span]:[text-transform:uppercase] [&_.icon-button]:[width:40px] [&_.icon-button]:[height:40px] [&_.icon-button]:[min-height:40px] [&_.icon-button]:[border:0] [&_.icon-button]:[background:transparent]">
+              <div className="reading-sheet-handle w-9.5 h-1 uv-margin-4841c6f0e6 rounded-uv-red9ab892c5 bg-uv-border-strong" aria-hidden="true" />
+              <div className="reading-sheet-header flex items-center justify-between gap-3 min-h-11 mb-0.75 uv-v22810335d8:text-uv-text-muted uv-v22810335d8:text-uv-f58b84cc6f5 uv-v22810335d8:uv-weight-650 uv-v22810335d8:uv-letter-spacing-70fabcad9b uv-v22810335d8:uppercase uv-v907997862c:w-10 uv-v907997862c:h-10 uv-v907997862c:min-h-10 uv-v907997862c:border-0 uv-v907997862c:bg-transparent">
                 <span>Word details</span>
                 <button
                   ref={closeButtonRef}
                   aria-label="Close word details"
-                  className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]"
+                  className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383"
                   type="button"
                   onClick={() => setMobileOpen(false)}
                 >

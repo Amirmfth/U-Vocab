@@ -26,7 +26,7 @@ export default async function ConversationPage({ searchParams }: {
   });
 
   return (
-    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+    <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
       <PersistedFirstUseGuide
         userId={user.id}
         guide={FIRST_USE_GUIDES.conversation}
@@ -35,20 +35,20 @@ export default async function ConversationPage({ searchParams }: {
         items={[t("guidance.conversation.item1")]}
         dismissLabel={t("guidance.dismiss")}
       />
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
         <h1>{t("conversation.title")}</h1>
       </section>
 
       <ConversationStartForm initialMode={params.mode === "MISSION" ? "MISSION" : "PRACTICE"} />
 
       {sessions.length ? (
-        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
-          <h2 className="section-title [margin:0_0_10px] [font-size:1rem] [color:var(--text-soft)] [letter-spacing:-0.02em]">{t("conversation.recent")}</h2>
-          <div className="collection-list [display:flex] [flex-direction:column]">
+        <section className="page-section flex flex-col gap-3">
+          <h2 className="section-title uv-margin-83bba30fc1 text-uv-f19feeb881c text-uv-text-soft uv-letter-spacing-235f37bdea">{t("conversation.recent")}</h2>
+          <div className="collection-list flex flex-col">
             {sessions.map((session) => (
               <Link
                 href={"/conversation/" + session.id}
-                className="collection-row [border-bottom:1px_solid_var(--border)] [min-height:64px] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [align-items:center] [gap:12px] [padding:11px_2px] [&_strong]:[display:block] [&_span]:[display:block] [&_span]:[margin-top:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.76rem] min-[940px]:[&:hover]:[background:var(--surface)]"
+                className="collection-row uv-border-bottom-8d7f82f403 min-h-16 grid uv-grid-template-columns-f06dd92ea5 items-center gap-3 uv-padding-c9f5e3c335 uv-veda02a0adb:block uv-v36c0309a03:block uv-v36c0309a03:mt-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
                 key={session.id}
               >
                 <div>
@@ -66,7 +66,7 @@ export default async function ConversationPage({ searchParams }: {
           </div>
         </section>
       ) : (
-        <div className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
+        <div className="empty-state compact-empty flex flex-col gap-3 items-start uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
           <MessageCircle size={21} />
           <strong>{t("conversation.none")}</strong>
         </div>

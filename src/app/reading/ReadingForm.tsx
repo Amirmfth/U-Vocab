@@ -23,16 +23,16 @@ function ReadingGenerationPreview({ navigating }: { navigating: boolean }) {
 
   return (
     <div
-      className="reading-generation-preview [display:grid] [gap:14px] [padding:18px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_>_strong]:[font-size:0.88rem]"
+      className="reading-generation-preview grid gap-3.5 p-4.5 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-ve6b262f465:text-uv-f35097633a2"
       role="status"
       aria-live="polite"
       aria-label={t("reading.generatingLabel")}
     >
       <strong>{pending ? t("reading.generating") : t("reading.opening")}</strong>
-      <div className="skeleton loading-generated-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(80%,_390px)] [height:30px]" aria-hidden="true" />
-      <div className="loading-generated-paragraphs [display:grid] [gap:11px] [&_.skeleton]:[width:100%] [&_.skeleton]:[height:15px] [&_.skeleton:nth-child(3n)]:[width:68%] [&_.skeleton:nth-child(5n)]:[width:86%]" aria-hidden="true">
-        <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
-        <div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" /><div className="skeleton [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite]" />
+      <div className="skeleton loading-generated-title rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b uv-width-e4b8e80a02 h-7.5" aria-hidden="true" />
+      <div className="loading-generated-paragraphs grid gap-2.75 uv-v56f1a99c32:w-full uv-v56f1a99c32:h-3.75 uv-v8a023aef31:uv-width-1c1d4ebb4c uv-va056c95d80:uv-width-6dd6198fd9" aria-hidden="true">
+        <div className="skeleton rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b" /><div className="skeleton rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b" /><div className="skeleton rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b" />
+        <div className="skeleton rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b" /><div className="skeleton rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b" />
       </div>
     </div>
   );
@@ -84,10 +84,10 @@ export function ReadingForm({
     : [];
 
   return (
-    <form action={action} className="panel story-form reading-generation-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:780px] [display:grid] [gap:18px] [border-radius:18px]">
+    <form action={action} className="panel story-form reading-generation-form uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 w-full max-w-uv-5dbc91eac8 grid gap-4.5 rounded-uv-r6d27d54c6c">
       <input type="hidden" name="requestId" value={requestId} />
-      <div className="form-grid story-settings-grid [display:grid] [gap:12px] [grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
+      <div className="form-grid story-settings-grid grid gap-3 uv-grid-template-columns-dd0b1a1848 uv-min620:uv-grid-template-columns-dd0b1a1848">
+        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
           <label htmlFor="reading-length-trigger">{t("reading.length")}</label>
           <ActivitySelect
             defaultValue="MEDIUM"
@@ -100,7 +100,7 @@ export function ReadingForm({
             ]}
           />
         </div>
-        <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
+        <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
           <label htmlFor="grammar-focus-trigger">{t("reading.grammarFocus")}</label>
           <ActivitySelect
             defaultValue=""
@@ -117,9 +117,9 @@ export function ReadingForm({
         </div>
       </div>
 
-      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
+      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
         <label htmlFor="reading-topic">
-          {t("reading.topic")} <span className="muted [color:var(--text-muted)]">({t("reading.optional")})</span>
+          {t("reading.topic")} <span className="muted text-uv-text-muted">({t("reading.optional")})</span>
         </label>
         <input
           id="reading-topic"
@@ -130,7 +130,7 @@ export function ReadingForm({
       </div>
 
       {targetLevel !== currentLevel ? (
-        <label className="reading-stretch-option [display:flex] [align-items:flex-start] [gap:10px] [padding:12px_14px] [border:1px_solid_var(--border)] [border-radius:14px] [&_span]:[display:grid] [&_span]:[gap:3px] [&_small]:[color:var(--text-muted)]">
+        <label className="reading-stretch-option flex items-start gap-2.5 uv-padding-277e98e510 uv-border-8d7f82f403 rounded-uv-rd65225386d uv-v36c0309a03:grid uv-v36c0309a03:gap-0.75 uv-v982220ddd5:text-uv-text-muted">
           <input type="checkbox" name="stretch" />
           <span>
             <strong>{t("reading.stretch", { level: targetLevel })}</strong>
@@ -139,15 +139,15 @@ export function ReadingForm({
         </label>
       ) : null}
 
-      <fieldset className="target-picker story-target-picker [margin:0] [padding:0] [border:0] [&_legend]:[margin-bottom:8px] [&_legend]:[color:var(--text-soft)] [&_legend]:[font-size:0.83rem] [&_legend]:[font-weight:560] [&_.story-picker-hint]:[margin:10px_0_0]">
+      <fieldset className="target-picker story-target-picker m-0 p-0 border-0 uv-v73883af7e9:mb-2 uv-v73883af7e9:text-uv-text-soft uv-v73883af7e9:text-uv-f845cf53f3a uv-v73883af7e9:uv-weight-560 uv-v6b038101b8:uv-margin-456435724d">
         <legend>
-          {t("reading.vocabFocus")} <span className="muted [color:var(--text-muted)]">· {t("reading.optional")}</span>
+          {t("reading.vocabFocus")} <span className="muted text-uv-text-muted">· {t("reading.optional")}</span>
         </legend>
         {selectedIds.map((id) => (
           <input key={id} type="hidden" name="targetIds" value={id} />
         ))}
 
-        <div className="story-word-search [display:flex] [align-items:center] [gap:9px] [padding:0_12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [color:var(--text-muted)] [&_input]:[min-height:46px] [&_input]:[border:0] [&_input]:[padding:0] [&_input]:[background:transparent] [&:focus-within]:[border-color:var(--primary)]">
+        <div className="story-word-search flex items-center gap-2.25 uv-padding-f74548ca12 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised text-uv-text-muted uv-vcf5ce320fa:min-h-11.5 uv-vcf5ce320fa:border-0 uv-vcf5ce320fa:p-0 uv-vcf5ce320fa:bg-transparent uv-ve65c99bcbe:border-uv-primary">
           <Search size={18} aria-hidden="true" />
           <input
             aria-label={t("reading.searchVocabulary")}
@@ -159,12 +159,12 @@ export function ReadingForm({
         </div>
 
         {matches.length ? (
-          <div className="story-search-results [display:grid] [gap:6px] [margin-top:8px]" role="listbox">
+          <div className="story-search-results grid gap-1.5 mt-2" role="listbox">
             {matches.map((target) => {
               const selected = selectedIds.includes(target.lexemeId);
               return (
                 <button
-                  className="story-search-result [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [width:100%] [padding:10px_12px] [border:1px_solid_var(--border)] [border-radius:12px] [background:var(--surface-raised)] [color:var(--text)] [text-align:left] [&_>_span:first-child]:[display:grid] [&_>_span:first-child]:[gap:2px] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.78rem] [&:disabled]:[opacity:0.58]"
+                  className="story-search-result flex justify-between items-center gap-3 w-full uv-padding-df857c6c31 uv-border-8d7f82f403 rounded-uv-r0939007802 bg-uv-surface-raised text-uv-text text-left uv-v386ffa8f69:grid uv-v386ffa8f69:gap-0.5 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-fe9d5fd6635 disabled:uv-opacity-8ecc5701b7"
                   key={target.lexemeId}
                   type="button"
                   disabled={selected}
@@ -182,7 +182,7 @@ export function ReadingForm({
                     </strong>
                     <small>{target.state.toLowerCase()}</small>
                   </span>
-                  <span className="story-result-action [display:inline-flex] [align-items:center] [gap:4px] [color:var(--primary-strong)] [font-size:0.8rem] [font-weight:650]">
+                  <span className="story-result-action inline-flex items-center gap-1 text-uv-primary-strong text-uv-f6c2d68ddb8 uv-weight-650">
                     {selected ? t("reading.added") : <><Plus size={15} /> {t("reading.add")}</>}
                   </span>
                 </button>
@@ -192,9 +192,9 @@ export function ReadingForm({
         ) : null}
 
         {selectedTargets.length ? (
-          <div className="story-selected-targets [display:flex] [flex-wrap:wrap] [gap:8px] [margin-top:14px]">
+          <div className="story-selected-targets flex flex-wrap gap-2 mt-3.5">
             {selectedTargets.map((target) => (
-              <span className="story-selected-target [display:inline-flex] [align-items:center] [gap:5px] [padding:6px_8px_6px_10px] [border-radius:999px] [background:var(--primary-soft)] [color:var(--primary-strong)] [font-size:0.82rem] [font-weight:650] [&_button]:[display:inline-flex] [&_button]:[padding:1px] [&_button]:[border:0] [&_button]:[background:transparent] [&_button]:[color:inherit] [&_button]:[cursor:pointer]" key={target.lexemeId}>
+              <span className="story-selected-target inline-flex items-center gap-1.25 uv-padding-6eea9087d4 rounded-uv-red9ab892c5 bg-uv-cbdfd7cd038 text-uv-primary-strong text-uv-fa2582d5d6e uv-weight-650 uv-v513a7112a0:inline-flex uv-v513a7112a0:p-0.25 uv-v513a7112a0:border-0 uv-v513a7112a0:bg-transparent uv-v513a7112a0:text-inherit uv-v513a7112a0:cursor-pointer" key={target.lexemeId}>
                 <span className="learning-content" lang={targetLanguage} dir="ltr">
                   {target.label}
                 </span>
@@ -213,7 +213,7 @@ export function ReadingForm({
             ))}
           </div>
         ) : (
-          <p className="story-picker-hint [color:var(--text-muted)] [font-size:0.78rem]">{t("reading.autoTargets")}</p>
+          <p className="story-picker-hint text-uv-text-muted text-uv-fe9d5fd6635">{t("reading.autoTargets")}</p>
         )}
       </fieldset>
 

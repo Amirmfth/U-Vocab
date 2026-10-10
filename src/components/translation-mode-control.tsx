@@ -15,8 +15,8 @@ export function TranslationModeControl({
   const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
 
   return (
-    <div className="translation-switch-wrap [display:inline-flex] [flex-direction:column] [gap:3px] [align-items:flex-end]">
-      <div className="translation-switch [display:inline-flex] [gap:3px] [padding:3px] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface)] [&_button]:[min-height:36px] [&_button]:[padding:0_10px] [&_button]:[border:0] [&_button]:[border-radius:8px] [&_button]:[background:transparent] [&_button]:[color:var(--text-muted)] [&_button]:[cursor:pointer] [&_button]:[font-size:0.72rem] [&_button]:[font-weight:650] [&_button.is-active]:[background:var(--surface-soft)] [&_button.is-active]:[color:var(--text)] [&_button:disabled]:[cursor:wait] [&_button:disabled]:[opacity:0.65]" aria-label="Translation language">
+    <div className="translation-switch-wrap inline-flex flex-col gap-0.75 items-end">
+      <div className="translation-switch inline-flex gap-0.75 p-0.75 uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface uv-v513a7112a0:min-h-9 uv-v513a7112a0:uv-padding-4d5c65a39c uv-v513a7112a0:border-0 uv-v513a7112a0:rounded-uv-r9bc5fefa1a uv-v513a7112a0:bg-transparent uv-v513a7112a0:text-uv-text-muted uv-v513a7112a0:cursor-pointer uv-v513a7112a0:text-uv-ff1713651e0 uv-v513a7112a0:uv-weight-650 uv-v169acfe1bb:bg-uv-surface-soft uv-v169acfe1bb:text-uv-text uv-v2497b722ae:cursor-wait uv-v2497b722ae:opacity-65" aria-label="Translation language">
         {([
           ["ENGLISH", "EN"],
           ["PERSIAN", "FA"],
@@ -46,7 +46,7 @@ export function TranslationModeControl({
         ))}
       </div>
       <span
-        className={"translation-switch-status [min-height:12px] [color:var(--text-muted)] [font-size:0.62rem] [line-height:1] [&.is-error]:[color:var(--danger)] " + (status === "error" ? "is-error" : "")}
+        className={"translation-switch-status min-h-3 text-uv-text-muted text-uv-f174ef476a0 uv-line-height-356a192b79 uv-vfd5e162739:text-uv-danger " + (status === "error" ? "is-error" : "")}
         aria-live="polite"
       >
         {pending ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Failed" : ""}

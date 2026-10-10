@@ -22,12 +22,12 @@ export function UiLocaleForm({ locale }: { locale: UiLocale }) {
   }, [router, state.status]);
 
   return (
-    <form action={action} className="panel form-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:680px] [border-radius:18px]">
-      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
+    <form action={action} className="panel form-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 w-full max-w-uv-74487d394e rounded-uv-r6d27d54c6c">
+      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
         <label htmlFor="uiLocale-trigger">
           <Languages size={17} aria-hidden="true" /> {t("settings.uiLanguage")}
         </label>
-        <span className="muted [color:var(--text-muted)]">{t("settings.uiLanguageHelp")}</span>
+        <span className="muted text-uv-text-muted">{t("settings.uiLanguageHelp")}</span>
         <ActivitySelect
           defaultValue={locale}
           id="uiLocale"

@@ -108,7 +108,7 @@ export function ReadingText({
   }, [active]);
 
   return (
-    <article className="panel generated-reading-text learning-content [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [max-width:var(--reading-measure)] [margin-inline:auto] [padding:clamp(22px,_4vw,_40px)] [font-size:clamp(1.03rem,_2vw,_1.14rem)] [line-height:1.8] [&_p_+_p]:[margin-top:1.15em] max-[720px]:[padding:18px] max-[720px]:[line-height:1.72] [border-radius:18px] [&_.reading-target-word]:[display:inline] [&_.reading-target-word]:[padding:0_2px] [&_.reading-target-word]:[border:0] [&_.reading-target-word]:[border-radius:4px] [&_.reading-target-word]:[background:color-mix(in_srgb,_var(--primary)_22%,_transparent)] [&_.reading-target-word]:[color:var(--primary-strong)] [&_.reading-target-word]:[font:inherit] [&_.reading-target-word]:[font-weight:680] [&_.reading-target-word]:[line-height:inherit] [&_.reading-target-word]:[cursor:pointer] [&_.reading-target-word]:[box-decoration-break:clone] [&_.reading-target-word:hover]:[background:color-mix(in_srgb,_var(--primary)_36%,_transparent)] [&_.reading-target-word[aria-expanded=true]]:[background:color-mix(in_srgb,_var(--primary)_36%,_transparent)]" lang="de" dir="ltr">
+    <article className="panel generated-reading-text learning-content uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 uv-max-width-ff0948b971 mx-auto uv-padding-3adff930ea text-uv-fe2022883cc uv-line-height-93ec1d5b0e uv-v3696a6f5e9:uv-margin-top-03a660ae63 uv-max720:p-4.5 uv-max720:uv-line-height-3d827c0dc2 rounded-uv-r6d27d54c6c uv-v3aa23311a7:inline uv-v3aa23311a7:uv-padding-a03728e684 uv-v3aa23311a7:border-0 uv-v3aa23311a7:rounded-uv-r5e0d704b33 uv-v3aa23311a7:uv-background-19dd733243 uv-v3aa23311a7:text-uv-primary-strong uv-v3aa23311a7:uv-font-3e26d67509 uv-v3aa23311a7:uv-weight-680 uv-v3aa23311a7:uv-line-height-3e26d67509 uv-v3aa23311a7:cursor-pointer uv-v3aa23311a7:uv-box-decoration-break-5e0072329d uv-vf10a1b1a22:uv-background-53af3ed932 uv-vdd060a9ceb:uv-background-53af3ed932" lang="de" dir="ltr">
       {content.split(/\n{2,}/u).map((paragraph, paragraphIndex) => {
         if (!pattern) return <p key={paragraphIndex}>{paragraph}</p>;
         const pieces: React.ReactNode[] = [];
@@ -149,13 +149,13 @@ export function ReadingText({
       {active
         ? createPortal(
             <div
-              className="reading-word-popover [position:fixed] [z-index:90] [width:min(280px,_calc(100vw_-_24px))] [max-height:min(300px,_calc(100dvh_-_24px))] [overflow:auto] [display:grid] [gap:9px] [padding:15px] [border:1px_solid_var(--border-strong)] [border-radius:14px] [background:var(--surface-raised)] [box-shadow:var(--shadow)] [font-size:0.86rem] [line-height:1.4] [&_p]:[margin:0] [&_p]:[overflow-wrap:anywhere] [&_.text-link]:[margin-top:2px] [&_.text-link]:[font-size:0.78rem]"
+              className="reading-word-popover fixed uv-z-index-2d0c8af807 uv-width-a5dde6895c uv-max-height-ff42f1ab80 overflow-auto grid gap-2.25 p-3.75 uv-border-488f4b382f rounded-uv-rd65225386d bg-uv-surface-raised uv-box-shadow-4ee177db8b text-uv-f9601fe81a7 uv-line-height-a26f83404b uv-vb19eb067c9:m-0 uv-vb19eb067c9:uv-overflow-wrap-112c2a063a uv-vffc37e4c0f:mt-0.5 uv-vffc37e4c0f:text-uv-fe9d5fd6635"
               ref={popoverRef}
               role="dialog"
               aria-label={t("reading.detail.meaningOf", { word: active.target.lemma })}
               style={{ top: active.top, insetInlineStart: active.inlineStart }}
             >
-              <div className="reading-word-popover-head [display:grid] [gap:3px] [&_strong]:[color:var(--text)] [&_strong]:[font-size:1rem] [&_small]:[color:var(--text-muted)]">
+              <div className="reading-word-popover-head grid gap-0.75 uv-veda02a0adb:text-uv-text uv-veda02a0adb:text-uv-f19feeb881c uv-v982220ddd5:text-uv-text-muted">
                 <strong className="learning-content" lang="de" dir="ltr">{formatLexemeLabel(active.target)}</strong>
                 <small>
                   {partOfSpeechKeys[active.target.partOfSpeech] ? t(partOfSpeechKeys[active.target.partOfSpeech]) : active.target.partOfSpeech.toLowerCase().replaceAll("_", " ")}
@@ -168,7 +168,7 @@ export function ReadingText({
                     {translation.text}
                   </p>
                 ))}
-              <Link href={`/vocabulary/${active.target.id}`} className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]">{t("reading.detail.openWord")}</Link>
+              <Link href={`/vocabulary/${active.target.id}`} className="text-link text-uv-primary-strong uv-weight-560 inline-flex items-center gap-1.5">{t("reading.detail.openWord")}</Link>
             </div>,
             document.body,
           )

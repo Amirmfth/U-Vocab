@@ -11,7 +11,7 @@ const initialState: PackMutationState = { status: "idle" };
 export function PackActions({ packId }: { packId: string }) {
   const [state, action] = useActionState(addPackToVocabulary, initialState);
   return (
-    <div className="pack-global-action [display:flex] [flex-direction:column] [gap:8px]">
+    <div className="pack-global-action flex flex-col gap-2">
       <form action={action}>
         <input type="hidden" name="packId" value={packId} />
         <ActionButton variant="secondary" pendingLabel="Adding…"><LibraryBig size={18} />Add all words</ActionButton>

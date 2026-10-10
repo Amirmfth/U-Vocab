@@ -184,33 +184,33 @@ export default async function GrammarConceptPage({
   const richLesson = lesson?.success ? lesson.data : null;
 
   return (
-    <main className="page grammar-detail [display:flex] [flex-direction:column] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [gap:18px]">
-      <Link href="/grammar" className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
+    <main className="page grammar-detail flex flex-col uv-min620:gap-5.5 uv-min940:gap-6 gap-4.5">
+      <Link href="/grammar" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
         <ArrowLeft className="rtl-mirror" size={16} />
         {t("grammar.detail.back")}
       </Link>
 
-      <section className="grammar-detail-hero [display:flex] [flex-direction:column] [gap:14px] [padding:14px_0_2px] [&_h1]:[margin:3px_0_0] [&_h1]:[max-width:820px] [&_h1]:[font-size:clamp(2.25rem,_11vw,_4.8rem)] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560]">
-        <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-          <span className={"grammar-state [min-height:25px] [display:inline-flex] [align-items:center] [width:fit-content] [padding:0_8px] [border:1px_solid_var(--border)] [border-radius:999px] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.62rem] [color:var(--text-soft)] [background:var(--surface-raised)] [&.grammar-state-needs_attention]:[border-color:rgba(255,_107,_122,_0.28)] [&.grammar-state-needs_attention]:[color:#ffc2c9] [&.grammar-state-needs_attention]:[background:var(--danger-soft)] [&.grammar-state-learning]:[border-color:rgba(139,_124,_255,_0.28)] [&.grammar-state-learning]:[color:#d7d2ff] [&.grammar-state-learning]:[background:var(--primary-soft)] [&.grammar-state-strong]:[border-color:rgba(73,_201,_139,_0.25)] [&.grammar-state-strong]:[color:#b8f2d4] [&.grammar-state-strong]:[background:var(--success-soft)] [&.grammar-state-assumed]:[border-color:var(--border)] [&.grammar-state-assumed]:[color:var(--text-muted)] grammar-state-" + status.toLowerCase()}>
+      <section className="grammar-detail-hero flex flex-col gap-3.5 uv-padding-2753259b77 uv-v3bccf64584:uv-margin-4dbe78398d uv-v3bccf64584:max-w-uv-d1f4d3e141 uv-v3bccf64584:text-uv-fdd704d9153 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560">
+        <div className="word-meta flex flex-wrap gap-1.75 items-center">
+          <span className={"grammar-state min-h-6.25 inline-flex items-center w-fit uv-padding-4f85d0e84d uv-border-8d7f82f403 rounded-uv-red9ab892c5 uv-font-family-320794573f text-uv-f174ef476a0 text-uv-text-soft bg-uv-surface-raised uv-v828a2a58d3:border-uv-c60009ca3c2 uv-v828a2a58d3:text-uv-c7d351e814d uv-v828a2a58d3:bg-uv-c8b3083dabe uv-vfcdc2edabe:border-uv-c85a9d06a78 uv-vfcdc2edabe:text-uv-c1d285c7551 uv-vfcdc2edabe:bg-uv-cbdfd7cd038 uv-v516803f730:border-uv-cad82869dd8 uv-v516803f730:text-uv-cf9ab83a8af uv-v516803f730:bg-uv-cafddaf6a65 uv-v9a6fa25db7:border-uv-border uv-v9a6fa25db7:text-uv-text-muted grammar-state-" + status.toLowerCase()}>
             {t(statusKeys[status])}
           </span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{concept.introducedAt}</span>
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{concept.introducedAt}</span>
           {concept.expectedBy && concept.expectedBy !== concept.introducedAt ? (
-            <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+            <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
               {t("grammar.detail.expectedBy", { level: concept.expectedBy })}
             </span>
           ) : null}
         </div>
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t(categoryKeys[concept.category])}</p>
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t(categoryKeys[concept.category])}</p>
         <h1 className="learning-content" lang="en" dir="ltr">
           {concept.title}
         </h1>
-        <p className="page-description learning-content [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]" lang="en" dir="ltr">
+        <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a" lang="en" dir="ltr">
           {concept.shortDescription}
         </p>
 
-        <div className="grammar-detail-actions [display:flex] [flex-direction:column] [gap:8px] [&_form]:[display:contents] min-[620px]:[flex-direction:row] min-[620px]:[&_.button]:[width:auto]">
+        <div className="grammar-detail-actions flex flex-col gap-2 uv-v8cd0743a41:contents uv-min620:flex-row uv-min620:uv-vcded88c612:w-auto">
           <TeachGrammarSheet
             grammarConceptId={concept.id}
             label={concept.title}
@@ -220,7 +220,7 @@ export default async function GrammarConceptPage({
             <form action={startGrammarConceptAction}>
               <input type="hidden" name="grammarConceptId" value={concept.id} />
               <input type="hidden" name="slug" value={concept.slug} />
-              <button className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="submit">
+              <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" type="submit">
                 <BookOpenCheck size={17} />
                 {status === "LEARNING"
                   ? t("grammar.detail.continue")
@@ -230,7 +230,7 @@ export default async function GrammarConceptPage({
           ) : null}
           <Link
             href={"/practice?grammar=" + concept.slug}
-            className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
           >
             <Brain size={17} />
             {t("grammar.detail.openPractice")}
@@ -239,10 +239,10 @@ export default async function GrammarConceptPage({
       </section>
 
       {progress ? (
-        <section className="panel grammar-profile-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:flex] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <section className="panel grammar-profile-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c flex flex-col gap-3 uv-vd552c26874:uv-margin-4dbe78398d uv-vd552c26874:text-uv-fa9aa53fab2">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.profile")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.profile")}</p>
               <h2>
                 {progress.source === "DECLARED_LEVEL"
                   ? t("grammar.detail.assumedFromLevel")
@@ -252,7 +252,7 @@ export default async function GrammarConceptPage({
             <Sparkles size={19} />
           </div>
           {progress.evidenceCount > 0 ? (
-            <div className="grammar-dimensions [display:grid] [grid-template-columns:1fr] [gap:7px] [&_>_div]:[min-height:52px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[padding:9px_11px] [&_>_div]:[border:1px_solid_var(--border)] [&_>_div]:[border-radius:12px] [&_>_div]:[background:var(--surface-raised)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.72rem] [&_strong]:[color:var(--text-soft)] [&_strong]:[font-size:0.72rem] min-[620px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))]">
+            <div className="grammar-dimensions grid uv-grid-template-columns-6a5c4d4d49 gap-1.75 uv-vcbb57f4d35:min-h-13 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-padding-1f71e5d904 uv-vcbb57f4d35:uv-border-8d7f82f403 uv-vcbb57f4d35:rounded-uv-r0939007802 uv-vcbb57f4d35:bg-uv-surface-raised uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff1713651e0 uv-veda02a0adb:text-uv-text-soft uv-veda02a0adb:text-uv-ff1713651e0 uv-min620:uv-grid-template-columns-563355decf">
               <div>
                 <span>{t("grammar.detail.understanding")}</span>
                 <strong>{dimensionLabel(t, progress.understanding)}</strong>
@@ -269,13 +269,13 @@ export default async function GrammarConceptPage({
               </div>
             </div>
           ) : (
-            <p className="muted [color:var(--text-muted)]">{t("grammar.detail.noEvidence")}</p>
+            <p className="muted text-uv-text-muted">{t("grammar.detail.noEvidence")}</p>
           )}
         </section>
       ) : null}
 
-      <section className="panel grammar-canonical-reference [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:grid] [gap:12px] [&_>_h2]:[margin:0] [&_>_h2]:[font-size:1.08rem] [&_>_p]:[margin:0] [&_>_p]:[color:var(--text-soft)] [&_>_p]:[line-height:1.65] [&_details]:[border-top:1px_solid_var(--border)] [&_details]:[padding-top:10px] [&_summary]:[cursor:pointer] [&_summary]:[color:var(--text-soft)] [&_summary]:[font-weight:650] [&_summary]:[font-size:0.78rem] [&_details_>_*:not(summary)]:[margin-top:10px]">
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.canonical")}</p>
+      <section className="panel grammar-canonical-reference uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c grid gap-3 uv-v8fa571edc2:m-0 uv-v8fa571edc2:text-uv-f44eab8f17b uv-v026f084606:m-0 uv-v026f084606:text-uv-text-soft uv-v026f084606:uv-line-height-cf9a155f4a uv-v91ffd8b624:uv-border-top-8d7f82f403 uv-v91ffd8b624:pt-2.5 uv-vaa46806d56:cursor-pointer uv-vaa46806d56:text-uv-text-soft uv-vaa46806d56:uv-weight-650 uv-vaa46806d56:text-uv-fe9d5fd6635 uv-v9d25868181:mt-2.5">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.canonical")}</p>
         <h2>{t("grammar.detail.curriculumDefinition")}</h2>
         <p className="learning-content" lang="en" dir="ltr">
           {concept.explanation || concept.shortDescription}
@@ -283,7 +283,7 @@ export default async function GrammarConceptPage({
         {rules.length ? (
           <details>
             <summary>{t("grammar.detail.canonicalRules")}</summary>
-            <ol className="grammar-rule-list [margin:0] [color:var(--text-soft)] [line-height:1.62] [padding-left:20px] [&_li_+_li]:[margin-top:8px]">
+            <ol className="grammar-rule-list m-0 text-uv-text-soft uv-line-height-daa388cc8c pl-5 uv-vfe836888b7:mt-2">
               {rules.map((rule) => (
                 <li key={rule} className="learning-content" dir="auto">
                   {rule}
@@ -295,9 +295,9 @@ export default async function GrammarConceptPage({
         {examples.length ? (
           <details>
             <summary>{t("grammar.detail.canonicalExamples")}</summary>
-            <div className="grammar-example-list [display:grid] [grid-template-columns:1fr] [gap:8px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+            <div className="grammar-example-list grid uv-grid-template-columns-6a5c4d4d49 gap-2 uv-min620:uv-grid-template-columns-dd0b1a1848">
               {examples.map((example) => (
-                <div className="grammar-example learning-content [padding:14px_15px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface)] [font-size:0.94rem] [line-height:1.55]" dir="auto" key={example}>
+                <div className="grammar-example learning-content uv-padding-815f98af78 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface text-uv-fbe55c92df5 uv-line-height-05c248da4c" dir="auto" key={example}>
                   {example}
                 </div>
               ))}
@@ -315,9 +315,9 @@ export default async function GrammarConceptPage({
         />
       ) : (
         <>
-          <div className="grammar-detail-grid [display:grid] [grid-template-columns:1fr] [gap:10px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-            <section className="panel grammar-teaching-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:flex] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem] [&_>_p:last-child]:[margin:0] [&_>_p:last-child]:[color:var(--text-soft)] [&_>_p:last-child]:[line-height:1.62]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.whyMatters")}</p>
+          <div className="grammar-detail-grid grid uv-grid-template-columns-6a5c4d4d49 gap-2.5 uv-min620:uv-grid-template-columns-dd0b1a1848">
+            <section className="panel grammar-teaching-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c flex flex-col gap-3 uv-vd552c26874:uv-margin-4dbe78398d uv-vd552c26874:text-uv-fa9aa53fab2 uv-vd9a40650be:m-0 uv-vd9a40650be:text-uv-text-soft uv-vd9a40650be:uv-line-height-daa388cc8c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.whyMatters")}</p>
               <h2 className="learning-content" lang="en" dir="ltr">
                 {concept.title}
               </h2>
@@ -326,10 +326,10 @@ export default async function GrammarConceptPage({
               </p>
             </section>
             {rules.length ? (
-              <section className="panel grammar-teaching-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:flex] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem] [&_>_p:last-child]:[margin:0] [&_>_p:last-child]:[color:var(--text-soft)] [&_>_p:last-child]:[line-height:1.62]">
-                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.pattern")}</p>
+              <section className="panel grammar-teaching-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c flex flex-col gap-3 uv-vd552c26874:uv-margin-4dbe78398d uv-vd552c26874:text-uv-fa9aa53fab2 uv-vd9a40650be:m-0 uv-vd9a40650be:text-uv-text-soft uv-vd9a40650be:uv-line-height-daa388cc8c">
+                <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.pattern")}</p>
                 <h2>{t("grammar.detail.rules")}</h2>
-                <ol className="grammar-rule-list [margin:0] [color:var(--text-soft)] [line-height:1.62] [padding-left:20px] [&_li_+_li]:[margin-top:8px]">
+                <ol className="grammar-rule-list m-0 text-uv-text-soft uv-line-height-daa388cc8c pl-5 uv-vfe836888b7:mt-2">
                   {rules.map((rule) => (
                     <li key={rule} className="learning-content" dir="auto">
                       {rule}
@@ -339,18 +339,18 @@ export default async function GrammarConceptPage({
               </section>
             ) : null}
           </div>
-          <section className="panel grammar-lesson-missing [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [display:grid] [gap:12px] [&_>_h2]:[margin:0] [&_>_h2]:[font-size:1.08rem]">
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.fullLesson")}</p>
+          <section className="panel grammar-lesson-missing uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c grid gap-3 uv-v8fa571edc2:m-0 uv-v8fa571edc2:text-uv-f44eab8f17b">
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.fullLesson")}</p>
             <h2>{t("grammar.detail.lessonMissing")}</h2>
-            <p className="muted [color:var(--text-muted)]">{t("grammar.detail.lessonMissingHelp")}</p>
+            <p className="muted text-uv-text-muted">{t("grammar.detail.lessonMissingHelp")}</p>
           </section>
         </>
       )}
 
-      <section className="panel grammar-watch-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px] [flex-direction:column] [gap:12px] [&_h2]:[margin:3px_0_0] [&_h2]:[font-size:1.05rem] [&_p]:[margin:0] [&_p]:[color:var(--text-soft)] [&_p]:[line-height:1.62] [display:grid] [grid-template-columns:24px_minmax(0,_1fr)] [align-items:start] [&_>_svg]:[color:var(--danger)] [&_ul]:[margin:10px_0_0] [&_ul]:[padding-left:18px] [&_ul]:[color:var(--text-muted)]">
+      <section className="panel grammar-watch-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c flex-col gap-3 uv-vd552c26874:uv-margin-4dbe78398d uv-vd552c26874:text-uv-fa9aa53fab2 uv-vb19eb067c9:m-0 uv-vb19eb067c9:text-uv-text-soft uv-vb19eb067c9:uv-line-height-daa388cc8c grid uv-grid-template-columns-5416fe9056 items-start uv-v872d6ea02a:text-uv-danger uv-v10010674ad:uv-margin-456435724d uv-v10010674ad:pl-4.5 uv-v10010674ad:text-uv-text-muted">
         <CircleAlert size={20} />
         <div>
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.quickWarning")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.quickWarning")}</p>
           <h2>{t("grammar.detail.commonMistakes")}</h2>
           <p>{t(watchForKey(concept.category))}</p>
           {!richLesson && exceptions.length ? (
@@ -366,15 +366,15 @@ export default async function GrammarConceptPage({
       </section>
 
       {concept.prerequisites.length || concept.parent || concept.children.length ? (
-        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <section className="page-section flex flex-col gap-3">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.connections")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.connections")}</p>
               <h2>{t("grammar.detail.whereFits")}</h2>
             </div>
             <Layers3 size={19} />
           </div>
-          <div className="grammar-connection-list [display:grid] [grid-template-columns:1fr] [gap:8px] [&_a]:[min-height:58px] [&_a]:[display:flex] [&_a]:[flex-direction:column] [&_a]:[justify-content:center] [&_a]:[gap:3px] [&_a]:[padding:10px_12px] [&_a]:[border:1px_solid_var(--border)] [&_a]:[border-radius:13px] [&_a]:[background:var(--surface)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.65rem] [&_strong]:[font-size:0.8rem] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))]">
+          <div className="grammar-connection-list grid uv-grid-template-columns-6a5c4d4d49 gap-2 uv-v99777dc5b4:min-h-14.5 uv-v99777dc5b4:flex uv-v99777dc5b4:flex-col uv-v99777dc5b4:justify-center uv-v99777dc5b4:gap-0.75 uv-v99777dc5b4:uv-padding-df857c6c31 uv-v99777dc5b4:uv-border-8d7f82f403 uv-v99777dc5b4:rounded-uv-r233710a71e uv-v99777dc5b4:bg-uv-surface uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f2311a7d95c uv-veda02a0adb:text-uv-f6c2d68ddb8 uv-min620:uv-grid-template-columns-dd0b1a1848 uv-min940:uv-grid-template-columns-563355decf">
             {concept.parent ? (
               <Link href={"/grammar/" + concept.parent.slug}>
                 <span>{t("grammar.detail.parent")}</span>
@@ -415,17 +415,17 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {vocabulary.length ? (
-        <section className="page-section [display:flex] [flex-direction:column] [gap:12px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <section className="page-section flex flex-col gap-3">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.yourVocabulary")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.yourVocabulary")}</p>
               <h2>{t("grammar.detail.reuseWords")}</h2>
             </div>
           </div>
-          <p className="muted grammar-vocab-note [color:var(--text-muted)] [margin:-4px_0_0] [max-width:720px] [font-size:0.72rem] [line-height:1.5]">
+          <p className="muted grammar-vocab-note text-uv-text-muted uv-margin-115dc61086 max-w-uv-8b89fb679d text-uv-ff1713651e0 uv-line-height-aa8f289ebe">
             {t("grammar.detail.vocabHelp")}
           </p>
-          <div className="grammar-vocab-grid [display:grid] [grid-template-columns:1fr] [gap:8px] [&_a]:[min-height:58px] [&_a]:[display:flex] [&_a]:[flex-direction:column] [&_a]:[justify-content:center] [&_a]:[gap:3px] [&_a]:[padding:10px_12px] [&_a]:[border:1px_solid_var(--border)] [&_a]:[border-radius:13px] [&_a]:[background:var(--surface)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.65rem] [&_strong]:[font-size:0.8rem] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] min-[940px]:[grid-template-columns:repeat(3,_minmax(0,_1fr))]">
+          <div className="grammar-vocab-grid grid uv-grid-template-columns-6a5c4d4d49 gap-2 uv-v99777dc5b4:min-h-14.5 uv-v99777dc5b4:flex uv-v99777dc5b4:flex-col uv-v99777dc5b4:justify-center uv-v99777dc5b4:gap-0.75 uv-v99777dc5b4:uv-padding-df857c6c31 uv-v99777dc5b4:uv-border-8d7f82f403 uv-v99777dc5b4:rounded-uv-r233710a71e uv-v99777dc5b4:bg-uv-surface uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f2311a7d95c uv-veda02a0adb:text-uv-f6c2d68ddb8 uv-min620:uv-grid-template-columns-dd0b1a1848 uv-min940:uv-grid-template-columns-563355decf">
             {vocabulary.map((item) => (
               <Link href={"/vocabulary/" + item.lexeme.id} key={item.id}>
                 <strong className="learning-content" lang={language.code} dir="ltr">
@@ -454,14 +454,14 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {concept.evidence.length ? (
-        <details className="grammar-evidence-disclosure [padding:0] [overflow:hidden] [&_>_summary]:[min-height:62px] [&_>_summary]:[display:flex] [&_>_summary]:[align-items:center] [&_>_summary]:[padding:12px_14px] [&_>_summary]:[list-style:none] [&_>_summary::-webkit-details-marker]:[display:none] [&_summary_span]:[display:flex] [&_summary_span]:[flex-direction:column] [&_summary_span]:[gap:3px] [&_summary_strong]:[color:var(--text)] [&_summary_strong]:[font-size:0.85rem] [&_summary_small]:[color:var(--text-muted)] [&_summary_small]:[font-size:0.65rem]">
+        <details className="grammar-evidence-disclosure p-0 overflow-hidden uv-v1888c0d32c:min-h-15.5 uv-v1888c0d32c:flex uv-v1888c0d32c:items-center uv-v1888c0d32c:uv-padding-277e98e510 uv-v1888c0d32c:list-none uv-v0f504617cb:hidden uv-v54584f9d98:flex uv-v54584f9d98:flex-col uv-v54584f9d98:gap-0.75 uv-v0c36329b9e:text-uv-text uv-v0c36329b9e:text-uv-fcc370f51d4 uv-vb8cdaac41c:text-uv-text-muted uv-vb8cdaac41c:text-uv-f2311a7d95c">
           <summary>
             <span>
               <strong>{t("grammar.detail.evidenceWhy")}</strong>
               <small>{t("grammar.detail.evidenceHelp")}</small>
             </span>
           </summary>
-          <div className="grammar-evidence-list [padding:0_14px_14px] [&_>_div]:[padding:10px_0] [&_>_div]:[border-top:1px_solid_var(--border)] [&_>_div_>_div]:[display:flex] [&_>_div_>_div]:[justify-content:space-between] [&_>_div_>_div]:[gap:12px] [&_strong]:[font-size:0.68rem] [&_span]:[font-size:0.68rem] [&_small]:[font-size:0.68rem] [&_span]:[color:var(--text-muted)] [&_small]:[color:var(--text-muted)]">
+          <div className="grammar-evidence-list uv-padding-455d6903c4 uv-vcbb57f4d35:uv-padding-10ff753f5f uv-vcbb57f4d35:uv-border-top-8d7f82f403 uv-vc5efaac82a:flex uv-vc5efaac82a:justify-between uv-vc5efaac82a:gap-3 uv-veda02a0adb:text-uv-f78eb7000a9 uv-v36c0309a03:text-uv-f78eb7000a9 uv-v982220ddd5:text-uv-f78eb7000a9 uv-v36c0309a03:text-uv-text-muted uv-v982220ddd5:text-uv-text-muted">
             {concept.evidence.map((item) => (
               <div key={item.id}>
                 <div>
@@ -496,8 +496,8 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {concept.outgoingRelations.length ? (
-        <section className="grammar-related [display:flex] [flex-wrap:wrap] [align-items:center] [gap:8px] [&_>_p]:[width:100%] [&_a]:[min-height:38px] [&_a]:[display:inline-flex] [&_a]:[align-items:center] [&_a]:[gap:6px] [&_a]:[padding:0_10px] [&_a]:[border:1px_solid_var(--border)] [&_a]:[border-radius:999px] [&_a]:[color:var(--text-soft)] [&_a]:[font-size:0.7rem]">
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("grammar.detail.related")}</p>
+        <section className="grammar-related flex flex-wrap items-center gap-2 uv-v026f084606:w-full uv-v99777dc5b4:min-h-9.5 uv-v99777dc5b4:inline-flex uv-v99777dc5b4:items-center uv-v99777dc5b4:gap-1.5 uv-v99777dc5b4:uv-padding-4d5c65a39c uv-v99777dc5b4:uv-border-8d7f82f403 uv-v99777dc5b4:rounded-uv-red9ab892c5 uv-v99777dc5b4:text-uv-text-soft uv-v99777dc5b4:text-uv-f58b84cc6f5">
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("grammar.detail.related")}</p>
           {concept.outgoingRelations.map((relation) => (
             <Link href={"/grammar/" + relation.target.slug} key={relation.id}>
               <span className="learning-content" lang="en" dir="ltr">

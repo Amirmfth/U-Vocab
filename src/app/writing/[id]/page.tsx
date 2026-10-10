@@ -105,16 +105,16 @@ export default async function WritingSessionPage({
     session.mode === "GUIDED" ? t("writing.guided") : t("writing.open");
 
   return (
-    <main className="page writing-session-page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px] [width:100%] [max-width:980px] [&_.writing-task]:[max-width:820px] [&_.writing-task]:[padding:18px] [&_.writing-task]:[background:var(--surface)] [&_.writing-task_pre]:[font-size:0.94rem] [&_.writing-task_pre]:[line-height:1.7] [&_.writing-editor]:[max-width:900px] [&_.writing-editor]:[gap:12px] [&_.writing-editor_textarea]:[min-height:52dvh] [&_.writing-editor_textarea]:[padding:16px] [&_.writing-editor_textarea]:[border-color:var(--border-strong)] [&_.writing-editor_textarea]:[border-radius:18px] [&_.writing-editor_textarea]:[background:linear-gradient(180deg,_rgba(255,255,255,0.018),_transparent_18rem),_#0d0d10] [&_.writing-editor_textarea]:[font-size:1.03rem] [&_.writing-editor_textarea]:[line-height:1.75] [&_.writing-editor_textarea:focus]:[background:#101014] [&_.writing-editor-footer]:[border-color:var(--border-strong)] [&_.writing-editor-footer]:[box-shadow:0_14px_34px_rgba(0,0,0,0.26)] [&_.writing-score-grid]:[border-color:var(--border-strong)] [&_.writing-score-grid]:[border-radius:18px] [&_.writing-score-grid]:[background:var(--surface)] [&_.writing-score-grid_>_div]:[min-height:74px] [&_.writing-score-grid_>_div]:[justify-content:center] [&_.writing-score-grid_>_div]:[padding:14px] [&_.writing-score-grid_strong]:[font-size:1.35rem] [&_.writing-summary]:[max-width:820px] [&_.improved-writing]:[max-width:820px] [&_.writing-feedback-section]:[max-width:900px] min-[620px]:[&_.writing-editor_textarea]:[min-height:56vh] min-[620px]:[&_.writing-editor_textarea]:[padding:20px] min-[940px]:[&_.writing-editor]:[max-width:920px] min-[940px]:[&_.writing-editor-footer]:[position:static] min-[940px]:[&_.writing-editor-footer]:[padding:0] min-[940px]:[&_.writing-editor-footer]:[border:0] min-[940px]:[&_.writing-editor-footer]:[background:transparent] min-[940px]:[&_.writing-editor-footer]:[box-shadow:none] min-[940px]:[&_.writing-editor-footer]:[backdrop-filter:none]">
-      <section className="page-header compact writing-session-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [max-width:820px] [&_h1]:[font-size:clamp(2.2rem,_9vw,_4.2rem)] [&_h1]:[line-height:0.98]">
-        <Link href="/writing" className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
+    <main className="page writing-session-page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6 w-full max-w-uv-2991113b44 uv-v19f0956f17:max-w-uv-d1f4d3e141 uv-v19f0956f17:p-4.5 uv-v19f0956f17:bg-uv-surface uv-vaca0928d6e:text-uv-fbe55c92df5 uv-vaca0928d6e:uv-line-height-58e6d386c3 uv-v691ffddc27:max-w-uv-0927635a28 uv-v691ffddc27:gap-3 uv-v5143847986:uv-min-height-69924f8d09 uv-v5143847986:p-4 uv-v5143847986:border-uv-border-strong uv-v5143847986:rounded-uv-r6d27d54c6c uv-v5143847986:uv-background-4e298cec10 uv-v5143847986:text-uv-fcb7a01623a uv-v5143847986:uv-line-height-86d76fc750 uv-v642ba83c04:bg-uv-cfcbfb23a40 uv-ve70de6f77f:border-uv-border-strong uv-ve70de6f77f:uv-box-shadow-f19c4300a8 uv-vbfa1b6e621:border-uv-border-strong uv-vbfa1b6e621:rounded-uv-r6d27d54c6c uv-vbfa1b6e621:bg-uv-surface uv-v28c8916e41:min-h-18.5 uv-v28c8916e41:justify-center uv-v28c8916e41:p-3.5 uv-v0681bf294a:text-uv-f3951047c34 uv-v53390288ba:max-w-uv-d1f4d3e141 uv-v8dc5afe670:max-w-uv-d1f4d3e141 uv-vd79dd6aeee:max-w-uv-0927635a28 uv-min620:uv-v5143847986:uv-min-height-e5ba4e032a uv-min620:uv-v5143847986:p-5 uv-min940:uv-v691ffddc27:max-w-uv-2e0eb67d1b uv-min940:uv-ve70de6f77f:static uv-min940:uv-ve70de6f77f:p-0 uv-min940:uv-ve70de6f77f:border-0 uv-min940:uv-ve70de6f77f:bg-transparent uv-min940:uv-ve70de6f77f:uv-box-shadow-71f8e7976e uv-min940:uv-ve70de6f77f:uv-backdrop-filter-71f8e7976e">
+      <section className="page-header compact writing-session-header flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 max-w-uv-d1f4d3e141 uv-v3bccf64584:text-uv-f13caea62a0 uv-v3bccf64584:uv-line-height-e6da655eed">
+        <Link href="/writing" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
           <ArrowLeft className="rtl-mirror" size={16} />
           {t("writing.detail.back")}
         </Link>
-        <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{modeLabel}</span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{session.level}</span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+        <div className="word-meta flex flex-wrap gap-1.75 items-center">
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{modeLabel}</span>
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{session.level}</span>
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
             {t("writing.detail.targetWords", {
               count: formatNumber(locale, session.targetWords),
             })}
@@ -123,12 +123,12 @@ export default async function WritingSessionPage({
         <h1 className="learning-content" dir="auto">{session.topic}</h1>
       </section>
 
-      <section className="panel writing-task [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:12px] [&_pre]:[margin:0] [&_pre]:[white-space:pre-wrap] [&_pre]:[font:inherit] [&_pre]:[line-height:1.6] [&_pre]:[color:var(--text-soft)] [border-radius:18px]">
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.task")}</p>
+      <section className="panel writing-task uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3 uv-v465306b89e:m-0 uv-v465306b89e:whitespace-pre-wrap uv-v465306b89e:uv-font-3e26d67509 uv-v465306b89e:uv-line-height-4693695d02 uv-v465306b89e:text-uv-text-soft rounded-uv-r6d27d54c6c">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.task")}</p>
         <pre className="learning-content" lang={targetLanguageCode} dir="ltr">{session.task}</pre>
 
         {session.targets.length ? (
-          <div className="writing-targets [display:flex] [flex-wrap:wrap] [gap:6px] [&_span]:[padding:5px_8px] [&_span]:[border:1px_solid_var(--border)] [&_span]:[border-radius:999px] [&_span]:[background:var(--surface-raised)] [&_span]:[font-size:0.7rem]">
+          <div className="writing-targets flex flex-wrap gap-1.5 uv-v36c0309a03:uv-padding-24a7c581e4 uv-v36c0309a03:uv-border-8d7f82f403 uv-v36c0309a03:rounded-uv-red9ab892c5 uv-v36c0309a03:bg-uv-surface-raised uv-v36c0309a03:text-uv-f58b84cc6f5">
             {session.targets.slice(0, 10).map((target) => (
               <span
                 key={target.id}
@@ -146,12 +146,12 @@ export default async function WritingSessionPage({
       {session.status === "ACTIVE" ? (
         <>
           {parent ? (
-            <section className="panel rewrite-reference [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:20px] [&_ul]:[color:var(--text-soft)] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.rewrite")}</p>
-              <p className="muted [color:var(--text-muted)]">{t("writing.detail.rewriteHelp")}</p>
+            <section className="panel rewrite-reference uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-5 uv-v10010674ad:text-uv-text-soft rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.rewrite")}</p>
+              <p className="muted text-uv-text-muted">{t("writing.detail.rewriteHelp")}</p>
               {parentEvaluation?.success ? (
                 <>
-                  <p className="rewrite-score [margin:14px_0_0] [color:var(--primary-strong)] [font-weight:650]">
+                  <p className="rewrite-score uv-margin-897443304a text-uv-primary-strong uv-weight-650">
                     {t("writing.detail.previousOverall", {
                       percent: formatPercent(
                         locale,
@@ -180,7 +180,7 @@ export default async function WritingSessionPage({
       ) : evaluation?.success ? (
         <>
           {parentEvaluation?.success ? (
-            <section className="writing-improvement-banner [display:flex] [align-items:flex-start] [gap:10px] [padding:12px_13px] [border:1px_solid_rgba(73,_201,_139,_0.28)] [border-radius:13px] [background:rgba(73,_201,_139,_0.08)] [&_>_svg]:[color:var(--success)] [&_>_svg]:[flex:0_0_auto] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.74rem]">
+            <section className="writing-improvement-banner flex items-start gap-2.5 uv-padding-fed09d08e0 uv-border-768674f7ad rounded-uv-r233710a71e bg-uv-cb0392f6948 uv-v872d6ea02a:text-uv-success uv-v872d6ea02a:uv-flex-18ba0b6e31 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f63777cce16">
               <CheckCircle2 size={19} />
               <div>
                 <strong>
@@ -201,7 +201,7 @@ export default async function WritingSessionPage({
             </section>
           ) : null}
 
-          <section className="writing-score-grid [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [border:1px_solid_var(--border)] [border-radius:14px] [overflow:hidden] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_>_div]:[padding:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:nth-child(odd)]:[border-right:1px_solid_var(--border)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_strong]:[font-size:1.15rem] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.66rem] [&_span]:[text-transform:capitalize] min-[620px]:[grid-template-columns:repeat(4,_minmax(0,_1fr))] min-[620px]:[&_>_div]:[border-right:0] min-[620px]:[&_>_div:nth-child(odd)]:[border-right:0] min-[620px]:[&_>_div_+_div]:[border-left:1px_solid_var(--border)]">
+          <section className="writing-score-grid grid uv-grid-template-columns-dd0b1a1848 uv-border-8d7f82f403 rounded-uv-rd65225386d overflow-hidden uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:p-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-v3de32a793f:uv-border-right-8d7f82f403 uv-veda02a0adb:uv-font-family-320794573f uv-veda02a0adb:text-uv-f6d7755962e uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff7862da171 uv-v36c0309a03:capitalize uv-min620:uv-grid-template-columns-0cbc4f103a uv-min620:uv-vcbb57f4d35:uv-border-right-b6589fc6ab uv-min620:uv-v3de32a793f:uv-border-right-b6589fc6ab uv-min620:uv-v5007062a75:uv-border-left-8d7f82f403">
             {[
               ["overall", evaluation.data.overall],
               ["task", evaluation.data.taskCompletion],
@@ -220,22 +220,22 @@ export default async function WritingSessionPage({
             ))}
           </section>
 
-          <section className="panel writing-summary [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_>_p:last-child]:[margin-bottom:0] [&_>_p:last-child]:[white-space:pre-wrap] [&_>_p:last-child]:[line-height:1.6] [border-radius:18px]">
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.summary")}</p>
+          <section className="panel writing-summary uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-vd9a40650be:mb-0 uv-vd9a40650be:whitespace-pre-wrap uv-vd9a40650be:uv-line-height-4693695d02 rounded-uv-r6d27d54c6c">
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.summary")}</p>
             <p className="learning-content" dir="auto">{evaluation.data.summary}</p>
           </section>
 
           {evaluation.data.grammarObservations.length ? (
-            <section className="panel writing-feedback-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] [border-radius:18px]">
-              <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+            <section className="panel writing-feedback-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 rounded-uv-r6d27d54c6c">
+              <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
                 <div>
-                  <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.grammarEyebrow")}</p>
+                  <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.grammarEyebrow")}</p>
                   <h2>{t("writing.detail.grammarTitle")}</h2>
                 </div>
                 <Sparkles size={19} />
               </div>
 
-              <div className="writing-grammar-observations [display:grid] [gap:12px]">
+              <div className="writing-grammar-observations grid gap-3">
                 {evaluation.data.grammarObservations.map((observation, index) => {
                   const concept = grammarConceptById.get(
                     observation.grammarConceptId,
@@ -246,7 +246,7 @@ export default async function WritingSessionPage({
                   return (
                     <article
                       className={
-                        "writing-grammar-observation [display:grid] [gap:10px] [padding:14px] [border:1px_solid_var(--border)] [border-radius:14px] [&.writing-grammar-observation--error]:[border-inline-start:3px_solid_var(--text)] [&.writing-grammar-observation--opportunity]:[border-style:dashed] [&_.button-row]:[display:flex] [&_.button-row]:[flex-wrap:wrap] [&_.button-row]:[gap:8px] writing-grammar-observation--" +
+                        "writing-grammar-observation grid gap-2.5 p-3.5 uv-border-8d7f82f403 rounded-uv-rd65225386d uv-ve990c9e3f3:uv-border-inline-start-010bdec6ad uv-v98372579a2:border-dashed uv-v17ef11e3d4:flex uv-v17ef11e3d4:flex-wrap uv-v17ef11e3d4:gap-2 writing-grammar-observation--" +
                         observation.signal.toLowerCase()
                       }
                       key={
@@ -257,11 +257,11 @@ export default async function WritingSessionPage({
                         index
                       }
                     >
-                      <div className="writing-grammar-observation-head [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:12px] [&_>_div]:[display:grid] [&_>_div]:[gap:6px]">
+                      <div className="writing-grammar-observation-head flex items-start justify-between gap-3 uv-vcbb57f4d35:grid uv-vcbb57f4d35:gap-1.5">
                         <div>
-                          <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-                            <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{concept.introducedAt}</span>
-                            <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+                          <div className="word-meta flex flex-wrap gap-1.75 items-center">
+                            <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{concept.introducedAt}</span>
+                            <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
                               {isError
                                 ? t("writing.detail.needsWork")
                                 : isOpportunity
@@ -284,7 +284,7 @@ export default async function WritingSessionPage({
                         {observation.original}
                       </p>
                       {observation.corrected ? (
-                        <p className="muted [color:var(--text-muted)]">
+                        <p className="muted text-uv-text-muted">
                           {isOpportunity
                             ? t("writing.detail.try")
                             : t("writing.detail.correction")}{" "}
@@ -293,20 +293,20 @@ export default async function WritingSessionPage({
                           </strong>
                         </p>
                       ) : null}
-                      <p className="muted learning-content [color:var(--text-muted)]" dir="auto">
+                      <p className="muted learning-content text-uv-text-muted" dir="auto">
                         {observation.explanation}
                       </p>
 
                       <div className="button-row">
                         <Link
-                          className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                          className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                           href={"/grammar/" + concept.slug}
                         >
                           {t("writing.detail.learn")}
                         </Link>
                         {!isOpportunity ? (
                           <Link
-                            className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                             href={"/practice?grammar=" + concept.slug}
                           >
                             {t("writing.detail.practice")}
@@ -320,9 +320,9 @@ export default async function WritingSessionPage({
             </section>
           ) : null}
 
-          <section className="writing-result-grid [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-            <article className="panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.strengths")}</p>
+          <section className="writing-result-grid flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 uv-min620:grid uv-min620:uv-grid-template-columns-dd0b1a1848">
+            <article className="panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.strengths")}</p>
               <ul>
                 {evaluation.data.strengths.map((item) => (
                   <li className="learning-content" dir="auto" key={item}>
@@ -332,8 +332,8 @@ export default async function WritingSessionPage({
               </ul>
             </article>
 
-            <article className="panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.improveNext")}</p>
+            <article className="panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.improveNext")}</p>
               <ul>
                 {evaluation.data.improvements.map((item) => (
                   <li className="learning-content" dir="auto" key={item}>
@@ -345,22 +345,22 @@ export default async function WritingSessionPage({
           </section>
 
           {evaluation.data.targetUsage.length ? (
-            <section className="panel writing-feedback-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.vocabUsage")}</p>
+            <section className="panel writing-feedback-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.vocabUsage")}</p>
               {evaluation.data.targetUsage.map((usage) => {
                 const target = session.targets.find(
                   (item) => item.lexemeId === usage.lexemeId,
                 );
                 if (!target) return null;
                 return (
-                  <div className="writing-feedback-row [display:flex] [flex-direction:column] [gap:5px] [padding:11px_0] [border-bottom:1px_solid_var(--border)] [&:last-child]:[border-bottom:0] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:4px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45]" key={usage.lexemeId}>
+                  <div className="writing-feedback-row flex flex-col gap-1.25 uv-padding-3da39b7f2e uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-v0fee2d502c:flex uv-v0fee2d502c:flex-col uv-v0fee2d502c:gap-1 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-2792cf2449" key={usage.lexemeId}>
                     <div>
                       <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                         {target.lexeme.lemma}
                       </strong>
                       <span className="learning-content" dir="auto">{usage.note}</span>
                     </div>
-                    <div className="target-result-status [display:flex] [flex-wrap:wrap] [gap:6px] [&_span]:[padding:4px_7px] [&_span]:[border:1px_solid_var(--border)] [&_span]:[border-radius:999px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.65rem]">
+                    <div className="target-result-status flex flex-wrap gap-1.5 uv-v36c0309a03:uv-padding-b9d3ef7fdf uv-v36c0309a03:uv-border-8d7f82f403 uv-v36c0309a03:rounded-uv-red9ab892c5 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f2311a7d95c">
                       <span>
                         {usage.used
                           ? t("writing.detail.used")
@@ -384,10 +384,10 @@ export default async function WritingSessionPage({
           ) : null}
 
           {evaluation.data.repetition.length ? (
-            <section className="panel writing-feedback-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.repetition")}</p>
+            <section className="panel writing-feedback-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.repetition")}</p>
               {evaluation.data.repetition.map((item) => (
-                <div className="writing-feedback-row [display:flex] [flex-direction:column] [gap:5px] [padding:11px_0] [border-bottom:1px_solid_var(--border)] [&:last-child]:[border-bottom:0] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:4px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45]" key={item.item}>
+                <div className="writing-feedback-row flex flex-col gap-1.25 uv-padding-3da39b7f2e uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-v0fee2d502c:flex uv-v0fee2d502c:flex-col uv-v0fee2d502c:gap-1 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-2792cf2449" key={item.item}>
                   <div>
                     <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                       {item.item} · {formatNumber(locale, item.count)}×
@@ -402,8 +402,8 @@ export default async function WritingSessionPage({
           ) : null}
 
           {evaluation.data.collocationFeedback.length ? (
-            <section className="panel writing-feedback-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.collocations")}</p>
+            <section className="panel writing-feedback-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.collocations")}</p>
               <ul>
                 {evaluation.data.collocationFeedback.map((item) => (
                   <li className="learning-content" dir="auto" key={item}>
@@ -415,10 +415,10 @@ export default async function WritingSessionPage({
           ) : null}
 
           {evaluation.data.corrections.length ? (
-            <section className="panel writing-feedback-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.corrections")}</p>
+            <section className="panel writing-feedback-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.corrections")}</p>
               {evaluation.data.corrections.map((item, index) => (
-                <div className="writing-correction [display:flex] [flex-direction:column] [gap:5px] [padding:11px_0] [border-bottom:1px_solid_var(--border)] [&:last-child]:[border-bottom:0] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45] [&_del]:[color:var(--danger)] [&_strong]:[color:var(--success)]" key={index}>
+                <div className="writing-correction flex flex-col gap-1.25 uv-padding-3da39b7f2e uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-2792cf2449 uv-vc1468be021:text-uv-danger uv-veda02a0adb:text-uv-success" key={index}>
                   <del className="learning-content" lang={targetLanguageCode} dir="ltr">
                     {item.original}
                   </del>
@@ -434,10 +434,10 @@ export default async function WritingSessionPage({
           ) : null}
 
           {evaluation.data.strongerVocabulary.length ? (
-            <section className="panel writing-feedback-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.strongerVocab")}</p>
+            <section className="panel writing-feedback-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.strongerVocab")}</p>
               {evaluation.data.strongerVocabulary.map((item) => (
-                <div className="writing-feedback-row [display:flex] [flex-direction:column] [gap:5px] [padding:11px_0] [border-bottom:1px_solid_var(--border)] [&:last-child]:[border-bottom:0] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:4px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45]" key={item.targetText}>
+                <div className="writing-feedback-row flex flex-col gap-1.25 uv-padding-3da39b7f2e uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-v0fee2d502c:flex uv-v0fee2d502c:flex-col uv-v0fee2d502c:gap-1 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-2792cf2449" key={item.targetText}>
                   <div>
                     <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                       {item.targetText}
@@ -451,23 +451,23 @@ export default async function WritingSessionPage({
             </section>
           ) : null}
 
-          <section className="panel improved-writing [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_>_p:last-child]:[margin-bottom:0] [&_>_p:last-child]:[white-space:pre-wrap] [&_>_p:last-child]:[line-height:1.6] [border-radius:18px]">
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.improvedVersion")}</p>
+          <section className="panel improved-writing uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-vd9a40650be:mb-0 uv-vd9a40650be:whitespace-pre-wrap uv-vd9a40650be:uv-line-height-4693695d02 rounded-uv-r6d27d54c6c">
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.improvedVersion")}</p>
             <p className="learning-content" lang={targetLanguageCode} dir="ltr">
               {evaluation.data.improvedVersion}
             </p>
           </section>
 
           {parent ? (
-            <section className="writing-comparison [display:flex] [flex-direction:column] [gap:14px] [&_article_>_p:last-child]:[margin-bottom:0] [&_article_>_p:last-child]:[white-space:pre-wrap] [&_article_>_p:last-child]:[line-height:1.6] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-              <article className="panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px]">
-                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.previousAttempt")}</p>
+            <section className="writing-comparison flex flex-col gap-3.5 uv-ve9bd506672:mb-0 uv-ve9bd506672:whitespace-pre-wrap uv-ve9bd506672:uv-line-height-4693695d02 uv-min620:grid uv-min620:uv-grid-template-columns-dd0b1a1848">
+              <article className="panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c">
+                <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.previousAttempt")}</p>
                 <p className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {parent.draft}
                 </p>
               </article>
-              <article className="panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px]">
-                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("writing.detail.rewrite")}</p>
+              <article className="panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c">
+                <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("writing.detail.rewrite")}</p>
                 <p className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {session.draft}
                 </p>
@@ -478,9 +478,9 @@ export default async function WritingSessionPage({
           <RewriteButton sessionId={session.id} />
 
           {rewrites.length ? (
-            <section className="page-section rewrite-history [display:flex] [flex-direction:column] [gap:12px]">
-              <h2 className="section-title [margin:0_0_10px] [font-size:1rem] [color:var(--text-soft)] [letter-spacing:-0.02em]">{t("writing.detail.rewriteHistory")}</h2>
-              <div className="collection-list [display:flex] [flex-direction:column]">
+            <section className="page-section rewrite-history flex flex-col gap-3">
+              <h2 className="section-title uv-margin-83bba30fc1 text-uv-f19feeb881c text-uv-text-soft uv-letter-spacing-235f37bdea">{t("writing.detail.rewriteHistory")}</h2>
+              <div className="collection-list flex flex-col">
                 {rewrites.map((rewrite, index) => {
                   const rewriteEvaluation = rewrite.evaluation
                     ? writingEvaluationSchema.safeParse(rewrite.evaluation)
@@ -491,7 +491,7 @@ export default async function WritingSessionPage({
                       : t("writing.status.active");
                   return (
                     <Link
-                      className="collection-row [border-bottom:1px_solid_var(--border)] [min-height:64px] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [align-items:center] [gap:12px] [padding:11px_2px] [&_strong]:[display:block] [&_span]:[display:block] [&_span]:[margin-top:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.76rem] min-[940px]:[&:hover]:[background:var(--surface)]"
+                      className="collection-row uv-border-bottom-8d7f82f403 min-h-16 grid uv-grid-template-columns-f06dd92ea5 items-center gap-3 uv-padding-c9f5e3c335 uv-veda02a0adb:block uv-v36c0309a03:block uv-v36c0309a03:mt-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
                       href={"/writing/" + rewrite.id}
                       key={rewrite.id}
                     >
@@ -517,7 +517,7 @@ export default async function WritingSessionPage({
                         </span>
                       </div>
                       <ArrowLeft
-                        className="rewrite-history-arrow rtl-mirror [transform:rotate(180deg)]"
+                        className="rewrite-history-arrow rtl-mirror uv-transform-14214c0e93"
                         size={16}
                       />
                     </Link>
@@ -528,7 +528,7 @@ export default async function WritingSessionPage({
           ) : null}
         </>
       ) : (
-        <div className="empty-state [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [padding:24px] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)]">
+        <div className="empty-state flex flex-col gap-3 items-start p-6 uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft">
           <strong>{t("writing.detail.evaluationUnreadable")}</strong>
         </div>
       )}

@@ -74,26 +74,26 @@ export default async function TeachWordPage({
   );
 
   return (
-    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
-        <Link href={"/vocabulary/" + word.id} className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
+    <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+        <Link href={"/vocabulary/" + word.id} className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
           <ArrowLeft className="rtl-mirror" size={16} />
           {t("word.lesson.back")}
         </Link>
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">
           {t("word.lesson.eyebrow", { level: course.targetLevel })}
         </p>
         <h1 className="learning-content" lang={targetLanguageCode} dir="ltr">
           {formatLexemeLabel(word)}
         </h1>
-        <p className="page-description [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]">{t("word.lesson.description")}</p>
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a">{t("word.lesson.description")}</p>
       </section>
 
-      <section className="lesson-grid [display:grid] [grid-template-columns:1fr] [gap:12px] min-[700px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-        <article className="panel lesson-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:4px_0_0] [&_h2]:[letter-spacing:-0.03em] [&_h3]:[margin:0_0_6px] [&_h3]:[font-size:0.98rem] [&_h3]:[letter-spacing:-0.02em] [&_p]:[line-height:1.58] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+      <section className="lesson-grid grid uv-grid-template-columns-6a5c4d4d49 gap-3 uv-min700:uv-grid-template-columns-dd0b1a1848">
+        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.lesson.meaningStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.meaningStep")}</p>
               <h2>{t("word.lesson.meaningTitle")}</h2>
             </div>
             <BookOpenCheck size={20} />
@@ -102,7 +102,7 @@ export default async function TeachWordPage({
           {visibleMeanings.map((translation) => (
             <p
               key={translation.kind + ":" + translation.language + ":" + translation.text}
-              className="lesson-meaning learning-content [margin:5px_0] [font-size:1.1rem] [line-height:1.5]"
+              className="lesson-meaning learning-content uv-margin-397bb87e55 text-uv-f24126b21bc uv-line-height-aa8f289ebe"
               lang={translation.language === "fa" ? "fa" : "en"}
               dir={translation.language === "fa" ? "rtl" : "ltr"}
             >
@@ -111,10 +111,10 @@ export default async function TeachWordPage({
           ))}
         </article>
 
-        <article className="panel lesson-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:4px_0_0] [&_h2]:[letter-spacing:-0.03em] [&_h3]:[margin:0_0_6px] [&_h3]:[font-size:0.98rem] [&_h3]:[letter-spacing:-0.02em] [&_p]:[line-height:1.58] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.lesson.patternStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.patternStep")}</p>
               <h2>{t("word.lesson.patternTitle")}</h2>
             </div>
             <Brain size={20} />
@@ -122,34 +122,34 @@ export default async function TeachWordPage({
 
           {word.patterns.length ? (
             word.patterns.map((pattern) => (
-              <div className="lesson-pattern [padding:13px_0] [border-bottom:1px_solid_var(--border)] [&:last-child]:[border-bottom:0] [&_p]:[margin:6px_0_0]" key={pattern.id}>
+              <div className="lesson-pattern uv-padding-d53d738632 uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-vb19eb067c9:uv-margin-66a0389558" key={pattern.id}>
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {pattern.pattern}
                 </strong>
                 {pattern.explanation ? (
-                  <p className="muted learning-content [color:var(--text-muted)]" lang="en" dir="ltr">
+                  <p className="muted learning-content text-uv-text-muted" lang="en" dir="ltr">
                     {pattern.explanation}
                   </p>
                 ) : null}
               </div>
             ))
           ) : (
-            <p className="muted [color:var(--text-muted)]">{t("word.lesson.noPattern")}</p>
+            <p className="muted text-uv-text-muted">{t("word.lesson.noPattern")}</p>
           )}
         </article>
 
-        <article className="panel lesson-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:4px_0_0] [&_h2]:[letter-spacing:-0.03em] [&_h3]:[margin:0_0_6px] [&_h3]:[font-size:0.98rem] [&_h3]:[letter-spacing:-0.02em] [&_p]:[line-height:1.58] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.lesson.contextStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.contextStep")}</p>
               <h2>{t("word.lesson.contextTitle")}</h2>
             </div>
             <BookOpenCheck size={20} />
           </div>
 
-          <div className="lesson-examples [display:flex] [flex-direction:column] [gap:10px]">
+          <div className="lesson-examples flex flex-col gap-2.5">
             {word.examples.slice(0, 4).map((example) => (
-              <div className="lesson-example [display:flex] [flex-direction:column] [gap:5px] [padding:13px_14px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.8rem] [&_span]:[line-height:1.5]" key={example.id}>
+              <div className="lesson-example flex flex-col gap-1.25 uv-padding-e93fc48d3c uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f6c2d68ddb8 uv-v36c0309a03:uv-line-height-aa8f289ebe" key={example.id}>
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                   {example.targetText}
                 </strong>
@@ -170,22 +170,22 @@ export default async function TeachWordPage({
           </div>
         </article>
 
-        <article className="panel lesson-section [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_h2]:[margin:4px_0_0] [&_h2]:[letter-spacing:-0.03em] [&_h3]:[margin:0_0_6px] [&_h3]:[font-size:0.98rem] [&_h3]:[letter-spacing:-0.02em] [&_p]:[line-height:1.58] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <article className="panel lesson-section uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce uv-v55c53ce4b9:uv-margin-320a979a9f uv-v55c53ce4b9:text-uv-fde89c2b680 uv-v55c53ce4b9:uv-letter-spacing-235f37bdea uv-vb19eb067c9:uv-line-height-fe7a9b32f9 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.lesson.connectionsStep")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.connectionsStep")}</p>
               <h2>{t("word.lesson.connectionsTitle")}</h2>
             </div>
             <Network size={20} />
           </div>
 
           {word.outgoing.length ? (
-            <div className="relation-list [display:flex] [flex-wrap:wrap] [gap:8px]">
+            <div className="relation-list flex flex-wrap gap-2">
               {word.outgoing.map((relation) => (
                 <Link
                   key={relation.id}
                   href={"/vocabulary/" + relation.target.id}
-                  className="relation-chip [min-height:48px] [min-width:110px] [display:inline-flex] [flex-direction:column] [justify-content:center] [gap:3px] [padding:8px_12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_span]:[font-weight:600] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.66rem]"
+                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:font-semibold uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff7862da171"
                 >
                   <span className="learning-content" lang={targetLanguageCode} dir="ltr">
                     {relation.target.lemma}
@@ -199,15 +199,15 @@ export default async function TeachWordPage({
               ))}
             </div>
           ) : (
-            <p className="muted [color:var(--text-muted)]">{t("word.lesson.noConnections")}</p>
+            <p className="muted text-uv-text-muted">{t("word.lesson.noConnections")}</p>
           )}
         </article>
       </section>
 
-      <section className="lesson-production [&_h2]:[margin:4px_0_0] [&_h2]:[letter-spacing:-0.03em] [display:flex] [flex-direction:column] [gap:12px] [&_.learning-card]:[max-width:none]">
-        <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+      <section className="lesson-production uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce flex flex-col gap-3 uv-vb0069fed3b:max-w-none">
+        <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
           <div>
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.lesson.produceStep")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.produceStep")}</p>
             <h2>{t("word.lesson.produceTitle")}</h2>
           </div>
           <Brain size={20} />
@@ -224,11 +224,11 @@ export default async function TeachWordPage({
         />
       </section>
 
-      <section className="panel lesson-footer-actions [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_h2]:[margin:4px_0_0] [&_h2]:[letter-spacing:-0.03em] [display:flex] [flex-direction:column] [gap:16px] [&_p]:[margin-bottom:0] min-[700px]:[flex-direction:row] min-[700px]:[align-items:center] min-[700px]:[justify-content:space-between] [border-radius:18px]">
+      <section className="panel lesson-footer-actions uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:uv-letter-spacing-60c8585fce flex flex-col gap-4 uv-vb19eb067c9:mb-0 uv-min700:flex-row uv-min700:items-center uv-min700:justify-between rounded-uv-r6d27d54c6c">
         <div>
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.lesson.retainStep")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.lesson.retainStep")}</p>
           <h2>{t("word.lesson.retainTitle")}</h2>
-          <p className="muted [color:var(--text-muted)]">{t("word.lesson.retainHelp")}</p>
+          <p className="muted text-uv-text-muted">{t("word.lesson.retainHelp")}</p>
         </div>
         <ScheduleReviewForm lexemeId={word.id} />
       </section>

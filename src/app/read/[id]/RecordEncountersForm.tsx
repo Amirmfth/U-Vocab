@@ -15,7 +15,7 @@ export function RecordEncountersForm({ documentId }: { documentId: string }) {
   const [state, action] = useActionState(recordReadingEncounters, initialState);
 
   return (
-    <div className="reading-action-stack [display:flex] [flex-direction:column] [gap:14px]">
+    <div className="reading-action-stack flex flex-col gap-3.5">
       <form action={action}>
         <input type="hidden" name="documentId" value={documentId} />
         <ActionButton pendingLabel="Recording…">

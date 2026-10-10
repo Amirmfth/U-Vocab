@@ -37,9 +37,9 @@ export function WritingEditor({
   }, [router, state.status]);
 
   return (
-    <form action={action} className="writing-editor [display:flex] [flex-direction:column] [gap:14px] [&_textarea]:[resize:vertical] [&_textarea]:[font-size:1rem] [&_textarea]:[line-height:1.65] [&_textarea]:[min-height:48dvh] [&_textarea]:[padding:14px]">
+    <form action={action} className="writing-editor flex flex-col gap-3.5 uv-v3c40c23539:resize-y uv-v3c40c23539:text-uv-f19feeb881c uv-v3c40c23539:uv-line-height-cf9a155f4a uv-v3c40c23539:uv-min-height-acf4fad8b6 uv-v3c40c23539:p-3.5">
       <input type="hidden" name="sessionId" value={sessionId} />
-      <div className="writing-editor-heading [display:flex] [flex-direction:column] [gap:3px] [&_label]:[color:var(--text)] [&_label]:[font-size:0.9rem] [&_label]:[font-weight:650] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.72rem]">
+      <div className="writing-editor-heading flex flex-col gap-0.75 uv-v586b3820a5:text-uv-text uv-v586b3820a5:text-uv-fee84419642 uv-v586b3820a5:uv-weight-650 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff1713651e0">
         <label htmlFor="writing-draft">{t("writing.editor.response")}</label>
         <span>{t("writing.editor.help")}</span>
       </div>
@@ -56,7 +56,7 @@ export function WritingEditor({
         dir="ltr"
       />
 
-      <div className="writing-editor-footer [display:flex] [flex-direction:column] [gap:9px] [&_>_span]:[color:var(--text-muted)] [&_>_span]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_>_span]:[font-size:0.74rem] [&_>_span.is-under]:[color:var(--warning)] min-[620px]:[flex-direction:row] min-[620px]:[align-items:center] min-[620px]:[justify-content:space-between] [position:sticky] [bottom:calc(96px_+_env(safe-area-inset-bottom))] [z-index:4] [padding:9px] [border:1px_solid_var(--border)] [border-radius:15px] [background:rgba(17,_17,_20,_0.94)] [backdrop-filter:blur(14px)] min-[620px]:[position:static] min-[620px]:[padding:0] min-[620px]:[border:0] min-[620px]:[background:transparent] min-[620px]:[backdrop-filter:none]">
+      <div className="writing-editor-footer flex flex-col gap-2.25 uv-v22810335d8:text-uv-text-muted uv-v22810335d8:uv-font-family-320794573f uv-v22810335d8:text-uv-f63777cce16 uv-v60c3901c7a:text-uv-warning uv-min620:flex-row uv-min620:items-center uv-min620:justify-between sticky uv-bottom-19e81ff378 uv-z-index-1b64538924 p-2.25 uv-border-8d7f82f403 rounded-uv-r344c386330 bg-uv-c54c3fe5d99 uv-backdrop-filter-fa0b2b5363 uv-min620:static uv-min620:p-0 uv-min620:border-0 uv-min620:bg-transparent uv-min620:uv-backdrop-filter-71f8e7976e">
         <span
           id="writing-word-count"
           className={words < targetWords * 0.7 ? "is-under" : ""}

@@ -442,7 +442,7 @@ export default async function ProgressPage({
   };
 
   return (
-    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
+    <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
       <TimezoneSync savedTimezone={user.timezone} />
       <PersistedFirstUseGuide
         userId={user.id}
@@ -453,19 +453,19 @@ export default async function ProgressPage({
         dismissLabel={t("guidance.dismiss")}
       />
 
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.eyebrow")}</p>
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.eyebrow")}</p>
         <h1>{t("progress.title")}</h1>
-        <p className="page-description [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]">{t("progress.description")}</p>
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a">{t("progress.description")}</p>
       </section>
 
-      <nav className="range-tabs [width:fit-content] [max-width:100%] [display:flex] [gap:4px] [overflow-x:auto] [padding:3px] [border:1px_solid_var(--border)] [border-radius:12px] [background:var(--surface)]" aria-label={t("progress.range")}>
+      <nav className="range-tabs w-fit max-w-full flex gap-1 overflow-x-auto p-0.75 uv-border-8d7f82f403 rounded-uv-r0939007802 bg-uv-surface" aria-label={t("progress.range")}>
         {(["7", "30", "90", "365", "all"] as ProgressRange[]).map((value) =>
           canUseAdvancedAnalytics || value === "7" ? (
             <Link
               key={value}
               href={"/progress?range=" + value}
-              className={"range-tab [min-width:48px] [min-height:38px] [display:grid] [place-items:center] [padding:0_10px] [border-radius:9px] [color:var(--text-muted)] [font-size:0.76rem] [font-weight:600] [white-space:nowrap] [&.is-active]:[background:var(--surface-soft)] [&.is-active]:[color:var(--text)] [&.is-locked]:[grid-auto-flow:column] [&.is-locked]:[gap:6px] [&.is-locked]:[cursor:not-allowed] [&.is-locked]:[opacity:0.72] [&.is-locked_small]:[font-size:0.58rem] [&.is-locked_small]:[font-weight:700] [&.is-locked_small]:[letter-spacing:0.04em] [&.is-locked_small]:[text-transform:uppercase] " + (range === value ? "is-active" : "")}
+              className={"range-tab min-w-12 min-h-9.5 grid uv-place-items-305047e96e uv-padding-4d5c65a39c rounded-uv-r22be94e0a1 text-uv-text-muted text-uv-f74fc13de71 font-semibold whitespace-nowrap uv-v14ef0811e9:bg-uv-surface-soft uv-v14ef0811e9:text-uv-text uv-v33850dc841:uv-grid-auto-flow-aa60230ab0 uv-v33850dc841:gap-1.5 uv-v33850dc841:cursor-not-allowed uv-v33850dc841:opacity-72 uv-v271612ab88:text-uv-fd95043f679 uv-v271612ab88:font-bold uv-v271612ab88:uv-letter-spacing-a3adac5ce9 uv-v271612ab88:uppercase " + (range === value ? "is-active" : "")}
               aria-current={range === value ? "page" : undefined}
             >
               {t(rangeLabelKeys[value])}
@@ -473,7 +473,7 @@ export default async function ProgressPage({
           ) : (
             <span
               key={value}
-              className="range-tab is-locked [min-width:48px] [min-height:38px] [display:grid] [place-items:center] [padding:0_10px] [border-radius:9px] [color:var(--text-muted)] [font-size:0.76rem] [font-weight:600] [white-space:nowrap] [&.is-active]:[background:var(--surface-soft)] [&.is-active]:[color:var(--text)] [&.is-locked]:[grid-auto-flow:column] [&.is-locked]:[gap:6px] [&.is-locked]:[cursor:not-allowed] [&.is-locked]:[opacity:0.72] [&.is-locked_small]:[font-size:0.58rem] [&.is-locked_small]:[font-weight:700] [&.is-locked_small]:[letter-spacing:0.04em] [&.is-locked_small]:[text-transform:uppercase]"
+              className="range-tab is-locked min-w-12 min-h-9.5 grid uv-place-items-305047e96e uv-padding-4d5c65a39c rounded-uv-r22be94e0a1 text-uv-text-muted text-uv-f74fc13de71 font-semibold whitespace-nowrap uv-v14ef0811e9:bg-uv-surface-soft uv-v14ef0811e9:text-uv-text uv-v33850dc841:uv-grid-auto-flow-aa60230ab0 uv-v33850dc841:gap-1.5 uv-v33850dc841:cursor-not-allowed uv-v33850dc841:opacity-72 uv-v271612ab88:text-uv-fd95043f679 uv-v271612ab88:font-bold uv-v271612ab88:uv-letter-spacing-a3adac5ce9 uv-v271612ab88:uppercase"
               aria-label={t("progress.proRangeLocked", {
                 range: t(rangeLabelKeys[value]),
               })}
@@ -485,7 +485,7 @@ export default async function ProgressPage({
         )}
       </nav>
 
-      <section className="progress-summary [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [border:1px_solid_var(--border)] [border-radius:var(--radius-lg)] [overflow:hidden] [&_>_div]:[min-width:0] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:4px] [&_>_div]:[padding:15px_13px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:nth-child(odd)]:[border-right:1px_solid_var(--border)] [&_>_div:nth-last-child(-n_+_2)]:[border-bottom:0] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.7rem] [&_span]:[line-height:1.35] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.7rem] [&_small]:[line-height:1.35] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_strong]:[font-variant-numeric:tabular-nums] [&_strong]:[font-size:1.55rem] [&_strong]:[letter-spacing:-0.05em] min-[620px]:[grid-template-columns:repeat(4,_minmax(0,_1fr))] min-[620px]:[&_>_div]:[border-bottom:0] min-[620px]:[&_>_div:nth-last-child(-n_+_2)]:[border-bottom:0] min-[620px]:[&_>_div:nth-child(odd)]:[border-right:0] min-[620px]:[&_>_div_+_div]:[border-left:1px_solid_var(--border)]">
+      <section className="progress-summary grid uv-grid-template-columns-dd0b1a1848 uv-border-8d7f82f403 rounded-uv-r02a0a889dd overflow-hidden uv-vcbb57f4d35:min-w-0 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-1 uv-vcbb57f4d35:uv-padding-13f34872df uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-v3de32a793f:uv-border-right-8d7f82f403 uv-v3f0a529921:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f58b84cc6f5 uv-v36c0309a03:uv-line-height-ec0a69ff34 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-f58b84cc6f5 uv-v982220ddd5:uv-line-height-ec0a69ff34 uv-veda02a0adb:uv-font-family-320794573f uv-veda02a0adb:uv-font-variant-numeric-3032cae0ba uv-veda02a0adb:text-uv-f52dd23ea8f uv-veda02a0adb:uv-letter-spacing-52201352dd uv-min620:uv-grid-template-columns-0cbc4f103a uv-min620:uv-vcbb57f4d35:uv-border-bottom-b6589fc6ab uv-min620:uv-v3f0a529921:uv-border-bottom-b6589fc6ab uv-min620:uv-v3de32a793f:uv-border-right-b6589fc6ab uv-min620:uv-v5007062a75:uv-border-left-8d7f82f403">
         <div>
           <span>{t("progress.vocabulary")}</span>
           <strong>{formatNumber(locale, vocabulary.length)}</strong>
@@ -525,22 +525,22 @@ export default async function ProgressPage({
         compact={!canUseAdvancedAnalytics}
       />
 
-      <section className="progress-grid [display:grid] [grid-template-columns:1fr] [gap:12px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-        <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+      <section className="progress-grid grid uv-grid-template-columns-6a5c4d4d49 gap-3 uv-min620:uv-grid-template-columns-dd0b1a1848">
+        <article className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.skillBalance")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.skillBalance")}</p>
               <h2>{t("progress.recognitionProduction")}</h2>
             </div>
             <TrendingUp size={19} />
           </div>
-          <div className="progress-bars [display:flex] [flex-direction:column] [gap:15px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:7px] [&_span]:[display:flex] [&_span]:[justify-content:space-between] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.78rem] [&_b]:[color:var(--text-soft)] [&_b]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
+          <div className="progress-bars flex flex-col gap-3.75 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-1.75 uv-v36c0309a03:flex uv-v36c0309a03:justify-between uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-fe9d5fd6635 uv-vad81a304ad:text-uv-text-soft uv-vad81a304ad:uv-font-family-320794573f">
             <div>
               <span>
                 {t("progress.recognition")}{" "}
                 <b>{formatPercent(locale, averageRecognition)}</b>
               </span>
-              <div className="metric-bar [height:7px] [overflow:hidden] [border-radius:999px] [background:var(--surface-soft)] [&_>_span]:[display:block] [&_>_span]:[height:100%] [&_>_span]:[border-radius:inherit] [&_>_span]:[background:var(--primary)]">
+              <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft uv-v22810335d8:block uv-v22810335d8:h-full uv-v22810335d8:rounded-uv-r3e26d67509 uv-v22810335d8:bg-uv-primary">
                 <span
                   style={{ width: Math.round(averageRecognition * 100) + "%" }}
                 />
@@ -551,25 +551,25 @@ export default async function ProgressPage({
                 {t("progress.production")}{" "}
                 <b>{formatPercent(locale, averageProduction)}</b>
               </span>
-              <div className="metric-bar [height:7px] [overflow:hidden] [border-radius:999px] [background:var(--surface-soft)] [&_>_span]:[display:block] [&_>_span]:[height:100%] [&_>_span]:[border-radius:inherit] [&_>_span]:[background:var(--primary)]">
+              <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft uv-v22810335d8:block uv-v22810335d8:h-full uv-v22810335d8:rounded-uv-r3e26d67509 uv-v22810335d8:bg-uv-primary">
                 <span
                   style={{ width: Math.round(averageProduction * 100) + "%" }}
                 />
               </div>
             </div>
           </div>
-          <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.estimateCaveat")}</p>
+          <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">{t("progress.estimateCaveat")}</p>
         </article>
 
-        <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <article className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.workload")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.workload")}</p>
               <h2>{t("progress.reviewQueue")}</h2>
             </div>
             <Clock3 size={19} />
           </div>
-          <div className={"workload-numbers [&.is-free]:[grid-template-columns:1fr] [&.is-free_>_div_+_div]:[border-left:0] [display:grid] [grid-template-columns:repeat(3,_minmax(0,_1fr))] [border-top:1px_solid_var(--border)] [border-bottom:1px_solid_var(--border)] [&_>_div]:[min-width:0] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:4px] [&_>_div]:[padding:13px_8px] [&_>_div_+_div]:[border-left:1px_solid_var(--border)] [&_strong]:[font-size:1.35rem] [&_strong]:[font-variant-numeric:tabular-nums] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.67rem] " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
+          <div className={"workload-numbers uv-vf08df4920a:uv-grid-template-columns-6a5c4d4d49 uv-v91ab2e2d13:uv-border-left-b6589fc6ab grid uv-grid-template-columns-563355decf uv-border-top-8d7f82f403 uv-border-bottom-8d7f82f403 uv-vcbb57f4d35:min-w-0 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-1 uv-vcbb57f4d35:uv-padding-7841f3c20a uv-v5007062a75:uv-border-left-8d7f82f403 uv-veda02a0adb:text-uv-f3951047c34 uv-veda02a0adb:uv-font-variant-numeric-3032cae0ba uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-fe22288a701 " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
             <div>
               <strong>{formatNumber(locale, dueNow)}</strong>
               <span>{t("progress.dueNow")}</span>
@@ -587,7 +587,7 @@ export default async function ProgressPage({
               </>
             ) : null}
           </div>
-          <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">
+          <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">
             {canUseAdvancedAnalytics
               ? t("progress.reviewSuccess", {
                   percent: formatPercent(locale, reviewSuccess),
@@ -597,20 +597,20 @@ export default async function ProgressPage({
         </article>
 
         {canUseAdvancedAnalytics ? (
-          <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-            <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+          <article className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+            <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
               <div>
-                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.time")}</p>
+                <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.time")}</p>
                 <h2>{t("progress.activePractice")}</h2>
               </div>
               <Flame size={19} />
             </div>
-            <p className="big-metric [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-variant-numeric:tabular-nums] [margin:12px_0_2px] [font-size:clamp(2rem,_10vw,_3.4rem)] [line-height:0.95] [letter-spacing:-0.07em]">
+            <p className="big-metric uv-font-family-320794573f uv-font-variant-numeric-3032cae0ba uv-margin-41866770f5 text-uv-fad6b4ffcf8 uv-line-height-33493e5f53 uv-letter-spacing-5d34879886">
               {t("progress.minutes", {
                 count: formatNumber(locale, minutes(totalDurationMs)),
               })}
             </p>
-            <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">
+            <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">
               {t("progress.practiceAccuracy", {
                 percent: formatPercent(locale, practiceAccuracy),
                 count: formatNumber(locale, encounterCount),
@@ -619,16 +619,16 @@ export default async function ProgressPage({
           </article>
         ) : null}
 
-        <article className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <article className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.weakAreas")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.weakAreas")}</p>
               <h2>{t("progress.needsWork")}</h2>
             </div>
             <ShieldCheck size={19} />
           </div>
           {weakAreas.length ? (
-            <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
+            <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
               {weakAreas
                 .slice(0, canUseAdvancedAnalytics ? 6 : 3)
                 .map(([type, count]) => (
@@ -643,7 +643,7 @@ export default async function ProgressPage({
                 ))}
             </div>
           ) : (
-            <p className="muted [color:var(--text-muted)]">{t("progress.noWeakness")}</p>
+            <p className="muted text-uv-text-muted">{t("progress.noWeakness")}</p>
           )}
         </article>
       </section>
@@ -657,15 +657,15 @@ export default async function ProgressPage({
       ) : (
         <>
           {comparisons ? (
-            <section className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-              <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+            <section className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+              <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
                 <div>
-                  <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.comparison.eyebrow")}</p>
+                  <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.comparison.eyebrow")}</p>
                   <h2>{t("progress.comparison.title")}</h2>
                 </div>
                 <TrendingUp size={19} />
               </div>
-              <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
+              <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
                 <div>
                   <span>{t("progress.comparison.wordsAdded")}</span>
                   <strong>{signedNumber(locale, comparisons.learned.delta)}</strong>
@@ -695,19 +695,19 @@ export default async function ProgressPage({
                   </strong>
                 </div>
               </div>
-              <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.comparison.caveat")}</p>
+              <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">{t("progress.comparison.caveat")}</p>
             </section>
           ) : null}
 
-          <section className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-            <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+          <section className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+            <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
               <div>
-                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.report.eyebrow")}</p>
+                <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.report.eyebrow")}</p>
                 <h2>{t("progress.report.title")}</h2>
               </div>
               <Sparkles size={19} />
             </div>
-            <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
+            <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
               <div>
                 <span>{t("progress.report.strongest")}</span>
                 <strong>{reportLabel(report.strongest)}</strong>
@@ -725,29 +725,29 @@ export default async function ProgressPage({
                 <strong>{reportLabel(report.suggestedNext)}</strong>
               </div>
             </div>
-            <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.report.caveat")}</p>
+            <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">{t("progress.report.caveat")}</p>
           </section>
 
-          <section className="panel progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [min-width:0] [border-radius:18px]">
-            <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+          <section className="panel progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
+            <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
               <div>
-                <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.growth")}</p>
+                <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.growth")}</p>
                 <h2>{t("progress.trend")}</h2>
               </div>
             </div>
-            <div className="trend-chart [height:150px] [display:grid] [grid-template-columns:repeat(12,_minmax(18px,_1fr))] [gap:5px] [align-items:end] [padding-top:12px] [overflow-x:auto]" aria-label={t("progress.trendAria")}>
+            <div className="trend-chart h-37.5 grid uv-grid-template-columns-099132f0c9 gap-1.25 items-end pt-3 overflow-x-auto" aria-label={t("progress.trendAria")}>
               {monthlyTrend.map((item) => (
-                <div className="trend-month [height:100%] [min-width:20px] [display:grid] [grid-template-rows:minmax(0,_1fr)_auto] [gap:6px] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.58rem] [&_small]:[text-align:center]" key={item.month}>
-                  <div className="trend-bars [height:100%] [display:flex] [align-items:end] [justify-content:center] [gap:2px]">
+                <div className="trend-month h-full min-w-5 grid uv-grid-template-rows-f06dd92ea5 gap-1.5 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-fd95043f679 uv-v982220ddd5:text-center" key={item.month}>
+                  <div className="trend-bars h-full flex items-end justify-center gap-0.5">
                     <span
-                      className="trend-bar learned [width:min(8px,_45%)] [min-height:3px] [border-radius:4px_4px_1px_1px] [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)]"
+                      className="trend-bar learned uv-width-53ed35ab81 min-h-0.75 rounded-uv-rce83e44a7d uv-v6fdb4efa47:bg-uv-primary uv-v432f644386:bg-uv-success"
                       style={{ height: Math.max(3, (item.learned / maxTrend) * 100) + "%" }}
                       title={t("progress.learnedTitle", {
                         count: formatNumber(locale, item.learned),
                       })}
                     />
                     <span
-                      className="trend-bar mastered [width:min(8px,_45%)] [min-height:3px] [border-radius:4px_4px_1px_1px] [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)]"
+                      className="trend-bar mastered uv-width-53ed35ab81 min-h-0.75 rounded-uv-rce83e44a7d uv-v6fdb4efa47:bg-uv-primary uv-v432f644386:bg-uv-success"
                       style={{ height: Math.max(3, (item.mastered / maxTrend) * 100) + "%" }}
                       title={t("progress.masteredTitle", {
                         count: formatNumber(locale, item.mastered),
@@ -762,30 +762,30 @@ export default async function ProgressPage({
                 </div>
               ))}
             </div>
-            <div className="trend-legend [display:flex] [gap:14px] [margin-top:10px] [color:var(--text-muted)] [font-size:0.68rem] [&_span]:[display:inline-flex] [&_span]:[align-items:center] [&_span]:[gap:6px]">
+            <div className="trend-legend flex gap-3.5 mt-2.5 text-uv-text-muted text-uv-f78eb7000a9 uv-v36c0309a03:inline-flex uv-v36c0309a03:items-center uv-v36c0309a03:gap-1.5">
               <span>
-                <i className="trend-key learned [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)] [width:8px] [height:8px] [border-radius:2px]" /> {t("progress.added")}
+                <i className="trend-key learned uv-v6fdb4efa47:bg-uv-primary uv-v432f644386:bg-uv-success w-2 h-2 rounded-uv-ra0179b92f3" /> {t("progress.added")}
               </span>
               <span>
-                <i className="trend-key mastered [&.learned]:[background:var(--primary)] [&.mastered]:[background:var(--success)] [width:8px] [height:8px] [border-radius:2px]" /> {t("progress.masteredLegend")}
+                <i className="trend-key mastered uv-v6fdb4efa47:bg-uv-primary uv-v432f644386:bg-uv-success w-2 h-2 rounded-uv-ra0179b92f3" /> {t("progress.masteredLegend")}
               </span>
             </div>
-            <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.trendCaveat")}</p>
+            <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">{t("progress.trendCaveat")}</p>
           </section>
         </>
       )}
 
-      <section className="panel heatmap-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [overflow:hidden] [border-radius:18px]">
-        <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+      <section className="panel heatmap-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 overflow-hidden rounded-uv-r6d27d54c6c">
+        <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
           <div>
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.activity")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.activity")}</p>
             <h2>
               {canUseAdvancedAnalytics
                 ? t("progress.days365")
                 : t("progress.days7")}
             </h2>
           </div>
-          <span className="muted [color:var(--text-muted)]">{user.timezone}</span>
+          <span className="muted text-uv-text-muted">{user.timezone}</span>
         </div>
 
         <ActivityHeatmap
@@ -797,7 +797,7 @@ export default async function ProgressPage({
           dayCount={canUseAdvancedAnalytics ? 365 : 7}
         />
 
-        <div className="day-detail [display:flex] [flex-direction:column] [gap:10px] [padding-top:14px] [border-top:1px_solid_var(--border)] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:3px] [&_>_div:first-child_span]:[color:var(--text-muted)] [&_>_div:first-child_span]:[font-size:0.7rem] min-[620px]:[flex-direction:row] min-[620px]:[justify-content:space-between] min-[620px]:[align-items:center]">
+        <div className="day-detail flex flex-col gap-2.5 pt-3.5 uv-border-top-8d7f82f403 uv-v0fee2d502c:flex uv-v0fee2d502c:flex-col uv-v0fee2d502c:gap-0.75 uv-v1c155e3be2:text-uv-text-muted uv-v1c155e3be2:text-uv-f58b84cc6f5 uv-min620:flex-row uv-min620:justify-between uv-min620:items-center">
           <div>
             <strong>
               {formatDate(locale, new Date(selectedDay + "T12:00:00Z"), {
@@ -810,7 +810,7 @@ export default async function ProgressPage({
                 : t("progress.noActivity")}
             </span>
           </div>
-          <div className="day-detail-metrics [display:flex] [flex-wrap:wrap] [gap:6px] [&_span]:[padding:5px_8px] [&_span]:[border:1px_solid_var(--border)] [&_span]:[border-radius:999px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.68rem]">
+          <div className="day-detail-metrics flex flex-wrap gap-1.5 uv-v36c0309a03:uv-padding-24a7c581e4 uv-v36c0309a03:uv-border-8d7f82f403 uv-v36c0309a03:rounded-uv-red9ab892c5 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f78eb7000a9">
             <span>
               {t("progress.reviewed", {
                 count: formatNumber(locale, selectedActivity?.reviewed ?? 0),
@@ -845,12 +845,12 @@ export default async function ProgressPage({
         </div>
       </section>
 
-      <section className="progress-actions [display:flex] [flex-direction:column] [gap:9px] min-[620px]:[flex-direction:row]">
-        <Link href="/rescue" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
+      <section className="progress-actions flex flex-col gap-2.25 uv-min620:flex-row">
+        <Link href="/rescue" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
           {t("progress.rescueWeak")}{" "}
           <ArrowRight className="rtl-mirror" size={17} />
         </Link>
-        <Link href="/mistakes" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
+        <Link href="/mistakes" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
           {t("progress.reviewMistakes")}
         </Link>
       </section>

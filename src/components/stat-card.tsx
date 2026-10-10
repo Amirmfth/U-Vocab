@@ -8,10 +8,10 @@ export function StatCard({
   detail?: React.ReactNode;
 }) {
   return (
-    <article className="stat-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [border-radius:var(--radius-lg)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:17px]">
-      <p className="stat-label [color:var(--text-muted)] [margin:0] [font-size:0.76rem]">{label}</p>
-      <p className="stat-value [margin:8px_0_2px] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:1.75rem] [line-height:1] [letter-spacing:-0.05em] [font-variant-numeric:tabular-nums]">{value}</p>
-      {detail ? <p className="stat-detail [margin:0] [font-size:0.76rem] [color:var(--text-muted)] [margin-top:8px]">{detail}</p> : null}
+    <article className="stat-card uv-border-8d7f82f403 uv-background-bfb621eb09 rounded-uv-r02a0a889dd uv-box-shadow-2853ca6bd8 p-4.25">
+      <p className="stat-label text-uv-text-muted m-0 text-uv-f74fc13de71">{label}</p>
+      <p className="stat-value uv-margin-ab8437355d uv-font-family-320794573f text-uv-f28f667fcee uv-line-height-356a192b79 uv-letter-spacing-52201352dd uv-font-variant-numeric-3032cae0ba">{value}</p>
+      {detail ? <p className="stat-detail m-0 text-uv-f74fc13de71 text-uv-text-muted mt-2">{detail}</p> : null}
     </article>
   );
 }

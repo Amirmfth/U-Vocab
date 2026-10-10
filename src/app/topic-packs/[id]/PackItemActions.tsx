@@ -15,7 +15,7 @@ export function PackItemActions({ itemId }: { itemId: string }) {
   const [state, action] = useActionState(removePackItem, initialState);
 
   return (
-    <div className="pack-item-action [display:flex] [flex-direction:column] [gap:8px]">
+    <div className="pack-item-action flex flex-col gap-2">
       <form action={action}>
         <input type="hidden" name="itemId" value={itemId} />
         <ActionButton variant="secondary" pendingLabel="Removing…">

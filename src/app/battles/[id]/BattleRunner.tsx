@@ -105,15 +105,15 @@ export function BattleRunner({
 
   if (!current || (mode === "TIMED" && remaining <= 0)) {
     return (
-      <section className="panel battle-finished [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:18px] [&_h2]:[margin:0] [&_h2]:[font-size:clamp(1.3rem,_6vw,_2rem)] [&_h2]:[line-height:1.25] [&_h2]:[letter-spacing:-0.035em] [border-radius:18px]">
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">BATTLE COMPLETE</p>
+      <section className="panel battle-finished uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-4.5 uv-vd552c26874:m-0 uv-vd552c26874:text-uv-fd69b9c5786 uv-vd552c26874:uv-line-height-8e007eaa50 uv-vd552c26874:uv-letter-spacing-b22247dbaf rounded-uv-r6d27d54c6c">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">BATTLE COMPLETE</p>
         <h2>{score} points</h2>
-        <p className="muted [color:var(--text-muted)]">
+        <p className="muted text-uv-text-muted">
           {Math.min(answered, questions.length)} / {questions.length} answered
         </p>
         <button
           type="button"
-          className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+          className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
           disabled={pending}
           onClick={() =>
             startTransition(async () => {
@@ -164,12 +164,12 @@ export function BattleRunner({
   }
 
   return (
-    <section className="battle-runner [display:flex] [flex-direction:column] [gap:14px]">
-      <div className="battle-hud [display:grid] [grid-template-columns:1fr_auto_1fr] [align-items:center] [gap:10px] [min-height:42px] [padding:0_2px] [color:var(--text-muted)] [font-size:0.75rem] [&_strong]:[color:var(--text)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_strong]:[font-size:1rem] [&_>_:last-child]:[justify-self:end]">
+    <section className="battle-runner flex flex-col gap-3.5">
+      <div className="battle-hud grid uv-grid-template-columns-e4c3efd568 items-center gap-2.5 min-h-10.5 uv-padding-a03728e684 text-uv-text-muted text-uv-f823f1262bd uv-veda02a0adb:text-uv-text uv-veda02a0adb:uv-font-family-320794573f uv-veda02a0adb:text-uv-f19feeb881c uv-v87e7c148d8:uv-justify-self-7a92f3d263">
         <span>{index + 1}/{questions.length}</span>
         <strong>{score} pts</strong>
         {mode === "TIMED" ? (
-          <span className="battle-timer [display:inline-flex] [align-items:center] [gap:5px]"><Clock3 size={15} /> {remaining}s</span>
+          <span className="battle-timer inline-flex items-center gap-1.25"><Clock3 size={15} /> {remaining}s</span>
         ) : (
           <span>untimed</span>
         )}
@@ -178,7 +178,7 @@ export function BattleRunner({
       <AnimatePresence mode="wait" initial={false}>
         <motion.article
           key={current.id}
-          className="panel battle-question-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:18px] [&_h2]:[margin:0] [&_h2]:[font-size:clamp(1.3rem,_6vw,_2rem)] [&_h2]:[line-height:1.25] [&_h2]:[letter-spacing:-0.035em] [border-radius:18px]"
+          className="panel battle-question-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-4.5 uv-vd552c26874:m-0 uv-vd552c26874:text-uv-fd69b9c5786 uv-vd552c26874:uv-line-height-8e007eaa50 uv-vd552c26874:uv-letter-spacing-b22247dbaf rounded-uv-r6d27d54c6c"
           initial={reduceMotion ? false : { opacity: 0, x: 30, scale: 0.99 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -36, scale: 0.985 }}
@@ -186,7 +186,7 @@ export function BattleRunner({
         >
           <h2>{current.prompt}</h2>
 
-          <div className="battle-options [display:grid] [grid-template-columns:1fr] [gap:10px] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
+          <div className="battle-options grid uv-grid-template-columns-6a5c4d4d49 gap-2.5 uv-min620:uv-grid-template-columns-dd0b1a1848">
             {current.options.map((option) => {
               const isCorrect = Boolean(result) && option === result?.expected;
               const isWrong = Boolean(result) && selected === option && !result?.correct;
@@ -194,7 +194,7 @@ export function BattleRunner({
                 <button
                   type="button"
                   className={[
-                    "battle-option [font:inherit] [min-height:58px] [width:100%] [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [padding:13px_15px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface)] [color:var(--text)] [text-align:left] [cursor:pointer] [transition:transform_140ms_ease,_border-color_140ms_ease,_background_140ms_ease,_opacity_140ms_ease] [&:hover:not(:disabled)]:[border-color:var(--border-strong)] [&:hover:not(:disabled)]:[background:var(--surface-raised)] [&:hover:not(:disabled)]:[transform:translateY(-1px)] [&:focus-visible:not(:disabled)]:[border-color:var(--border-strong)] [&:focus-visible:not(:disabled)]:[background:var(--surface-raised)] [&:focus-visible:not(:disabled)]:[transform:translateY(-1px)] [&:disabled]:[cursor:default] [&.is-selected]:[border-color:var(--border-strong)] [&.is-selected]:[background:var(--surface-raised)] [&.is-correct]:[border-color:var(--success)] [&.is-correct]:[background:var(--success-soft)] [&.is-wrong]:[border-color:var(--danger)] [&.is-wrong]:[background:var(--danger-soft)] [&.is-correct_>_svg]:[color:var(--success)] [&.is-wrong_>_svg]:[color:var(--danger)]",
+                    "battle-option uv-font-3e26d67509 min-h-14.5 w-full flex items-center justify-between gap-3 uv-padding-b0f44c163d uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface text-uv-text text-left cursor-pointer uv-transition-792ccfb84f uv-v999cdc25ee:border-uv-border-strong uv-v999cdc25ee:bg-uv-surface-raised uv-v999cdc25ee:uv-transform-4693dc4baa uv-v8b31ac2bd7:border-uv-border-strong uv-v8b31ac2bd7:bg-uv-surface-raised uv-v8b31ac2bd7:uv-transform-4693dc4baa disabled:cursor-default uv-v48f8f87023:border-uv-border-strong uv-v48f8f87023:bg-uv-surface-raised uv-vc1297541ff:border-uv-success uv-vc1297541ff:bg-uv-cafddaf6a65 uv-vfbdf4ae9ba:border-uv-danger uv-vfbdf4ae9ba:bg-uv-c8b3083dabe uv-vefd2d335a6:text-uv-success uv-vd980f564fa:text-uv-danger",
                     selected === option ? "is-selected" : "",
                     isCorrect ? "is-correct" : "",
                     isWrong ? "is-wrong" : "",
@@ -210,10 +210,10 @@ export function BattleRunner({
             })}
           </div>
 
-          {saveError ? <div className="battle-feedback is-wrong [display:flex] [align-items:flex-start] [gap:9px] [padding:12px] [border-radius:12px] [&.is-correct]:[background:rgba(73,_201,_139,_0.08)] [&.is-correct]:[color:var(--success)] [&.is-wrong]:[background:rgba(255,_107,_122,_0.07)] [&.is-wrong]:[color:var(--danger)] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.4] [&.is-pending]:[color:var(--text-muted)] [&.is-pending]:[background:var(--surface-raised)]" role="status">{saveError}</div> : null}
+          {saveError ? <div className="battle-feedback is-wrong flex items-start gap-2.25 p-3 rounded-uv-r0939007802 uv-vc1297541ff:bg-uv-cb0392f6948 uv-vc1297541ff:text-uv-success uv-vfbdf4ae9ba:bg-uv-c8ae00eb793 uv-vfbdf4ae9ba:text-uv-danger uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-a26f83404b uv-vc5ce1d313b:text-uv-text-muted uv-vc5ce1d313b:bg-uv-surface-raised" role="status">{saveError}</div> : null}
 
           {result ? (
-            <div className={"battle-feedback [display:flex] [align-items:flex-start] [gap:9px] [padding:12px] [border-radius:12px] [&.is-correct]:[background:rgba(73,_201,_139,_0.08)] [&.is-correct]:[color:var(--success)] [&.is-wrong]:[background:rgba(255,_107,_122,_0.07)] [&.is-wrong]:[color:var(--danger)] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.4] [&.is-pending]:[color:var(--text-muted)] [&.is-pending]:[background:var(--surface-raised)] " + (result.correct ? "is-correct" : "is-wrong")} role="status">
+            <div className={"battle-feedback flex items-start gap-2.25 p-3 rounded-uv-r0939007802 uv-vc1297541ff:bg-uv-cb0392f6948 uv-vc1297541ff:text-uv-success uv-vfbdf4ae9ba:bg-uv-c8ae00eb793 uv-vfbdf4ae9ba:text-uv-danger uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-a26f83404b uv-vc5ce1d313b:text-uv-text-muted uv-vc5ce1d313b:bg-uv-surface-raised " + (result.correct ? "is-correct" : "is-wrong")} role="status">
               {result.correct ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
               <div>
                 <strong>

@@ -133,19 +133,19 @@ export function ReviewReminderSettings({
           : null;
 
   return (
-    <section className="panel notification-settings [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:grid] [gap:18px] [border-radius:18px]">
-      <div className="notification-settings-heading [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:16px] [&_h2]:[margin:4px_0_6px] [&_p]:[margin-bottom:0] max-[680px]:[align-items:stretch] max-[680px]:[flex-direction:column]">
+    <section className="panel notification-settings uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid gap-4.5 rounded-uv-r6d27d54c6c">
+      <div className="notification-settings-heading flex items-start justify-between gap-4 uv-vd552c26874:uv-margin-fcf6155ded uv-vb19eb067c9:mb-0 uv-max680:items-stretch uv-max680:flex-col">
         <div>
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("notifications.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("notifications.eyebrow")}</p>
           <h2>{t("notifications.title")}</h2>
-          <p className="muted [color:var(--text-muted)]">{t("notifications.description")}</p>
+          <p className="muted text-uv-text-muted">{t("notifications.description")}</p>
         </div>
-        <span className={enabled ? "notification-status is-enabled [flex:none] [padding:5px_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-muted)] [font-size:.75rem] [font-weight:700] [&.is-enabled]:[border-color:color-mix(in_srgb,_var(--success)_48%,_var(--border))] [&.is-enabled]:[background:var(--success-soft)] [&.is-enabled]:[color:var(--success)] max-[680px]:[width:fit-content]" : "notification-status [flex:none] [padding:5px_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-muted)] [font-size:.75rem] [font-weight:700] [&.is-enabled]:[border-color:color-mix(in_srgb,_var(--success)_48%,_var(--border))] [&.is-enabled]:[background:var(--success-soft)] [&.is-enabled]:[color:var(--success)] max-[680px]:[width:fit-content]"}>
+        <span className={enabled ? "notification-status is-enabled uv-flex-71f8e7976e uv-padding-6c1a581b91 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-muted text-uv-f60ac4cf407 font-bold uv-v23e0a94081:uv-border-color-a6a2a05324 uv-v23e0a94081:bg-uv-cafddaf6a65 uv-v23e0a94081:text-uv-success uv-max680:w-fit" : "notification-status uv-flex-71f8e7976e uv-padding-6c1a581b91 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-muted text-uv-f60ac4cf407 font-bold uv-v23e0a94081:uv-border-color-a6a2a05324 uv-v23e0a94081:bg-uv-cafddaf6a65 uv-v23e0a94081:text-uv-success uv-max680:w-fit"}>
           {enabled ? t("notifications.on") : t("notifications.off")}
         </span>
       </div>
 
-      <div className="notification-preferences-grid [display:grid] [grid-template-columns:repeat(3,_minmax(0,_1fr))] [gap:10px] [&_label]:[display:grid] [&_label]:[gap:6px] [&_label]:[color:var(--text-muted)] [&_label]:[font-size:.78rem] [&_input]:[min-height:46px] [&_input]:[width:100%] [&_input]:[border:1px_solid_var(--border)] [&_input]:[border-radius:12px] [&_input]:[padding:0_12px] [&_input]:[background:var(--surface-raised)] [&_input]:[color:var(--text)] max-[680px]:[grid-template-columns:1fr]">
+      <div className="notification-preferences-grid grid uv-grid-template-columns-563355decf gap-2.5 uv-v586b3820a5:grid uv-v586b3820a5:gap-1.5 uv-v586b3820a5:text-uv-text-muted uv-v586b3820a5:text-uv-f5f68d82942 uv-vcf5ce320fa:min-h-11.5 uv-vcf5ce320fa:w-full uv-vcf5ce320fa:uv-border-8d7f82f403 uv-vcf5ce320fa:rounded-uv-r0939007802 uv-vcf5ce320fa:uv-padding-f74548ca12 uv-vcf5ce320fa:bg-uv-surface-raised uv-vcf5ce320fa:text-uv-text uv-max680:uv-grid-template-columns-6a5c4d4d49">
         <label>
           <span>{t("notifications.reminderTime")}</span>
           <input
@@ -177,22 +177,22 @@ export function ReviewReminderSettings({
         </label>
       </div>
 
-      <p className="muted notification-device-summary [color:var(--text-muted)] [margin:0] [font-size:.84rem] [line-height:1.5]">
+      <p className="muted notification-device-summary text-uv-text-muted m-0 text-uv-f6b4e408307 uv-line-height-aa8f289ebe">
         {t("notifications.devices", { count: activeDeviceCount })}
         {deviceSubscribed ? " · " + t("notifications.thisDeviceActive") : ""}
       </p>
 
       {initialTimeZone === "UTC" ? (
-        <p className="notification-warning [margin:0] [font-size:.84rem] [line-height:1.5] [color:var(--warning)]">{t("notifications.timeZoneFallback")}</p>
+        <p className="notification-warning m-0 text-uv-f6b4e408307 uv-line-height-aa8f289ebe text-uv-warning">{t("notifications.timeZoneFallback")}</p>
       ) : null}
-      {unavailable ? <p className="notification-warning [margin:0] [font-size:.84rem] [line-height:1.5] [color:var(--warning)]">{unavailable}</p> : null}
-      {message ? <p className="notification-message [margin:0] [font-size:.84rem] [line-height:1.5] [color:var(--text-soft)]" role="status">{message}</p> : null}
+      {unavailable ? <p className="notification-warning m-0 text-uv-f6b4e408307 uv-line-height-aa8f289ebe text-uv-warning">{unavailable}</p> : null}
+      {message ? <p className="notification-message m-0 text-uv-f6b4e408307 uv-line-height-aa8f289ebe text-uv-text-soft" role="status">{message}</p> : null}
 
-      <div className="notification-actions [display:flex] [gap:10px] [&_.button]:[width:auto] max-[680px]:[&_.button]:[width:100%]">
+      <div className="notification-actions flex gap-2.5 uv-vcded88c612:w-auto uv-max680:uv-vcded88c612:w-full">
         {!enabled || !deviceSubscribed ? (
           <button
             type="button"
-            className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
             disabled={pending || Boolean(unavailable) || supported === null}
             onClick={enable}
           >
@@ -202,7 +202,7 @@ export function ReviewReminderSettings({
         ) : (
           <button
             type="button"
-            className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
             disabled={pending}
             onClick={disable}
           >

@@ -20,7 +20,7 @@ export function ExampleGenerationPanel({
   const t = useTranslations();
 
   return (
-    <form action={action} className="word-example-action [align-items:flex-start]">
+    <form action={action} className="word-example-action items-start">
       <input type="hidden" name="lexemeId" value={lexemeId} />
       <ActionButton pendingLabel={t("word.generatingExamples")}>
         <Sparkles size={17} />

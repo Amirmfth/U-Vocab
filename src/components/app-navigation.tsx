@@ -87,7 +87,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={"nav-link min-[940px]:[min-height:42px] min-[940px]:[display:flex] min-[940px]:[align-items:center] min-[940px]:[gap:11px] min-[940px]:[padding:0_11px] min-[940px]:[border-radius:12px] min-[940px]:[color:var(--text-muted)] min-[940px]:[font-size:0.86rem] min-[940px]:[transition:background_150ms_ease,_color_150ms_ease] min-[940px]:[&:hover]:[color:var(--text-soft)] min-[940px]:[&:hover]:[background:var(--surface)] min-[940px]:[&.is-active]:[color:var(--text)] min-[940px]:[&.is-active]:[background:var(--primary-soft)] [min-height:var(--tap-target)] " + (isActive ? "is-active" : "")}
+      className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:uv-padding-e76eae74a0 uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:uv-transition-bce4a9f76d uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:uv-v14ef0811e9:text-uv-text uv-min940:uv-v14ef0811e9:bg-uv-cbdfd7cd038 uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
       aria-current={isActive ? (pathname === href ? "page" : "location") : undefined}
       aria-label={
         section === "review" && dueCount
@@ -99,7 +99,7 @@ function NavLink({
       <span>{label}</span>
       {section === "review" && dueCount ? (
         <span
-          className="review-nav-badge [min-width:20px] [height:20px] [margin-left:auto] [padding:0_5px] [display:inline-flex] [align-items:center] [justify-content:center] [border-radius:999px] [background:var(--primary-strong)] [color:#111114] [font-size:0.65rem] [font-weight:750] [line-height:1]"
+          className="review-nav-badge min-w-5 h-5 ml-auto uv-padding-5335c6828f inline-flex items-center justify-center rounded-uv-red9ab892c5 bg-uv-primary-strong text-uv-c39fe93f0de text-uv-f2311a7d95c uv-weight-750 uv-line-height-356a192b79"
           title={t("nav.reviewsDue", { count: formattedDueCount ?? dueCount })}
         >
           {dueCount > 99 ? formatNumber(locale, 99) + "+" : formattedDueCount}
@@ -161,15 +161,15 @@ export function AppNavigation({
 
   return (
     <>
-      <header className="mobile-header [position:fixed] [inset:0_0_auto_0] [z-index:50] [height:calc(60px_+_env(safe-area-inset-top))] [padding:env(safe-area-inset-top)_16px_0] [display:flex] [align-items:center] [justify-content:space-between] [border-bottom:1px_solid_rgba(255,_255,_255,_0.06)] [background:rgba(9,_9,_11,_0.82)] [backdrop-filter:blur(18px)] min-[940px]:[display:none]">
-        <Link href="/vocabulary" className="brand [display:inline-flex] [align-items:center] [gap:9px] [font-weight:620] [letter-spacing:-0.02em]" aria-label={t("nav.brandWords")}>
-          <span className="brand-mark [width:30px] [height:30px] [display:grid] [place-items:center] [border-radius:10px] [background:linear-gradient(145deg,_var(--primary-strong),_#6657ee)] [color:white] [box-shadow:inset_0_1px_0_rgba(255,_255,_255,_0.25)]">U</span>
+      <header className="mobile-header fixed uv-inset-b8cc3b4645 uv-z-index-e1822db470 uv-height-30fe4268f5 uv-padding-ce098359fd flex items-center justify-between uv-border-bottom-d07d4bb668 bg-uv-c06b07fb064 uv-backdrop-filter-ee1e0ecb9e uv-min940:hidden">
+        <Link href="/vocabulary" className="brand inline-flex items-center gap-2.25 uv-weight-620 uv-letter-spacing-235f37bdea" aria-label={t("nav.brandWords")}>
+          <span className="brand-mark w-7.5 h-7.5 grid uv-place-items-305047e96e rounded-uv-r933cc73310 uv-background-6217892e56 uv-color-528cef87d0 uv-box-shadow-a1161bbdbc">U</span>
           <span>U-Vocab</span>
         </Link>
-        <div className="mobile-header-actions [display:flex] [gap:8px]">
+        <div className="mobile-header-actions flex gap-2">
           <button
             type="button"
-            className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]"
+            className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383"
             aria-label={t("nav.addWord")}
             aria-expanded={isAddSheetOpen}
             aria-controls="mobile-add-sheet [position:fixed] [z-index:100] [inset:0] [display:flex] [align-items:flex-end] min-[940px]:[display:none]"
@@ -180,20 +180,20 @@ export function AppNavigation({
           >
             <AnimatedAppIcon name="add" size={20} />
           </button>
-          <Link href="/settings" className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]" aria-label={t("nav.settings")}>
+          <Link href="/settings" className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383" aria-label={t("nav.settings")}>
             <AnimatedAppIcon name="settings" size={19} />
           </Link>
         </div>
       </header>
 
-      <aside className="desktop-sidebar [display:none] min-[940px]:[position:fixed] min-[940px]:[inset:0_auto_0_0] min-[940px]:[z-index:50] min-[940px]:[width:242px] min-[940px]:[display:flex] min-[940px]:[flex-direction:column] min-[940px]:[padding:24px_16px] min-[940px]:[border-right:1px_solid_var(--border)] min-[940px]:[background:rgba(13,_13,_16,_0.95)]">
-        <Link href="/vocabulary" className="brand sidebar-brand [display:inline-flex] [align-items:center] [gap:9px] [font-weight:620] [letter-spacing:-0.02em] min-[940px]:[padding:0_8px_24px]" aria-label={t("nav.brandWords")}>
-          <span className="brand-mark [width:30px] [height:30px] [display:grid] [place-items:center] [border-radius:10px] [background:linear-gradient(145deg,_var(--primary-strong),_#6657ee)] [color:white] [box-shadow:inset_0_1px_0_rgba(255,_255,_255,_0.25)]">U</span>
+      <aside className="desktop-sidebar hidden uv-min940:fixed uv-min940:uv-inset-8a0ae26192 uv-min940:uv-z-index-e1822db470 uv-min940:w-60.5 uv-min940:flex uv-min940:flex-col uv-min940:uv-padding-3e6175ce44 uv-min940:uv-border-right-8d7f82f403 uv-min940:bg-uv-c22c77a4653">
+        <Link href="/vocabulary" className="brand sidebar-brand inline-flex items-center gap-2.25 uv-weight-620 uv-letter-spacing-235f37bdea uv-min940:uv-padding-cf4e33fcb4" aria-label={t("nav.brandWords")}>
+          <span className="brand-mark w-7.5 h-7.5 grid uv-place-items-305047e96e rounded-uv-r933cc73310 uv-background-6217892e56 uv-color-528cef87d0 uv-box-shadow-a1161bbdbc">U</span>
           <span>U-Vocab</span>
         </Link>
 
-        <nav className="sidebar-nav min-[940px]:[display:flex] min-[940px]:[flex-direction:column] min-[940px]:[gap:5px]" aria-label={t("nav.main")}>
-          <p className="nav-eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600] min-[940px]:[padding:0_10px_7px]">{t("common.learn")}</p>
+        <nav className="sidebar-nav uv-min940:flex uv-min940:flex-col uv-min940:gap-1.25" aria-label={t("nav.main")}>
+          <p className="nav-eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold uv-min940:uv-padding-6338b38ab4">{t("common.learn")}</p>
           {primary.map((item) => (
             <NavLink
               key={item.section}
@@ -207,8 +207,8 @@ export function AppNavigation({
           ))}
         </nav>
 
-        <div className="sidebar-secondary [margin-top:auto] [display:flex] [flex-direction:column] [gap:5px] [padding-top:24px] [border-top:1px_solid_var(--border)] [&_.sidebar-add]:[margin-top:10px]">
-          <p className="nav-eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600] min-[940px]:[padding:0_10px_7px]">{t("common.insights")}</p>
+        <div className="sidebar-secondary mt-auto flex flex-col gap-1.25 pt-6 uv-border-top-8d7f82f403 uv-v62842742dd:mt-2.5">
+          <p className="nav-eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold uv-min940:uv-padding-6338b38ab4">{t("common.insights")}</p>
           {insights.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
@@ -216,7 +216,7 @@ export function AppNavigation({
               <Link
                 key={item.href}
                 href={item.href}
-                className={"nav-link min-[940px]:[min-height:42px] min-[940px]:[display:flex] min-[940px]:[align-items:center] min-[940px]:[gap:11px] min-[940px]:[padding:0_11px] min-[940px]:[border-radius:12px] min-[940px]:[color:var(--text-muted)] min-[940px]:[font-size:0.86rem] min-[940px]:[transition:background_150ms_ease,_color_150ms_ease] min-[940px]:[&:hover]:[color:var(--text-soft)] min-[940px]:[&:hover]:[background:var(--surface)] min-[940px]:[&.is-active]:[color:var(--text)] min-[940px]:[&.is-active]:[background:var(--primary-soft)] [min-height:var(--tap-target)] " + (isActive ? "is-active" : "")}
+                className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:uv-padding-e76eae74a0 uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:uv-transition-bce4a9f76d uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:uv-v14ef0811e9:text-uv-text uv-min940:uv-v14ef0811e9:bg-uv-cbdfd7cd038 uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
                 aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
                 <AnimatedAppIcon name={item.icon} size={18} />
@@ -224,7 +224,7 @@ export function AppNavigation({
               </Link>
             );
           })}
-          <p className="nav-eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600] min-[940px]:[padding:0_10px_7px]">{t("common.account")}</p>
+          <p className="nav-eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold uv-min940:uv-padding-6338b38ab4">{t("common.account")}</p>
           {system.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
@@ -232,7 +232,7 @@ export function AppNavigation({
               <Link
                 key={item.href}
                 href={item.href}
-                className={"nav-link min-[940px]:[min-height:42px] min-[940px]:[display:flex] min-[940px]:[align-items:center] min-[940px]:[gap:11px] min-[940px]:[padding:0_11px] min-[940px]:[border-radius:12px] min-[940px]:[color:var(--text-muted)] min-[940px]:[font-size:0.86rem] min-[940px]:[transition:background_150ms_ease,_color_150ms_ease] min-[940px]:[&:hover]:[color:var(--text-soft)] min-[940px]:[&:hover]:[background:var(--surface)] min-[940px]:[&.is-active]:[color:var(--text)] min-[940px]:[&.is-active]:[background:var(--primary-soft)] [min-height:var(--tap-target)] " + (isActive ? "is-active" : "")}
+                className={"nav-link uv-min940:min-h-10.5 uv-min940:flex uv-min940:items-center uv-min940:gap-2.75 uv-min940:uv-padding-e76eae74a0 uv-min940:rounded-uv-r0939007802 uv-min940:text-uv-text-muted uv-min940:text-uv-f9601fe81a7 uv-min940:uv-transition-bce4a9f76d uv-min940:hover:text-uv-text-soft uv-min940:hover:bg-uv-surface uv-min940:uv-v14ef0811e9:text-uv-text uv-min940:uv-v14ef0811e9:bg-uv-cbdfd7cd038 uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
                 aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
               >
                 <AnimatedAppIcon name={item.icon} size={18} />
@@ -240,7 +240,7 @@ export function AppNavigation({
               </Link>
             );
           })}
-          <Link href="/vocabulary/new" className="sidebar-add min-[940px]:[min-height:44px] min-[940px]:[margin-top:auto] min-[940px]:[display:flex] min-[940px]:[align-items:center] min-[940px]:[justify-content:center] min-[940px]:[gap:8px] min-[940px]:[border-radius:13px] min-[940px]:[background:var(--text)] min-[940px]:[color:#111114] min-[940px]:[font-size:0.84rem] min-[940px]:[font-weight:650]">
+          <Link href="/vocabulary/new" className="sidebar-add uv-min940:min-h-11 uv-min940:mt-auto uv-min940:flex uv-min940:items-center uv-min940:justify-center uv-min940:gap-2 uv-min940:rounded-uv-r233710a71e uv-min940:bg-uv-text uv-min940:text-uv-c39fe93f0de uv-min940:text-uv-f8bb1a95a21 uv-min940:uv-weight-650">
             <AnimatedAppIcon name="add" size={18} />
             {t("nav.addWord")}
           </Link>
@@ -248,7 +248,7 @@ export function AppNavigation({
       </aside>
 
       {!isPrimary && owner.section ? (
-        <nav className="section-context-nav [display:none] min-[940px]:[position:fixed] min-[940px]:[z-index:40] min-[940px]:[top:24px] min-[940px]:[right:36px] min-[940px]:[display:flex] min-[940px]:[align-items:center] min-[940px]:[gap:7px] min-[940px]:[max-width:calc(100vw_-_330px)] min-[940px]:[padding:7px_10px] min-[940px]:[border:1px_solid_var(--border)] min-[940px]:[border-radius:999px] min-[940px]:[background:rgba(17,_17,_20,_0.88)] min-[940px]:[backdrop-filter:blur(12px)] min-[940px]:[color:var(--text-muted)] min-[940px]:[font-size:0.68rem] min-[940px]:[&_a]:[color:var(--primary-strong)] min-[940px]:[&_a]:[font-weight:600] min-[940px]:[&_strong]:[overflow:hidden] min-[940px]:[&_strong]:[color:var(--text-soft)] min-[940px]:[&_strong]:[text-overflow:ellipsis] min-[940px]:[&_strong]:[white-space:nowrap]" aria-label={t("nav.sectionContext")}>
+        <nav className="section-context-nav hidden uv-min940:fixed uv-min940:uv-z-index-af3e133428 uv-min940:top-6 uv-min940:right-9 uv-min940:flex uv-min940:items-center uv-min940:gap-1.75 uv-min940:uv-max-width-f65a3e8425 uv-min940:uv-padding-1eec12de18 uv-min940:uv-border-8d7f82f403 uv-min940:rounded-uv-red9ab892c5 uv-min940:bg-uv-c20ef9fea58 uv-min940:uv-backdrop-filter-bab5c12c11 uv-min940:text-uv-text-muted uv-min940:text-uv-f78eb7000a9 uv-min940:uv-v99777dc5b4:text-uv-primary-strong uv-min940:uv-v99777dc5b4:font-semibold uv-min940:uv-veda02a0adb:overflow-hidden uv-min940:uv-veda02a0adb:text-uv-text-soft uv-min940:uv-veda02a0adb:uv-text-overflow-900198081b uv-min940:uv-veda02a0adb:whitespace-nowrap" aria-label={t("nav.sectionContext")}>
           <Link href={LEARNING_SECTIONS[owner.section].href}>
             {t(
               owner.section === "words"
@@ -271,7 +271,7 @@ export function AppNavigation({
         </nav>
       ) : null}
 
-      <nav className="mobile-bottom-nav [position:fixed] [z-index:50] [inset:auto_10px_max(10px,_env(safe-area-inset-bottom))_10px] [display:grid] [grid-template-columns:repeat(4,_1fr)] [gap:2px] [padding:9px] [border:1px_solid_rgba(255,_255,_255,_0.08)] [border-radius:20px] [background:rgba(17,_17,_20,_0.92)] [box-shadow:0_18px_50px_rgba(0,_0,_0,_0.4)] [backdrop-filter:blur(20px)] min-[940px]:[display:none]" aria-label={t("nav.mobile")}>
+      <nav className="mobile-bottom-nav fixed uv-z-index-e1822db470 uv-inset-1c88d7d0e2 grid uv-grid-template-columns-50678a67eb gap-0.5 p-2.25 uv-border-fbc4d8b2cf rounded-uv-r998b02c207 bg-uv-cd13dd822fd uv-box-shadow-b29865e499 uv-backdrop-filter-220f98ca33 uv-min940:hidden" aria-label={t("nav.mobile")}>
         {primary.map((item) => {
           const isActive = sectionForPath(pathname) === item.section;
           const formattedDueCount = dueCount ? formatNumber(locale, dueCount) : null;
@@ -279,14 +279,14 @@ export function AppNavigation({
             <Link
               key={item.section}
               href={item.href}
-              className={"mobile-nav-item [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:4px] [border-radius:14px] [color:var(--text-muted)] [font-size:0.66rem] [transition:color_160ms_ease,_transform_160ms_ease] [&:active]:[transform:scale(0.96)] [&.is-active]:[color:var(--primary)] [min-height:var(--tap-target)] " + (isActive ? "is-active" : "")}
+              className={"mobile-nav-item flex flex-col items-center justify-center gap-1 rounded-uv-rd65225386d text-uv-text-muted text-uv-ff7862da171 uv-transition-be257b436b active:uv-transform-6161c738a7 uv-v14ef0811e9:text-uv-primary uv-min-height-e45618b383 " + (isActive ? "is-active" : "")}
               aria-current={isActive ? (pathname === item.href ? "page" : "location") : undefined}
             >
-              <span className="mobile-nav-icon [position:relative] [display:inline-flex] [&_.review-nav-badge]:[position:absolute] [&_.review-nav-badge]:[top:-8px] [&_.review-nav-badge]:[left:14px] [&_.review-nav-badge]:[min-width:16px] [&_.review-nav-badge]:[height:16px] [&_.review-nav-badge]:[padding-inline:3px] [&_.review-nav-badge]:[font-size:0.58rem]">
+              <span className="mobile-nav-icon relative inline-flex uv-v5c2228c20d:absolute uv-v5c2228c20d:-top-2 uv-v5c2228c20d:left-3.5 uv-v5c2228c20d:min-w-4 uv-v5c2228c20d:h-4 uv-v5c2228c20d:px-0.75 uv-v5c2228c20d:text-uv-fd95043f679">
                 <AnimatedAppIcon name={item.icon} size={25} />
                 {item.section === "review" && dueCount ? (
                   <span
-                    className="review-nav-badge [min-width:20px] [height:20px] [margin-left:auto] [padding:0_5px] [display:inline-flex] [align-items:center] [justify-content:center] [border-radius:999px] [background:var(--primary-strong)] [color:#111114] [font-size:0.65rem] [font-weight:750] [line-height:1]"
+                    className="review-nav-badge min-w-5 h-5 ml-auto uv-padding-5335c6828f inline-flex items-center justify-center rounded-uv-red9ab892c5 bg-uv-primary-strong text-uv-c39fe93f0de text-uv-f2311a7d95c uv-weight-750 uv-line-height-356a192b79"
                     aria-label={t("nav.reviewsDue", { count: formattedDueCount ?? dueCount })}
                   >
                     {dueCount > 99 ? formatNumber(locale, 99) + "+" : formattedDueCount}

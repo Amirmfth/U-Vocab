@@ -46,11 +46,11 @@ export default async function SettingsPage() {
         : language.label;
 
   return (
-    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("settings.eyebrow")}</p>
+    <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("settings.eyebrow")}</p>
         <h1>{t("settings.title")}</h1>
-        <p className="page-description [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]">
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a">
           {t("settings.activeCourse", {
             language: languageLabel,
             current: course.currentLevel,
@@ -88,10 +88,10 @@ export default async function SettingsPage() {
         languageLabel={languageLabel}
       />
 
-      <section className="panel account-links [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:5px] [&_.muted]:[font-size:0.76rem] [&_.muted]:[line-height:1.5] min-[620px]:[flex-direction:row] min-[620px]:[align-items:center] min-[620px]:[justify-content:space-between] [border-radius:18px]">
+      <section className="panel account-links uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-1.25 uv-vf122c6d218:text-uv-f74fc13de71 uv-vf122c6d218:uv-line-height-aa8f289ebe uv-min620:flex-row uv-min620:items-center uv-min620:justify-between rounded-uv-r6d27d54c6c">
         <div>
           <strong>{t("settings.accountSession")}</strong>
-          <span className="muted [color:var(--text-muted)]">{t("settings.accountSessionHelp")}</span>
+          <span className="muted text-uv-text-muted">{t("settings.accountSessionHelp")}</span>
         </div>
         <SignOutButton />
       </section>

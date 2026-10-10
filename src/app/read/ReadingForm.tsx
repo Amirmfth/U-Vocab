@@ -16,13 +16,13 @@ export function ReadingForm() {
   const [state, action] = useActionState(createReadingDocument, initialState);
 
   return (
-    <form action={action} className="panel reading-form [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [display:flex] [flex-direction:column] [gap:14px] [width:100%] [max-width:760px] [border-radius:18px] [padding:15px] [&_textarea]:[min-height:38dvh]">
-      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
-        <label htmlFor="title">Title <span className="muted [color:var(--text-muted)]">(optional)</span></label>
+    <form action={action} className="panel reading-form uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 flex flex-col gap-3.5 w-full max-w-uv-c078f10a0b rounded-uv-r6d27d54c6c p-3.75 uv-v3c40c23539:uv-min-height-92341db0b5">
+      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
+        <label htmlFor="title">Title <span className="muted text-uv-text-muted">(optional)</span></label>
         <input id="title" name="title" placeholder="Article, email, transcript…" autoComplete="off" />
       </div>
 
-      <div className="field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:var(--text-soft)] [&_label]:[font-size:0.83rem] [&_label]:[font-weight:560]">
+      <div className="field flex flex-col gap-2 uv-v586b3820a5:text-uv-text-soft uv-v586b3820a5:text-uv-f845cf53f3a uv-v586b3820a5:uv-weight-560">
         <label htmlFor="content">German text</label>
         <textarea
           id="content"
@@ -42,7 +42,7 @@ export function ReadingForm() {
         <StatusNotice tone="success">
           {state.message}
           {state.documentId ? (
-            <Link href={"/read/" + state.documentId} className="status-link [display:inline-flex] [align-items:center] [gap:6px]">
+            <Link href={"/read/" + state.documentId} className="status-link inline-flex items-center gap-1.5">
               Open reading <ArrowRight size={15} />
             </Link>
           ) : null}

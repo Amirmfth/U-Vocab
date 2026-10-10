@@ -30,17 +30,17 @@ export function CourseManagement({
   );
 
   return (
-    <section className="panel course-management [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:grid] [gap:16px] [border-radius:18px]">
-      <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+    <section className="panel course-management uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid gap-4 rounded-uv-r6d27d54c6c">
+      <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("settings.coursesEyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("settings.coursesEyebrow")}</p>
           <h2>{t("settings.coursesTitle")}</h2>
         </div>
         <Languages size={20} />
       </div>
-      <p className="muted [color:var(--text-muted)]">{t("settings.coursesHelp")}</p>
+      <p className="muted text-uv-text-muted">{t("settings.coursesHelp")}</p>
 
-      <div className="course-management-list [display:grid] [gap:8px] [&_form]:[margin:0]">
+      <div className="course-management-list grid gap-2 uv-v8cd0743a41:m-0">
         {courses.map((course) => {
           const language = targetLanguageConfig(course.targetLanguage);
           const active = course.id === activeCourseId;
@@ -49,7 +49,7 @@ export function CourseManagement({
               <input type="hidden" name="courseId" value={course.id} />
               <button
                 type="submit"
-                className={"course-management-row [width:100%] [min-height:58px] [display:flex] [align-items:center] [justify-content:space-between] [gap:16px] [padding:12px_14px] [border:1px_solid_var(--border)] [border-radius:12px] [background:var(--surface-soft)] [color:var(--text)] [text-align:start] [cursor:pointer] [&_>_span:first-child]:[display:grid] [&_>_span:first-child]:[gap:3px] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.72rem] [&_>_span:last-child]:[color:var(--text-muted)] [&_>_span:last-child]:[font-size:0.72rem] [&.is-active]:[border-color:var(--primary)] [&:disabled]:[cursor:default] [&:disabled]:[opacity:1] " + (active ? "is-active" : "")}
+                className={"course-management-row w-full min-h-14.5 flex items-center justify-between gap-4 uv-padding-277e98e510 uv-border-8d7f82f403 rounded-uv-r0939007802 bg-uv-surface-soft text-uv-text text-start cursor-pointer uv-v386ffa8f69:grid uv-v386ffa8f69:gap-0.75 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff1713651e0 uv-vfedd56ae40:text-uv-text-muted uv-vfedd56ae40:text-uv-ff1713651e0 uv-v14ef0811e9:border-uv-primary disabled:cursor-default disabled:opacity-100 " + (active ? "is-active" : "")}
                 disabled={active || !language.enabled}
                 aria-current={active ? "true" : undefined}
               >
@@ -68,11 +68,11 @@ export function CourseManagement({
 
       {availableToCreate.length ? (
         canCreateAdditionalCourse || courses.length === 0 ? (
-          <div className="course-create-list [display:flex] [flex-wrap:wrap] [align-items:center] [gap:10px]">
+          <div className="course-create-list flex flex-wrap items-center gap-2.5">
             {availableToCreate.map((language) => (
               <form action={createCourseAction} key={language}>
                 <input type="hidden" name="targetLanguage" value={language} />
-                <button type="submit" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
+                <button type="submit" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
                   <Plus size={17} />
                   {t("settings.addCourse", {
                     language: languageLabel(t, language),
@@ -82,8 +82,8 @@ export function CourseManagement({
             ))}
           </div>
         ) : (
-          <div className="course-upgrade [display:flex] [flex-wrap:wrap] [align-items:center] [gap:10px]">
-            <p className="muted [color:var(--text-muted)]">{t("settings.multiCoursePro")}</p>
+          <div className="course-upgrade flex flex-wrap items-center gap-2.5">
+            <p className="muted text-uv-text-muted">{t("settings.multiCoursePro")}</p>
             <UpgradeCta label={t("settings.multiCourseUpgrade")} />
           </div>
         )

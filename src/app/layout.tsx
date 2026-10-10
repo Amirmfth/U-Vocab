@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body>
         <I18nProvider locale={locale}>
-          <a className="skip-link [position:fixed] [z-index:200] [top:max(10px,_env(safe-area-inset-top))] [left:12px] [padding:10px_13px] [border:1px_solid_var(--border-strong)] [border-radius:12px] [background:var(--text)] [color:var(--bg)] [font-size:0.8rem] [font-weight:700] [transform:translateY(-160%)] [transition:transform_140ms_ease] [&:focus]:[transform:translateY(0)]" href="#main-content">
+          <a className="skip-link fixed uv-z-index-9f9af02958 uv-top-95733511cd left-3 uv-padding-00c5ba1734 uv-border-488f4b382f rounded-uv-r0939007802 bg-uv-text text-uv-bg text-uv-f6c2d68ddb8 font-bold uv-transform-77924e0e6e uv-transition-f271694b07 focus:uv-transform-602912b724" href="#main-content">
             {t("layout.skipToContent")}
           </a>
           {authenticated ? <WebVitals /> : null}
@@ -96,7 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div
               id="main-content"
               tabIndex={-1}
-              className={authenticated ? "app-shell [width:100%] [max-width:1180px] [margin:0_auto] [padding:calc(72px_+_env(safe-area-inset-top))_16px_calc(104px_+_env(safe-area-inset-bottom))] min-[620px]:[padding-inline:24px] min-[940px]:[padding:28px_36px_64px]" : "auth-shell [min-height:100dvh] [width:100%]"}
+              className={authenticated ? "app-shell w-full max-w-uv-47cb1166bf uv-margin-ddbc4f5b25 uv-padding-80602a2787 uv-min620:px-6 uv-min940:uv-padding-aa8e12aa90" : "auth-shell min-h-dvh w-full"}
             >
               <PageTransition>{children}</PageTransition>
             </div>

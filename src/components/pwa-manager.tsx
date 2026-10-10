@@ -179,21 +179,21 @@ export function PwaManager() {
   return (
     <>
       {offline ? (
-        <div className="pwa-connectivity [position:fixed] [z-index:80] [top:max(10px,_env(safe-area-inset-top))] [left:50%] [transform:translateX(-50%)] [display:inline-flex] [align-items:center] [gap:8px] [max-width:calc(100vw_-_24px)] [padding:8px_12px] [border:1px_solid_var(--border)] [border-radius:999px] [background:rgba(17,17,20,.96)] [color:var(--text-soft)] [box-shadow:var(--shadow)] [font-size:.78rem]" role="status">
+        <div className="pwa-connectivity fixed uv-z-index-b888b29826 uv-top-95733511cd uv-left-b46da6ec37 uv-transform-9fc1c118d6 inline-flex items-center gap-2 uv-max-width-d2dbda58ca uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-red9ab892c5 bg-uv-cec7f8cbea6 text-uv-text-soft uv-box-shadow-4ee177db8b text-uv-f5f68d82942" role="status">
           <WifiOff size={15} />
           <span>{t("pwa.offlineBanner")}</span>
         </div>
       ) : null}
 
       {waiting ? (
-        <aside className="pwa-update [position:fixed] [z-index:90] [inset:auto_12px_calc(86px_+_env(safe-area-inset-bottom))_12px] [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [max-width:620px] [margin-inline:auto] [padding:14px] [border:1px_solid_var(--border-strong)] [border-radius:18px] [background:rgba(17,17,20,.98)] [box-shadow:var(--shadow)] [backdrop-filter:blur(18px)] [&_>_div]:[display:grid] [&_>_div]:[gap:3px] [&_>_div]:[min-width:0] [&_span]:[color:var(--text-soft)] [&_span]:[font-size:.78rem] [&_span]:[line-height:1.4] [&_.button]:[width:auto] [&_.button]:[min-width:124px] min-[900px]:[inset-inline:auto_24px] min-[900px]:[bottom:24px] min-[900px]:[width:min(520px,_calc(100vw_-_48px))] min-[900px]:[margin:0] max-[560px]:[align-items:stretch] max-[560px]:[flex-direction:column]" role="status" aria-live="polite">
+        <aside className="pwa-update fixed uv-z-index-2d0c8af807 uv-inset-4ef3e57216 flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 uv-border-488f4b382f rounded-uv-r6d27d54c6c bg-uv-cfc0f1d21e4 uv-box-shadow-4ee177db8b uv-backdrop-filter-ee1e0ecb9e uv-vcbb57f4d35:grid uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:min-w-0 uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:text-uv-f5f68d82942 uv-v36c0309a03:uv-line-height-a26f83404b uv-vcded88c612:w-auto uv-vcded88c612:min-w-31 uv-min900:uv-inset-inline-d4d626e5fe uv-min900:bottom-6 uv-min900:uv-width-e83f4f51d7 uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" role="status" aria-live="polite">
           <div>
             <strong>{t("pwa.updateTitle")}</strong>
             <span>{dirty ? t("pwa.updateUnsaved") : t("pwa.updateBody")}</span>
           </div>
           <button
             type="button"
-            className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
             onClick={applyUpdate}
             disabled={dirty}
           >
@@ -204,19 +204,19 @@ export function PwaManager() {
       ) : null}
 
       {installPrompt ? (
-        <aside className="pwa-install [position:fixed] [z-index:90] [inset:auto_12px_calc(86px_+_env(safe-area-inset-bottom))_12px] [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [max-width:620px] [margin-inline:auto] [padding:14px] [border:1px_solid_var(--border-strong)] [border-radius:18px] [background:rgba(17,17,20,.98)] [box-shadow:var(--shadow)] [backdrop-filter:blur(18px)] [&_>_div:first-child]:[display:grid] [&_>_div:first-child]:[gap:3px] [&_>_div:first-child]:[min-width:0] [&_span]:[color:var(--text-soft)] [&_span]:[font-size:.78rem] [&_span]:[line-height:1.4] [&_.button]:[width:auto] [&_.button]:[min-width:124px] min-[900px]:[inset-inline:auto_24px] min-[900px]:[bottom:24px] min-[900px]:[width:min(520px,_calc(100vw_-_48px))] min-[900px]:[margin:0] max-[560px]:[align-items:stretch] max-[560px]:[flex-direction:column]" aria-label={t("pwa.installTitle")}>
+        <aside className="pwa-install fixed uv-z-index-2d0c8af807 uv-inset-4ef3e57216 flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 uv-border-488f4b382f rounded-uv-r6d27d54c6c bg-uv-cfc0f1d21e4 uv-box-shadow-4ee177db8b uv-backdrop-filter-ee1e0ecb9e uv-v0fee2d502c:grid uv-v0fee2d502c:gap-0.75 uv-v0fee2d502c:min-w-0 uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:text-uv-f5f68d82942 uv-v36c0309a03:uv-line-height-a26f83404b uv-vcded88c612:w-auto uv-vcded88c612:min-w-31 uv-min900:uv-inset-inline-d4d626e5fe uv-min900:bottom-6 uv-min900:uv-width-e83f4f51d7 uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" aria-label={t("pwa.installTitle")}>
           <div>
             <strong>{t("pwa.installTitle")}</strong>
             <span>{t("pwa.installBody")}</span>
           </div>
-          <div className="pwa-install-actions [display:flex] [gap:8px] [align-items:center] max-[560px]:[&_.button]:[flex:1]">
-            <button type="button" className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" onClick={install}>
+          <div className="pwa-install-actions flex gap-2 items-center uv-max560:uv-vcded88c612:uv-flex-356a192b79">
+            <button type="button" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" onClick={install}>
               <Download size={16} />
               {t("pwa.installAction")}
             </button>
             <button
               type="button"
-              className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]"
+              className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383"
               aria-label={t("pwa.installDismiss")}
               onClick={() => {
                 try {

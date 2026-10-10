@@ -182,8 +182,8 @@ export function VocabularyFilters({
       : null;
 
   return (
-    <section className="library-tools [display:flex] [flex-direction:column] [gap:8px]">
-      <form className="library-search [min-height:48px] [grid-template-columns:auto_minmax(0,_1fr)_auto] [padding:0_8px_0_13px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface)] [&_input]:[min-height:44px] [&_input]:[padding:0] [&_input]:[border:0] [&_input]:[background:transparent] [&_input:focus]:[box-shadow:none] [position:relative] [display:flex] [align-items:center] [gap:8px] [&_>_svg]:[position:absolute] [&_>_svg]:[left:13px] [&_>_svg]:[z-index:1] [&_>_svg]:[color:var(--text-muted)] [&_input[type=text]]:[min-height:48px] [&_input[type=text]]:[padding-left:40px] [&_input[type=text]]:[padding-right:48px] [&_input[name=q]]:[min-height:48px] [&_input[name=q]]:[padding-left:40px] [&_input[name=q]]:[padding-right:48px] [&_.icon-button]:[position:absolute] [&_.icon-button]:[right:3px] [&_.icon-button]:[width:42px] [&_.icon-button]:[height:42px] [&_.icon-button]:[min-height:42px] [&_.icon-button]:[border:0] [&_.icon-button]:[background:transparent]" action="/vocabulary">
+    <section className="library-tools flex flex-col gap-2">
+      <form className="library-search min-h-12 uv-grid-template-columns-738a8da05d uv-padding-445dd0ce12 uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface uv-vcf5ce320fa:min-h-11 uv-vcf5ce320fa:p-0 uv-vcf5ce320fa:border-0 uv-vcf5ce320fa:bg-transparent uv-vcf57ac372f:uv-box-shadow-71f8e7976e relative flex items-center gap-2 uv-v872d6ea02a:absolute uv-v872d6ea02a:left-3.25 uv-v872d6ea02a:uv-z-index-356a192b79 uv-v872d6ea02a:text-uv-text-muted uv-v144ec8229e:min-h-12 uv-v144ec8229e:pl-10 uv-v144ec8229e:pr-12 uv-v808eb306d1:min-h-12 uv-v808eb306d1:pl-10 uv-v808eb306d1:pr-12 uv-v907997862c:absolute uv-v907997862c:right-0.75 uv-v907997862c:w-10.5 uv-v907997862c:h-10.5 uv-v907997862c:min-h-10.5 uv-v907997862c:border-0 uv-v907997862c:bg-transparent" action="/vocabulary">
         <input
           name="q"
           defaultValue={current.q}
@@ -198,13 +198,13 @@ export function VocabularyFilters({
             <input key={filter.key} type="hidden" name={filter.key} value={value} />
           ) : null;
         })}
-        <button type="submit" className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]" aria-label={t("vocab.search")}>
+        <button type="submit" className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383" aria-label={t("vocab.search")}>
           <Search size={17} />
         </button>
       </form>
 
-      <div className="vocabulary-controls-row [display:flex] [align-items:center] [justify-content:space-between] [gap:10px] [&_.translation-switch]:[flex:0_1_auto] [&_.translation-switch]:[min-width:0] [&_.filter-builder]:[flex:0_0_auto]">
-        <div className="translation-switch [display:inline-flex] [gap:3px] [padding:3px] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface)] [&_button]:[min-height:36px] [&_button]:[padding:0_10px] [&_button]:[border:0] [&_button]:[border-radius:8px] [&_button]:[background:transparent] [&_button]:[color:var(--text-muted)] [&_button]:[cursor:pointer] [&_button]:[font-size:0.72rem] [&_button]:[font-weight:650] [&_button.is-active]:[background:var(--surface-soft)] [&_button.is-active]:[color:var(--text)] [&_button:disabled]:[cursor:wait] [&_button:disabled]:[opacity:0.65]" aria-label={t("vocab.translationLanguage")}>
+      <div className="vocabulary-controls-row flex items-center justify-between gap-2.5 uv-ve9ea81b080:uv-flex-b1519c2d12 uv-ve9ea81b080:min-w-0 uv-v82af058c60:uv-flex-18ba0b6e31">
+        <div className="translation-switch inline-flex gap-0.75 p-0.75 uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface uv-v513a7112a0:min-h-9 uv-v513a7112a0:uv-padding-4d5c65a39c uv-v513a7112a0:border-0 uv-v513a7112a0:rounded-uv-r9bc5fefa1a uv-v513a7112a0:bg-transparent uv-v513a7112a0:text-uv-text-muted uv-v513a7112a0:cursor-pointer uv-v513a7112a0:text-uv-ff1713651e0 uv-v513a7112a0:uv-weight-650 uv-v169acfe1bb:bg-uv-surface-soft uv-v169acfe1bb:text-uv-text uv-v2497b722ae:cursor-wait uv-v2497b722ae:opacity-65" aria-label={t("vocab.translationLanguage")}>
           {([["ENGLISH", "EN"], ["PERSIAN", "FA"]] as const).map(
             ([mode, label]) => (
               <button
@@ -220,12 +220,12 @@ export function VocabularyFilters({
           )}
         </div>
 
-        <div className="filter-builder [position:relative] [z-index:10]" ref={menuRef}>
-          <div className="filter-add-anchor [position:relative] [display:inline-flex]">
+        <div className="filter-builder relative uv-z-index-b1d5781111" ref={menuRef}>
+          <div className="filter-add-anchor relative inline-flex">
             <button
               ref={addButtonRef}
               aria-expanded={menu !== null}
-              className="filter-add-button [display:inline-flex] [align-items:center] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface-raised)] [color:var(--text-soft)] [font-size:0.78rem] [gap:7px] [padding:0_11px] [cursor:pointer] [transition:border-color_150ms_ease,_background_150ms_ease,_color_150ms_ease] [&:hover]:[border-color:rgba(167,_157,_255,_0.55)] [&:hover]:[background:var(--primary-soft)] [&:hover]:[color:var(--primary-strong)] [&[aria-expanded=true]]:[border-color:rgba(167,_157,_255,_0.55)] [&[aria-expanded=true]]:[background:var(--primary-soft)] [&[aria-expanded=true]]:[color:var(--primary-strong)] [flex:0_0_auto] [min-height:38px]"
+              className="filter-add-button inline-flex items-center uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface-raised text-uv-text-soft text-uv-fe9d5fd6635 gap-1.75 uv-padding-e76eae74a0 cursor-pointer uv-transition-2df24b8968 hover:border-uv-cfe2456a398 hover:bg-uv-cbdfd7cd038 hover:text-uv-primary-strong uv-vb90b783b8b:border-uv-cfe2456a398 uv-vb90b783b8b:bg-uv-cbdfd7cd038 uv-vb90b783b8b:text-uv-primary-strong uv-flex-18ba0b6e31 min-h-9.5"
               onClick={() => setMenu((currentMenu) => currentMenu ? null : "types")}
               type="button"
             >
@@ -235,14 +235,14 @@ export function VocabularyFilters({
 
             {menu ? (
               <div
-                className="filter-menu [position:absolute] [top:calc(100%_+_8px)] [left:0] [width:min(300px,_calc(100vw_-_32px))] [overflow:hidden] [padding:5px] [border:1px_solid_var(--border-strong)] [border-radius:15px] [background:var(--surface-raised)] [box-shadow:var(--shadow)] [animation:filter-menu-in_150ms_ease-out] max-[619px]:[z-index:80] max-[619px]:[max-height:min(62dvh,_520px)] max-[619px]:[overflow:auto] [overscroll-behavior:contain]"
+                className="filter-menu absolute uv-top-7278eb9a3e left-0 uv-width-07483bb933 overflow-hidden p-1.25 uv-border-488f4b382f rounded-uv-r344c386330 bg-uv-surface-raised uv-box-shadow-4ee177db8b uv-animation-b70179107c uv-max619:uv-z-index-b888b29826 uv-max619:uv-max-height-2e61becd04 uv-max619:overflow-auto overscroll-contain"
                 role="dialog"
                 aria-label={t("vocab.filters")}
                 style={{ insetInlineStart: menuOffset }}
               >
                 {selectedFilter ? (
                   <>
-                    <button className="filter-menu-back [width:100%] [min-height:40px] [display:flex] [align-items:center] [gap:8px] [padding:0_10px] [border:0] [background:transparent] [cursor:pointer] [font-size:0.82rem] [text-align:left] [border-bottom:1px_solid_var(--border)] [border-radius:0] [color:var(--text-muted)] [&:hover]:[outline:none] [&:hover]:[background:var(--surface-soft)] [&:hover]:[color:var(--text)] [&:focus-visible]:[outline:none] [&:focus-visible]:[background:var(--surface-soft)] [&:focus-visible]:[color:var(--text)]" onClick={() => setMenu("types")} type="button">
+                    <button className="filter-menu-back w-full min-h-10 flex items-center gap-2 uv-padding-4d5c65a39c border-0 bg-transparent cursor-pointer text-uv-fa2582d5d6e text-left uv-border-bottom-8d7f82f403 rounded-none text-uv-text-muted hover:outline-none hover:bg-uv-surface-soft hover:text-uv-text focus-visible:outline-none focus-visible:bg-uv-surface-soft focus-visible:text-uv-text" onClick={() => setMenu("types")} type="button">
                       <ChevronLeft className="rtl-mirror" size={16} />
                       {selectedFilter.label}
                     </button>
@@ -252,7 +252,7 @@ export function VocabularyFilters({
                         return (
                           <button
                             aria-selected={isSelected}
-                            className={isSelected ? "filter-menu-option is-selected [width:100%] [display:flex] [align-items:center] [gap:8px] [padding:0_10px] [border:0] [border-radius:10px] [background:transparent] [color:var(--text-soft)] [cursor:pointer] [font-size:0.82rem] [text-align:left] [&:hover]:[outline:none] [&:hover]:[background:var(--surface-soft)] [&:hover]:[color:var(--text)] [&:focus-visible]:[outline:none] [&:focus-visible]:[background:var(--surface-soft)] [&:focus-visible]:[color:var(--text)] [&.is-selected]:[background:var(--primary-soft)] [&.is-selected]:[color:var(--text)] [&_span]:[margin-left:auto] [&_span]:[color:var(--primary-strong)] [&_span]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_span]:[font-size:0.64rem] [min-height:var(--tap-target)]" : "filter-menu-option [width:100%] [display:flex] [align-items:center] [gap:8px] [padding:0_10px] [border:0] [border-radius:10px] [background:transparent] [color:var(--text-soft)] [cursor:pointer] [font-size:0.82rem] [text-align:left] [&:hover]:[outline:none] [&:hover]:[background:var(--surface-soft)] [&:hover]:[color:var(--text)] [&:focus-visible]:[outline:none] [&:focus-visible]:[background:var(--surface-soft)] [&:focus-visible]:[color:var(--text)] [&.is-selected]:[background:var(--primary-soft)] [&.is-selected]:[color:var(--text)] [&_span]:[margin-left:auto] [&_span]:[color:var(--primary-strong)] [&_span]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_span]:[font-size:0.64rem] [min-height:var(--tap-target)]"}
+                            className={isSelected ? "filter-menu-option is-selected w-full flex items-center gap-2 uv-padding-4d5c65a39c border-0 rounded-uv-r933cc73310 bg-transparent text-uv-text-soft cursor-pointer text-uv-fa2582d5d6e text-left hover:outline-none hover:bg-uv-surface-soft hover:text-uv-text focus-visible:outline-none focus-visible:bg-uv-surface-soft focus-visible:text-uv-text uv-v48f8f87023:bg-uv-cbdfd7cd038 uv-v48f8f87023:text-uv-text uv-v36c0309a03:ml-auto uv-v36c0309a03:text-uv-primary-strong uv-v36c0309a03:uv-font-family-320794573f uv-v36c0309a03:text-uv-fbe567142e3 uv-min-height-e45618b383" : "filter-menu-option w-full flex items-center gap-2 uv-padding-4d5c65a39c border-0 rounded-uv-r933cc73310 bg-transparent text-uv-text-soft cursor-pointer text-uv-fa2582d5d6e text-left hover:outline-none hover:bg-uv-surface-soft hover:text-uv-text focus-visible:outline-none focus-visible:bg-uv-surface-soft focus-visible:text-uv-text uv-v48f8f87023:bg-uv-cbdfd7cd038 uv-v48f8f87023:text-uv-text uv-v36c0309a03:ml-auto uv-v36c0309a03:text-uv-primary-strong uv-v36c0309a03:uv-font-family-320794573f uv-v36c0309a03:text-uv-fbe567142e3 uv-min-height-e45618b383"}
                             key={option.value}
                             onClick={() => setParam(selectedFilter.key, option.value)}
                             role="option"
@@ -270,7 +270,7 @@ export function VocabularyFilters({
                     {filters.map((filter) => (
                       <button
                         aria-selected={!isDefaultValue(filter.key, current[filter.key])}
-                        className="filter-menu-option [width:100%] [display:flex] [align-items:center] [gap:8px] [padding:0_10px] [border:0] [border-radius:10px] [background:transparent] [color:var(--text-soft)] [cursor:pointer] [font-size:0.82rem] [text-align:left] [&:hover]:[outline:none] [&:hover]:[background:var(--surface-soft)] [&:hover]:[color:var(--text)] [&:focus-visible]:[outline:none] [&:focus-visible]:[background:var(--surface-soft)] [&:focus-visible]:[color:var(--text)] [&.is-selected]:[background:var(--primary-soft)] [&.is-selected]:[color:var(--text)] [&_span]:[margin-left:auto] [&_span]:[color:var(--primary-strong)] [&_span]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_span]:[font-size:0.64rem] [min-height:var(--tap-target)]"
+                        className="filter-menu-option w-full flex items-center gap-2 uv-padding-4d5c65a39c border-0 rounded-uv-r933cc73310 bg-transparent text-uv-text-soft cursor-pointer text-uv-fa2582d5d6e text-left hover:outline-none hover:bg-uv-surface-soft hover:text-uv-text focus-visible:outline-none focus-visible:bg-uv-surface-soft focus-visible:text-uv-text uv-v48f8f87023:bg-uv-cbdfd7cd038 uv-v48f8f87023:text-uv-text uv-v36c0309a03:ml-auto uv-v36c0309a03:text-uv-primary-strong uv-v36c0309a03:uv-font-family-320794573f uv-v36c0309a03:text-uv-fbe567142e3 uv-min-height-e45618b383"
                         key={filter.key}
                         onClick={() => setMenu(filter.key)}
                         role="option"
@@ -291,11 +291,11 @@ export function VocabularyFilters({
       </div>
 
       {activeFilters.length ? (
-        <div className="filter-chip-row [align-items:center] [display:flex] [gap:7px] [flex-wrap:wrap] [padding-bottom:2px]" aria-label={t("vocab.activeFilters")}>
+        <div className="filter-chip-row items-center flex gap-1.75 flex-wrap pb-0.5" aria-label={t("vocab.activeFilters")}>
           {activeFilters.map((filter) => (
-            <span className="filter-chip [display:inline-flex] [align-items:center] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface-raised)] [color:var(--text-soft)] [font-size:0.78rem] [overflow:hidden] [&_button]:[width:31px] [&_button]:[align-self:stretch] [&_button]:[display:grid] [&_button]:[place-items:center] [&_button]:[border:0] [&_button]:[border-left:1px_solid_var(--border)] [&_button]:[background:transparent] [&_button]:[color:var(--text-muted)] [&_button]:[cursor:pointer] [&_button:hover]:[color:var(--text)] [&_button:hover]:[background:var(--surface-soft)] [flex:0_0_auto] [min-height:38px]" key={filter.key}>
-              <span className="filter-chip-type [align-self:stretch] [display:inline-flex] [align-items:center] [padding:0_9px] [border-right:1px_solid_var(--border)] [color:var(--text-muted)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.66rem]">{filter.label}</span>
-              <span className="filter-chip-value [padding:0_8px] [color:var(--text)] [font-weight:600]">{filter.valueLabel}</span>
+            <span className="filter-chip inline-flex items-center uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface-raised text-uv-text-soft text-uv-fe9d5fd6635 overflow-hidden uv-v513a7112a0:w-7.75 uv-v513a7112a0:self-stretch uv-v513a7112a0:grid uv-v513a7112a0:uv-place-items-305047e96e uv-v513a7112a0:border-0 uv-v513a7112a0:uv-border-left-8d7f82f403 uv-v513a7112a0:bg-transparent uv-v513a7112a0:text-uv-text-muted uv-v513a7112a0:cursor-pointer uv-v402c621420:text-uv-text uv-v402c621420:bg-uv-surface-soft uv-flex-18ba0b6e31 min-h-9.5" key={filter.key}>
+              <span className="filter-chip-type self-stretch inline-flex items-center uv-padding-16c4636e97 uv-border-right-8d7f82f403 text-uv-text-muted uv-font-family-320794573f text-uv-ff7862da171">{filter.label}</span>
+              <span className="filter-chip-value uv-padding-4f85d0e84d text-uv-text font-semibold">{filter.valueLabel}</span>
               <button
                 aria-label={t("vocab.removeFilter", { label: filter.label })}
                 onClick={() => setParam(filter.key, "ALL")}
@@ -311,7 +311,7 @@ export function VocabularyFilters({
       {current.q || activeFilters.length ? (
         <button
           type="button"
-          className="text-button library-clear [min-height:38px] [display:inline-flex] [align-items:center] [gap:6px] [border:0] [background:transparent] [color:var(--text-muted)] [cursor:pointer] [width:fit-content]"
+          className="text-button library-clear min-h-9.5 inline-flex items-center gap-1.5 border-0 bg-transparent text-uv-text-muted cursor-pointer w-fit"
           onClick={() => router.push("/vocabulary")}
         >
           <X size={15} />

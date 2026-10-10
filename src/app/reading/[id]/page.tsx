@@ -61,19 +61,19 @@ export default async function ReadingDetailPage({
   const questions = reading.questions as unknown as ReadingQuestion[];
 
   return (
-    <main className="page generated-reading-page [display:flex] [flex-direction:column] [--reading-measure:68ch] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-      <section className="page-header compact reading-document-header [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [max-width:860px] [&_h1]:[font-size:clamp(2.25rem,_9vw,_4.4rem)]">
-        <Link href="/reading" className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
+    <main className="page generated-reading-page flex flex-col uv---reading-measure-51f5a1cba8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact reading-document-header flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 max-w-uv-a9051779da uv-v3bccf64584:text-uv-fb9b4a66c9a">
+        <Link href="/reading" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
           <ArrowLeft className="rtl-mirror" size={16} />
           {t("reading.detail.back")}
         </Link>
-        <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{reading.level}</span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+        <div className="word-meta flex flex-wrap gap-1.75 items-center">
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{reading.level}</span>
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
             {t(lengthKeys[reading.length] ?? "reading.length.medium")}
           </span>
           {reading.completedAt ? (
-            <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+            <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
               {t("reading.comprehension", { percent: formatPercent(
                   locale,
                   reading.comprehensionScore ?? 0,
@@ -85,7 +85,7 @@ export default async function ReadingDetailPage({
           {reading.title}
         </h1>
         {reading.topic ? (
-          <p className="page-description learning-content [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]" dir="auto">
+          <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a" dir="auto">
             {reading.topic}
           </p>
         ) : null}
@@ -108,20 +108,20 @@ export default async function ReadingDetailPage({
       />
 
       {reading.grammarTargets.length ? (
-        <section className="panel reading-language-notes [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [max-width:860px] [margin-inline:auto] [&_blockquote]:[margin:10px_0] [&_blockquote]:[padding-inline-start:12px] [&_blockquote]:[border-inline-start:2px_solid_var(--border)] [&_blockquote]:[color:var(--text-muted)] [border-radius:18px]">
-          <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+        <section className="panel reading-language-notes uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 max-w-uv-a9051779da mx-auto uv-v40f68432a8:uv-margin-10ff753f5f uv-v40f68432a8:ps-3 uv-v40f68432a8:uv-border-inline-start-c419f9412a uv-v40f68432a8:text-uv-text-muted rounded-uv-r6d27d54c6c">
+          <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("reading.detail.notes")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("reading.detail.notes")}</p>
               <h2>{t("reading.detail.grammarContext")}</h2>
             </div>
             <Brain size={19} />
           </div>
-          <p className="muted [color:var(--text-muted)]">{t("reading.detail.notesHelp")}</p>
-          <div className="question-list [display:flex] [flex-direction:column] [gap:8px]">
+          <p className="muted text-uv-text-muted">{t("reading.detail.notesHelp")}</p>
+          <div className="question-list flex flex-col gap-2">
             {reading.grammarTargets.map((target) => (
-              <details className="question-item [&_summary]:[display:flex] [&_summary]:[align-items:center] [&_summary]:[gap:9px] [&_summary]:[line-height:1.45] [&_p]:[margin:12px_0_2px] [&_p]:[line-height:1.6]" key={target.id}>
+              <details className="question-item uv-vaa46806d56:flex uv-vaa46806d56:items-center uv-vaa46806d56:gap-2.25 uv-vaa46806d56:uv-line-height-2792cf2449 uv-vb19eb067c9:uv-margin-41866770f5 uv-vb19eb067c9:uv-line-height-4693695d02" key={target.id}>
                 <summary>
-                  <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+                  <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
                     {target.grammarConcept.introducedAt}
                   </span>
                   <span className="learning-content" lang="en" dir="ltr">
@@ -139,7 +139,7 @@ export default async function ReadingDetailPage({
                   </p>
                 ) : null}
                 <Link
-                  className="text-link [color:var(--primary-strong)] [font-weight:560] [display:inline-flex] [align-items:center] [gap:6px]"
+                  className="text-link text-uv-primary-strong uv-weight-560 inline-flex items-center gap-1.5"
                   href={"/grammar/" + target.grammarConcept.slug}
                 >
                   {t("reading.detail.learnGrammar")}
@@ -152,22 +152,22 @@ export default async function ReadingDetailPage({
 
       <ReadingAssessment readingId={reading.id} questions={questions} />
 
-      <section className="panel reading-language-summary [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [max-width:860px] [margin-inline:auto] [border-radius:18px]">
-        <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+      <section className="panel reading-language-summary uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 max-w-uv-a9051779da mx-auto rounded-uv-r6d27d54c6c">
+        <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
           <div>
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("reading.detail.languageText")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("reading.detail.languageText")}</p>
             <h2>{t("reading.detail.encountered")}</h2>
           </div>
           <BookOpenCheck size={19} />
         </div>
 
         {reading.grammarTargets.length ? (
-          <div className="reading-summary-group [display:grid] [gap:10px] [&_+_.reading-summary-group]:[margin-top:18px]">
+          <div className="reading-summary-group grid gap-2.5 uv-vd1ee2fd995:mt-4.5">
             <strong>{t("reading.detail.grammar")}</strong>
-            <div className="relation-list [display:flex] [flex-wrap:wrap] [gap:8px]">
+            <div className="relation-list flex flex-wrap gap-2">
               {reading.grammarTargets.map((target) => (
                 <Link
-                  className="relation-chip [min-height:48px] [min-width:110px] [display:inline-flex] [flex-direction:column] [justify-content:center] [gap:3px] [padding:8px_12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_span]:[font-weight:600] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.66rem]"
+                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:font-semibold uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff7862da171"
                   href={"/grammar/" + target.grammarConcept.slug}
                   key={target.id}
                 >
@@ -186,12 +186,12 @@ export default async function ReadingDetailPage({
         ) : null}
 
         {reading.targets.length ? (
-          <div className="reading-summary-group [display:grid] [gap:10px] [&_+_.reading-summary-group]:[margin-top:18px]">
+          <div className="reading-summary-group grid gap-2.5 uv-vd1ee2fd995:mt-4.5">
             <strong>{t("reading.detail.vocabulary")}</strong>
-            <div className="relation-list [display:flex] [flex-wrap:wrap] [gap:8px]">
+            <div className="relation-list flex flex-wrap gap-2">
               {reading.targets.map((target) => (
                 <Link
-                  className="relation-chip [min-height:48px] [min-width:110px] [display:inline-flex] [flex-direction:column] [justify-content:center] [gap:3px] [padding:8px_12px] [border:1px_solid_var(--border)] [border-radius:14px] [background:var(--surface-raised)] [&_span]:[font-weight:600] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.66rem]"
+                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 uv-padding-e4accf4b2b uv-border-8d7f82f403 rounded-uv-rd65225386d bg-uv-surface-raised uv-v36c0309a03:font-semibold uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-ff7862da171"
                   href={"/vocabulary/" + target.lexeme.id}
                   key={target.id}
                 >
@@ -223,8 +223,8 @@ export default async function ReadingDetailPage({
         ) : null}
       </section>
 
-      <section className="panel story-summary [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_p]:[line-height:1.65] [border-radius:18px]">
-        <h2 className="section-title [margin:0_0_10px] [font-size:1rem] [color:var(--text-soft)] [letter-spacing:-0.02em]">{t("reading.detail.summary")}</h2>
+      <section className="panel story-summary uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-vb19eb067c9:uv-line-height-cf9a155f4a rounded-uv-r6d27d54c6c">
+        <h2 className="section-title uv-margin-83bba30fc1 text-uv-f19feeb881c text-uv-text-soft uv-letter-spacing-235f37bdea">{t("reading.detail.summary")}</h2>
         {course.explanationLanguage !== "PERSIAN" && reading.englishSummary ? (
           <p className="learning-content" lang="en" dir="ltr">
             {reading.englishSummary}

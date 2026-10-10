@@ -116,7 +116,7 @@ export function VerbConjugation({
       <button
         aria-controls="conjugation-sheet"
         aria-expanded={open}
-        className="word-quick-action-button [appearance:none] [display:inline-flex] [align-items:center] [justify-content:center] [gap:7px] [min-height:44px] [padding:0_11px] [border:1px_solid_var(--border)] [border-radius:12px] [background:var(--surface-raised)] [color:var(--text-soft)] [cursor:pointer] [font:inherit] [font-size:.82rem] [font-weight:620] [&:active]:[transform:scale(.97)]"
+        className="word-quick-action-button appearance-none inline-flex items-center justify-center gap-1.75 min-h-11 uv-padding-e76eae74a0 uv-border-8d7f82f403 rounded-uv-r0939007802 bg-uv-surface-raised text-uv-text-soft cursor-pointer uv-font-3e26d67509 text-uv-f68df68d03a uv-weight-620 active:uv-transform-9c10e35e08"
         type="button"
         onClick={() => setOpen(true)}
       >
@@ -128,14 +128,14 @@ export function VerbConjugation({
           <motion.div
             key="conjugation-sheet"
             id="conjugation-sheet"
-            className="conjugation-overlay [position:fixed] [z-index:100] [inset:0] [display:flex] [align-items:center] [justify-content:center] [padding:12px] max-[619px]:[align-items:flex-end] max-[619px]:[padding:0]"
+            className="conjugation-overlay fixed uv-z-index-310b86e0b6 inset-0 flex items-center justify-center p-3 uv-max619:items-end uv-max619:p-0"
             role="dialog"
             aria-modal="true"
             aria-labelledby="conjugation-title"
           >
             <motion.button
               aria-label={t("word.closeConjugation")}
-              className="conjugation-backdrop [position:absolute] [inset:0] [border:0] [background:rgba(0,0,0,.72)] [backdrop-filter:blur(5px)]"
+              className="conjugation-backdrop absolute inset-0 border-0 bg-uv-c551182bf8a uv-backdrop-filter-f609dff645"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -144,7 +144,7 @@ export function VerbConjugation({
               onClick={() => setOpen(false)}
             />
             <motion.section
-              className="conjugation-panel [position:relative] [width:min(940px,_100%)] [max-height:min(860px,_calc(100dvh_-_24px))] [overflow:hidden] [overscroll-behavior:contain] [border:1px_solid_var(--border-strong)] [border-radius:22px] [background:var(--surface)] [color:var(--text)] [box-shadow:var(--shadow)] max-[619px]:[width:100%] max-[619px]:[max-height:min(88dvh,_760px)] max-[619px]:[border-bottom:0] max-[619px]:[border-radius:26px_26px_0_0]"
+              className="conjugation-panel relative uv-width-e7a610a02c uv-max-height-1242661972 overflow-hidden overscroll-contain uv-border-488f4b382f rounded-uv-r42d92f3218 bg-uv-surface text-uv-text uv-box-shadow-4ee177db8b uv-max619:w-full uv-max619:uv-max-height-65132cd709 uv-max619:uv-border-bottom-b6589fc6ab uv-max619:rounded-uv-re9f29dbce4"
               initial={reduceMotion ? false : { opacity: 0, y: 44, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={
@@ -159,11 +159,11 @@ export function VerbConjugation({
                 mass: 0.8,
               }}
             >
-              <div className="conjugation-sheet-handle [display:none] max-[619px]:[display:block] max-[619px]:[width:38px] max-[619px]:[height:4px] max-[619px]:[margin:10px_auto_0] max-[619px]:[border-radius:999px] max-[619px]:[background:var(--border-strong)]" aria-hidden="true" />
-              <div className="conjugation-shell [display:flex] [flex-direction:column] [min-height:min(720px,_calc(100dvh_-_24px))] [max-height:min(860px,_calc(100dvh_-_24px))] min-[620px]:[min-height:640px] max-[619px]:[min-height:0] max-[619px]:[max-height:min(88dvh,_760px)] max-[619px]:[padding-bottom:env(safe-area-inset-bottom)]">
-                <header className="conjugation-header [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:16px] [padding:18px_18px_14px] [border-bottom:1px_solid_var(--border)] [&_h2]:[margin:4px_0_0] [&_h2]:[font-size:1.45rem]">
+              <div className="conjugation-sheet-handle hidden uv-max619:block uv-max619:w-9.5 uv-max619:h-1 uv-max619:uv-margin-7c0d32cb01 uv-max619:rounded-uv-red9ab892c5 uv-max619:bg-uv-border-strong" aria-hidden="true" />
+              <div className="conjugation-shell flex flex-col uv-min-height-deda98129e uv-max-height-1242661972 uv-min620:min-h-uv-e6fb97d224 uv-max619:min-h-0 uv-max619:uv-max-height-65132cd709 uv-max619:uv-padding-bottom-49b583ae64">
+                <header className="conjugation-header flex items-start justify-between gap-4 uv-padding-eec66b4496 uv-border-bottom-8d7f82f403 uv-vd552c26874:uv-margin-02a5349d58 uv-vd552c26874:text-uv-fab62110780">
                   <div>
-                    <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("word.verbReference")}</p>
+                    <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("word.verbReference")}</p>
                     <h2 id="conjugation-title">
                       {query.data?.data.lemma
                         ? t("word.conjugateLemma", {
@@ -173,7 +173,7 @@ export function VerbConjugation({
                     </h2>
                   </div>
                   <button
-                    className="icon-button [width:44px] [height:44px] [display:grid] [place-items:center] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface)] [color:var(--text-soft)] [min-height:var(--tap-target)]"
+                    className="icon-button w-11 h-11 grid uv-place-items-305047e96e uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft uv-min-height-e45618b383"
                     type="button"
                     onClick={() => setOpen(false)}
                     aria-label={t("word.closeConjugation")}
@@ -183,15 +183,15 @@ export function VerbConjugation({
                 </header>
 
                 {query.isPending ? (
-                  <div className="conjugation-state [flex:1] [display:flex] [flex-direction:column] [justify-content:center] [gap:12px] [padding:24px] [&_>_span]:[color:var(--text-muted)]" role="status">
-                    <div className="skeleton skeleton-title [border-radius:10px] [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [width:min(88%,_560px)] [height:54px]" />
-                    <div className="skeleton skeleton-card [background:linear-gradient(90deg,_#16161a_25%,_#202026_50%,_#16161a_75%)] [background-size:200%_100%] [animation:shimmer_1.4s_infinite] [height:112px] [border-radius:var(--radius-lg)]" />
+                  <div className="conjugation-state uv-flex-356a192b79 flex flex-col justify-center gap-3 p-6 uv-v22810335d8:text-uv-text-muted" role="status">
+                    <div className="skeleton skeleton-title rounded-uv-r933cc73310 uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b uv-width-86fd0a9d90 h-13.5" />
+                    <div className="skeleton skeleton-card uv-background-f9cc7f1a35 uv-background-size-6f7b2cd4e5 uv-animation-78b09c2c3b h-28 rounded-uv-r02a0a889dd" />
                     <span>{t("word.generatingConjugation")}</span>
                   </div>
                 ) : null}
 
                 {query.isError ? (
-                  <div className="conjugation-state [flex:1] [display:flex] [flex-direction:column] [justify-content:center] [gap:12px] [padding:24px] [&_>_span]:[color:var(--text-muted)]" role="alert">
+                  <div className="conjugation-state uv-flex-356a192b79 flex flex-col justify-center gap-3 p-6 uv-v22810335d8:text-uv-text-muted" role="alert">
                     <strong>{t("word.conjugationUnavailable")}</strong>
                     <span>
                       {query.error instanceof Error
@@ -199,7 +199,7 @@ export function VerbConjugation({
                         : t("word.conjugationError")}
                     </span>
                     <button
-                      className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                      className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
                       type="button"
                       onClick={() => query.refetch()}
                     >
@@ -210,7 +210,7 @@ export function VerbConjugation({
 
                 {query.data ? (
                   <>
-                    <div className="conjugation-meta [display:flex] [flex-wrap:wrap] [gap:6px] [padding:12px_18px_0] [&_span]:[padding:5px_8px] [&_span]:[border:1px_solid_var(--border)] [&_span]:[border-radius:999px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:.68rem]">
+                    <div className="conjugation-meta flex flex-wrap gap-1.5 uv-padding-cb7b9f1f30 uv-v36c0309a03:uv-padding-24a7c581e4 uv-v36c0309a03:uv-border-8d7f82f403 uv-v36c0309a03:rounded-uv-red9ab892c5 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff051c59395">
                       <span className="learning-content" lang="de" dir="ltr">
                         {query.data.data.metadata.auxiliary}
                       </span>
@@ -229,7 +229,7 @@ export function VerbConjugation({
                     </div>
 
                     <div
-                      className="conjugation-tabs [display:flex] [gap:6px] [overflow-x:auto] [padding:12px_18px] [border-bottom:1px_solid_var(--border)] [&_button]:[min-height:48px] [&_button]:[flex:0_0_auto] [&_button]:[display:flex] [&_button]:[flex-direction:column] [&_button]:[justify-content:center] [&_button]:[gap:2px] [&_button]:[padding:7px_11px] [&_button]:[border:1px_solid_var(--border)] [&_button]:[border-radius:11px] [&_button]:[background:var(--surface-raised)] [&_button]:[color:var(--text-soft)] [&_button]:[cursor:pointer] [&_button_small]:[color:var(--text-muted)] [&_button_small]:[font-size:.62rem] [&_button.is-active]:[border-color:var(--primary)] [&_button.is-active]:[background:var(--primary-soft)] [&_button.is-active]:[color:var(--text)]"
+                      className="conjugation-tabs flex gap-1.5 overflow-x-auto uv-padding-a3f9842c21 uv-border-bottom-8d7f82f403 uv-v513a7112a0:min-h-12 uv-v513a7112a0:uv-flex-18ba0b6e31 uv-v513a7112a0:flex uv-v513a7112a0:flex-col uv-v513a7112a0:justify-center uv-v513a7112a0:gap-0.5 uv-v513a7112a0:uv-padding-8297b577da uv-v513a7112a0:uv-border-8d7f82f403 uv-v513a7112a0:rounded-uv-r4bd46d4017 uv-v513a7112a0:bg-uv-surface-raised uv-v513a7112a0:text-uv-text-soft uv-v513a7112a0:cursor-pointer uv-v9628fc471b:text-uv-text-muted uv-v9628fc471b:text-uv-ff13a2a157c uv-v169acfe1bb:border-uv-primary uv-v169acfe1bb:bg-uv-cbdfd7cd038 uv-v169acfe1bb:text-uv-text"
                       role="tablist"
                       aria-label={t("word.conjugationTense")}
                     >
@@ -290,12 +290,12 @@ export function VerbConjugation({
 
                     <section
                       id="conjugation-tense-panel"
-                      className="conjugation-content [flex:1] [overflow:auto] [padding:18px]"
+                      className="conjugation-content uv-flex-356a192b79 overflow-auto p-4.5"
                       role="tabpanel"
                       aria-live="polite"
                     >
                       {active === "imperative" ? (
-                        <div className="conjugation-reference-grid [display:grid] [grid-template-columns:1fr] [gap:9px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:4px] [&_>_div]:[padding:13px] [&_>_div]:[border:1px_solid_var(--border)] [&_>_div]:[border-radius:12px] [&_>_div]:[background:var(--surface-raised)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:.68rem] [&_p]:[grid-column:1/-1] [&_p]:[color:var(--text-soft)] [&_p]:[line-height:1.55] min-[620px]:[grid-template-columns:repeat(2,minmax(0,1fr))]">
+                        <div className="conjugation-reference-grid grid uv-grid-template-columns-6a5c4d4d49 gap-2.25 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-1 uv-vcbb57f4d35:p-3.25 uv-vcbb57f4d35:uv-border-8d7f82f403 uv-vcbb57f4d35:rounded-uv-r0939007802 uv-vcbb57f4d35:bg-uv-surface-raised uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff051c59395 uv-vb19eb067c9:uv-grid-column-5f9213811d uv-vb19eb067c9:text-uv-text-soft uv-vb19eb067c9:uv-line-height-05c248da4c uv-min620:uv-grid-template-columns-6ed5bb837d">
                           <div lang="de" dir="ltr" className="learning-content">
                             <span>du</span>
                             <strong>{query.data.data.imperative.du}</strong>
@@ -315,7 +315,7 @@ export function VerbConjugation({
                           ) : null}
                         </div>
                       ) : active === "forms" ? (
-                        <div className="conjugation-reference-grid [display:grid] [grid-template-columns:1fr] [gap:9px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:4px] [&_>_div]:[padding:13px] [&_>_div]:[border:1px_solid_var(--border)] [&_>_div]:[border-radius:12px] [&_>_div]:[background:var(--surface-raised)] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:.68rem] [&_p]:[grid-column:1/-1] [&_p]:[color:var(--text-soft)] [&_p]:[line-height:1.55] min-[620px]:[grid-template-columns:repeat(2,minmax(0,1fr))]">
+                        <div className="conjugation-reference-grid grid uv-grid-template-columns-6a5c4d4d49 gap-2.25 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-1 uv-vcbb57f4d35:p-3.25 uv-vcbb57f4d35:uv-border-8d7f82f403 uv-vcbb57f4d35:rounded-uv-r0939007802 uv-vcbb57f4d35:bg-uv-surface-raised uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff051c59395 uv-vb19eb067c9:uv-grid-column-5f9213811d uv-vb19eb067c9:text-uv-text-soft uv-vb19eb067c9:uv-line-height-05c248da4c uv-min620:uv-grid-template-columns-6ed5bb837d">
                           <div>
                             <span>{t("word.infinitive")}</span>
                             <strong className="learning-content" lang="de" dir="ltr">
@@ -366,7 +366,7 @@ export function VerbConjugation({
                         </div>
                       ) : selected ? (
                         <>
-                          <div className="conjugation-tense-heading [display:flex] [flex-direction:column] [gap:5px] [margin-bottom:12px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:.76rem] [&_span]:[line-height:1.5]">
+                          <div className="conjugation-tense-heading flex flex-col gap-1.25 mb-3 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-fb0a544cd05 uv-v36c0309a03:uv-line-height-aa8f289ebe">
                             <strong>
                               {t(
                                 tenseLabelKeys[selected.id] ??
@@ -383,7 +383,7 @@ export function VerbConjugation({
                               </span>
                             ) : null}
                           </div>
-                          <table className="conjugation-table [width:100%] [border-collapse:collapse] [&_th]:[padding:13px_10px] [&_th]:[border-bottom:1px_solid_var(--border)] [&_th]:[text-align:left] [&_td]:[padding:13px_10px] [&_td]:[border-bottom:1px_solid_var(--border)] [&_td]:[text-align:left] [&_thead_th]:[color:var(--text-muted)] [&_thead_th]:[font-size:.7rem] [&_thead_th]:[font-weight:550] [&_tbody_th]:[width:32%] [&_tbody_th]:[color:var(--text-muted)] [&_tbody_th]:[font-weight:550] [&_tbody_td]:[font-size:1rem] [&_tbody_td]:[font-weight:620] max-[619px]:[&_th]:[padding:12px_6px] max-[619px]:[&_td]:[padding:12px_6px]">
+                          <table className="conjugation-table w-full uv-border-collapse-86d3bfb618 uv-v91df30fa0b:uv-padding-c4e72a1e2c uv-v91df30fa0b:uv-border-bottom-8d7f82f403 uv-v91df30fa0b:text-left uv-v96e4348bba:uv-padding-c4e72a1e2c uv-v96e4348bba:uv-border-bottom-8d7f82f403 uv-v96e4348bba:text-left uv-v1717b45db1:text-uv-text-muted uv-v1717b45db1:text-uv-ff73364d9bf uv-v1717b45db1:uv-weight-550 uv-va13082df36:uv-width-5be8ff9cc2 uv-va13082df36:text-uv-text-muted uv-va13082df36:uv-weight-550 uv-v18e0fc6455:text-uv-f19feeb881c uv-v18e0fc6455:uv-weight-620 uv-max619:uv-v91df30fa0b:uv-padding-b8b41d92d1 uv-max619:uv-v96e4348bba:uv-padding-b8b41d92d1">
                             <thead>
                               <tr>
                                 <th>{t("word.person")}</th>

@@ -53,22 +53,22 @@ export function ReviewCard({
   }, [onGrade, revealed]);
 
   return (
-    <section className="panel learning-card review-flashcard [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [width:100%] [max-width:760px] [display:flex] [flex-direction:column] [gap:18px] [&_.learning-prompt]:[font-size:clamp(1.55rem,_7vw,_2.35rem)] [min-height:min(520px,_70dvh)] [justify-content:space-between] [&_.review-card-front_.learning-prompt]:[font-size:clamp(1.9rem,_5vw,_2.8rem)] [&_.review-card-front_.learning-prompt]:[line-height:1.18] [&_.review-card-front_.learning-prompt]:[font-weight:700] [border-radius:18px]">
-      <div className="learning-card-head [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_>_.muted]:[font-size:0.78rem]">
-        <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{card.review.family.replaceAll("_", " ").toLowerCase()}</span>
-        <span className="muted [color:var(--text-muted)]">{t("review.activeRecall")}</span>
+    <section className="panel learning-card review-flashcard uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 w-full max-w-uv-c078f10a0b flex flex-col gap-4.5 uv-vbc4e530e94:text-uv-f128d50102f uv-min-height-c618951de9 justify-between uv-vc7c4bbad24:text-uv-f8bea779a86 uv-vc7c4bbad24:uv-line-height-6ce245771a uv-vc7c4bbad24:font-bold rounded-uv-r6d27d54c6c">
+      <div className="learning-card-head flex items-center justify-between gap-3 uv-va472f14696:text-uv-fe9d5fd6635">
+        <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{card.review.family.replaceAll("_", " ").toLowerCase()}</span>
+        <span className="muted text-uv-text-muted">{t("review.activeRecall")}</span>
       </div>
 
       <motion.div
         animate={{ rotateY: revealed ? 180 : 0 }}
-        className="review-card-flip [display:grid] [min-height:180px] [padding:20px_0] [perspective:1200px]"
+        className="review-card-flip grid min-h-45 uv-padding-f2a961c8b0 uv-perspective-83c3d2d9cb"
         style={{ transformStyle: "preserve-3d" }}
         transition={{ duration: reduceMotion ? 0 : 0.42, ease: "easeInOut" }}
       >
-        <div aria-hidden={revealed} className="review-card-face review-card-front [grid-area:1_/_1] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [display:flex] [flex-direction:column] [gap:10px] [&_.eyebrow]:[font-size:.75rem] [&_>_.muted]:[font-size:.95rem]">
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("review.recall")}</p>
+        <div aria-hidden={revealed} className="review-card-face review-card-front uv-grid-area-b6147458c1 uv-backface-visibility-99d72c7fc3 uv--webkit-backface-visibility-99d72c7fc3 flex flex-col gap-2.5 uv-vf3c20c0d1d:text-uv-f60ac4cf407 uv-va472f14696:text-uv-fed7a8e9b27">
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("review.recall")}</p>
           <h2
-            className="learning-prompt learning-content [margin:0] [font-size:clamp(1.35rem,_6vw,_2rem)] [line-height:1.25] [letter-spacing:-0.035em] [font-weight:560]"
+            className="learning-prompt learning-content m-0 text-uv-fb5d06bc327 uv-line-height-8e007eaa50 uv-letter-spacing-b22247dbaf uv-weight-560"
             lang={card.review.front.language}
             dir={direction(card.review.front.language)}
           >
@@ -76,7 +76,7 @@ export function ReviewCard({
           </h2>
           {card.review.front.hint ? (
             <p
-              className="muted learning-content [color:var(--text-muted)]"
+              className="muted learning-content text-uv-text-muted"
               lang={card.review.front.language}
               dir={direction(card.review.front.language)}
             >
@@ -85,8 +85,8 @@ export function ReviewCard({
           ) : null}
         </div>
 
-        <div aria-hidden={!revealed} className="answer-panel review-card-face review-card-back [margin-top:4px] [padding:16px] [border:1px_solid_var(--border)] [border-radius:var(--radius-md)] [background:var(--surface-soft)] [grid-area:1_/_1] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [display:flex] [flex-direction:column] [gap:8px] [transform:rotateY(180deg)] [&_>_strong]:[font-size:clamp(1.9rem,_5vw,_2.8rem)] [&_>_strong]:[line-height:1.18] [&_>_strong]:[font-weight:700] [&_>_strong]:[letter-spacing:-.025em] [&_p]:[margin:0] [&_p]:[color:var(--text-soft)] [&_p]:[font-size:clamp(.95rem,_2.5vw,_1.1rem)] [&_p]:[line-height:1.55] [&_.eyebrow]:[font-size:.75rem]">
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("review.check")}</p>
+        <div aria-hidden={!revealed} className="answer-panel review-card-face review-card-back mt-1 p-4 uv-border-8d7f82f403 rounded-uv-rd50c223e36 bg-uv-surface-soft uv-grid-area-b6147458c1 uv-backface-visibility-99d72c7fc3 uv--webkit-backface-visibility-99d72c7fc3 flex flex-col gap-2 uv-transform-79cfc571da uv-ve6b262f465:text-uv-f8bea779a86 uv-ve6b262f465:uv-line-height-6ce245771a uv-ve6b262f465:font-bold uv-ve6b262f465:uv-letter-spacing-08161724d7 uv-vb19eb067c9:m-0 uv-vb19eb067c9:text-uv-text-soft uv-vb19eb067c9:text-uv-f1a8b10037e uv-vb19eb067c9:uv-line-height-05c248da4c uv-vf3c20c0d1d:text-uv-f60ac4cf407">
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("review.check")}</p>
           <strong
             className="learning-content"
             lang={card.review.back.language}
@@ -109,7 +109,7 @@ export function ReviewCard({
 
       {!revealed ? (
         <button
-          className="button button-primary review-reveal [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+          className="button button-primary review-reveal w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
           type="button"
           onClick={() => setRevealed(true)}
         >
@@ -118,23 +118,23 @@ export function ReviewCard({
         </button>
       ) : (
         <>
-          <div className="learning-card-head [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_>_.muted]:[font-size:0.78rem]">
-            <p className="muted [color:var(--text-muted)]">{t("review.rateHelp")}</p>
-            <button className="text-button [min-height:38px] [display:inline-flex] [align-items:center] [gap:6px] [border:0] [background:transparent] [color:var(--text-muted)] [cursor:pointer]" type="button" onClick={() => setRevealed(false)}>
+          <div className="learning-card-head flex items-center justify-between gap-3 uv-va472f14696:text-uv-fe9d5fd6635">
+            <p className="muted text-uv-text-muted">{t("review.rateHelp")}</p>
+            <button className="text-button min-h-9.5 inline-flex items-center gap-1.5 border-0 bg-transparent text-uv-text-muted cursor-pointer" type="button" onClick={() => setRevealed(false)}>
               <RotateCcw size={15} />
               {t("review.hide")}
             </button>
           </div>
-          <div className="grade-grid review-grade-grid [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:8px] [&_form]:[display:block] min-[620px]:[grid-template-columns:repeat(4,_minmax(0,_1fr))] [&_button]:[min-height:54px] [&_button]:[flex-direction:column] [&_button]:[gap:2px] [&_button_small]:[opacity:.65] [&_button_small]:[font-size:.62rem] [&_.button:disabled]:[cursor:wait]">
+          <div className="grade-grid review-grade-grid grid uv-grid-template-columns-dd0b1a1848 gap-2 uv-v8cd0743a41:block uv-min620:uv-grid-template-columns-0cbc4f103a uv-v513a7112a0:min-h-13.5 uv-v513a7112a0:flex-col uv-v513a7112a0:gap-0.5 uv-v9628fc471b:opacity-65 uv-v9628fc471b:text-uv-ff13a2a157c uv-vf34c80d831:cursor-wait">
             {ratings.map((rating, index) => (
               <button
                 className={
-                  "button [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)] " +
+                  "button w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383 " +
                   (rating.grade === "AGAIN"
-                    ? "button-danger [background:var(--danger)] [color:#19070a] [border-color:currentColor]"
+                    ? "button-danger bg-uv-danger text-uv-cb667f4b109 border-current"
                     : rating.grade === "EASY"
-                      ? "button-success [background:var(--success)] [color:#07140e]"
-                      : "button-secondary [background:var(--surface-raised)] [border-color:var(--border)] [color:var(--text)]")
+                      ? "button-success bg-uv-success text-uv-c1667a9177b"
+                      : "button-secondary bg-uv-surface-raised border-uv-border text-uv-text")
                 }
                 key={rating.grade}
                 onClick={() => onGrade(rating.grade, startedAt.current)}

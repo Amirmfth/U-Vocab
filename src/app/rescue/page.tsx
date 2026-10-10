@@ -70,9 +70,9 @@ export default async function RescuePage({
     const rescueSet = top.slice(0, 10);
 
     return (
-      <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-        <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
-          <Link href="/review" className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
+      <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+        <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+          <Link href="/review" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
             <ArrowLeft className="rtl-mirror" size={16} />
             {t("nav.review")}
           </Link>
@@ -81,16 +81,16 @@ export default async function RescuePage({
 
         {top.length ? (
           <>
-            <section className="rescue-list [display:flex] [flex-direction:column] [border-top:1px_solid_var(--border)]">
+            <section className="rescue-list flex flex-col uv-border-top-8d7f82f403">
               {top.map((item, index) => (
-                <article className="rescue-row [display:grid] [grid-template-columns:auto_minmax(0,_1fr)_auto] [gap:12px] [align-items:start] [padding:14px_0] [border-bottom:1px_solid_var(--border)] min-[620px]:[align-items:center]" key={item.id}>
-                  <div className="rescue-rank [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-variant-numeric:tabular-nums] [padding-top:2px] [color:var(--text-muted)] [font-size:0.68rem]">
+                <article className="rescue-row grid uv-grid-template-columns-738a8da05d gap-3 items-start uv-padding-612d1e1532 uv-border-bottom-8d7f82f403 uv-min620:items-center" key={item.id}>
+                  <div className="rescue-rank uv-font-family-320794573f uv-font-variant-numeric-3032cae0ba pt-0.5 text-uv-text-muted text-uv-f78eb7000a9">
                     {formatNumber(locale, index + 1, {
                       minimumIntegerDigits: 2,
                       useGrouping: false,
                     })}
                   </div>
-                  <div className="rescue-row-copy [min-width:0] [display:flex] [flex-direction:column] [gap:8px] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:3px] [&_>_div:first-child_span]:[color:var(--text-muted)] [&_>_div:first-child_span]:[font-size:0.72rem]">
+                  <div className="rescue-row-copy min-w-0 flex flex-col gap-2 uv-v0fee2d502c:flex uv-v0fee2d502c:flex-col uv-v0fee2d502c:gap-0.75 uv-v1c155e3be2:text-uv-text-muted uv-v1c155e3be2:text-uv-ff1713651e0">
                     <div>
                       <strong
                         className="learning-content"
@@ -108,7 +108,7 @@ export default async function RescuePage({
                         })}
                       </span>
                     </div>
-                    <div className="rescue-reasons [display:flex] [flex-wrap:wrap] [gap:6px] [&_span]:[padding:5px_8px] [&_span]:[border:1px_solid_rgba(255,_107,_122,_0.18)] [&_span]:[border-radius:999px] [&_span]:[background:var(--danger-soft)] [&_span]:[color:#ffc2c9] [&_span]:[font-size:0.68rem]">
+                    <div className="rescue-reasons flex flex-wrap gap-1.5 uv-v36c0309a03:uv-padding-24a7c581e4 uv-v36c0309a03:uv-border-7314b293fb uv-v36c0309a03:rounded-uv-red9ab892c5 uv-v36c0309a03:bg-uv-c8b3083dabe uv-v36c0309a03:text-uv-c7d351e814d uv-v36c0309a03:text-uv-f78eb7000a9">
                       {item.risk.reasons.map((reason) => (
                         <span key={reason}>
                           {localizedRiskReason(reason, t, locale)}
@@ -117,7 +117,7 @@ export default async function RescuePage({
                     </div>
                   </div>
                   <strong
-                    className="rescue-score [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-variant-numeric:tabular-nums] [min-width:34px] [text-align:right] [color:var(--danger)] [font-size:0.8rem]"
+                    className="rescue-score uv-font-family-320794573f uv-font-variant-numeric-3032cae0ba min-w-8.5 text-right text-uv-danger text-uv-f6c2d68ddb8"
                     title={t("rescue.score")}
                   >
                     {formatNumber(locale, Math.round(item.risk.score * 100))}
@@ -126,7 +126,7 @@ export default async function RescuePage({
               ))}
             </section>
 
-            <div className="progress-actions [display:flex] [flex-direction:column] [gap:9px] min-[620px]:[flex-direction:row]">
+            <div className="progress-actions flex flex-col gap-2.25 uv-min620:flex-row">
               <Link
                 href={
                   "/rescue?ids=" +
@@ -135,7 +135,7 @@ export default async function RescuePage({
                   ) +
                   "&step=0"
                 }
-                className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]"
+                className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383"
               >
                 <LifeBuoy size={18} />
                 {t("rescue.cta", {
@@ -143,13 +143,13 @@ export default async function RescuePage({
                 })}
                 <ArrowRight className="rtl-mirror" size={17} />
               </Link>
-              <Link href="/review" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
+              <Link href="/review" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
                 {t("rescue.regularReview")}
               </Link>
             </div>
           </>
         ) : (
-          <div className="empty-state [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [padding:24px] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)]">
+          <div className="empty-state flex flex-col gap-3 items-start p-6 uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft">
             <CheckCircle2 size={22} />
             <strong>{t("rescue.none")}</strong>
             <span>{t("rescue.noneHelp")}</span>

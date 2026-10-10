@@ -72,38 +72,38 @@ export default async function ConversationSessionPage({
         : t("conversation.detail.formality.contextual");
 
   return (
-    <main className="page conversation-page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
-        <Link href="/conversation" className="back-link [width:fit-content] [min-height:40px] [display:inline-flex] [align-items:center] [gap:7px] [color:var(--text-muted)] [font-size:0.82rem]">
+    <main className="page conversation-page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+        <Link href="/conversation" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
           <ArrowLeft className="rtl-mirror" size={16} />
           {t("conversation.detail.back")}
         </Link>
 
-        <div className="word-meta [display:flex] [flex-wrap:wrap] [gap:7px] [align-items:center]">
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+        <div className="word-meta flex flex-wrap gap-1.75 items-center">
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
             {session.kind === "MISSION"
               ? t("conversation.mission")
               : t("conversation.conversation")}
           </span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{session.level}</span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{session.level}</span>
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
             {session.status === "COMPLETED"
               ? t("conversation.detail.status.completed")
               : t("conversation.detail.status.active")}
           </span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">
             {t(toneKeys[session.tone] ?? "conversation.detail.tone.friendly")}
           </span>
-          <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{formalityLabel}</span>
+          <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{formalityLabel}</span>
         </div>
 
         <h1 className="learning-content" dir="auto">{session.title}</h1>
-        <p className="page-description learning-content [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]" lang="de" dir="ltr">
+        <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a" lang="de" dir="ltr">
           {session.scenario}
         </p>
 
         {session.objective ? (
-          <div className="mission-objective [display:flex] [align-items:flex-start] [gap:10px] [padding:12px_13px] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface-raised)] [&_>_svg]:[flex:0_0_auto] [&_>_svg]:[margin-top:2px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45]">
+          <div className="mission-objective flex items-start gap-2.5 uv-padding-fed09d08e0 uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface-raised uv-v872d6ea02a:uv-flex-18ba0b6e31 uv-v872d6ea02a:mt-0.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-2792cf2449">
             <Target size={18} />
             <div>
               <strong>{t("conversation.detail.objective")}</strong>
@@ -117,13 +117,13 @@ export default async function ConversationSessionPage({
 
       {session.revealTargets || session.status === "COMPLETED" ? (
         <section
-          className="conversation-targets [display:flex] [gap:7px] [overflow-x:auto] [padding-bottom:3px]"
+          className="conversation-targets flex gap-1.75 overflow-x-auto pb-0.75"
           aria-label={t("conversation.detail.targets")}
         >
           {session.targets.map((target) => (
             <div
               className={
-                "conversation-target [min-width:max-content] [display:flex] [flex-direction:column] [gap:2px] [padding:7px_10px] [border:1px_solid_var(--border)] [border-radius:11px] [background:var(--surface)] [&_>_span]:[font-size:0.78rem] [&_>_span]:[font-weight:650] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.62rem] [&.is-used]:[border-color:rgba(73,_201,_139,_0.28)] [&.is-used]:[background:rgba(73,_201,_139,_0.07)] " +
+                "conversation-target uv-min-width-db94728b84 flex flex-col gap-0.5 uv-padding-1eec12de18 uv-border-8d7f82f403 rounded-uv-r4bd46d4017 bg-uv-surface uv-v22810335d8:text-uv-fe9d5fd6635 uv-v22810335d8:uv-weight-650 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-f174ef476a0 uv-v4ec7069b3c:border-uv-c126ca15671 uv-v4ec7069b3c:bg-uv-c3bbdd32fbd " +
                 (target.successfulUses > 0 ? "is-used" : "")
               }
               key={target.id}
@@ -141,7 +141,7 @@ export default async function ConversationSessionPage({
           ))}
         </section>
       ) : (
-        <p className="secret-target-note [margin:0] [color:var(--text-muted)] [font-size:0.75rem]">
+        <p className="secret-target-note m-0 text-uv-text-muted text-uv-f823f1262bd">
           {t("conversation.detail.hiddenTargets")}
         </p>
       )}
@@ -165,7 +165,7 @@ export default async function ConversationSessionPage({
         </>
       ) : summary?.success ? (
         <>
-          <section className="conversation-score-grid [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [border:1px_solid_var(--border)] [border-radius:14px] [overflow:hidden] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_>_div]:[padding:13px] [&_>_div:nth-child(odd)]:[border-right:1px_solid_var(--border)] [&_>_div:nth-child(-n_+_2)]:[border-bottom:1px_solid_var(--border)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [&_strong]:[font-size:1.25rem] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.68rem] min-[620px]:[grid-template-columns:repeat(4,_minmax(0,_1fr))] min-[620px]:[&_>_div]:[border-right:0] min-[620px]:[&_>_div]:[border-bottom:0] min-[620px]:[&_>_div:nth-child(odd)]:[border-right:0] min-[620px]:[&_>_div:nth-child(odd)]:[border-bottom:0] min-[620px]:[&_>_div:nth-child(-n_+_2)]:[border-right:0] min-[620px]:[&_>_div:nth-child(-n_+_2)]:[border-bottom:0] min-[620px]:[&_>_div_+_div]:[border-left:1px_solid_var(--border)]">
+          <section className="conversation-score-grid grid uv-grid-template-columns-dd0b1a1848 uv-border-8d7f82f403 rounded-uv-rd65225386d overflow-hidden uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:p-3.25 uv-v3de32a793f:uv-border-right-8d7f82f403 uv-v907ac4759b:uv-border-bottom-8d7f82f403 uv-veda02a0adb:uv-font-family-320794573f uv-veda02a0adb:text-uv-f081acf2896 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f78eb7000a9 uv-min620:uv-grid-template-columns-0cbc4f103a uv-min620:uv-vcbb57f4d35:uv-border-right-b6589fc6ab uv-min620:uv-vcbb57f4d35:uv-border-bottom-b6589fc6ab uv-min620:uv-v3de32a793f:uv-border-right-b6589fc6ab uv-min620:uv-v3de32a793f:uv-border-bottom-b6589fc6ab uv-min620:uv-v907ac4759b:uv-border-right-b6589fc6ab uv-min620:uv-v907ac4759b:uv-border-bottom-b6589fc6ab uv-min620:uv-v5007062a75:uv-border-left-8d7f82f403">
             <div>
               <strong>{formatPercent(locale, summary.data.overallScore)}</strong>
               <span>{t("conversation.detail.score.overall")}</span>
@@ -191,7 +191,7 @@ export default async function ConversationSessionPage({
           {session.kind === "MISSION" ? (
             <section
               className={
-                "mission-result [display:flex] [align-items:flex-start] [gap:10px] [padding:12px_13px] [border:1px_solid_var(--border)] [border-radius:13px] [background:var(--surface-raised)] [&_>_svg]:[flex:0_0_auto] [&_>_svg]:[margin-top:2px] [&_>_div]:[display:flex] [&_>_div]:[flex-direction:column] [&_>_div]:[gap:3px] [&_span]:[color:var(--text-muted)] [&_span]:[line-height:1.45] [&.is-success]:[border-color:rgba(73,_201,_139,_0.28)] [&.is-success]:[background:rgba(73,_201,_139,_0.08)] [&.is-success_>_svg]:[color:var(--success)] [&.is-incomplete]:[border-color:rgba(255,_107,_122,_0.24)] [&.is-incomplete]:[background:rgba(255,_107,_122,_0.06)] [&.is-incomplete_>_svg]:[color:var(--danger)] " +
+                "mission-result flex items-start gap-2.5 uv-padding-fed09d08e0 uv-border-8d7f82f403 rounded-uv-r233710a71e bg-uv-surface-raised uv-v872d6ea02a:uv-flex-18ba0b6e31 uv-v872d6ea02a:mt-0.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:flex-col uv-vcbb57f4d35:gap-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:uv-line-height-2792cf2449 uv-v03d79f50fa:border-uv-c126ca15671 uv-v03d79f50fa:bg-uv-cb0392f6948 uv-v7816860752:text-uv-success uv-v3499e844b5:border-uv-cfc300cc991 uv-v3499e844b5:bg-uv-c7322cb8d99 uv-v78a70b7303:text-uv-danger " +
                 (summary.data.taskSuccess ? "is-success" : "is-incomplete")
               }
             >
@@ -212,17 +212,17 @@ export default async function ConversationSessionPage({
               </div>
             </section>
           ) : (
-            <section className="panel conversation-summary [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [&_>_p:last-child]:[margin-bottom:0] [&_>_p:last-child]:[line-height:1.55] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("conversation.detail.summary")}</p>
+            <section className="panel conversation-summary uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 uv-vd9a40650be:mb-0 uv-vd9a40650be:uv-line-height-05c248da4c rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("conversation.detail.summary")}</p>
               <p className="learning-content" dir="auto">
                 {summary.data.summary}
               </p>
             </section>
           )}
 
-          <section className="conversation-result-grid [display:flex] [flex-direction:column] [gap:14px] [&_ul]:[margin:8px_0_0] [&_ul]:[padding-left:18px] [&_li]:[margin:6px_0] [&_li]:[color:var(--text-soft)] [&_li]:[line-height:1.45] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]">
-            <article className="panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("conversation.detail.strengths")}</p>
+          <section className="conversation-result-grid flex flex-col gap-3.5 uv-v10010674ad:uv-margin-86ddfb81a1 uv-v10010674ad:pl-4.5 uv-vbc8f6c01a9:uv-margin-c37400d7c5 uv-vbc8f6c01a9:text-uv-text-soft uv-vbc8f6c01a9:uv-line-height-2792cf2449 uv-min620:grid uv-min620:uv-grid-template-columns-dd0b1a1848">
+            <article className="panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("conversation.detail.strengths")}</p>
               <ul>
                 {summary.data.strengths.map((item) => (
                   <li className="learning-content" dir="auto" key={item}>
@@ -232,8 +232,8 @@ export default async function ConversationSessionPage({
               </ul>
             </article>
 
-            <article className="panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [border-radius:18px]">
-              <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("conversation.detail.improveNext")}</p>
+            <article className="panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 rounded-uv-r6d27d54c6c">
+              <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("conversation.detail.improveNext")}</p>
               <ul>
                 {summary.data.improvements.map((item) => (
                   <li className="learning-content" dir="auto" key={item}>
@@ -244,14 +244,14 @@ export default async function ConversationSessionPage({
             </article>
           </section>
 
-          <section className="panel conversation-target-results [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:flex] [flex-direction:column] [gap:14px] [border-radius:18px]">
-            <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("conversation.detail.targetResults")}</p>
+          <section className="panel conversation-target-results uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 flex flex-col gap-3.5 rounded-uv-r6d27d54c6c">
+            <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("conversation.detail.targetResults")}</p>
             {summary.data.targetResults.map((result) => {
               const target = session.targets.find(
                 (item) => item.lexemeId === result.lexemeId,
               );
               return (
-                <div className="target-result-row [display:flex] [flex-direction:column] [gap:9px] [padding:12px_0] [border-bottom:1px_solid_var(--border)] [&:last-child]:[border-bottom:0] [&_>_div:first-child]:[display:flex] [&_>_div:first-child]:[flex-direction:column] [&_>_div:first-child]:[gap:3px] [&_>_div:first-child_span]:[color:var(--text-muted)] [&_>_div:first-child_span]:[line-height:1.4] min-[620px]:[display:grid] min-[620px]:[grid-template-columns:minmax(0,_1fr)_auto] min-[620px]:[align-items:center]" key={result.lexemeId}>
+                <div className="target-result-row flex flex-col gap-2.25 uv-padding-3da68d188d uv-border-bottom-8d7f82f403 last:uv-border-bottom-b6589fc6ab uv-v0fee2d502c:flex uv-v0fee2d502c:flex-col uv-v0fee2d502c:gap-0.75 uv-v1c155e3be2:text-uv-text-muted uv-v1c155e3be2:uv-line-height-a26f83404b uv-min620:grid uv-min620:uv-grid-template-columns-f06dd92ea5 uv-min620:items-center" key={result.lexemeId}>
                   <div>
                     <strong className="learning-content" lang="de" dir="ltr">
                       {target?.lexeme.lemma ?? t("conversation.detail.targetWord")}
@@ -260,7 +260,7 @@ export default async function ConversationSessionPage({
                       {result.note}
                     </span>
                   </div>
-                  <div className="target-result-status [display:flex] [flex-wrap:wrap] [gap:6px] [&_span]:[padding:4px_7px] [&_span]:[border:1px_solid_var(--border)] [&_span]:[border-radius:999px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.65rem]">
+                  <div className="target-result-status flex flex-wrap gap-1.5 uv-v36c0309a03:uv-padding-b9d3ef7fdf uv-v36c0309a03:uv-border-8d7f82f403 uv-v36c0309a03:rounded-uv-red9ab892c5 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f2311a7d95c">
                     <span>
                       {result.used
                         ? t("conversation.detail.used")
@@ -285,7 +285,7 @@ export default async function ConversationSessionPage({
           <ConversationReplay sessionId={session.id} kind={session.kind} />
         </>
       ) : (
-        <div className="empty-state [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [padding:24px] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)]">
+        <div className="empty-state flex flex-col gap-3 items-start p-6 uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft">
           <strong>{t("conversation.detail.unreadable")}</strong>
         </div>
       )}

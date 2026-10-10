@@ -190,10 +190,10 @@ export async function GrammarProgressPanel({
   }
 
   return (
-    <section className="panel grammar-progress-panel [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:grid] [gap:18px] [margin-bottom:22px] [border-radius:18px]">
-      <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+    <section className="panel grammar-progress-panel uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid gap-4.5 mb-5.5 rounded-uv-r6d27d54c6c">
+      <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("progress.grammar.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("progress.grammar.eyebrow")}</p>
           <h2>
             {currentLevel} → {targetLevel}
           </h2>
@@ -201,9 +201,9 @@ export async function GrammarProgressPanel({
         <GraduationCap size={20} />
       </div>
 
-      <p className="analytics-caveat [margin:14px_0_0] [color:var(--text-muted)] [font-size:0.7rem] [line-height:1.5]">{t("progress.grammar.description")}</p>
+      <p className="analytics-caveat uv-margin-897443304a text-uv-text-muted text-uv-f58b84cc6f5 uv-line-height-aa8f289ebe">{t("progress.grammar.description")}</p>
 
-      <div className="grammar-progress-status-grid [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:8px] [&_>_div]:[display:grid] [&_>_div]:[gap:3px] [&_>_div]:[padding:12px] [&_>_div]:[border:1px_solid_var(--border)] [&_>_div]:[border-radius:12px] [&_strong]:[font-size:1.2rem] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.72rem] min-[620px]:[grid-template-columns:repeat(5,_minmax(0,_1fr))]">
+      <div className="grammar-progress-status-grid grid uv-grid-template-columns-dd0b1a1848 gap-2 uv-vcbb57f4d35:grid uv-vcbb57f4d35:gap-0.75 uv-vcbb57f4d35:p-3 uv-vcbb57f4d35:uv-border-8d7f82f403 uv-vcbb57f4d35:rounded-uv-r0939007802 uv-veda02a0adb:text-uv-fffcebd47f5 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-ff1713651e0 uv-min620:uv-grid-template-columns-259802fd7a">
         {(
           [
             "STRONG",
@@ -220,7 +220,7 @@ export async function GrammarProgressPanel({
         ))}
       </div>
 
-      <div className="grammar-progress-evidence [color:var(--text-muted)] [font-size:0.72rem] [display:flex] [flex-wrap:wrap] [gap:12px]">
+      <div className="grammar-progress-evidence text-uv-text-muted text-uv-ff1713651e0 flex flex-wrap gap-3">
         <span>
           <strong>{formatNumber(locale, demonstrated)}</strong>{" "}
           {t("progress.grammar.demonstrated", {
@@ -236,9 +236,9 @@ export async function GrammarProgressPanel({
       </div>
 
       {!compact && byLevel.length ? (
-        <div className="grammar-progress-section [display:grid] [gap:10px] [&_h3]:[margin:0] [&_h3]:[font-size:0.86rem]">
+        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.byLevel")}</h3>
-          <div className="grammar-profile-breakdown [display:grid] [gap:8px] [&_>_div]:[display:grid] [&_>_div]:[grid-template-columns:minmax(0,_1fr)_auto] [&_>_div]:[gap:3px_10px] [&_>_div]:[padding:10px_0] [&_>_div]:[border-top:1px_solid_var(--border)] [&_strong]:[text-transform:capitalize] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.7rem] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.7rem] [&_small]:[grid-column:1_/_-1]">
+          <div className="grammar-profile-breakdown grid gap-2 uv-vcbb57f4d35:grid uv-vcbb57f4d35:uv-grid-template-columns-f06dd92ea5 uv-vcbb57f4d35:uv-gap-be0270db3f uv-vcbb57f4d35:uv-padding-10ff753f5f uv-vcbb57f4d35:uv-border-top-8d7f82f403 uv-veda02a0adb:capitalize uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f58b84cc6f5 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-f58b84cc6f5 uv-v982220ddd5:uv-grid-column-93b665dfb5">
             {byLevel.map((group) => (
               <div key={group.label}>
                 <strong>{group.label}</strong>
@@ -255,9 +255,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && byCategory.length ? (
-        <div className="grammar-progress-section [display:grid] [gap:10px] [&_h3]:[margin:0] [&_h3]:[font-size:0.86rem]">
+        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.byCategory")}</h3>
-          <div className="grammar-profile-breakdown [display:grid] [gap:8px] [&_>_div]:[display:grid] [&_>_div]:[grid-template-columns:minmax(0,_1fr)_auto] [&_>_div]:[gap:3px_10px] [&_>_div]:[padding:10px_0] [&_>_div]:[border-top:1px_solid_var(--border)] [&_strong]:[text-transform:capitalize] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.7rem] [&_small]:[color:var(--text-muted)] [&_small]:[font-size:0.7rem] [&_small]:[grid-column:1_/_-1]">
+          <div className="grammar-profile-breakdown grid gap-2 uv-vcbb57f4d35:grid uv-vcbb57f4d35:uv-grid-template-columns-f06dd92ea5 uv-vcbb57f4d35:uv-gap-be0270db3f uv-vcbb57f4d35:uv-padding-10ff753f5f uv-vcbb57f4d35:uv-border-top-8d7f82f403 uv-veda02a0adb:capitalize uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f58b84cc6f5 uv-v982220ddd5:text-uv-text-muted uv-v982220ddd5:text-uv-f58b84cc6f5 uv-v982220ddd5:uv-grid-column-93b665dfb5">
             {byCategory.map((group) => (
               <div key={group.category}>
                 <strong>{t(categoryKeys[group.category])}</strong>
@@ -274,12 +274,12 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && weaknesses.length ? (
-        <div className="grammar-progress-section [display:grid] [gap:10px] [&_h3]:[margin:0] [&_h3]:[font-size:0.86rem]">
+        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.needsAttention")}</h3>
-          <div className="collection-list [display:flex] [flex-direction:column]">
+          <div className="collection-list flex flex-col">
             {weaknesses.map((item) => (
               <Link
-                className="collection-row [border-bottom:1px_solid_var(--border)] [min-height:64px] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [align-items:center] [gap:12px] [padding:11px_2px] [&_strong]:[display:block] [&_span]:[display:block] [&_span]:[margin-top:3px] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.76rem] min-[940px]:[&:hover]:[background:var(--surface)]"
+                className="collection-row uv-border-bottom-8d7f82f403 min-h-16 grid uv-grid-template-columns-f06dd92ea5 items-center gap-3 uv-padding-c9f5e3c335 uv-veda02a0adb:block uv-v36c0309a03:block uv-v36c0309a03:mt-0.75 uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
                 href={"/practice?grammar=" + item.grammarConcept.slug}
                 key={item.id}
               >
@@ -305,9 +305,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && transitions.length ? (
-        <div className="grammar-progress-section [display:grid] [gap:10px] [&_h3]:[margin:0] [&_h3]:[font-size:0.86rem]">
+        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.recentChanges")}</h3>
-          <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
+          <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
             {transitions.map((transition) => (
               <div key={transition.id}>
                 <span className="learning-content" lang="en" dir="ltr">
@@ -326,9 +326,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && recentEvidence.length ? (
-        <div className="grammar-progress-section [display:grid] [gap:10px] [&_h3]:[margin:0] [&_h3]:[font-size:0.86rem]">
+        <div className="grammar-progress-section grid gap-2.5 uv-v55c53ce4b9:m-0 uv-v55c53ce4b9:text-uv-f9601fe81a7">
           <h3>{t("progress.grammar.recentEvidence")}</h3>
-          <div className="weakness-list [display:flex] [flex-direction:column] [&_>_div]:[min-height:42px] [&_>_div]:[display:flex] [&_>_div]:[align-items:center] [&_>_div]:[justify-content:space-between] [&_>_div]:[gap:12px] [&_>_div]:[border-bottom:1px_solid_var(--border)] [&_>_div:last-child]:[border-bottom:0] [&_span]:[color:var(--text-soft)] [&_span]:[text-transform:capitalize] [&_strong]:[color:var(--text-muted)] [&_strong]:[font-family:var(--font-geist-mono),_Geist_Mono,_monospace]">
+          <div className="weakness-list flex flex-col uv-vcbb57f4d35:min-h-10.5 uv-vcbb57f4d35:flex uv-vcbb57f4d35:items-center uv-vcbb57f4d35:justify-between uv-vcbb57f4d35:gap-3 uv-vcbb57f4d35:uv-border-bottom-8d7f82f403 uv-vaff5733806:uv-border-bottom-b6589fc6ab uv-v36c0309a03:text-uv-text-soft uv-v36c0309a03:capitalize uv-veda02a0adb:text-uv-text-muted uv-veda02a0adb:uv-font-family-320794573f">
             {recentEvidence.slice(0, 5).map((evidence) => (
               <div key={evidence.id}>
                 <span>
@@ -351,7 +351,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      <Link href="/grammar" className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]">
+      <Link href="/grammar" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383">
         {t("progress.grammar.openProfile")}{" "}
         <ArrowRight className="rtl-mirror" size={16} />
       </Link>

@@ -39,16 +39,16 @@ export function PlanStatusCard({
   };
 
   return (
-    <section id="subscription" className="panel plan-status-card [border:1px_solid_var(--border)] [background:linear-gradient(180deg,_rgba(255,255,255,0.025),_transparent),_var(--surface)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.025)] [padding:18px] [display:grid] [gap:1rem] [border-radius:18px]">
-      <div className="section-heading [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [&_h2]:[margin:5px_0_0] [&_h2]:[font-size:1.1rem] [&_h2]:[letter-spacing:-0.025em] [margin-bottom:12px] [color:var(--text-soft)]">
+    <section id="subscription" className="panel plan-status-card uv-border-8d7f82f403 uv-background-bfb621eb09 uv-box-shadow-2853ca6bd8 p-4.5 grid uv-gap-19feeb881c rounded-uv-r6d27d54c6c">
+      <div className="section-heading flex items-center justify-between gap-3 uv-vd552c26874:uv-margin-2efa7d29f3 uv-vd552c26874:text-uv-f24126b21bc uv-vd552c26874:uv-letter-spacing-8b899f0f19 mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">{t("plan.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">{t("plan.eyebrow")}</p>
           <h2>{plan.plan === "PRO" ? t("plan.pro") : t("plan.free")}</h2>
         </div>
-        <span className="badge [min-height:26px] [display:inline-flex] [align-items:center] [padding:0_9px] [border:1px_solid_var(--border)] [border-radius:999px] [color:var(--text-soft)] [background:var(--surface-raised)] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.67rem] [letter-spacing:0.02em]">{plan.plan}</span>
+        <span className="badge min-h-6.5 inline-flex items-center uv-padding-16c4636e97 uv-border-8d7f82f403 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised uv-font-family-320794573f text-uv-fe22288a701 uv-letter-spacing-6a477777e6">{plan.plan}</span>
       </div>
 
-      <p className="muted [color:var(--text-muted)]">
+      <p className="muted text-uv-text-muted">
         {plan.source === "subscription"
           ? plan.cancelAtPeriodEnd
             ? t("plan.endsOn", {
@@ -70,7 +70,7 @@ export function PlanStatusCard({
             : t("plan.freeHelp")}
       </p>
 
-      <div className="quota-grid [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [gap:0.75rem] max-[640px]:[grid-template-columns:1fr]">
+      <div className="quota-grid grid uv-grid-template-columns-dd0b1a1848 uv-gap-823f1262bd uv-max640:uv-grid-template-columns-6a5c4d4d49">
         {quotaOrder.map((key) => {
           const quota = byKey.get(key);
           if (!quota) return null;
@@ -86,11 +86,11 @@ export function PlanStatusCard({
         })}
       </div>
 
-      <div className="plan-actions [display:flex] [flex-wrap:wrap] [gap:0.75rem] [align-items:center]">
-        <button className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="button" disabled>
+      <div className="plan-actions flex flex-wrap uv-gap-823f1262bd items-center">
+        <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" type="button" disabled>
           {plan.plan === "PRO" ? t("plan.manageComingSoon") : t("plan.upgradeComingSoon")}
         </button>
-        <span className="muted [color:var(--text-muted)]">{t("plan.billingPlaceholder")}</span>
+        <span className="muted text-uv-text-muted">{t("plan.billingPlaceholder")}</span>
       </div>
     </section>
   );

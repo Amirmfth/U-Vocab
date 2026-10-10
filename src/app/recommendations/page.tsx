@@ -18,42 +18,42 @@ export default async function RecommendationsPage() {
   const targetLanguage = targetLanguageConfig(course.targetLanguage);
 
   return (
-    <main className="page [display:flex] [flex-direction:column] [gap:18px] min-[620px]:[gap:22px] min-[940px]:[gap:24px]">
-      <section className="page-header compact [display:flex] [flex-direction:column] [padding:24px_0_4px] [&.compact]:[max-width:720px] [&_h1]:[margin:0] [&_h1]:[line-height:0.96] [&_h1]:[letter-spacing:-0.055em] [&_h1]:[font-weight:560] min-[940px]:[padding-top:34px] [&.compact_h1]:[margin-bottom:4px] [gap:8px] [padding-top:16px] [&_h1]:[font-size:clamp(2rem,_9vw,_4.5rem)]">
-        <p className="eyebrow [color:var(--text-muted)] [margin:0] [font-family:var(--font-geist-mono),_Geist_Mono,_monospace] [font-size:0.68rem] [letter-spacing:0.12em] [font-weight:600]">Personalized vocabulary</p>
+    <main className="page flex flex-col gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact flex flex-col uv-padding-40251c0803 uv-vc442bc911a:max-w-uv-8b89fb679d uv-v3bccf64584:m-0 uv-v3bccf64584:uv-line-height-47e4b02db5 uv-v3bccf64584:uv-letter-spacing-5499e35ba4 uv-v3bccf64584:uv-weight-560 uv-min940:pt-8.5 uv-v3faa105aea:mb-1 gap-2 pt-4 uv-v3bccf64584:text-uv-fce2aeaeade">
+        <p className="eyebrow text-uv-text-muted m-0 uv-font-family-320794573f text-uv-f78eb7000a9 uv-letter-spacing-fb52455c07 font-semibold">Personalized vocabulary</p>
         <h1>Recommendations</h1>
-        <p className="page-description [margin:0] [max-width:680px] [color:var(--text-soft)] [font-size:0.98rem] [line-height:1.65]">
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 uv-line-height-cf9a155f4a">
           Deterministic retrieval finds useful candidates; optional low-cost AI only reranks that bounded set.
         </p>
       </section>
 
       {recommendations.length ? (
-        <section className="vocabulary-list [display:flex] [flex-direction:column] [border-top:1px_solid_var(--border)]">
+        <section className="vocabulary-list flex flex-col uv-border-top-8d7f82f403">
           {recommendations.map((item, index) => {
             const rationale =
               item.aiReasonCode
                 ? reasonLabel(item.aiReasonCode) ?? ""
                 : item.reasons[0]?.label ?? "";
             return (
-              <article className="vocabulary-row [&:nth-child(even)]:[background:rgb(22,_22,_22)] min-[940px]:[&:hover]:[background:var(--surface)] [position:relative] [min-height:78px] [display:grid] [grid-template-columns:minmax(0,_1fr)_auto] [gap:8px_12px] [padding:12px_2px_13px] [border-bottom:1px_solid_var(--border)] [background:transparent] [&_.word]:[overflow:hidden] [&_.word]:[font-size:1.04rem] [&_.word]:[line-height:1.25] [&_.word]:[text-overflow:ellipsis] [&_.word]:[white-space:nowrap] [&_.mastery-line]:[grid-column:1_/_-1] [&_.mastery-line]:[height:3px] [&_.mastery-line]:[margin-top:-2px] min-[620px]:[min-height:84px] min-[620px]:[padding-inline:8px]" key={item.lexemeId}>
-                <div className="vocabulary-row-main [min-width:0]">
+              <article className="vocabulary-row uv-v4af6d61843:bg-uv-ccd6923c4a1 uv-min940:hover:bg-uv-surface relative min-h-19.5 grid uv-grid-template-columns-f06dd92ea5 uv-gap-e4accf4b2b uv-padding-9e55c755a1 uv-border-bottom-8d7f82f403 bg-transparent uv-va00727a60e:overflow-hidden uv-va00727a60e:text-uv-f2862aaf96f uv-va00727a60e:uv-line-height-8e007eaa50 uv-va00727a60e:uv-text-overflow-900198081b uv-va00727a60e:whitespace-nowrap uv-vc89072ee13:uv-grid-column-93b665dfb5 uv-vc89072ee13:h-0.75 uv-vc89072ee13:-mt-0.5 uv-min620:min-h-21 uv-min620:px-2" key={item.lexemeId}>
+                <div className="vocabulary-row-main min-w-0">
                   <Link
-                    className="word learning-content [font-size:1.35rem] [font-weight:610] [letter-spacing:-0.03em]"
+                    className="word learning-content text-uv-f3951047c34 uv-weight-610 uv-letter-spacing-60c8585fce"
                     lang={targetLanguage.code}
                     dir="ltr"
                     href={"/vocabulary/" + item.lexemeId}
                   >
                     {item.article ? item.article + " " : ""}{item.lemma}
                   </Link>
-                  <div className="translation-line [display:flex] [flex-wrap:wrap] [gap:4px_10px] [color:var(--text-muted)] [font-size:0.84rem] [min-width:0] [margin-top:4px] [&_span]:[display:block] [&_span]:[overflow:hidden] [&_span]:[color:var(--text-muted)] [&_span]:[font-size:0.74rem] [&_span]:[text-overflow:ellipsis] [&_span]:[white-space:nowrap]">
+                  <div className="translation-line flex flex-wrap uv-gap-4de81a03a8 text-uv-text-muted text-uv-f8bb1a95a21 min-w-0 mt-1 uv-v36c0309a03:block uv-v36c0309a03:overflow-hidden uv-v36c0309a03:text-uv-text-muted uv-v36c0309a03:text-uv-f63777cce16 uv-v36c0309a03:uv-text-overflow-900198081b uv-v36c0309a03:whitespace-nowrap">
                     {item.english ? <span lang="en">{item.english}</span> : null}
                     {item.persian ? <span lang="fa" dir="rtl">{item.persian}</span> : null}
                   </div>
-                  <small className="muted [color:var(--text-muted)]">
+                  <small className="muted text-uv-text-muted">
                     {rationale || "Useful for your current learning state"}
                   </small>
                 </div>
-                <div className="hero-actions [display:flex] [flex-direction:column] [gap:10px] [margin:6px_0_0] min-[620px]:[flex-direction:row] min-[620px]:[align-items:center] min-[620px]:[&_.button]:[width:auto]">
+                <div className="hero-actions flex flex-col gap-2.5 uv-margin-66a0389558 uv-min620:flex-row uv-min620:items-center uv-min620:uv-vcded88c612:w-auto">
                   <form action={async (formData) => {
                     "use server";
                     await addRecommendation({ status: "idle" }, formData);
@@ -62,7 +62,7 @@ export default async function RecommendationsPage() {
                     <input type="hidden" name="rationale" value={rationale} />
                     <input type="hidden" name="aiReasonCode" value={item.aiReasonCode ?? ""} />
                     <input type="hidden" name="position" value={index + 1} />
-                    <button className="button button-primary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [background:var(--text)] [&.button-primary]:[color:#101014] [color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="submit">Add</button>
+                    <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised uv-vd08a54826e:border-uv-border uv-vd08a54826e:text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" type="submit">Add</button>
                   </form>
                   <form action={async (formData) => {
                     "use server";
@@ -72,7 +72,7 @@ export default async function RecommendationsPage() {
                     <input type="hidden" name="rationale" value={rationale} />
                     <input type="hidden" name="aiReasonCode" value={item.aiReasonCode ?? ""} />
                     <input type="hidden" name="position" value={index + 1} />
-                    <button className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" type="submit">Dismiss</button>
+                    <button className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" type="submit">Dismiss</button>
                   </form>
                 </div>
               </article>
@@ -80,9 +80,9 @@ export default async function RecommendationsPage() {
           })}
         </section>
       ) : (
-        <section className="empty-state compact-empty [display:flex] [flex-direction:column] [gap:12px] [align-items:flex-start] [border:1px_dashed_var(--border-strong)] [border-radius:var(--radius-lg)] [color:var(--text-soft)] [padding:17px]">
+        <section className="empty-state compact-empty flex flex-col gap-3 items-start uv-border-c8a81946fb rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
           <strong>No recommendations right now.</strong>
-          <Link className="button button-secondary [width:100%] [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [padding:0_16px] [border:1px_solid_transparent] [border-radius:14px] [font-weight:600] [font-size:0.9rem] [cursor:pointer] [transition:transform_150ms_ease,_border-color_150ms_ease,_background_150ms_ease,_opacity_150ms_ease] [&:active:not(:disabled)]:[transform:scale(0.985)] [&:disabled]:[opacity:0.58] [&:disabled]:[cursor:wait] [&.button-primary]:[background:var(--text)] [&.button-primary]:[color:#101014] [&.button-secondary]:[background:var(--surface-raised)] [background:var(--surface-raised)] [&.button-secondary]:[border-color:var(--border)] [border-color:var(--border)] [&.button-secondary]:[color:var(--text)] [color:var(--text)] [&.button-success]:[background:var(--success)] [&.button-success]:[color:#07140e] [&.button-danger]:[background:var(--danger)] [&.button-danger]:[color:#19070a] min-[940px]:[width:auto] [&.button-danger]:[border-color:currentColor] [min-height:var(--tap-target)]" href="/vocabulary">Back to vocabulary</Link>
+          <Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 uv-padding-14a564f8da uv-border-bdc43f584d rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer uv-transition-be50aec0a8 uv-v823f0b002f:uv-transform-bcd93e0f45 disabled:uv-opacity-8ecc5701b7 disabled:cursor-wait uv-vb179ff5bf5:bg-uv-text uv-vb179ff5bf5:text-uv-cfcbfb23a40 uv-vd08a54826e:bg-uv-surface-raised bg-uv-surface-raised uv-vd08a54826e:border-uv-border border-uv-border uv-vd08a54826e:text-uv-text text-uv-text uv-ve5986489c0:bg-uv-success uv-ve5986489c0:text-uv-c1667a9177b uv-v33c878f16d:bg-uv-danger uv-v33c878f16d:text-uv-cb667f4b109 uv-min940:w-auto uv-v33c878f16d:border-current uv-min-height-e45618b383" href="/vocabulary">Back to vocabulary</Link>
         </section>
       )}
     </main>

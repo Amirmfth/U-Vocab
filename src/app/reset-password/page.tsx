@@ -13,13 +13,13 @@ export default async function ResetPasswordPage({
   const { t } = await getServerTranslator();
 
   return (
-    <main className="login-page [min-height:100dvh] [display:grid] [place-items:center] [padding:24px_16px]">
+    <main className="login-page min-h-dvh grid uv-place-items-305047e96e uv-padding-3e6175ce44">
       <ResetPasswordForm
         token={params.token ?? ""}
         returnTo={returnTo}
         invalidToken={Boolean(params.error)}
       />
-      <p className="muted [color:var(--text-muted)]">
+      <p className="muted text-uv-text-muted">
         <Link href={"/forgot-password?returnTo=" + encodeURIComponent(returnTo)}>
           {t("auth.requestAnotherReset")}
         </Link>

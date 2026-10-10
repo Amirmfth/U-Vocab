@@ -19,6 +19,8 @@
   --color-uv-warning: #f0b35b;
 }
 
+@layer base {
+
 :root {
   color-scheme: dark;
   --bg: #09090b;
@@ -194,4 +196,6 @@ body {
 
 #main-content:focus {
   outline: none;
+}
+
 }

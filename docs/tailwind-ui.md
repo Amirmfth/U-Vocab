@@ -5,7 +5,8 @@ The application's page/component styles have been migrated from global semantic 
 ## Where styles live
 
 - `className` in TSX owns component and page styling.
-- `src/app/globals.css` owns Tailwind imports, shared `@theme` color tokens, document/browser primitives, keyframes, and reduced-motion behavior.
+- `src/app/globals.css` owns Tailwind imports, core `@theme` color tokens, document/browser primitives, keyframes, and reduced-motion behavior.
+- `src/app/tailwind-named-utilities.css` contains named theme values, reusable uncommon utility declarations, and selector variants required to preserve the old visual design exactly.
 - `src/i18n/fonts.css` retains IRANYekan font-face declarations and RTL typography semantics.
 - `postcss.config.mjs` configures Tailwind's PostCSS plugin.
 
@@ -25,9 +26,9 @@ Prefer idiomatic utilities such as `flex`, `grid`, `gap-3`, `rounded-xl`, `trans
 
 ## Existing pixel-specific styles
 
-The automated migration intentionally preserved exact declarations using arbitrary-property utilities such as `[gap:14px]`, `[border-radius:13px]`, and selector-scoped variants. They encode the previous visual output rather than introducing a new spacing scale.
+The first mechanical migration used arbitrary-property utilities; these were then converted to standard Tailwind utilities wherever exact equivalents existed (e.g. `flex`, `flex-col`, `gap-3.5`, `text-center`). Existing special values are preserved through named Tailwind theme tokens and custom utilities rather than embedding CSS declarations in JSX.
 
-You can gradually replace these with standard Tailwind utilities **only when** a resulting visual difference is acceptable. Some variants include original semantic class selectors or descendants; preserve those hooks until the related elements are refactored together.
+You can gradually replace these with standard Tailwind utilities **only when** a resulting visual difference is acceptable. Some named variants, such as `in-library-header:`, preserve descendant selectors from the original stylesheet. Keep those hooks until the related elements are refactored together.
 
 ## Responsive, RTL, motion, and safe areas
 
@@ -56,4 +57,4 @@ Treat any layout or behavior differences as migration regressions, not intention
 
 ## Migration implementation
 
-`scripts/migrate-tailwind-ui.mjs` documents the one-time selector/declaration conversion. It is not intended as an everyday design authoring mechanism; make new changes directly to TSX classes and theme tokens.
+`scripts/migrate-tailwind-ui.mjs`, `scripts/normalize-tailwind-classes.mjs`, and `scripts/refine-tailwind-utilities.mjs` document the one-time selector/declaration conversion and normalization. It is not intended as an everyday design authoring mechanism; make new changes directly to TSX classes and theme tokens.

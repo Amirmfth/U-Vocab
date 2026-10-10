@@ -98,14 +98,14 @@ export default async function AdminDashboardPage() {
   const cost30Number = aiTotals._sum.totalCost ? Number(aiTotals._sum.totalCost) : 0;
 
   return (
-    <main className="page admin-page">
-      <section className="page-header compact">
-        <p className="eyebrow">OPERATIONS</p>
+    <main className="page admin-page flex flex-col max-w-uv-fe3c59b9c7 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
+      <section className="page-header compact flex flex-col padding-24px-0-4px in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 gap-2 pt-4 in-h1:text-exact-clamp-2rem-9vw-4p5rem">
+        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">OPERATIONS</p>
         <h1>Admin dashboard</h1>
-        <p className="page-description">U-Vocab-owned operational state. Use Sentry and PostHog for deep error and funnel investigation.</p>
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">U-Vocab-owned operational state. Use Sentry and PostHog for deep error and funnel investigation.</p>
       </section>
 
-      <section className="admin-metric-grid">
+      <section className="admin-metric-grid grid grid-template-columns-repeat-auto-fit-minmax-210px-1fr gap-p85rem margin-bottom-1rem">
         {[
           ["Users", n(totalUsers), `+${n(users7)} in 7d · +${n(users30)} in 30d`],
           ["Active users · 30d", n(active), "AI, practice, or learning-session activity"],
@@ -113,31 +113,31 @@ export default async function AdminDashboardPage() {
           ["AI spend", money(todayCost._sum.totalCost), `${money(cost7._sum.totalCost)} 7d · ${money(cost30._sum.totalCost)} 30d`],
           ["AI cost / active user", active ? money(cost30Number / active) : "$0.0000", "30-day recorded cost"],
           ["AI failure rate", requests ? ((failures / requests) * 100).toFixed(2) + "%" : "0%", `${n(requests)} requests · ${n(aiTotals._sum.totalTokens)} tokens`],
-        ].map(([label,value,help]) => <article className="panel admin-metric" key={label}><span>{label}</span><strong>{value}</strong><small>{help}</small></article>)}
+        ].map(([label,value,help]) => <article className="panel admin-metric border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-p3rem in-span-2:text-uv-c7dbd63a13e in-small-2:text-uv-c7dbd63a13e in-strong:text-exact-1p45rem rounded-exact-18px" key={label}><span>{label}</span><strong>{value}</strong><small>{help}</small></article>)}
       </section>
 
-      <section className="admin-two-column">
-        <article className="panel">
-          <div className="section-heading"><div><p className="eyebrow">COST</p><h2>High-cost operations · 30d</h2></div><Link href="/admin/usage">Explore</Link></div>
-          <div className="admin-table-list">
+      <section className="admin-two-column grid gap-1rem margin-1rem-0 grid-template-columns-repeat-2-minmax-0-1fr uv-max900:grid-template-columns-1fr">
+        <article className="panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft"><div><p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">COST</p><h2>High-cost operations · 30d</h2></div><Link href="/admin/usage">Explore</Link></div>
+          <div className="admin-table-list grid gap-p55rem margin-top-p75rem in-div:grid in-div:grid-template-columns-minmax-0-1p3fr-minmax-0-1fr-auto in-div:gap-p75rem in-div:items-center in-div:padding-p7rem-0 in-div:border-1px-solid-border-3 in-div-first-child:border-0 in-span:text-exact-p84rem in-span:text-uv-c7dbd63a13e in-span:font-medium in-b:text-exact-p84rem in-b:text-uv-c7dbd63a13e in-b:font-medium">
             {topOps.map((row) => <div key={row.operation}><strong>{row.operation}</strong><span>{n(row._count._all)} requests</span><b>{money(row._sum.totalCost)}</b></div>)}
-            {!topOps.length ? <p className="muted">No AI usage yet.</p> : null}
+            {!topOps.length ? <p className="muted text-uv-text-muted">No AI usage yet.</p> : null}
           </div>
         </article>
-        <article className="panel">
-          <div className="section-heading"><div><p className="eyebrow">LEXICON</p><h2>Recent flags</h2></div><Link href="/admin/lexicon?review=FLAGGED">Review</Link></div>
-          <div className="admin-table-list">
+        <article className="panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft"><div><p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">LEXICON</p><h2>Recent flags</h2></div><Link href="/admin/lexicon?review=FLAGGED">Review</Link></div>
+          <div className="admin-table-list grid gap-p55rem margin-top-p75rem in-div:grid in-div:grid-template-columns-minmax-0-1p3fr-minmax-0-1fr-auto in-div:gap-p75rem in-div:items-center in-div:padding-p7rem-0 in-div:border-1px-solid-border-3 in-div-first-child:border-0 in-span:text-exact-p84rem in-span:text-uv-c7dbd63a13e in-span:font-medium in-b:text-exact-p84rem in-b:text-uv-c7dbd63a13e in-b:font-medium">
             {recentFlags.map((flag) => <div key={flag.id}><strong>{flag.lexeme.lemma}</strong><span>{flag.provider ?? "unknown"} · {flag.model ?? "unknown"}</span><b>{flag.createdAt.toISOString().slice(0,10)}</b></div>)}
-            {!recentFlags.length ? <p className="muted">No flagged provenance.</p> : null}
+            {!recentFlags.length ? <p className="muted text-uv-text-muted">No flagged provenance.</p> : null}
           </div>
         </article>
       </section>
 
-      <section className="panel">
-        <div className="section-heading"><div><p className="eyebrow">AUDIT</p><h2>Recent privileged changes</h2></div></div>
-        <div className="admin-table-list">
+      <section className="panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px">
+        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft"><div><p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">AUDIT</p><h2>Recent privileged changes</h2></div></div>
+        <div className="admin-table-list grid gap-p55rem margin-top-p75rem in-div:grid in-div:grid-template-columns-minmax-0-1p3fr-minmax-0-1fr-auto in-div:gap-p75rem in-div:items-center in-div:padding-p7rem-0 in-div:border-1px-solid-border-3 in-div-first-child:border-0 in-span:text-exact-p84rem in-span:text-uv-c7dbd63a13e in-span:font-medium in-b:text-exact-p84rem in-b:text-uv-c7dbd63a13e in-b:font-medium">
           {recentAudits.map((row) => <div key={row.id}><strong>{row.action}</strong><span>{row.targetType} · {row.targetId}</span><b>{row.createdAt.toLocaleString()}</b></div>)}
-          {!recentAudits.length ? <p className="muted">No admin mutations recorded yet.</p> : null}
+          {!recentAudits.length ? <p className="muted text-uv-text-muted">No admin mutations recorded yet.</p> : null}
         </div>
       </section>
     </main>

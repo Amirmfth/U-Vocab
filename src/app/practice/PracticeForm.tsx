@@ -88,14 +88,14 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   if(!current){
     const correct=history.filter((item)=>item.correct).length;
     const skills=[...new Set(history.map((item)=>item.skill))];
-    return <section className="panel practice-complete">
-      <p className="eyebrow">{t("practice.sessionComplete")}</p>
+    return <section className="panel practice-complete border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-4 rounded-exact-18px">
+      <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("practice.sessionComplete")}</p>
       <h1>{t("practice.correctCount",{ correct:formatNumber(locale,correct),total:formatNumber(locale,history.length) })}</h1>
-      <p className="muted">{t("practice.practiced",{ skills:skills.join(", ")||t("practice.vocabulary").toLowerCase() })}</p>
-      <div className="ia-empty-actions">
-        <Link className="button button-primary" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> {t("practice.anotherSet")}</Link>
-        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary" href="/grammar">{t("practice.backGrammar")}</Link>:<Link className="button button-secondary" href="/review">{t("practice.reviewDue")}</Link>}
-        <Link className="text-link" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?t("practice.back"):t("practice.backWords")}</Link>
+      <p className="muted text-uv-text-muted">{t("practice.practiced",{ skills:skills.join(", ")||t("practice.vocabulary").toLowerCase() })}</p>
+      <div className="ia-empty-actions flex flex-col gap-2 uv-min620:flex-row uv-min620:items-center">
+        <Link className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" href={exercises.some((item)=>item.grammarConceptId)?"/practice?grammar=1":"/practice?drill=1"}><RotateCcw size={17}/> {t("practice.anotherSet")}</Link>
+        {exercises.some((item)=>item.grammarConceptId)?<Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" href="/grammar">{t("practice.backGrammar")}</Link>:<Link className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" href="/review">{t("practice.reviewDue")}</Link>}
+        <Link className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5" href={exercises.some((item)=>item.grammarConceptId)?"/practice":"/vocabulary"}>{exercises.some((item)=>item.grammarConceptId)?t("practice.back"):t("practice.backWords")}</Link>
       </div>
     </section>;
   }
@@ -103,30 +103,30 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
   const progress=Math.min(100,Math.round((index/Math.max(queue.length,1))*100));
   const success=result?.status==="success";
 
-  return <div className="practice-session-stage">
-    <div className="practice-progress">
+  return <div className="practice-session-stage flex flex-col gap-3">
+    <div className="practice-progress grid grid-template-columns-auto-minmax-0-1fr items-center gap-2.5 text-uv-text-muted text-exact-p72rem">
       <span>{formatNumber(locale,Math.min(index+1,queue.length))} / {formatNumber(locale,queue.length)}</span>
-      <div className="metric-bar"><span style={{ width:progress+"%" }}/></div>
+      <div className="metric-bar h-1.75 overflow-hidden rounded-exact-999px bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-exact-inherit in-span-2:bg-uv-primary"><span style={{ width:progress+"%" }}/></div>
     </div>
 
     <AnimatePresence mode="wait" initial={false}>
       <motion.section
         key={current.id}
-        className="panel learning-card practice-session-card"
+        className="panel learning-card practice-session-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 w-full max-w-uv-c078f10a0b in-learning-prompt:text-exact-clamp-1p55rem-7vw-2p35rem flex flex-col gap-4 in-form:flex in-form:flex-col in-form:gap-3 in-input:min-h-12.5 rounded-exact-18px"
         initial={reduceMotion?false:{ opacity:0,x:28,scale:.99 }}
         animate={{ opacity:1,x:0,scale:1 }}
         exit={reduceMotion?{ opacity:0 }:{ opacity:0,x:-34,scale:.985 }}
         transition={{ duration:reduceMotion?0:.2,ease:"easeOut" }}
       >
-        <div className="learning-card-head">
-          <span className="exercise-type">{current.exercise.type.replaceAll("_"," ").toLowerCase()}</span>
-          <span className="muted learning-content" lang="de" dir="ltr">{current.lemma}{current.retry?" · "+t("practice.retryLabel"):""}</span>
+        <div className="learning-card-head flex items-center justify-between gap-3 in-muted-2:text-exact-0p78rem">
+          <span className="exercise-type text-uv-text-muted text-exact-0p74rem capitalize">{current.exercise.type.replaceAll("_"," ").toLowerCase()}</span>
+          <span className="muted learning-content text-uv-text-muted" lang="de" dir="ltr">{current.lemma}{current.retry?" · "+t("practice.retryLabel"):""}</span>
         </div>
 
-        <h1 className="learning-prompt learning-content" dir="auto">{current.exercise.prompt}</h1>
+        <h1 className="learning-prompt learning-content m-0 text-exact-clamp-1p35rem-6vw-2rem line-height-1p25 letter-spacing-0p035em font-560" dir="auto">{current.exercise.prompt}</h1>
 
         {current.exercise.interaction==="choice"?(
-          <div className="practice-choice-grid" role="group" aria-label={t("practice.answerChoices")}>
+          <div className="practice-choice-grid grid grid-template-columns-1fr gap-2.5 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr" role="group" aria-label={t("practice.answerChoices")}>
             {current.exercise.options?.map((option)=>{
               const isExpected=success&&option===current.exercise.expected;
               const isSelected=selected===option;
@@ -135,7 +135,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
                 key={option}
                 type="button"
                 className={[
-                  "practice-option",
+                  "practice-option min-h-14.5 w-full flex items-center justify-between gap-3 padding-13px-15px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-uv-text text-left cursor-pointer transition-transform-140ms-ease-border-color-140ms-ease-backgro in-hover-not-disabled:border-uv-border-strong in-hover-not-disabled:bg-uv-surface-raised in-hover-not-disabled:transform-translatey-1px in-focus-visible-not-disabled:border-uv-border-strong in-focus-visible-not-disabled:bg-uv-surface-raised in-focus-visible-not-disabled:transform-translatey-1px disabled:cursor-default in-is-selected:border-uv-border-strong in-is-selected:bg-uv-surface-raised in-is-correct:border-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-wrong:border-uv-danger in-is-wrong:bg-uv-c8b3083dabe in-is-correct-svg:text-uv-success in-is-wrong-svg:text-uv-danger",
                   isExpected?"is-correct":"",
                   isWrong?"is-wrong":"",
                   isSelected?"is-selected":"",
@@ -150,11 +150,11 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
           </div>
         ):(
           <form onSubmit={(event)=>{ event.preventDefault();submit(answer); }}>
-            <div className="field">
+            <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
               <label htmlFor="practice-answer">{t("practice.yourAnswer")}</label>
               <input id="practice-answer" value={answer} onChange={(event)=>setAnswer(event.target.value)} disabled={success} autoFocus autoComplete="off" dir="auto"/>
             </div>
-            <button className="button button-primary" type="submit" disabled={success||!answer.trim()}>
+            <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="submit" disabled={success||!answer.trim()}>
               <Check size={18}/>{t("practice.checkAnswer")}
             </button>
           </form>
@@ -163,7 +163,7 @@ export function PracticeForm({ exercises }:{ exercises:PracticeSessionExercise[]
         {saveError?<StatusNotice tone="error">{saveError}</StatusNotice>:null}
         {result?.status==="error"?<StatusNotice tone="error">{result.message}</StatusNotice>:null}
         {result?.status==="success"?(
-          <div className={"practice-instant-feedback "+(result.correct?"is-correct":"is-wrong")} role="status">
+          <div className={"practice-instant-feedback min-h-10.5 flex items-center gap-2.25 padding-10px-12px rounded-exact-12px text-uv-text-muted bg-uv-surface-raised in-is-correct:text-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-wrong:text-uv-danger in-is-wrong:bg-uv-c8b3083dabe in-span-2:flex in-span-2:flex-col in-span-2:gap-0.5 in-small:text-uv-text-muted "+(result.correct?"is-correct":"is-wrong")} role="status">
             {result.correct?<CheckCircle2 size={18}/>:<XCircle size={18}/>}
             <span>
               <strong>{result.correct?t("practice.correct"):t("practice.notQuite")}</strong>

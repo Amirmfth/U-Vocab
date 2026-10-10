@@ -15,8 +15,8 @@ export function TranslationModeControl({
   const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
 
   return (
-    <div className="translation-switch-wrap">
-      <div className="translation-switch" aria-label="Translation language">
+    <div className="translation-switch-wrap inline-flex flex-col gap-0.75 items-end">
+      <div className="translation-switch inline-flex gap-0.75 p-0.75 border-1px-solid-border-2 rounded-exact-11px bg-uv-surface in-button-3:min-h-9 in-button-3:padding-0-10px in-button-3:border-0 in-button-3:rounded-exact-8px in-button-3:bg-transparent in-button-3:text-uv-text-muted in-button-3:cursor-pointer in-button-3:text-exact-0p72rem in-button-3:font-650 in-button-is-active:bg-uv-surface-soft in-button-is-active:text-uv-text in-button-disabled-2:cursor-wait in-button-disabled-2:opacity-65" aria-label="Translation language">
         {([
           ["ENGLISH", "EN"],
           ["PERSIAN", "FA"],
@@ -46,7 +46,7 @@ export function TranslationModeControl({
         ))}
       </div>
       <span
-        className={"translation-switch-status " + (status === "error" ? "is-error" : "")}
+        className={"translation-switch-status min-h-3 text-uv-text-muted text-exact-0p62rem line-height-1 in-is-error:text-uv-danger " + (status === "error" ? "is-error" : "")}
         aria-live="polite"
       >
         {pending ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Failed" : ""}

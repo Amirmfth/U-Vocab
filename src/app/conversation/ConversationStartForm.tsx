@@ -35,8 +35,8 @@ export function ConversationStartForm({
   }, [router, state]);
 
   return (
-    <form action={action} className="panel conversation-start-form">
-      <div className="field">
+    <form action={action} className="panel conversation-start-form border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 uv-min620:grid uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min620:in-field-first-of-type:grid-column-1-1 uv-min620:in-conversation-toggle:grid-column-1-1 uv-min620:in-status-notice:grid-column-1-1 uv-min620:in-button:grid-column-1-1 rounded-exact-18px in-loading-hub-form:flex in-loading-hub-form:flex-col uv-min620:in-loading-hub-form:grid uv-min620:in-loading-hub-form:grid-template-columns-repeat-2-minmax-0-1fr uv-min620:in-loading-hub-form-field-first-child:grid-column-1-1 uv-min620:in-loading-hub-form-loading-form-submit:grid-column-1-1">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor="conversation-mode-trigger">{t("conversation.mode")}</label>
         <ActivitySelect
           id="conversation-mode"
@@ -58,10 +58,10 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor={kind + "-topic"}>
           {t("conversation.topic")}{" "}
-          <span className="muted">({t("reading.optional")})</span>
+          <span className="muted text-uv-text-muted">({t("reading.optional")})</span>
         </label>
         <input
           id={kind + "-topic"}
@@ -75,7 +75,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor={kind + "-target-count"}>{t("conversation.targets")}</label>
         <ActivitySelect
           id={kind + "-target-count"}
@@ -90,7 +90,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor={kind + "-tone-trigger"}>{t("conversation.tone")}</label>
         <ActivitySelect
           id={kind + "-tone"}
@@ -126,7 +126,7 @@ export function ConversationStartForm({
         />
       </div>
 
-      <div className="field">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor={kind + "-formality-trigger"}>{t("conversation.formality")}</label>
         <ActivitySelect
           id={kind + "-formality"}
@@ -153,7 +153,7 @@ export function ConversationStartForm({
       </div>
 
       {kind === "MISSION" ? (
-        <label className="conversation-toggle">
+        <label className="conversation-toggle min-h-13.5 flex items-start gap-2.5 padding-11px-0 cursor-pointer in-input:w-4.5 in-input:h-4.5 in-input:mt-0.5 in-span:flex in-span:flex-col in-span:gap-0.75 in-small:text-uv-text-muted in-small:line-height-1p4">
           <input type="checkbox" name="revealTargets" />
           <span>
             <strong>{t("conversation.showTargets")}</strong>

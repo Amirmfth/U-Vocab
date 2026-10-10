@@ -21,8 +21,8 @@ export function BattleStartForm() {
   }, [router, state]);
 
   return (
-    <form action={action} className="panel battle-start-form">
-      <div className="field">
+    <form action={action} className="panel battle-start-form border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 uv-min620:grid uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min620:in-status-notice:grid-column-1-1 uv-min620:in-button:grid-column-1-1 rounded-exact-18px">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor="battle-game-trigger">Game</label>
         <ActivitySelect
           id="battle-game"
@@ -39,7 +39,7 @@ export function BattleStartForm() {
         />
       </div>
 
-      <div className="field">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor="battle-mode-trigger">Mode</label>
         <ActivitySelect
           id="battle-mode"
@@ -52,7 +52,7 @@ export function BattleStartForm() {
         />
       </div>
 
-      <div className="field">
+      <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
         <label htmlFor="battle-duration-trigger">Timed length</label>
         <ActivitySelect
           id="battle-duration"

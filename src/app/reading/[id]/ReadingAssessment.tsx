@@ -40,30 +40,30 @@ export function ReadingAssessment({
   const { locale, t } = useI18n();
 
   return (
-    <form action={action} className="panel reading-assessment">
+    <form action={action} className="panel reading-assessment border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 max-w-uv-a9051779da mx-auto rounded-exact-18px grid gap-5.5">
       <input type="hidden" name="readingId" value={readingId} />
-      <div className="section-heading">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow">{t("reading.assessment.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("reading.assessment.eyebrow")}</p>
           <h2>{t("reading.assessment.title")}</h2>
         </div>
       </div>
 
-      <div className="reading-question-list">
+      <div className="reading-question-list grid gap-5.5">
         {questions.map((question, index) => (
-          <fieldset className="reading-question" key={index}>
+          <fieldset className="reading-question grid border-0 border-1px-solid-border-3 in-legend:flex-wrap in-legend:font-650 min-w-0 gap-3.75 padding-19px-0-0 in-legend:w-full in-legend:flex in-legend:items-start in-legend:gap-2.75 in-legend:p-0 in-has-reading-answer-feedback-is-wrong-reading-question-o:border-uv-danger in-has-reading-answer-feedback-is-wrong-reading-question-o:bg-uv-c8b3083dabe" key={index}>
             <legend>
-              <span className="reading-question-number">{formatNumber(locale, index + 1, { minimumIntegerDigits: 2, useGrouping: false })}</span>
-              <span className="reading-question-heading">
-                <span className="badge">{t(typeKeys[question.type])}</span>
+              <span className="reading-question-number w-8.5 h-8.5 flex-0-0-34px grid place-items-center border-1px-solid-border-2 rounded-exact-10px text-uv-text-muted font-font-geist-mono-geist-mono-monospace text-exact-0p72rem">{formatNumber(locale, index + 1, { minimumIntegerDigits: 2, useGrouping: false })}</span>
+              <span className="reading-question-heading grid gap-2 min-w-0 in-badge:w-fit in-strong-2:text-uv-text in-strong-2:text-exact-0p98rem in-strong-2:line-height-1p45">
+                <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{t(typeKeys[question.type])}</span>
                 <strong className="learning-content" dir="auto">{question.question}</strong>
               </span>
             </legend>
-            <div className="reading-question-options">
+            <div className="reading-question-options grid in-label:flex in-label:gap-2.5 in-label:items-start in-label:padding-10px-12px in-label:border-1px-solid-border-2 in-label:rounded-exact-12px in-label:cursor-pointer uv-max720:in-label:p-2.75 gap-2.25">
               {question.options.map((option, optionIndex) => (
                 <label
                   className={
-                    "reading-question-option" +
+                    "reading-question-option min-h-13 flex items-center gap-3 padding-10px-13px border-1px-solid-border-2 rounded-exact-12px bg-uv-surface-raised cursor-pointer transition-border-color-140ms-ease-background-140ms-ease hover:border-uv-border-strong in-has-input-checked:border-uv-primary in-has-input-checked:bg-uv-cbdfd7cd038 in-is-correct:border-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-correct-reading-option-letter:border-uv-success in-is-correct-reading-option-letter:text-uv-success in-has-input-focus-visible:outline-2px-solid-primary-strong in-has-input-focus-visible:outline-offset-2px in-input:absolute in-input:opacity-0 in-input:w-0.25 in-input:h-0.25 in-has-input-checked-reading-option-letter:border-uv-primary in-has-input-checked-reading-option-letter:text-uv-primary-strong" +
                     (state.status === "success" && optionIndex === question.correctIndex ? " is-correct" : "")
                   }
                   key={optionIndex}
@@ -74,13 +74,13 @@ export function ReadingAssessment({
                     value={optionIndex}
                     required
                   />
-                  <span className="reading-option-letter" aria-hidden="true">{String.fromCharCode(65 + optionIndex)}</span>
-                  <span className="reading-option-text learning-content" dir="auto">{option}</span>
+                  <span className="reading-option-letter w-6.75 h-6.75 flex-0-0-27px grid place-items-center border-1px-solid-border-strong rounded-exact-8px text-uv-text-muted font-font-geist-mono-geist-mono-monospace text-exact-0p7rem" aria-hidden="true">{String.fromCharCode(65 + optionIndex)}</span>
+                  <span className="reading-option-text learning-content text-uv-text-soft line-height-1p45" dir="auto">{option}</span>
                 </label>
               ))}
             </div>
             {state.status === "success" ? (
-              <p className={state.correct?.[index] ? "reading-answer-feedback is-correct" : "reading-answer-feedback is-wrong"}>
+              <p className={state.correct?.[index] ? "reading-answer-feedback is-correct m-0 padding-11px-13px rounded-exact-10px text-exact-0p83rem line-height-1p5 in-is-correct:bg-uv-cafddaf6a65 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8b3083dabe in-is-wrong:text-uv-danger" : "reading-answer-feedback is-wrong m-0 padding-11px-13px rounded-exact-10px text-exact-0p83rem line-height-1p5 in-is-correct:bg-uv-cafddaf6a65 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8b3083dabe in-is-wrong:text-uv-danger"}>
                 {state.correct?.[index] ? t("reading.assessment.correct") : t("reading.assessment.notQuite")}{" "}
                 <span className="learning-content" dir="auto">{question.explanation}</span>
               </p>

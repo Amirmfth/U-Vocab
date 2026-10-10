@@ -14,13 +14,13 @@ export default async function VerifyEmailPage({
   const { t } = await getServerTranslator();
 
   return (
-    <main className="login-page">
+    <main className="login-page min-h-dvh grid place-items-center padding-24px-16px">
       <VerifyEmailForm
         email={email}
         returnTo={returnTo}
         invalidToken={params.error === "invalid_token"}
       />
-      <p className="muted">
+      <p className="muted text-uv-text-muted">
         {t("auth.alreadyVerified")}{" "}
         <Link href={"/login?returnTo=" + encodeURIComponent(returnTo)}>
           {t("auth.signIn")}

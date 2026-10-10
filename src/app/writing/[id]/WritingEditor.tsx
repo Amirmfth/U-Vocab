@@ -37,9 +37,9 @@ export function WritingEditor({
   }, [router, state.status]);
 
   return (
-    <form action={action} className="writing-editor">
+    <form action={action} className="writing-editor flex flex-col gap-3.5 in-textarea:resize-y in-textarea:text-exact-1rem in-textarea:line-height-1p65 in-textarea:min-height-48dvh in-textarea:p-3.5">
       <input type="hidden" name="sessionId" value={sessionId} />
-      <div className="writing-editor-heading">
+      <div className="writing-editor-heading flex flex-col gap-0.75 in-label:text-uv-text in-label:text-exact-0p9rem in-label:font-650 in-span:text-uv-text-muted in-span:text-exact-0p72rem">
         <label htmlFor="writing-draft">{t("writing.editor.response")}</label>
         <span>{t("writing.editor.help")}</span>
       </div>
@@ -56,7 +56,7 @@ export function WritingEditor({
         dir="ltr"
       />
 
-      <div className="writing-editor-footer">
+      <div className="writing-editor-footer flex flex-col gap-2.25 in-span-2:text-uv-text-muted in-span-2:font-font-geist-mono-geist-mono-monospace in-span-2:text-exact-0p74rem in-span-is-under:text-uv-warning uv-min620:flex-row uv-min620:items-center uv-min620:justify-between sticky bottom-calc-96px-env-safe-area-inset-bottom z-index-4 p-2.25 border-1px-solid-border-2 rounded-exact-15px bg-uv-c54c3fe5d99 backdrop-filter-blur-14px uv-min620:static uv-min620:p-0 uv-min620:border-0 uv-min620:bg-transparent uv-min620:backdrop-filter-none">
         <span
           id="writing-word-count"
           className={words < targetWords * 0.7 ? "is-under" : ""}

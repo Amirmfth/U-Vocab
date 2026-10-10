@@ -36,6 +36,7 @@
     "geist": "^1.7.2",
     "lucide-react": "^1.48.0",
     "motion": "^14.0.0",
+    "music-metadata": "11.16.1",
     "next": "^15.5.3",
     "openai": "^5.20.3",
     "posthog-js": "1.433.1",
@@ -47,18 +48,20 @@
     "remark-gfm": "^4.0.1",
     "ts-fsrs": "^5.4.2",
     "web-push": "3.6.7",
-    "zod": "^3.25.76",
-    "music-metadata": "11.16.1"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@bubblewrap/cli": "1.25.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.3.1",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "@types/web-push": "3.6.4",
     "eslint": "^9.35.0",
     "eslint-config-next": "^15.5.3",
+    "postcss": "^8.5.29",
     "serwist": "9.5.12",
+    "tailwindcss": "^4.3.3",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

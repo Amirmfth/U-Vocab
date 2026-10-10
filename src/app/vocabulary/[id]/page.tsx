@@ -120,31 +120,31 @@ function GrammarAndUsage({
 }) {
   const t = createTranslator(locale);
   return (
-    <details className="panel word-detail-card word-detail-disclosure" open>
+    <details className="panel word-detail-card word-detail-disclosure border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px in-h2:mb-2.5 p-0 in-summary-2:min-h-14.5 in-summary-2:flex in-summary-2:items-center in-summary-2:justify-between in-summary-2:gap-3 in-summary-2:padding-13px-15px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span-first-child:flex in-summary-span-first-child:flex-col in-summary-span-first-child:gap-0.75 in-summary-strong-2:text-uv-text in-summary-strong-2:text-exact-0p9rem" open>
       <summary>
         <span>
           <strong>{t("word.grammarUsage")}</strong>
         </span>
-        <span className="disclosure-hint">
+        <span className="disclosure-hint text-uv-text-muted text-exact-0p66rem">
           {t("word.savedCount", { count: formatNumber(locale, patterns.length) })}
         </span>
       </summary>
-      <div className="word-disclosure-content">
+      <div className="word-disclosure-content padding-0-15px-15px">
         {patterns.length ? (
           patterns.map((pattern) => (
-            <div className="pattern-block" key={pattern.id}>
+            <div className="pattern-block in-pattern-block:pt-3 in-pattern-block:border-1px-solid-border-3" key={pattern.id}>
               <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
                 {pattern.pattern}
               </strong>
               {pattern.explanation ? (
-                <p className="muted learning-content" dir="auto">
+                <p className="muted learning-content text-uv-text-muted" dir="auto">
                   {pattern.explanation}
                 </p>
               ) : null}
             </div>
           ))
         ) : (
-          <p className="muted">{t("word.noPatterns")}</p>
+          <p className="muted text-uv-text-muted">{t("word.noPatterns")}</p>
         )}
       </div>
     </details>
@@ -166,19 +166,19 @@ function LexicalGrammarLinks({
   const t = createTranslator(locale);
 
   return (
-    <section className="panel word-detail-card">
-      <div className="section-heading">
+    <section className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow">{t("word.grammarEyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.grammarEyebrow")}</p>
           <h2>{t("word.structures")}</h2>
         </div>
         <Brain size={19} />
       </div>
-      <div className="grammar-link-list">
+      <div className="grammar-link-list flex flex-col border-1px-solid-border-3">
         {links.map((link) => (
           <Link
             href={"/grammar/" + link.grammarConcept.slug}
-            className="grammar-link-row"
+            className="grammar-link-row min-h-15.5 grid grid-template-columns-minmax-0-1fr-auto-18px items-center gap-2.5 padding-10px-0 in-grammar-link-row:border-1px-solid-border-3 in-span-first-child:min-w-0 in-span-first-child:flex in-span-first-child:flex-col in-span-first-child:gap-0.75 in-strong-2:text-exact-0p82rem in-small:overflow-hidden in-small:text-uv-text-muted in-small:text-exact-0p66rem in-small:text-overflow-ellipsis in-small:whitespace-nowrap in-svg:text-uv-text-muted"
             key={link.id}
             prefetch
           >
@@ -195,7 +195,7 @@ function LexicalGrammarLinks({
                   )}
               </small>
             </span>
-            <span className="badge">{link.grammarConcept.introducedAt}</span>
+            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{link.grammarConcept.introducedAt}</span>
             <ArrowRight className="rtl-mirror" size={16} />
           </Link>
         ))}
@@ -222,9 +222,9 @@ function WordMastery({
     scores.reduce((sum, [, value]) => sum + Number(value), 0) / scores.length;
 
   return (
-    <section className="panel word-detail-card word-mastery-section">
+    <section className="panel word-detail-card word-mastery-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
       <h2>{t("word.mastery")}</h2>
-      <p className="muted">
+      <p className="muted text-uv-text-muted">
         {t("word.overallMastery", {
           percent: formatPercent(locale, overall),
         })}
@@ -232,12 +232,12 @@ function WordMastery({
       {scores.map(([label, value]) => {
         const score = Math.round(Number(value) * 100);
         return (
-          <div className="mastery-row" key={label}>
+          <div className="mastery-row flex flex-col gap-1.75 in-div-first-child:flex in-div-first-child:justify-between in-div-first-child:gap-3 in-div-first-child:text-uv-text-soft in-div-first-child:text-exact-0p8rem in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:text-exact-0p75rem" key={label}>
             <div>
               <span>{label}</span>
               <strong>{formatPercent(locale, Number(value))}</strong>
             </div>
-            <div className="metric-bar">
+            <div className="metric-bar h-1.75 overflow-hidden rounded-exact-999px bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-exact-inherit in-span-2:bg-uv-primary">
               <span style={{ width: score + "%" }} />
             </div>
           </div>
@@ -245,7 +245,7 @@ function WordMastery({
       })}
       {state.nextReviewAt ? (
         <p
-          className="muted"
+          className="muted text-uv-text-muted"
           title={formatDate(locale, toDate(state.nextReviewAt), {
             dateStyle: "medium",
             timeStyle: "short",
@@ -265,18 +265,18 @@ function SecondaryWordSkeleton({ locale }: { locale: UiLocale }) {
   return (
     <>
       <section
-        className="page-section"
+        className="page-section flex flex-col gap-3"
         aria-busy="true"
         aria-label={t("word.loadingDetails")}
       >
-        <div className="skeleton loading-section-heading" />
-        <div className="loading-example-grid">
-          <div className="skeleton loading-example-card" />
-          <div className="skeleton loading-example-card" />
+        <div className="skeleton loading-section-heading rounded-exact-10px bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite w-32.5 h-6.25" />
+        <div className="loading-example-grid grid gap-3 uv-min700:grid-template-columns-repeat-2-minmax-0-1fr">
+          <div className="skeleton loading-example-card bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-37.5 rounded-exact-14px" />
+          <div className="skeleton loading-example-card bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-37.5 rounded-exact-14px" />
         </div>
       </section>
-      <div className="skeleton loading-word-disclosure" aria-hidden="true" />
-      <div className="skeleton loading-word-disclosure" aria-hidden="true" />
+      <div className="skeleton loading-word-disclosure bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-17.5 rounded-exact-14px" aria-hidden="true" />
+      <div className="skeleton loading-word-disclosure bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-17.5 rounded-exact-14px" aria-hidden="true" />
     </>
   );
 }
@@ -346,8 +346,8 @@ async function DeferredWordDetails({
 
   return (
     <>
-      <section className="page-section">
-        <div className="section-heading">
+      <section className="page-section flex flex-col gap-3">
+        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
           <div>
             <h2>{t("word.examples")}</h2>
           </div>
@@ -355,15 +355,15 @@ async function DeferredWordDetails({
         </div>
 
         {word.examples.length ? (
-          <div className="grid">
+          <div className="grid grid grid-template-columns-1fr gap-3 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:grid-template-columns-repeat-3-minmax-0-1fr">
             {word.examples.slice(0, 4).map((example) => (
-              <article className="card example-card" key={example.id}>
-                <div className="word-meta">
+              <article className="card example-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 transition-border-color-160ms-ease-transform-160ms-ease-backgro in-a-active:transform-scale-0p985 uv-min940:in-a-hover-2:transform-translatey-2px uv-min940:in-a-hover-2:border-uv-border-strong uv-min940:in-a-hover-2:bg-uv-surface-raised flex flex-col gap-2.5 in-p:m-0 in-p:line-height-1p55 in-strong:m-0 in-strong:line-height-1p55 rounded-exact-18px" key={example.id}>
+                <div className="word-meta flex flex-wrap gap-1.75 items-center">
                   {example.level ? (
-                    <span className="badge">{example.level}</span>
+                    <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{example.level}</span>
                   ) : null}
                   {example.register ? (
-                    <span className="badge">{example.register}</span>
+                    <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{example.register}</span>
                   ) : null}
                 </div>
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
@@ -377,7 +377,7 @@ async function DeferredWordDetails({
             ))}
           </div>
         ) : (
-          <p className="muted">{t("word.noExamples")}</p>
+          <p className="muted text-uv-text-muted">{t("word.noExamples")}</p>
         )}
         <ExampleGenerationPanel
           lexemeId={word.id}
@@ -395,19 +395,19 @@ async function DeferredWordDetails({
       <WordMastery state={primaryState} locale={locale} />
 
       {personalizedRelations.relations.length ? (
-        <section className="panel intelligence-panel">
-          <div className="section-heading">
+        <section className="panel intelligence-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px uv-max619:scroll-margin-top-76px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
               <h2>{t("word.connections")}</h2>
             </div>
             <Network size={20} />
           </div>
 
-          <div className="relation-list">
+          <div className="relation-list flex flex-wrap gap-2">
             {personalizedRelations.relations.map((relation) => (
               <Link
                 href={"/vocabulary/" + relation.target.id}
-                className="relation-chip"
+                className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-exact-0p66rem"
                 key={relation.id}
                 prefetch
               >
@@ -423,28 +423,28 @@ async function DeferredWordDetails({
             ))}
           </div>
 
-          <Link href="/vocabulary" className="text-link" prefetch>
+          <Link href="/vocabulary" className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5" prefetch>
             {t("word.browseVocabulary")}{" "}
             <ArrowRight className="rtl-mirror" size={16} />
           </Link>
         </section>
       ) : null}
 
-      <details className="word-history-disclosure">
+      <details className="word-history-disclosure in-summary-2:min-h-14.5 in-summary-2:flex in-summary-2:items-center in-summary-2:justify-between in-summary-2:gap-3 in-summary-2:padding-13px-15px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span-first-child:flex in-summary-span-first-child:flex-col in-summary-span-first-child:gap-0.75 in-summary-strong-2:text-uv-text in-summary-strong-2:text-exact-0p9rem in-summary-small:text-uv-text-muted in-summary-small:text-exact-0p66rem p-0 overflow-hidden border-1px-solid-border-2 rounded-exact-16px bg-uv-surface in-word-history-grid:padding-0-10px-10px in-word-detail-card:box-shadow-none uv-max619:scroll-margin-top-76px">
         <summary>
           <span>
             <strong>{t("word.historyTitle")}</strong>
             <small>{t("word.historyHelp")}</small>
           </span>
         </summary>
-        <section className="word-history-grid">
-          <article className="panel word-detail-card">
-            <p className="eyebrow">{t("word.reviewHistory")}</p>
+        <section className="word-history-grid grid grid-template-columns-1fr gap-3 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr">
+          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.reviewHistory")}</p>
             <h2>{t("word.recentReviews")}</h2>
             {state?.reviews.length ? (
-              <div className="history-list">
+              <div className="history-list flex flex-col">
                 {state.reviews.map((review) => (
-                  <div className="history-row" key={review.id}>
+                  <div className="history-row min-h-10.5 flex items-center justify-between gap-3 padding-8px-0 border-1px-solid-border last:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-small:text-uv-text-muted in-small:text-right in-stacked:items-start in-stacked:flex-col in-stacked:gap-0.75" key={review.id}>
                     <span>
                       {ratingKeys[review.rating]
                         ? t(ratingKeys[review.rating])
@@ -460,17 +460,17 @@ async function DeferredWordDetails({
                 ))}
               </div>
             ) : (
-              <p className="muted">{t("word.noReviews")}</p>
+              <p className="muted text-uv-text-muted">{t("word.noReviews")}</p>
             )}
           </article>
 
-          <article className="panel word-detail-card">
-            <p className="eyebrow">{t("word.encounters")}</p>
+          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.encounters")}</p>
             <h2>{t("word.whereMet")}</h2>
             {word.encounters.length ? (
-              <div className="history-list">
+              <div className="history-list flex flex-col">
                 {word.encounters.map((encounter) => (
-                  <div className="history-row" key={encounter.id}>
+                  <div className="history-row min-h-10.5 flex items-center justify-between gap-3 padding-8px-0 border-1px-solid-border last:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-small:text-uv-text-muted in-small:text-right in-stacked:items-start in-stacked:flex-col in-stacked:gap-0.75" key={encounter.id}>
                     <span>{encounter.source}</span>
                     <small>
                       {formatDate(locale, toDate(encounter.createdAt), {
@@ -482,17 +482,17 @@ async function DeferredWordDetails({
                 ))}
               </div>
             ) : (
-              <p className="muted">{t("word.noEncounters")}</p>
+              <p className="muted text-uv-text-muted">{t("word.noEncounters")}</p>
             )}
           </article>
 
-          <article className="panel word-detail-card">
-            <p className="eyebrow">{t("word.mistakeMemory")}</p>
+          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.mistakeMemory")}</p>
             <h2>{t("word.recurringWeaknesses")}</h2>
             {word.mistakes.length ? (
-              <div className="history-list">
+              <div className="history-list flex flex-col">
                 {word.mistakes.map((mistake) => (
-                  <div className="history-row stacked" key={mistake.id}>
+                  <div className="history-row stacked min-h-10.5 flex items-center justify-between gap-3 padding-8px-0 border-1px-solid-border last:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-small:text-uv-text-muted in-small:text-right in-stacked:items-start in-stacked:flex-col in-stacked:gap-0.75" key={mistake.id}>
                     <span>
                       {mistakeKeys[mistake.type]
                         ? t(mistakeKeys[mistake.type])
@@ -508,7 +508,7 @@ async function DeferredWordDetails({
                 ))}
               </div>
             ) : (
-              <p className="muted">{t("word.noMistakes")}</p>
+              <p className="muted text-uv-text-muted">{t("word.noMistakes")}</p>
             )}
           </article>
         </section>
@@ -548,26 +548,26 @@ export default async function Word({
   });
 
   return (
-    <main className="page word-detail-page">
+    <main className="page word-detail-page flex flex-col uv-min620:gap-5.5 uv-min940:gap-6 w-full gap-4.5 in-word-detail-topline:grid in-word-detail-topline:grid-template-columns-minmax-0-1fr-auto in-word-detail-topline:items-start in-word-detail-topline:gap-3 in-word-detail-topline-word-meta:min-w-0 in-word-primary-actions:mt-0.5 in-word-quick-actions:gap-1.75 in-word-quick-actions-descendants:min-height-tap-target in-word-detail-grid:gap-2.5 in-word-detail-card:border-uv-border in-word-detail-card:bg-uv-surface in-word-detail-card-eyebrow:mb-0.5 in-lesson-meaning:text-exact-1p18rem in-mastery-row:gap-1.5 in-intelligence-panel:border-uv-border in-example-card:min-h-37.5 in-example-card-strong:text-exact-1rem in-example-card-strong:line-height-1p6 in-relation-chip:transition-border-color-140ms-ease-background-140ms-ease-transf uv-min620:in-word-primary-actions:items-start uv-min940:in-word-detail-grid:grid-template-columns-minmax-0-1p15fr-minmax-300px-0p85fr uv-min940:in-word-detail-grid:items-start uv-min940:in-word-detail-disclosure:grid-column-1-1 uv-min940:in-relation-chip-hover:border-uv-border-strong uv-min940:in-relation-chip-hover:bg-uv-surface-soft uv-min940:in-relation-chip-hover:transform-translatey-1px">
       <WordLanguageProvider
         preference={course.explanationLanguage}
         targetLanguageCode={targetLanguageCode}
       >
         <WordPageScrollReset wordId={word.id} />
-        <section className="page-header word-identity-hero">
-          <div className="word-detail-topline">
-            <div className="word-meta">
-              <span className="badge">
+        <section className="page-header word-identity-hero flex flex-col in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 pt-4 relative gap-3.5 overflow-hidden p-5 border-1px-solid-border-2 rounded-exact-radius-lg bg-radial-gradient-circle-at-100pct-0pct-rgb-139-124-255-0p11-t in-h1:max-w-uv-0927635a28 in-h1:text-exact-clamp-2p2rem-8vw-4p6rem in-h1:line-height-1p02 in-h1:letter-spacing-0p065em in-h1:overflow-wrap-anywhere in-page-description:text-uv-text-muted in-page-description:text-exact-0p82rem uv-min620:p-6.5 uv-min940:p-7.5">
+          <div className="word-detail-topline flex flex-col gap-2.5 uv-min620:flex-row uv-min620:items-center uv-min620:justify-between uv-max619:items-start uv-max619:in-word-meta:gap-1.25 uv-max619:in-badge-nth-child-n-3:hidden">
+            <div className="word-meta flex flex-wrap gap-1.75 items-center">
+              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
                 {partOfSpeechKeys[word.partOfSpeech]
                   ? t(partOfSpeechKeys[word.partOfSpeech])
                   : word.partOfSpeech.toLowerCase()}
               </span>
-              <span className="badge">
+              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
                 {stateKeys[state.state]
                   ? t(stateKeys[state.state])
                   : state.state.toLowerCase()}
               </span>
-              <span className="badge">{course.targetLevel}</span>
+              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{course.targetLevel}</span>
             </div>
             <WordLanguageSwitch />
           </div>
@@ -577,13 +577,13 @@ export default async function Word({
           </h1>
 
           {word.plural ? (
-            <p className="page-description">
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">
               {t("word.plural", { value: word.plural })}
             </p>
           ) : null}
 
-          <div className="word-hero-meanings">
-            <div className="word-hero-meaning-list">
+          <div className="word-hero-meanings mt-1 pt-4.5 border-1px-solid-border-3">
+            <div className="word-hero-meaning-list flex flex-wrap gap-16px-32px">
               <WordMeaning
                 translations={word.translations}
                 definitions={word.definitions}
@@ -592,11 +592,11 @@ export default async function Word({
           </div>
         </section>
 
-        <nav className="word-detail-actions" aria-label={t("word.actions")}>
+        <nav className="word-detail-actions flex flex-wrap gap-2 in-button:flex-1-1-165px in-button:min-height-tap-target in-word-quick-action-button:flex-1-1-165px in-word-quick-action-button:min-height-tap-target" aria-label={t("word.actions")}>
           <TeachWordSheet lexemeId={word.id} label={formatLexemeLabel(word)} />
           <Link
             href={"/practice?lexeme=" + word.id}
-            className="button button-secondary"
+            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
             prefetch
           >
             <Brain size={17} /> {t("word.practice")}

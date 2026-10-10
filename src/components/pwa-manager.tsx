@@ -179,21 +179,21 @@ export function PwaManager() {
   return (
     <>
       {offline ? (
-        <div className="pwa-connectivity" role="status">
+        <div className="pwa-connectivity fixed z-index-80 top-max-10px-env-safe-area-inset-top left-50pct transform-translatex-50pct inline-flex items-center gap-2 max-width-calc-100vw-24px padding-8px-12px border-1px-solid-border-2 rounded-exact-999px bg-uv-cec7f8cbea6 text-uv-text-soft box-shadow-shadow text-exact-p78rem" role="status">
           <WifiOff size={15} />
           <span>{t("pwa.offlineBanner")}</span>
         </div>
       ) : null}
 
       {waiting ? (
-        <aside className="pwa-update" role="status" aria-live="polite">
+        <aside className="pwa-update fixed z-index-90 inset-auto-12px-calc-86px-env-safe-area-inset-bottom-12px flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 border-1px-solid-border-strong rounded-exact-18px bg-uv-cfc0f1d21e4 box-shadow-shadow backdrop-filter-blur-18px in-div:grid in-div:gap-0.75 in-div:min-w-0 in-span:text-uv-text-soft in-span:text-exact-p78rem in-span:line-height-1p4 in-button-2:w-auto in-button-2:min-w-31 uv-min900:inset-inline-auto-24px uv-min900:bottom-6 uv-min900:width-min-520px-calc-100vw-48px uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" role="status" aria-live="polite">
           <div>
             <strong>{t("pwa.updateTitle")}</strong>
             <span>{dirty ? t("pwa.updateUnsaved") : t("pwa.updateBody")}</span>
           </div>
           <button
             type="button"
-            className="button button-primary"
+            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
             onClick={applyUpdate}
             disabled={dirty}
           >
@@ -204,19 +204,19 @@ export function PwaManager() {
       ) : null}
 
       {installPrompt ? (
-        <aside className="pwa-install" aria-label={t("pwa.installTitle")}>
+        <aside className="pwa-install fixed z-index-90 inset-auto-12px-calc-86px-env-safe-area-inset-bottom-12px flex items-center justify-between gap-3 max-w-uv-438408eab5 mx-auto p-3.5 border-1px-solid-border-strong rounded-exact-18px bg-uv-cfc0f1d21e4 box-shadow-shadow backdrop-filter-blur-18px in-div-first-child:grid in-div-first-child:gap-0.75 in-div-first-child:min-w-0 in-span:text-uv-text-soft in-span:text-exact-p78rem in-span:line-height-1p4 in-button-2:w-auto in-button-2:min-w-31 uv-min900:inset-inline-auto-24px uv-min900:bottom-6 uv-min900:width-min-520px-calc-100vw-48px uv-min900:m-0 uv-max560:items-stretch uv-max560:flex-col" aria-label={t("pwa.installTitle")}>
           <div>
             <strong>{t("pwa.installTitle")}</strong>
             <span>{t("pwa.installBody")}</span>
           </div>
-          <div className="pwa-install-actions">
-            <button type="button" className="button button-primary" onClick={install}>
+          <div className="pwa-install-actions flex gap-2 items-center uv-max560:in-button-2:flex-1">
+            <button type="button" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={install}>
               <Download size={16} />
               {t("pwa.installAction")}
             </button>
             <button
               type="button"
-              className="icon-button"
+              className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-exact-13px bg-uv-surface text-uv-text-soft min-height-tap-target"
               aria-label={t("pwa.installDismiss")}
               onClick={() => {
                 try {

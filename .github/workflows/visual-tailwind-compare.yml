@@ -1,0 +1,62 @@
+name: Tailwind visual parity
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "postcss.config.mjs"
+      - "package*.json"
+      - ".github/workflows/visual-tailwind-compare.yml"
+      - "scripts/compare-public-ui.mjs"
+
+jobs:
+  compare-public-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/u_vocab_visual
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/u_vocab_visual
+      OPENAI_API_KEY: test-key
+      BETTER_AUTH_SECRET: visual-parity-testing-only-secret-0123456789abcdef
+      BETTER_AUTH_URL: http://127.0.0.1:3102
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check out original main as visual baseline
+        run: git worktree add /tmp/u-vocab-main origin/main
+      - name: Install baseline dependencies
+        working-directory: /tmp/u-vocab-main
+        run: npm ci
+      - name: Install migrated dependencies and browser test utilities
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false playwright@1.58.2 pixelmatch@7.1.0 pngjs@7.0.0
+          npx playwright install --with-deps chromium
+      - name: Run baseline and migrated development servers
+        run: |
+          (cd /tmp/u-vocab-main && npm run dev -- --hostname 127.0.0.1 --port 3101 > /tmp/u-vocab-baseline.log 2>&1) &
+          echo $! > /tmp/u-vocab-baseline.pid
+          (npm run dev -- --hostname 127.0.0.1 --port 3102 > /tmp/u-vocab-migrated.log 2>&1) &
+          echo $! > /tmp/u-vocab-migrated.pid
+          for try in $(seq 1 180); do
+            if curl -fsS http://127.0.0.1:3101/login >/dev/null && curl -fsS http://127.0.0.1:3102/login >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/u-vocab-baseline.log
+          cat /tmp/u-vocab-migrated.log
+          exit 1
+      - name: Compare public-page screenshots
+        run: node scripts/compare-public-ui.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tailwind-parity-screenshots
+          path: visual-parity/
+          retention-days: 7

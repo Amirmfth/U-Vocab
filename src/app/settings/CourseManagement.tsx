@@ -30,10 +30,10 @@ export function CourseManagement({
   );
 
   return (
-    <section className="panel course-management border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4 rounded-uv-r6d27d54c6c">
-      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+    <section className="panel course-management border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4 rounded-exact-18px">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("settings.coursesEyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("settings.coursesEyebrow")}</p>
           <h2>{t("settings.coursesTitle")}</h2>
         </div>
         <Languages size={20} />
@@ -49,7 +49,7 @@ export function CourseManagement({
               <input type="hidden" name="courseId" value={course.id} />
               <button
                 type="submit"
-                className={"course-management-row w-full min-h-14.5 flex items-center justify-between gap-4 padding-12px-14px border-1px-solid-border-2 rounded-uv-r0939007802 bg-uv-surface-soft text-uv-text text-start cursor-pointer in-span-first-child:grid in-span-first-child:gap-0.75 in-small:text-uv-text-muted in-small:text-uv-ff1713651e0 in-span-last-child:text-uv-text-muted in-span-last-child:text-uv-ff1713651e0 in-is-active:border-uv-primary disabled:cursor-default disabled:opacity-100 " + (active ? "is-active" : "")}
+                className={"course-management-row w-full min-h-14.5 flex items-center justify-between gap-4 padding-12px-14px border-1px-solid-border-2 rounded-exact-12px bg-uv-surface-soft text-uv-text text-start cursor-pointer in-span-first-child:grid in-span-first-child:gap-0.75 in-small:text-uv-text-muted in-small:text-exact-0p72rem in-span-last-child:text-uv-text-muted in-span-last-child:text-exact-0p72rem in-is-active:border-uv-primary disabled:cursor-default disabled:opacity-100 " + (active ? "is-active" : "")}
                 disabled={active || !language.enabled}
                 aria-current={active ? "true" : undefined}
               >
@@ -72,7 +72,7 @@ export function CourseManagement({
             {availableToCreate.map((language) => (
               <form action={createCourseAction} key={language}>
                 <input type="hidden" name="targetLanguage" value={language} />
-                <button type="submit" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
+                <button type="submit" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
                   <Plus size={17} />
                   {t("settings.addCourse", {
                     language: languageLabel(t, language),

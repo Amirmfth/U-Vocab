@@ -75,7 +75,7 @@ export function ActivityHeatmap({
               key={date}
               href={"/progress?range=" + range + "&day=" + date}
               className={
-                "heatmap-cell heatmap-level w-2.75 h-2.75 rounded-uv-ra0179b92f3 bg-uv-surface-soft outline-1px-solid-transparent transition-transform-120ms-ease-outline-color-120ms-ease in-heatmap-level-1:bg-uv-c7978809be5 in-heatmap-level-2:bg-uv-cdedb452cb4 in-heatmap-level-3:bg-uv-c45f6640f64 in-heatmap-level-4:bg-uv-primary-strong hover:outline-uv-text-soft hover:transform-scale-1p18 focus-visible:outline-uv-text-soft focus-visible:transform-scale-1p18 in-is-selected:outline-2px-solid-text in-is-selected:outline-offset-1px heatmap-level-" +
+                "heatmap-cell heatmap-level w-2.75 h-2.75 rounded-exact-2px bg-uv-surface-soft outline-1px-solid-transparent transition-transform-120ms-ease-outline-color-120ms-ease in-heatmap-level-1:bg-uv-c7978809be5 in-heatmap-level-2:bg-uv-cdedb452cb4 in-heatmap-level-3:bg-uv-c45f6640f64 in-heatmap-level-4:bg-uv-primary-strong hover:outline-uv-text-soft hover:transform-scale-1p18 focus-visible:outline-uv-text-soft focus-visible:transform-scale-1p18 in-is-selected:outline-2px-solid-text in-is-selected:outline-offset-1px heatmap-level-" +
                 intensity(day) +
                 (selectedDay === date ? " is-selected" : "")
               }

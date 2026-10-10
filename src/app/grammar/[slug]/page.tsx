@@ -185,28 +185,28 @@ export default async function GrammarConceptPage({
 
   return (
     <main className="page grammar-detail flex flex-col uv-min620:gap-5.5 uv-min940:gap-6 gap-4.5">
-      <Link href="/grammar" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
+      <Link href="/grammar" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-exact-0p82rem">
         <ArrowLeft className="rtl-mirror" size={16} />
         {t("grammar.detail.back")}
       </Link>
 
-      <section className="grammar-detail-hero flex flex-col gap-3.5 padding-14px-0-2px in-h1:margin-3px-0-0 in-h1:max-w-uv-d1f4d3e141 in-h1:text-uv-fdd704d9153 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560">
+      <section className="grammar-detail-hero flex flex-col gap-3.5 padding-14px-0-2px in-h1:margin-3px-0-0 in-h1:max-w-uv-d1f4d3e141 in-h1:text-exact-clamp-2p25rem-11vw-4p8rem in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560">
         <div className="word-meta flex flex-wrap gap-1.75 items-center">
-          <span className={"grammar-state min-h-6.25 inline-flex items-center w-fit padding-0-8px border-1px-solid-border-2 rounded-uv-red9ab892c5 font-font-geist-mono-geist-mono-monospace text-uv-f174ef476a0 text-uv-text-soft bg-uv-surface-raised in-grammar-state-needs-attention:border-uv-c60009ca3c2 in-grammar-state-needs-attention:text-uv-c7d351e814d in-grammar-state-needs-attention:bg-uv-c8b3083dabe in-grammar-state-learning:border-uv-c85a9d06a78 in-grammar-state-learning:text-uv-c1d285c7551 in-grammar-state-learning:bg-uv-cbdfd7cd038 in-grammar-state-strong:border-uv-cad82869dd8 in-grammar-state-strong:text-uv-cf9ab83a8af in-grammar-state-strong:bg-uv-cafddaf6a65 in-grammar-state-assumed:border-uv-border in-grammar-state-assumed:text-uv-text-muted grammar-state-" + status.toLowerCase()}>
+          <span className={"grammar-state min-h-6.25 inline-flex items-center w-fit padding-0-8px border-1px-solid-border-2 rounded-exact-999px font-font-geist-mono-geist-mono-monospace text-exact-0p62rem text-uv-text-soft bg-uv-surface-raised in-grammar-state-needs-attention:border-uv-c60009ca3c2 in-grammar-state-needs-attention:text-uv-c7d351e814d in-grammar-state-needs-attention:bg-uv-c8b3083dabe in-grammar-state-learning:border-uv-c85a9d06a78 in-grammar-state-learning:text-uv-c1d285c7551 in-grammar-state-learning:bg-uv-cbdfd7cd038 in-grammar-state-strong:border-uv-cad82869dd8 in-grammar-state-strong:text-uv-cf9ab83a8af in-grammar-state-strong:bg-uv-cafddaf6a65 in-grammar-state-assumed:border-uv-border in-grammar-state-assumed:text-uv-text-muted grammar-state-" + status.toLowerCase()}>
             {t(statusKeys[status])}
           </span>
-          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{concept.introducedAt}</span>
+          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{concept.introducedAt}</span>
           {concept.expectedBy && concept.expectedBy !== concept.introducedAt ? (
-            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">
+            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
               {t("grammar.detail.expectedBy", { level: concept.expectedBy })}
             </span>
           ) : null}
         </div>
-        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t(categoryKeys[concept.category])}</p>
+        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t(categoryKeys[concept.category])}</p>
         <h1 className="learning-content" lang="en" dir="ltr">
           {concept.title}
         </h1>
-        <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65" lang="en" dir="ltr">
+        <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65" lang="en" dir="ltr">
           {concept.shortDescription}
         </p>
 
@@ -220,7 +220,7 @@ export default async function GrammarConceptPage({
             <form action={startGrammarConceptAction}>
               <input type="hidden" name="grammarConceptId" value={concept.id} />
               <input type="hidden" name="slug" value={concept.slug} />
-              <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="submit">
+              <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="submit">
                 <BookOpenCheck size={17} />
                 {status === "LEARNING"
                   ? t("grammar.detail.continue")
@@ -230,7 +230,7 @@ export default async function GrammarConceptPage({
           ) : null}
           <Link
             href={"/practice?grammar=" + concept.slug}
-            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
           >
             <Brain size={17} />
             {t("grammar.detail.openPractice")}
@@ -239,10 +239,10 @@ export default async function GrammarConceptPage({
       </section>
 
       {progress ? (
-        <section className="panel grammar-profile-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-uv-r6d27d54c6c flex flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-uv-fa9aa53fab2">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <section className="panel grammar-profile-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px flex flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-exact-1p05rem">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.profile")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.profile")}</p>
               <h2>
                 {progress.source === "DECLARED_LEVEL"
                   ? t("grammar.detail.assumedFromLevel")
@@ -252,7 +252,7 @@ export default async function GrammarConceptPage({
             <Sparkles size={19} />
           </div>
           {progress.evidenceCount > 0 ? (
-            <div className="grammar-dimensions grid grid-template-columns-1fr gap-1.75 in-div:min-h-13 in-div:flex in-div:items-center in-div:justify-between in-div:gap-3 in-div:padding-9px-11px in-div:border-1px-solid-border-2 in-div:rounded-uv-r0939007802 in-div:bg-uv-surface-raised in-span:text-uv-text-muted in-span:text-uv-ff1713651e0 in-strong-2:text-uv-text-soft in-strong-2:text-uv-ff1713651e0 uv-min620:grid-template-columns-repeat-3-minmax-0-1fr">
+            <div className="grammar-dimensions grid grid-template-columns-1fr gap-1.75 in-div:min-h-13 in-div:flex in-div:items-center in-div:justify-between in-div:gap-3 in-div:padding-9px-11px in-div:border-1px-solid-border-2 in-div:rounded-exact-12px in-div:bg-uv-surface-raised in-span:text-uv-text-muted in-span:text-exact-0p72rem in-strong-2:text-uv-text-soft in-strong-2:text-exact-0p72rem uv-min620:grid-template-columns-repeat-3-minmax-0-1fr">
               <div>
                 <span>{t("grammar.detail.understanding")}</span>
                 <strong>{dimensionLabel(t, progress.understanding)}</strong>
@@ -274,8 +274,8 @@ export default async function GrammarConceptPage({
         </section>
       ) : null}
 
-      <section className="panel grammar-canonical-reference border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-uv-r6d27d54c6c grid gap-3 in-h2-2:m-0 in-h2-2:text-uv-f44eab8f17b in-p:m-0 in-p:text-uv-text-soft in-p:line-height-1p65 in-details:border-1px-solid-border-3 in-details:pt-2.5 in-summary:cursor-pointer in-summary:text-uv-text-soft in-summary:font-650 in-summary:text-uv-fe9d5fd6635 in-details-descendants-not-summary:mt-2.5">
-        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.canonical")}</p>
+      <section className="panel grammar-canonical-reference border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px grid gap-3 in-h2-2:m-0 in-h2-2:text-exact-1p08rem in-p:m-0 in-p:text-uv-text-soft in-p:line-height-1p65 in-details:border-1px-solid-border-3 in-details:pt-2.5 in-summary:cursor-pointer in-summary:text-uv-text-soft in-summary:font-650 in-summary:text-exact-0p78rem in-details-descendants-not-summary:mt-2.5">
+        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.canonical")}</p>
         <h2>{t("grammar.detail.curriculumDefinition")}</h2>
         <p className="learning-content" lang="en" dir="ltr">
           {concept.explanation || concept.shortDescription}
@@ -297,7 +297,7 @@ export default async function GrammarConceptPage({
             <summary>{t("grammar.detail.canonicalExamples")}</summary>
             <div className="grammar-example-list grid grid-template-columns-1fr gap-2 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr">
               {examples.map((example) => (
-                <div className="grammar-example learning-content padding-14px-15px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-uv-fbe55c92df5 line-height-1p55" dir="auto" key={example}>
+                <div className="grammar-example learning-content padding-14px-15px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-exact-0p94rem line-height-1p55" dir="auto" key={example}>
                   {example}
                 </div>
               ))}
@@ -316,8 +316,8 @@ export default async function GrammarConceptPage({
       ) : (
         <>
           <div className="grammar-detail-grid grid grid-template-columns-1fr gap-2.5 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr">
-            <section className="panel grammar-teaching-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-uv-r6d27d54c6c flex flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-uv-fa9aa53fab2 in-p-last-child:m-0 in-p-last-child:text-uv-text-soft in-p-last-child:line-height-1p62">
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.whyMatters")}</p>
+            <section className="panel grammar-teaching-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px flex flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-exact-1p05rem in-p-last-child:m-0 in-p-last-child:text-uv-text-soft in-p-last-child:line-height-1p62">
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.whyMatters")}</p>
               <h2 className="learning-content" lang="en" dir="ltr">
                 {concept.title}
               </h2>
@@ -326,8 +326,8 @@ export default async function GrammarConceptPage({
               </p>
             </section>
             {rules.length ? (
-              <section className="panel grammar-teaching-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-uv-r6d27d54c6c flex flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-uv-fa9aa53fab2 in-p-last-child:m-0 in-p-last-child:text-uv-text-soft in-p-last-child:line-height-1p62">
-                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.pattern")}</p>
+              <section className="panel grammar-teaching-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px flex flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-exact-1p05rem in-p-last-child:m-0 in-p-last-child:text-uv-text-soft in-p-last-child:line-height-1p62">
+                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.pattern")}</p>
                 <h2>{t("grammar.detail.rules")}</h2>
                 <ol className="grammar-rule-list m-0 text-uv-text-soft line-height-1p62 pl-5 in-li-li:mt-2">
                   {rules.map((rule) => (
@@ -339,18 +339,18 @@ export default async function GrammarConceptPage({
               </section>
             ) : null}
           </div>
-          <section className="panel grammar-lesson-missing border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-uv-r6d27d54c6c grid gap-3 in-h2-2:m-0 in-h2-2:text-uv-f44eab8f17b">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.fullLesson")}</p>
+          <section className="panel grammar-lesson-missing border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px grid gap-3 in-h2-2:m-0 in-h2-2:text-exact-1p08rem">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.fullLesson")}</p>
             <h2>{t("grammar.detail.lessonMissing")}</h2>
             <p className="muted text-uv-text-muted">{t("grammar.detail.lessonMissingHelp")}</p>
           </section>
         </>
       )}
 
-      <section className="panel grammar-watch-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-uv-r6d27d54c6c flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-uv-fa9aa53fab2 in-p-2:m-0 in-p-2:text-uv-text-soft in-p-2:line-height-1p62 grid grid-template-columns-24px-minmax-0-1fr items-start in-svg:text-uv-danger in-ul:margin-10px-0-0 in-ul:pl-4.5 in-ul:text-uv-text-muted">
+      <section className="panel grammar-watch-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 rounded-exact-18px flex-col gap-3 in-h2:margin-3px-0-0 in-h2:text-exact-1p05rem in-p-2:m-0 in-p-2:text-uv-text-soft in-p-2:line-height-1p62 grid grid-template-columns-24px-minmax-0-1fr items-start in-svg:text-uv-danger in-ul:margin-10px-0-0 in-ul:pl-4.5 in-ul:text-uv-text-muted">
         <CircleAlert size={20} />
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.quickWarning")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.quickWarning")}</p>
           <h2>{t("grammar.detail.commonMistakes")}</h2>
           <p>{t(watchForKey(concept.category))}</p>
           {!richLesson && exceptions.length ? (
@@ -367,14 +367,14 @@ export default async function GrammarConceptPage({
 
       {concept.prerequisites.length || concept.parent || concept.children.length ? (
         <section className="page-section flex flex-col gap-3">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.connections")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.connections")}</p>
               <h2>{t("grammar.detail.whereFits")}</h2>
             </div>
             <Layers3 size={19} />
           </div>
-          <div className="grammar-connection-list grid grid-template-columns-1fr gap-2 in-a:min-h-14.5 in-a:flex in-a:flex-col in-a:justify-center in-a:gap-0.75 in-a:padding-10px-12px in-a:border-1px-solid-border-2 in-a:rounded-uv-r233710a71e in-a:bg-uv-surface in-span:text-uv-text-muted in-span:text-uv-f2311a7d95c in-strong-2:text-uv-f6c2d68ddb8 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:grid-template-columns-repeat-3-minmax-0-1fr">
+          <div className="grammar-connection-list grid grid-template-columns-1fr gap-2 in-a:min-h-14.5 in-a:flex in-a:flex-col in-a:justify-center in-a:gap-0.75 in-a:padding-10px-12px in-a:border-1px-solid-border-2 in-a:rounded-exact-13px in-a:bg-uv-surface in-span:text-uv-text-muted in-span:text-exact-0p65rem in-strong-2:text-exact-0p8rem uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:grid-template-columns-repeat-3-minmax-0-1fr">
             {concept.parent ? (
               <Link href={"/grammar/" + concept.parent.slug}>
                 <span>{t("grammar.detail.parent")}</span>
@@ -416,16 +416,16 @@ export default async function GrammarConceptPage({
 
       {vocabulary.length ? (
         <section className="page-section flex flex-col gap-3">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.yourVocabulary")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.yourVocabulary")}</p>
               <h2>{t("grammar.detail.reuseWords")}</h2>
             </div>
           </div>
-          <p className="muted grammar-vocab-note text-uv-text-muted margin-4px-0-0-2 max-w-uv-8b89fb679d text-uv-ff1713651e0 line-height-1p5">
+          <p className="muted grammar-vocab-note text-uv-text-muted margin-4px-0-0-2 max-w-uv-8b89fb679d text-exact-0p72rem line-height-1p5">
             {t("grammar.detail.vocabHelp")}
           </p>
-          <div className="grammar-vocab-grid grid grid-template-columns-1fr gap-2 in-a:min-h-14.5 in-a:flex in-a:flex-col in-a:justify-center in-a:gap-0.75 in-a:padding-10px-12px in-a:border-1px-solid-border-2 in-a:rounded-uv-r233710a71e in-a:bg-uv-surface in-span:text-uv-text-muted in-span:text-uv-f2311a7d95c in-strong-2:text-uv-f6c2d68ddb8 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:grid-template-columns-repeat-3-minmax-0-1fr">
+          <div className="grammar-vocab-grid grid grid-template-columns-1fr gap-2 in-a:min-h-14.5 in-a:flex in-a:flex-col in-a:justify-center in-a:gap-0.75 in-a:padding-10px-12px in-a:border-1px-solid-border-2 in-a:rounded-exact-13px in-a:bg-uv-surface in-span:text-uv-text-muted in-span:text-exact-0p65rem in-strong-2:text-exact-0p8rem uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:grid-template-columns-repeat-3-minmax-0-1fr">
             {vocabulary.map((item) => (
               <Link href={"/vocabulary/" + item.lexeme.id} key={item.id}>
                 <strong className="learning-content" lang={language.code} dir="ltr">
@@ -454,14 +454,14 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {concept.evidence.length ? (
-        <details className="grammar-evidence-disclosure p-0 overflow-hidden in-summary-2:min-h-15.5 in-summary-2:flex in-summary-2:items-center in-summary-2:padding-12px-14px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span:flex in-summary-span:flex-col in-summary-span:gap-0.75 in-summary-strong:text-uv-text in-summary-strong:text-uv-fcc370f51d4 in-summary-small:text-uv-text-muted in-summary-small:text-uv-f2311a7d95c">
+        <details className="grammar-evidence-disclosure p-0 overflow-hidden in-summary-2:min-h-15.5 in-summary-2:flex in-summary-2:items-center in-summary-2:padding-12px-14px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span:flex in-summary-span:flex-col in-summary-span:gap-0.75 in-summary-strong:text-uv-text in-summary-strong:text-exact-0p85rem in-summary-small:text-uv-text-muted in-summary-small:text-exact-0p65rem">
           <summary>
             <span>
               <strong>{t("grammar.detail.evidenceWhy")}</strong>
               <small>{t("grammar.detail.evidenceHelp")}</small>
             </span>
           </summary>
-          <div className="grammar-evidence-list padding-0-14px-14px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-div-div-2:flex in-div-div-2:justify-between in-div-div-2:gap-3 in-strong-2:text-uv-f78eb7000a9 in-span:text-uv-f78eb7000a9 in-small:text-uv-f78eb7000a9 in-span:text-uv-text-muted in-small:text-uv-text-muted">
+          <div className="grammar-evidence-list padding-0-14px-14px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-div-div-2:flex in-div-div-2:justify-between in-div-div-2:gap-3 in-strong-2:text-exact-0p68rem in-span:text-exact-0p68rem in-small:text-exact-0p68rem in-span:text-uv-text-muted in-small:text-uv-text-muted">
             {concept.evidence.map((item) => (
               <div key={item.id}>
                 <div>
@@ -496,8 +496,8 @@ export default async function GrammarConceptPage({
       ) : null}
 
       {concept.outgoingRelations.length ? (
-        <section className="grammar-related flex flex-wrap items-center gap-2 in-p:w-full in-a:min-h-9.5 in-a:inline-flex in-a:items-center in-a:gap-1.5 in-a:padding-0-10px in-a:border-1px-solid-border-2 in-a:rounded-uv-red9ab892c5 in-a:text-uv-text-soft in-a:text-uv-f58b84cc6f5">
-          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.detail.related")}</p>
+        <section className="grammar-related flex flex-wrap items-center gap-2 in-p:w-full in-a:min-h-9.5 in-a:inline-flex in-a:items-center in-a:gap-1.5 in-a:padding-0-10px in-a:border-1px-solid-border-2 in-a:rounded-exact-999px in-a:text-uv-text-soft in-a:text-exact-0p7rem">
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.detail.related")}</p>
           {concept.outgoingRelations.map((relation) => (
             <Link href={"/grammar/" + relation.target.slug} key={relation.id}>
               <span className="learning-content" lang="en" dir="ltr">

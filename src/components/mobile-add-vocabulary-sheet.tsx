@@ -96,20 +96,20 @@ export function MobileAddVocabularySheet({
             ref={panelRef}
             tabIndex={-1}
             key="mobile-add-sheet-panel [position:relative] [width:100%] [max-height:min(88dvh,_760px)] [min-height:60dvh] [overflow-y:auto] [padding:10px_16px_calc(24px_+_env(safe-area-inset-bottom))] [border-radius:26px_26px_0_0] [background:var(--surface)] [box-shadow:0_-18px_50px_rgba(0,_0,_0,_0.36)] [&_.import-workspace]:[max-width:none] [&_.form-panel]:[max-width:none] [overscroll-behavior:contain]"
-            className="mobile-add-sheet-panel relative w-full max-height-min-88dvh-760px min-height-60dvh overflow-y-auto padding-10px-16px-calc-24px-env-safe-area-inset-bottom rounded-uv-re9f29dbce4 bg-uv-surface box-shadow-0-18px-50px-rgb-0-0-0-0p36 in-import-workspace:max-w-none in-form-panel:max-w-none overscroll-contain"
+            className="mobile-add-sheet-panel relative w-full max-height-min-88dvh-760px min-height-60dvh overflow-y-auto padding-10px-16px-calc-24px-env-safe-area-inset-bottom rounded-exact-26px-26px-0-0 bg-uv-surface box-shadow-0-18px-50px-rgb-0-0-0-0p36 in-import-workspace:max-w-none in-form-panel:max-w-none overscroll-contain"
             initial={reduceMotion ? false : { opacity: 0, y: 44 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 44 }}
             transition={{ type: "spring", stiffness: 360, damping: 32, mass: 0.8 }}
           >
-            <div className="mobile-add-sheet-handle w-9.5 h-1 margin-0-auto-14px rounded-uv-red9ab892c5 bg-uv-border-strong" aria-hidden="true" />
-            <header className="mobile-add-sheet-header flex items-start justify-between gap-4 mb-3 in-h2:margin-4px-0-0 in-h2:text-uv-fab62110780 in-h2:letter-spacing-0p04em-2">
+            <div className="mobile-add-sheet-handle w-9.5 h-1 margin-0-auto-14px rounded-exact-999px bg-uv-border-strong" aria-hidden="true" />
+            <header className="mobile-add-sheet-header flex items-start justify-between gap-4 mb-3 in-h2:margin-4px-0-0 in-h2:text-exact-1p45rem in-h2:letter-spacing-0p04em-2">
               <div>
                 <h2 id="mobile-add-sheet-title">{t("common.addVocabulary")}</h2>
               </div>
               <button
                 ref={closeButtonRef}
-                className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft min-height-tap-target"
+                className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-exact-13px bg-uv-surface text-uv-text-soft min-height-tap-target"
                 type="button"
                 onClick={onClose}
                 aria-label={t("common.close")}

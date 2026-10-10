@@ -120,12 +120,12 @@ function GrammarAndUsage({
 }) {
   const t = createTranslator(locale);
   return (
-    <details className="panel word-detail-card word-detail-disclosure border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c in-h2:mb-2.5 p-0 in-summary-2:min-h-14.5 in-summary-2:flex in-summary-2:items-center in-summary-2:justify-between in-summary-2:gap-3 in-summary-2:padding-13px-15px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span-first-child:flex in-summary-span-first-child:flex-col in-summary-span-first-child:gap-0.75 in-summary-strong-2:text-uv-text in-summary-strong-2:text-uv-fee84419642" open>
+    <details className="panel word-detail-card word-detail-disclosure border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px in-h2:mb-2.5 p-0 in-summary-2:min-h-14.5 in-summary-2:flex in-summary-2:items-center in-summary-2:justify-between in-summary-2:gap-3 in-summary-2:padding-13px-15px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span-first-child:flex in-summary-span-first-child:flex-col in-summary-span-first-child:gap-0.75 in-summary-strong-2:text-uv-text in-summary-strong-2:text-exact-0p9rem" open>
       <summary>
         <span>
           <strong>{t("word.grammarUsage")}</strong>
         </span>
-        <span className="disclosure-hint text-uv-text-muted text-uv-ff7862da171">
+        <span className="disclosure-hint text-uv-text-muted text-exact-0p66rem">
           {t("word.savedCount", { count: formatNumber(locale, patterns.length) })}
         </span>
       </summary>
@@ -166,10 +166,10 @@ function LexicalGrammarLinks({
   const t = createTranslator(locale);
 
   return (
-    <section className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c p-3.75 in-h2:mb-2.5">
-      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+    <section className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.grammarEyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.grammarEyebrow")}</p>
           <h2>{t("word.structures")}</h2>
         </div>
         <Brain size={19} />
@@ -178,7 +178,7 @@ function LexicalGrammarLinks({
         {links.map((link) => (
           <Link
             href={"/grammar/" + link.grammarConcept.slug}
-            className="grammar-link-row min-h-15.5 grid grid-template-columns-minmax-0-1fr-auto-18px items-center gap-2.5 padding-10px-0 in-grammar-link-row:border-1px-solid-border-3 in-span-first-child:min-w-0 in-span-first-child:flex in-span-first-child:flex-col in-span-first-child:gap-0.75 in-strong-2:text-uv-fa2582d5d6e in-small:overflow-hidden in-small:text-uv-text-muted in-small:text-uv-ff7862da171 in-small:text-overflow-ellipsis in-small:whitespace-nowrap in-svg:text-uv-text-muted"
+            className="grammar-link-row min-h-15.5 grid grid-template-columns-minmax-0-1fr-auto-18px items-center gap-2.5 padding-10px-0 in-grammar-link-row:border-1px-solid-border-3 in-span-first-child:min-w-0 in-span-first-child:flex in-span-first-child:flex-col in-span-first-child:gap-0.75 in-strong-2:text-exact-0p82rem in-small:overflow-hidden in-small:text-uv-text-muted in-small:text-exact-0p66rem in-small:text-overflow-ellipsis in-small:whitespace-nowrap in-svg:text-uv-text-muted"
             key={link.id}
             prefetch
           >
@@ -195,7 +195,7 @@ function LexicalGrammarLinks({
                   )}
               </small>
             </span>
-            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{link.grammarConcept.introducedAt}</span>
+            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{link.grammarConcept.introducedAt}</span>
             <ArrowRight className="rtl-mirror" size={16} />
           </Link>
         ))}
@@ -222,7 +222,7 @@ function WordMastery({
     scores.reduce((sum, [, value]) => sum + Number(value), 0) / scores.length;
 
   return (
-    <section className="panel word-detail-card word-mastery-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c p-3.75 in-h2:mb-2.5">
+    <section className="panel word-detail-card word-mastery-section border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
       <h2>{t("word.mastery")}</h2>
       <p className="muted text-uv-text-muted">
         {t("word.overallMastery", {
@@ -232,12 +232,12 @@ function WordMastery({
       {scores.map(([label, value]) => {
         const score = Math.round(Number(value) * 100);
         return (
-          <div className="mastery-row flex flex-col gap-1.75 in-div-first-child:flex in-div-first-child:justify-between in-div-first-child:gap-3 in-div-first-child:text-uv-text-soft in-div-first-child:text-uv-f6c2d68ddb8 in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:text-uv-f823f1262bd" key={label}>
+          <div className="mastery-row flex flex-col gap-1.75 in-div-first-child:flex in-div-first-child:justify-between in-div-first-child:gap-3 in-div-first-child:text-uv-text-soft in-div-first-child:text-exact-0p8rem in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:text-exact-0p75rem" key={label}>
             <div>
               <span>{label}</span>
               <strong>{formatPercent(locale, Number(value))}</strong>
             </div>
-            <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-uv-r3e26d67509 in-span-2:bg-uv-primary">
+            <div className="metric-bar h-1.75 overflow-hidden rounded-exact-999px bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-exact-inherit in-span-2:bg-uv-primary">
               <span style={{ width: score + "%" }} />
             </div>
           </div>
@@ -269,14 +269,14 @@ function SecondaryWordSkeleton({ locale }: { locale: UiLocale }) {
         aria-busy="true"
         aria-label={t("word.loadingDetails")}
       >
-        <div className="skeleton loading-section-heading rounded-uv-r933cc73310 bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite w-32.5 h-6.25" />
+        <div className="skeleton loading-section-heading rounded-exact-10px bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite w-32.5 h-6.25" />
         <div className="loading-example-grid grid gap-3 uv-min700:grid-template-columns-repeat-2-minmax-0-1fr">
-          <div className="skeleton loading-example-card bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-37.5 rounded-uv-rd65225386d" />
-          <div className="skeleton loading-example-card bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-37.5 rounded-uv-rd65225386d" />
+          <div className="skeleton loading-example-card bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-37.5 rounded-exact-14px" />
+          <div className="skeleton loading-example-card bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-37.5 rounded-exact-14px" />
         </div>
       </section>
-      <div className="skeleton loading-word-disclosure bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-17.5 rounded-uv-rd65225386d" aria-hidden="true" />
-      <div className="skeleton loading-word-disclosure bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-17.5 rounded-uv-rd65225386d" aria-hidden="true" />
+      <div className="skeleton loading-word-disclosure bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-17.5 rounded-exact-14px" aria-hidden="true" />
+      <div className="skeleton loading-word-disclosure bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite h-17.5 rounded-exact-14px" aria-hidden="true" />
     </>
   );
 }
@@ -347,7 +347,7 @@ async function DeferredWordDetails({
   return (
     <>
       <section className="page-section flex flex-col gap-3">
-        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
           <div>
             <h2>{t("word.examples")}</h2>
           </div>
@@ -357,13 +357,13 @@ async function DeferredWordDetails({
         {word.examples.length ? (
           <div className="grid grid grid-template-columns-1fr gap-3 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr uv-min940:grid-template-columns-repeat-3-minmax-0-1fr">
             {word.examples.slice(0, 4).map((example) => (
-              <article className="card example-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 transition-border-color-160ms-ease-transform-160ms-ease-backgro in-a-active:transform-scale-0p985 uv-min940:in-a-hover-2:transform-translatey-2px uv-min940:in-a-hover-2:border-uv-border-strong uv-min940:in-a-hover-2:bg-uv-surface-raised flex flex-col gap-2.5 in-p:m-0 in-p:line-height-1p55 in-strong:m-0 in-strong:line-height-1p55 rounded-uv-r6d27d54c6c" key={example.id}>
+              <article className="card example-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 transition-border-color-160ms-ease-transform-160ms-ease-backgro in-a-active:transform-scale-0p985 uv-min940:in-a-hover-2:transform-translatey-2px uv-min940:in-a-hover-2:border-uv-border-strong uv-min940:in-a-hover-2:bg-uv-surface-raised flex flex-col gap-2.5 in-p:m-0 in-p:line-height-1p55 in-strong:m-0 in-strong:line-height-1p55 rounded-exact-18px" key={example.id}>
                 <div className="word-meta flex flex-wrap gap-1.75 items-center">
                   {example.level ? (
-                    <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{example.level}</span>
+                    <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{example.level}</span>
                   ) : null}
                   {example.register ? (
-                    <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{example.register}</span>
+                    <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{example.register}</span>
                   ) : null}
                 </div>
                 <strong className="learning-content" lang={targetLanguageCode} dir="ltr">
@@ -395,8 +395,8 @@ async function DeferredWordDetails({
       <WordMastery state={primaryState} locale={locale} />
 
       {personalizedRelations.relations.length ? (
-        <section className="panel intelligence-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c uv-max619:scroll-margin-top-76px">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <section className="panel intelligence-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px uv-max619:scroll-margin-top-76px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
               <h2>{t("word.connections")}</h2>
             </div>
@@ -407,7 +407,7 @@ async function DeferredWordDetails({
             {personalizedRelations.relations.map((relation) => (
               <Link
                 href={"/vocabulary/" + relation.target.id}
-                className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-uv-ff7862da171"
+                className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-exact-0p66rem"
                 key={relation.id}
                 prefetch
               >
@@ -430,7 +430,7 @@ async function DeferredWordDetails({
         </section>
       ) : null}
 
-      <details className="word-history-disclosure in-summary-2:min-h-14.5 in-summary-2:flex in-summary-2:items-center in-summary-2:justify-between in-summary-2:gap-3 in-summary-2:padding-13px-15px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span-first-child:flex in-summary-span-first-child:flex-col in-summary-span-first-child:gap-0.75 in-summary-strong-2:text-uv-text in-summary-strong-2:text-uv-fee84419642 in-summary-small:text-uv-text-muted in-summary-small:text-uv-ff7862da171 p-0 overflow-hidden border-1px-solid-border-2 rounded-uv-r4678bd4d8a bg-uv-surface in-word-history-grid:padding-0-10px-10px in-word-detail-card:box-shadow-none uv-max619:scroll-margin-top-76px">
+      <details className="word-history-disclosure in-summary-2:min-h-14.5 in-summary-2:flex in-summary-2:items-center in-summary-2:justify-between in-summary-2:gap-3 in-summary-2:padding-13px-15px in-summary-2:list-none in-summary-webkit-details-marker:hidden in-summary-span-first-child:flex in-summary-span-first-child:flex-col in-summary-span-first-child:gap-0.75 in-summary-strong-2:text-uv-text in-summary-strong-2:text-exact-0p9rem in-summary-small:text-uv-text-muted in-summary-small:text-exact-0p66rem p-0 overflow-hidden border-1px-solid-border-2 rounded-exact-16px bg-uv-surface in-word-history-grid:padding-0-10px-10px in-word-detail-card:box-shadow-none uv-max619:scroll-margin-top-76px">
         <summary>
           <span>
             <strong>{t("word.historyTitle")}</strong>
@@ -438,8 +438,8 @@ async function DeferredWordDetails({
           </span>
         </summary>
         <section className="word-history-grid grid grid-template-columns-1fr gap-3 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr">
-          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c p-3.75 in-h2:mb-2.5">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.reviewHistory")}</p>
+          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.reviewHistory")}</p>
             <h2>{t("word.recentReviews")}</h2>
             {state?.reviews.length ? (
               <div className="history-list flex flex-col">
@@ -464,8 +464,8 @@ async function DeferredWordDetails({
             )}
           </article>
 
-          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c p-3.75 in-h2:mb-2.5">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.encounters")}</p>
+          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.encounters")}</p>
             <h2>{t("word.whereMet")}</h2>
             {word.encounters.length ? (
               <div className="history-list flex flex-col">
@@ -486,8 +486,8 @@ async function DeferredWordDetails({
             )}
           </article>
 
-          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-uv-r6d27d54c6c p-3.75 in-h2:mb-2.5">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("word.mistakeMemory")}</p>
+          <article className="panel word-detail-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 flex flex-col gap-3.5 in-h2:margin-4px-0-0 in-h2:letter-spacing-0p03em rounded-exact-18px p-3.75 in-h2:mb-2.5">
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("word.mistakeMemory")}</p>
             <h2>{t("word.recurringWeaknesses")}</h2>
             {word.mistakes.length ? (
               <div className="history-list flex flex-col">
@@ -548,26 +548,26 @@ export default async function Word({
   });
 
   return (
-    <main className="page word-detail-page flex flex-col uv-min620:gap-5.5 uv-min940:gap-6 w-full gap-4.5 in-word-detail-topline:grid in-word-detail-topline:grid-template-columns-minmax-0-1fr-auto in-word-detail-topline:items-start in-word-detail-topline:gap-3 in-word-detail-topline-word-meta:min-w-0 in-word-primary-actions:mt-0.5 in-word-quick-actions:gap-1.75 in-word-quick-actions-descendants:min-height-tap-target in-word-detail-grid:gap-2.5 in-word-detail-card:border-uv-border in-word-detail-card:bg-uv-surface in-word-detail-card-eyebrow:mb-0.5 in-lesson-meaning:text-uv-f1fba8b9d92 in-mastery-row:gap-1.5 in-intelligence-panel:border-uv-border in-example-card:min-h-37.5 in-example-card-strong:text-uv-f19feeb881c in-example-card-strong:line-height-1p6 in-relation-chip:transition-border-color-140ms-ease-background-140ms-ease-transf uv-min620:in-word-primary-actions:items-start uv-min940:in-word-detail-grid:grid-template-columns-minmax-0-1p15fr-minmax-300px-0p85fr uv-min940:in-word-detail-grid:items-start uv-min940:in-word-detail-disclosure:grid-column-1-1 uv-min940:in-relation-chip-hover:border-uv-border-strong uv-min940:in-relation-chip-hover:bg-uv-surface-soft uv-min940:in-relation-chip-hover:transform-translatey-1px">
+    <main className="page word-detail-page flex flex-col uv-min620:gap-5.5 uv-min940:gap-6 w-full gap-4.5 in-word-detail-topline:grid in-word-detail-topline:grid-template-columns-minmax-0-1fr-auto in-word-detail-topline:items-start in-word-detail-topline:gap-3 in-word-detail-topline-word-meta:min-w-0 in-word-primary-actions:mt-0.5 in-word-quick-actions:gap-1.75 in-word-quick-actions-descendants:min-height-tap-target in-word-detail-grid:gap-2.5 in-word-detail-card:border-uv-border in-word-detail-card:bg-uv-surface in-word-detail-card-eyebrow:mb-0.5 in-lesson-meaning:text-exact-1p18rem in-mastery-row:gap-1.5 in-intelligence-panel:border-uv-border in-example-card:min-h-37.5 in-example-card-strong:text-exact-1rem in-example-card-strong:line-height-1p6 in-relation-chip:transition-border-color-140ms-ease-background-140ms-ease-transf uv-min620:in-word-primary-actions:items-start uv-min940:in-word-detail-grid:grid-template-columns-minmax-0-1p15fr-minmax-300px-0p85fr uv-min940:in-word-detail-grid:items-start uv-min940:in-word-detail-disclosure:grid-column-1-1 uv-min940:in-relation-chip-hover:border-uv-border-strong uv-min940:in-relation-chip-hover:bg-uv-surface-soft uv-min940:in-relation-chip-hover:transform-translatey-1px">
       <WordLanguageProvider
         preference={course.explanationLanguage}
         targetLanguageCode={targetLanguageCode}
       >
         <WordPageScrollReset wordId={word.id} />
-        <section className="page-header word-identity-hero flex flex-col in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 pt-4 relative gap-3.5 overflow-hidden p-5 border-1px-solid-border-2 rounded-uv-r02a0a889dd bg-radial-gradient-circle-at-100pct-0pct-rgb-139-124-255-0p11-t in-h1:max-w-uv-0927635a28 in-h1:text-uv-fd2f79ab33d in-h1:line-height-1p02 in-h1:letter-spacing-0p065em in-h1:overflow-wrap-anywhere in-page-description:text-uv-text-muted in-page-description:text-uv-fa2582d5d6e uv-min620:p-6.5 uv-min940:p-7.5">
+        <section className="page-header word-identity-hero flex flex-col in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 pt-4 relative gap-3.5 overflow-hidden p-5 border-1px-solid-border-2 rounded-exact-radius-lg bg-radial-gradient-circle-at-100pct-0pct-rgb-139-124-255-0p11-t in-h1:max-w-uv-0927635a28 in-h1:text-exact-clamp-2p2rem-8vw-4p6rem in-h1:line-height-1p02 in-h1:letter-spacing-0p065em in-h1:overflow-wrap-anywhere in-page-description:text-uv-text-muted in-page-description:text-exact-0p82rem uv-min620:p-6.5 uv-min940:p-7.5">
           <div className="word-detail-topline flex flex-col gap-2.5 uv-min620:flex-row uv-min620:items-center uv-min620:justify-between uv-max619:items-start uv-max619:in-word-meta:gap-1.25 uv-max619:in-badge-nth-child-n-3:hidden">
             <div className="word-meta flex flex-wrap gap-1.75 items-center">
-              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">
+              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
                 {partOfSpeechKeys[word.partOfSpeech]
                   ? t(partOfSpeechKeys[word.partOfSpeech])
                   : word.partOfSpeech.toLowerCase()}
               </span>
-              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">
+              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
                 {stateKeys[state.state]
                   ? t(stateKeys[state.state])
                   : state.state.toLowerCase()}
               </span>
-              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{course.targetLevel}</span>
+              <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{course.targetLevel}</span>
             </div>
             <WordLanguageSwitch />
           </div>
@@ -577,7 +577,7 @@ export default async function Word({
           </h1>
 
           {word.plural ? (
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">
               {t("word.plural", { value: word.plural })}
             </p>
           ) : null}
@@ -596,7 +596,7 @@ export default async function Word({
           <TeachWordSheet lexemeId={word.id} label={formatLexemeLabel(word)} />
           <Link
             href={"/practice?lexeme=" + word.id}
-            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
             prefetch
           >
             <Brain size={17} /> {t("word.practice")}

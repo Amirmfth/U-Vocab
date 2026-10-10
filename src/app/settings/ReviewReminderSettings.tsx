@@ -133,19 +133,19 @@ export function ReviewReminderSettings({
           : null;
 
   return (
-    <section className="panel notification-settings border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4.5 rounded-uv-r6d27d54c6c">
+    <section className="panel notification-settings border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4.5 rounded-exact-18px">
       <div className="notification-settings-heading flex items-start justify-between gap-4 in-h2:margin-4px-0-6px in-p-2:mb-0 uv-max680:items-stretch uv-max680:flex-col">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("notifications.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("notifications.eyebrow")}</p>
           <h2>{t("notifications.title")}</h2>
           <p className="muted text-uv-text-muted">{t("notifications.description")}</p>
         </div>
-        <span className={enabled ? "notification-status is-enabled flex-none padding-5px-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-muted text-uv-f60ac4cf407 font-bold in-is-enabled:border-color-mix-in-srgb-success-48pct-border in-is-enabled:bg-uv-cafddaf6a65 in-is-enabled:text-uv-success uv-max680:w-fit" : "notification-status flex-none padding-5px-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-muted text-uv-f60ac4cf407 font-bold in-is-enabled:border-color-mix-in-srgb-success-48pct-border in-is-enabled:bg-uv-cafddaf6a65 in-is-enabled:text-uv-success uv-max680:w-fit"}>
+        <span className={enabled ? "notification-status is-enabled flex-none padding-5px-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-muted text-exact-p75rem font-bold in-is-enabled:border-color-mix-in-srgb-success-48pct-border in-is-enabled:bg-uv-cafddaf6a65 in-is-enabled:text-uv-success uv-max680:w-fit" : "notification-status flex-none padding-5px-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-muted text-exact-p75rem font-bold in-is-enabled:border-color-mix-in-srgb-success-48pct-border in-is-enabled:bg-uv-cafddaf6a65 in-is-enabled:text-uv-success uv-max680:w-fit"}>
           {enabled ? t("notifications.on") : t("notifications.off")}
         </span>
       </div>
 
-      <div className="notification-preferences-grid grid grid-template-columns-repeat-3-minmax-0-1fr gap-2.5 in-label:grid in-label:gap-1.5 in-label:text-uv-text-muted in-label:text-uv-f5f68d82942 in-input:min-h-11.5 in-input:w-full in-input:border-1px-solid-border-2 in-input:rounded-uv-r0939007802 in-input:padding-0-12px in-input:bg-uv-surface-raised in-input:text-uv-text uv-max680:grid-template-columns-1fr">
+      <div className="notification-preferences-grid grid grid-template-columns-repeat-3-minmax-0-1fr gap-2.5 in-label:grid in-label:gap-1.5 in-label:text-uv-text-muted in-label:text-exact-p78rem in-input:min-h-11.5 in-input:w-full in-input:border-1px-solid-border-2 in-input:rounded-exact-12px in-input:padding-0-12px in-input:bg-uv-surface-raised in-input:text-uv-text uv-max680:grid-template-columns-1fr">
         <label>
           <span>{t("notifications.reminderTime")}</span>
           <input
@@ -177,22 +177,22 @@ export function ReviewReminderSettings({
         </label>
       </div>
 
-      <p className="muted notification-device-summary text-uv-text-muted m-0 text-uv-f6b4e408307 line-height-1p5">
+      <p className="muted notification-device-summary text-uv-text-muted m-0 text-exact-p84rem line-height-1p5">
         {t("notifications.devices", { count: activeDeviceCount })}
         {deviceSubscribed ? " · " + t("notifications.thisDeviceActive") : ""}
       </p>
 
       {initialTimeZone === "UTC" ? (
-        <p className="notification-warning m-0 text-uv-f6b4e408307 line-height-1p5 text-uv-warning">{t("notifications.timeZoneFallback")}</p>
+        <p className="notification-warning m-0 text-exact-p84rem line-height-1p5 text-uv-warning">{t("notifications.timeZoneFallback")}</p>
       ) : null}
-      {unavailable ? <p className="notification-warning m-0 text-uv-f6b4e408307 line-height-1p5 text-uv-warning">{unavailable}</p> : null}
-      {message ? <p className="notification-message m-0 text-uv-f6b4e408307 line-height-1p5 text-uv-text-soft" role="status">{message}</p> : null}
+      {unavailable ? <p className="notification-warning m-0 text-exact-p84rem line-height-1p5 text-uv-warning">{unavailable}</p> : null}
+      {message ? <p className="notification-message m-0 text-exact-p84rem line-height-1p5 text-uv-text-soft" role="status">{message}</p> : null}
 
       <div className="notification-actions flex gap-2.5 in-button-2:w-auto uv-max680:in-button-2:w-full">
         {!enabled || !deviceSubscribed ? (
           <button
             type="button"
-            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+            className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
             disabled={pending || Boolean(unavailable) || supported === null}
             onClick={enable}
           >
@@ -202,7 +202,7 @@ export function ReviewReminderSettings({
         ) : (
           <button
             type="button"
-            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+            className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
             disabled={pending}
             onClick={disable}
           >

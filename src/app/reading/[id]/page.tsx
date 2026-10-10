@@ -62,18 +62,18 @@ export default async function ReadingDetailPage({
 
   return (
     <main className="page generated-reading-page flex flex-col reading-measure-68ch gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-      <section className="page-header compact reading-document-header flex flex-col padding-24px-0-4px in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 gap-2 pt-4 max-w-uv-a9051779da in-h1:text-uv-fb9b4a66c9a">
-        <Link href="/reading" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-uv-fa2582d5d6e">
+      <section className="page-header compact reading-document-header flex flex-col padding-24px-0-4px in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 gap-2 pt-4 max-w-uv-a9051779da in-h1:text-exact-clamp-2p25rem-9vw-4p4rem">
+        <Link href="/reading" className="back-link w-fit min-h-10 inline-flex items-center gap-1.75 text-uv-text-muted text-exact-0p82rem">
           <ArrowLeft className="rtl-mirror" size={16} />
           {t("reading.detail.back")}
         </Link>
         <div className="word-meta flex flex-wrap gap-1.75 items-center">
-          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{reading.level}</span>
-          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">
+          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{reading.level}</span>
+          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
             {t(lengthKeys[reading.length] ?? "reading.length.medium")}
           </span>
           {reading.completedAt ? (
-            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">
+            <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
               {t("reading.comprehension", { percent: formatPercent(
                   locale,
                   reading.comprehensionScore ?? 0,
@@ -85,7 +85,7 @@ export default async function ReadingDetailPage({
           {reading.title}
         </h1>
         {reading.topic ? (
-          <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65" dir="auto">
+          <p className="page-description learning-content m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65" dir="auto">
             {reading.topic}
           </p>
         ) : null}
@@ -108,10 +108,10 @@ export default async function ReadingDetailPage({
       />
 
       {reading.grammarTargets.length ? (
-        <section className="panel reading-language-notes border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 max-w-uv-a9051779da mx-auto in-blockquote:margin-10px-0 in-blockquote:ps-3 in-blockquote:border-2px-solid-border in-blockquote:text-uv-text-muted rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <section className="panel reading-language-notes border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 max-w-uv-a9051779da mx-auto in-blockquote:margin-10px-0 in-blockquote:ps-3 in-blockquote:border-2px-solid-border in-blockquote:text-uv-text-muted rounded-exact-18px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("reading.detail.notes")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("reading.detail.notes")}</p>
               <h2>{t("reading.detail.grammarContext")}</h2>
             </div>
             <Brain size={19} />
@@ -121,7 +121,7 @@ export default async function ReadingDetailPage({
             {reading.grammarTargets.map((target) => (
               <details className="question-item in-summary:flex in-summary:items-center in-summary:gap-2.25 in-summary:line-height-1p45 in-p-2:margin-12px-0-2px in-p-2:line-height-1p6" key={target.id}>
                 <summary>
-                  <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">
+                  <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">
                     {target.grammarConcept.introducedAt}
                   </span>
                   <span className="learning-content" lang="en" dir="ltr">
@@ -152,10 +152,10 @@ export default async function ReadingDetailPage({
 
       <ReadingAssessment readingId={reading.id} questions={questions} />
 
-      <section className="panel reading-language-summary border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 max-w-uv-a9051779da mx-auto rounded-uv-r6d27d54c6c">
-        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+      <section className="panel reading-language-summary border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 max-w-uv-a9051779da mx-auto rounded-exact-18px">
+        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
           <div>
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("reading.detail.languageText")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("reading.detail.languageText")}</p>
             <h2>{t("reading.detail.encountered")}</h2>
           </div>
           <BookOpenCheck size={19} />
@@ -167,7 +167,7 @@ export default async function ReadingDetailPage({
             <div className="relation-list flex flex-wrap gap-2">
               {reading.grammarTargets.map((target) => (
                 <Link
-                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-uv-ff7862da171"
+                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-exact-0p66rem"
                   href={"/grammar/" + target.grammarConcept.slug}
                   key={target.id}
                 >
@@ -191,7 +191,7 @@ export default async function ReadingDetailPage({
             <div className="relation-list flex flex-wrap gap-2">
               {reading.targets.map((target) => (
                 <Link
-                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-uv-ff7862da171"
+                  className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-exact-0p66rem"
                   href={"/vocabulary/" + target.lexeme.id}
                   key={target.id}
                 >
@@ -223,8 +223,8 @@ export default async function ReadingDetailPage({
         ) : null}
       </section>
 
-      <section className="panel story-summary border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 in-p-2:line-height-1p65 rounded-uv-r6d27d54c6c">
-        <h2 className="section-title margin-0-0-10px text-uv-f19feeb881c text-uv-text-soft letter-spacing-0p02em-2">{t("reading.detail.summary")}</h2>
+      <section className="panel story-summary border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 in-p-2:line-height-1p65 rounded-exact-18px">
+        <h2 className="section-title margin-0-0-10px text-exact-1rem text-uv-text-soft letter-spacing-0p02em-2">{t("reading.detail.summary")}</h2>
         {course.explanationLanguage !== "PERSIAN" && reading.englishSummary ? (
           <p className="learning-content" lang="en" dir="ltr">
             {reading.englishSummary}

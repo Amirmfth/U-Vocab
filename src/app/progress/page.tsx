@@ -453,19 +453,19 @@ export default async function ProgressPage({
         dismissLabel={t("guidance.dismiss")}
       />
 
-      <section className="page-header compact flex flex-col padding-24px-0-4px in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 gap-2 pt-4 in-h1:text-uv-fce2aeaeade">
-        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.eyebrow")}</p>
+      <section className="page-header compact flex flex-col padding-24px-0-4px in-compact:max-w-uv-8b89fb679d in-h1:m-0 in-h1:line-height-0p96 in-h1:letter-spacing-0p055em in-h1:font-560 uv-min940:pt-8.5 in-compact-h1:mb-1 gap-2 pt-4 in-h1:text-exact-clamp-2rem-9vw-4p5rem">
+        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.eyebrow")}</p>
         <h1>{t("progress.title")}</h1>
-        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("progress.description")}</p>
+        <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("progress.description")}</p>
       </section>
 
-      <nav className="range-tabs w-fit max-w-full flex gap-1 overflow-x-auto p-0.75 border-1px-solid-border-2 rounded-uv-r0939007802 bg-uv-surface" aria-label={t("progress.range")}>
+      <nav className="range-tabs w-fit max-w-full flex gap-1 overflow-x-auto p-0.75 border-1px-solid-border-2 rounded-exact-12px bg-uv-surface" aria-label={t("progress.range")}>
         {(["7", "30", "90", "365", "all"] as ProgressRange[]).map((value) =>
           canUseAdvancedAnalytics || value === "7" ? (
             <Link
               key={value}
               href={"/progress?range=" + value}
-              className={"range-tab min-w-12 min-h-9.5 grid place-items-center padding-0-10px rounded-uv-r22be94e0a1 text-uv-text-muted text-uv-f74fc13de71 font-semibold whitespace-nowrap in-is-active:bg-uv-surface-soft in-is-active:text-uv-text in-is-locked:grid-auto-flow-column in-is-locked:gap-1.5 in-is-locked:cursor-not-allowed in-is-locked:opacity-72 in-is-locked-small:text-uv-fd95043f679 in-is-locked-small:font-bold in-is-locked-small:letter-spacing-0p04em in-is-locked-small:uppercase " + (range === value ? "is-active" : "")}
+              className={"range-tab min-w-12 min-h-9.5 grid place-items-center padding-0-10px rounded-exact-9px text-uv-text-muted text-exact-0p76rem font-semibold whitespace-nowrap in-is-active:bg-uv-surface-soft in-is-active:text-uv-text in-is-locked:grid-auto-flow-column in-is-locked:gap-1.5 in-is-locked:cursor-not-allowed in-is-locked:opacity-72 in-is-locked-small:text-exact-0p58rem in-is-locked-small:font-bold in-is-locked-small:letter-spacing-0p04em in-is-locked-small:uppercase " + (range === value ? "is-active" : "")}
               aria-current={range === value ? "page" : undefined}
             >
               {t(rangeLabelKeys[value])}
@@ -473,7 +473,7 @@ export default async function ProgressPage({
           ) : (
             <span
               key={value}
-              className="range-tab is-locked min-w-12 min-h-9.5 grid place-items-center padding-0-10px rounded-uv-r22be94e0a1 text-uv-text-muted text-uv-f74fc13de71 font-semibold whitespace-nowrap in-is-active:bg-uv-surface-soft in-is-active:text-uv-text in-is-locked:grid-auto-flow-column in-is-locked:gap-1.5 in-is-locked:cursor-not-allowed in-is-locked:opacity-72 in-is-locked-small:text-uv-fd95043f679 in-is-locked-small:font-bold in-is-locked-small:letter-spacing-0p04em in-is-locked-small:uppercase"
+              className="range-tab is-locked min-w-12 min-h-9.5 grid place-items-center padding-0-10px rounded-exact-9px text-uv-text-muted text-exact-0p76rem font-semibold whitespace-nowrap in-is-active:bg-uv-surface-soft in-is-active:text-uv-text in-is-locked:grid-auto-flow-column in-is-locked:gap-1.5 in-is-locked:cursor-not-allowed in-is-locked:opacity-72 in-is-locked-small:text-exact-0p58rem in-is-locked-small:font-bold in-is-locked-small:letter-spacing-0p04em in-is-locked-small:uppercase"
               aria-label={t("progress.proRangeLocked", {
                 range: t(rangeLabelKeys[value]),
               })}
@@ -485,7 +485,7 @@ export default async function ProgressPage({
         )}
       </nav>
 
-      <section className="progress-summary grid grid-template-columns-repeat-2-minmax-0-1fr border-1px-solid-border-2 rounded-uv-r02a0a889dd overflow-hidden in-div:min-w-0 in-div:flex in-div:flex-col in-div:gap-1 in-div:padding-15px-13px in-div:border-1px-solid-border in-div-nth-child-odd:border-1px-solid-border-4 in-div-nth-last-child-n-2:border-0-3 in-span:text-uv-text-muted in-span:text-uv-f58b84cc6f5 in-span:line-height-1p35 in-small:text-uv-text-muted in-small:text-uv-f58b84cc6f5 in-small:line-height-1p35 in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:font-tabular-nums in-strong-2:text-uv-f52dd23ea8f in-strong-2:letter-spacing-0p05em-2 uv-min620:grid-template-columns-repeat-4-minmax-0-1fr uv-min620:in-div:border-0-3 uv-min620:in-div-nth-last-child-n-2:border-0-3 uv-min620:in-div-nth-child-odd:border-0-2 uv-min620:in-div-div:border-1px-solid-border-5">
+      <section className="progress-summary grid grid-template-columns-repeat-2-minmax-0-1fr border-1px-solid-border-2 rounded-exact-radius-lg overflow-hidden in-div:min-w-0 in-div:flex in-div:flex-col in-div:gap-1 in-div:padding-15px-13px in-div:border-1px-solid-border in-div-nth-child-odd:border-1px-solid-border-4 in-div-nth-last-child-n-2:border-0-3 in-span:text-uv-text-muted in-span:text-exact-0p7rem in-span:line-height-1p35 in-small:text-uv-text-muted in-small:text-exact-0p7rem in-small:line-height-1p35 in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:font-tabular-nums in-strong-2:text-exact-1p55rem in-strong-2:letter-spacing-0p05em-2 uv-min620:grid-template-columns-repeat-4-minmax-0-1fr uv-min620:in-div:border-0-3 uv-min620:in-div-nth-last-child-n-2:border-0-3 uv-min620:in-div-nth-child-odd:border-0-2 uv-min620:in-div-div:border-1px-solid-border-5">
         <div>
           <span>{t("progress.vocabulary")}</span>
           <strong>{formatNumber(locale, vocabulary.length)}</strong>
@@ -526,21 +526,21 @@ export default async function ProgressPage({
       />
 
       <section className="progress-grid grid grid-template-columns-1fr gap-3 uv-min620:grid-template-columns-repeat-2-minmax-0-1fr">
-        <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.skillBalance")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.skillBalance")}</p>
               <h2>{t("progress.recognitionProduction")}</h2>
             </div>
             <TrendingUp size={19} />
           </div>
-          <div className="progress-bars flex flex-col gap-3.75 in-div:flex in-div:flex-col in-div:gap-1.75 in-span:flex in-span:justify-between in-span:text-uv-text-muted in-span:text-uv-fe9d5fd6635 in-b:text-uv-text-soft in-b:font-font-geist-mono-geist-mono-monospace">
+          <div className="progress-bars flex flex-col gap-3.75 in-div:flex in-div:flex-col in-div:gap-1.75 in-span:flex in-span:justify-between in-span:text-uv-text-muted in-span:text-exact-0p78rem in-b:text-uv-text-soft in-b:font-font-geist-mono-geist-mono-monospace">
             <div>
               <span>
                 {t("progress.recognition")}{" "}
                 <b>{formatPercent(locale, averageRecognition)}</b>
               </span>
-              <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-uv-r3e26d67509 in-span-2:bg-uv-primary">
+              <div className="metric-bar h-1.75 overflow-hidden rounded-exact-999px bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-exact-inherit in-span-2:bg-uv-primary">
                 <span
                   style={{ width: Math.round(averageRecognition * 100) + "%" }}
                 />
@@ -551,25 +551,25 @@ export default async function ProgressPage({
                 {t("progress.production")}{" "}
                 <b>{formatPercent(locale, averageProduction)}</b>
               </span>
-              <div className="metric-bar h-1.75 overflow-hidden rounded-uv-red9ab892c5 bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-uv-r3e26d67509 in-span-2:bg-uv-primary">
+              <div className="metric-bar h-1.75 overflow-hidden rounded-exact-999px bg-uv-surface-soft in-span-2:block in-span-2:h-full in-span-2:rounded-exact-inherit in-span-2:bg-uv-primary">
                 <span
                   style={{ width: Math.round(averageProduction * 100) + "%" }}
                 />
               </div>
             </div>
           </div>
-          <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">{t("progress.estimateCaveat")}</p>
+          <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">{t("progress.estimateCaveat")}</p>
         </article>
 
-        <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.workload")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.workload")}</p>
               <h2>{t("progress.reviewQueue")}</h2>
             </div>
             <Clock3 size={19} />
           </div>
-          <div className={"workload-numbers in-is-free:grid-template-columns-1fr in-is-free-div-div:border-0-4 grid grid-template-columns-repeat-3-minmax-0-1fr border-1px-solid-border-3 border-1px-solid-border in-div:min-w-0 in-div:flex in-div:flex-col in-div:gap-1 in-div:padding-13px-8px in-div-div:border-1px-solid-border-5 in-strong-2:text-uv-f3951047c34 in-strong-2:font-tabular-nums in-span:text-uv-text-muted in-span:text-uv-fe22288a701 " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
+          <div className={"workload-numbers in-is-free:grid-template-columns-1fr in-is-free-div-div:border-0-4 grid grid-template-columns-repeat-3-minmax-0-1fr border-1px-solid-border-3 border-1px-solid-border in-div:min-w-0 in-div:flex in-div:flex-col in-div:gap-1 in-div:padding-13px-8px in-div-div:border-1px-solid-border-5 in-strong-2:text-exact-1p35rem in-strong-2:font-tabular-nums in-span:text-uv-text-muted in-span:text-exact-0p67rem " + (!canUseAdvancedAnalytics ? "is-free" : "")}>
             <div>
               <strong>{formatNumber(locale, dueNow)}</strong>
               <span>{t("progress.dueNow")}</span>
@@ -587,7 +587,7 @@ export default async function ProgressPage({
               </>
             ) : null}
           </div>
-          <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">
+          <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">
             {canUseAdvancedAnalytics
               ? t("progress.reviewSuccess", {
                   percent: formatPercent(locale, reviewSuccess),
@@ -597,20 +597,20 @@ export default async function ProgressPage({
         </article>
 
         {canUseAdvancedAnalytics ? (
-          <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-            <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+          <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+            <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
               <div>
-                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.time")}</p>
+                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.time")}</p>
                 <h2>{t("progress.activePractice")}</h2>
               </div>
               <Flame size={19} />
             </div>
-            <p className="big-metric font-font-geist-mono-geist-mono-monospace font-tabular-nums margin-12px-0-2px text-uv-fad6b4ffcf8 line-height-0p95 letter-spacing-0p07em">
+            <p className="big-metric font-font-geist-mono-geist-mono-monospace font-tabular-nums margin-12px-0-2px text-exact-clamp-2rem-10vw-3p4rem line-height-0p95 letter-spacing-0p07em">
               {t("progress.minutes", {
                 count: formatNumber(locale, minutes(totalDurationMs)),
               })}
             </p>
-            <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">
+            <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">
               {t("progress.practiceAccuracy", {
                 percent: formatPercent(locale, practiceAccuracy),
                 count: formatNumber(locale, encounterCount),
@@ -619,10 +619,10 @@ export default async function ProgressPage({
           </article>
         ) : null}
 
-        <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+        <article className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+          <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
             <div>
-              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.weakAreas")}</p>
+              <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.weakAreas")}</p>
               <h2>{t("progress.needsWork")}</h2>
             </div>
             <ShieldCheck size={19} />
@@ -657,10 +657,10 @@ export default async function ProgressPage({
       ) : (
         <>
           {comparisons ? (
-            <section className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-              <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+            <section className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+              <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
                 <div>
-                  <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.comparison.eyebrow")}</p>
+                  <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.comparison.eyebrow")}</p>
                   <h2>{t("progress.comparison.title")}</h2>
                 </div>
                 <TrendingUp size={19} />
@@ -695,14 +695,14 @@ export default async function ProgressPage({
                   </strong>
                 </div>
               </div>
-              <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">{t("progress.comparison.caveat")}</p>
+              <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">{t("progress.comparison.caveat")}</p>
             </section>
           ) : null}
 
-          <section className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-            <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+          <section className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+            <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
               <div>
-                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.report.eyebrow")}</p>
+                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.report.eyebrow")}</p>
                 <h2>{t("progress.report.title")}</h2>
               </div>
               <Sparkles size={19} />
@@ -725,29 +725,29 @@ export default async function ProgressPage({
                 <strong>{reportLabel(report.suggestedNext)}</strong>
               </div>
             </div>
-            <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">{t("progress.report.caveat")}</p>
+            <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">{t("progress.report.caveat")}</p>
           </section>
 
-          <section className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-uv-r6d27d54c6c">
-            <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+          <section className="panel progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 min-w-0 rounded-exact-18px">
+            <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
               <div>
-                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.growth")}</p>
+                <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.growth")}</p>
                 <h2>{t("progress.trend")}</h2>
               </div>
             </div>
             <div className="trend-chart h-37.5 grid grid-template-columns-repeat-12-minmax-18px-1fr gap-1.25 items-end pt-3 overflow-x-auto" aria-label={t("progress.trendAria")}>
               {monthlyTrend.map((item) => (
-                <div className="trend-month h-full min-w-5 grid grid-template-rows-minmax-0-1fr-auto gap-1.5 in-small:text-uv-text-muted in-small:text-uv-fd95043f679 in-small:text-center" key={item.month}>
+                <div className="trend-month h-full min-w-5 grid grid-template-rows-minmax-0-1fr-auto gap-1.5 in-small:text-uv-text-muted in-small:text-exact-0p58rem in-small:text-center" key={item.month}>
                   <div className="trend-bars h-full flex items-end justify-center gap-0.5">
                     <span
-                      className="trend-bar learned width-min-8px-45pct min-h-0.75 rounded-uv-rce83e44a7d in-learned:bg-uv-primary in-mastered:bg-uv-success"
+                      className="trend-bar learned width-min-8px-45pct min-h-0.75 rounded-exact-4px-4px-1px-1px in-learned:bg-uv-primary in-mastered:bg-uv-success"
                       style={{ height: Math.max(3, (item.learned / maxTrend) * 100) + "%" }}
                       title={t("progress.learnedTitle", {
                         count: formatNumber(locale, item.learned),
                       })}
                     />
                     <span
-                      className="trend-bar mastered width-min-8px-45pct min-h-0.75 rounded-uv-rce83e44a7d in-learned:bg-uv-primary in-mastered:bg-uv-success"
+                      className="trend-bar mastered width-min-8px-45pct min-h-0.75 rounded-exact-4px-4px-1px-1px in-learned:bg-uv-primary in-mastered:bg-uv-success"
                       style={{ height: Math.max(3, (item.mastered / maxTrend) * 100) + "%" }}
                       title={t("progress.masteredTitle", {
                         count: formatNumber(locale, item.mastered),
@@ -762,23 +762,23 @@ export default async function ProgressPage({
                 </div>
               ))}
             </div>
-            <div className="trend-legend flex gap-3.5 mt-2.5 text-uv-text-muted text-uv-f78eb7000a9 in-span:inline-flex in-span:items-center in-span:gap-1.5">
+            <div className="trend-legend flex gap-3.5 mt-2.5 text-uv-text-muted text-exact-0p68rem in-span:inline-flex in-span:items-center in-span:gap-1.5">
               <span>
-                <i className="trend-key learned in-learned:bg-uv-primary in-mastered:bg-uv-success w-2 h-2 rounded-uv-ra0179b92f3" /> {t("progress.added")}
+                <i className="trend-key learned in-learned:bg-uv-primary in-mastered:bg-uv-success w-2 h-2 rounded-exact-2px" /> {t("progress.added")}
               </span>
               <span>
-                <i className="trend-key mastered in-learned:bg-uv-primary in-mastered:bg-uv-success w-2 h-2 rounded-uv-ra0179b92f3" /> {t("progress.masteredLegend")}
+                <i className="trend-key mastered in-learned:bg-uv-primary in-mastered:bg-uv-success w-2 h-2 rounded-exact-2px" /> {t("progress.masteredLegend")}
               </span>
             </div>
-            <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">{t("progress.trendCaveat")}</p>
+            <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">{t("progress.trendCaveat")}</p>
           </section>
         </>
       )}
 
-      <section className="panel heatmap-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 overflow-hidden rounded-uv-r6d27d54c6c">
-        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+      <section className="panel heatmap-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 overflow-hidden rounded-exact-18px">
+        <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
           <div>
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.activity")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.activity")}</p>
             <h2>
               {canUseAdvancedAnalytics
                 ? t("progress.days365")
@@ -797,7 +797,7 @@ export default async function ProgressPage({
           dayCount={canUseAdvancedAnalytics ? 365 : 7}
         />
 
-        <div className="day-detail flex flex-col gap-2.5 pt-3.5 border-1px-solid-border-3 in-div-first-child:flex in-div-first-child:flex-col in-div-first-child:gap-0.75 in-div-first-child-span:text-uv-text-muted in-div-first-child-span:text-uv-f58b84cc6f5 uv-min620:flex-row uv-min620:justify-between uv-min620:items-center">
+        <div className="day-detail flex flex-col gap-2.5 pt-3.5 border-1px-solid-border-3 in-div-first-child:flex in-div-first-child:flex-col in-div-first-child:gap-0.75 in-div-first-child-span:text-uv-text-muted in-div-first-child-span:text-exact-0p7rem uv-min620:flex-row uv-min620:justify-between uv-min620:items-center">
           <div>
             <strong>
               {formatDate(locale, new Date(selectedDay + "T12:00:00Z"), {
@@ -810,7 +810,7 @@ export default async function ProgressPage({
                 : t("progress.noActivity")}
             </span>
           </div>
-          <div className="day-detail-metrics flex flex-wrap gap-1.5 in-span:padding-5px-8px in-span:border-1px-solid-border-2 in-span:rounded-uv-red9ab892c5 in-span:text-uv-text-muted in-span:text-uv-f78eb7000a9">
+          <div className="day-detail-metrics flex flex-wrap gap-1.5 in-span:padding-5px-8px in-span:border-1px-solid-border-2 in-span:rounded-exact-999px in-span:text-uv-text-muted in-span:text-exact-0p68rem">
             <span>
               {t("progress.reviewed", {
                 count: formatNumber(locale, selectedActivity?.reviewed ?? 0),
@@ -846,11 +846,11 @@ export default async function ProgressPage({
       </section>
 
       <section className="progress-actions flex flex-col gap-2.25 uv-min620:flex-row">
-        <Link href="/rescue" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
+        <Link href="/rescue" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
           {t("progress.rescueWeak")}{" "}
           <ArrowRight className="rtl-mirror" size={17} />
         </Link>
-        <Link href="/mistakes" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
+        <Link href="/mistakes" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
           {t("progress.reviewMistakes")}
         </Link>
       </section>

@@ -108,7 +108,7 @@ export function ReadingText({
   }, [active]);
 
   return (
-    <article className="panel generated-reading-text learning-content border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 max-width-reading-measure mx-auto padding-clamp-22px-4vw-40px text-uv-fe2022883cc line-height-1p8 in-p-p:margin-top-1p15em uv-max720:p-4.5 uv-max720:line-height-1p72 rounded-uv-r6d27d54c6c in-reading-target-word:inline in-reading-target-word:padding-0-2px in-reading-target-word:border-0 in-reading-target-word:rounded-uv-r5e0d704b33 in-reading-target-word:bg-color-mix-in-srgb-primary-22pct-transparent in-reading-target-word:text-uv-primary-strong in-reading-target-word:font-inherit in-reading-target-word:font-680 in-reading-target-word:line-height-inherit in-reading-target-word:cursor-pointer in-reading-target-word:box-decoration-break-clone in-reading-target-word-hover:bg-color-mix-in-srgb-primary-36pct-transparent in-reading-target-word-aria-expanded-true:bg-color-mix-in-srgb-primary-36pct-transparent" lang="de" dir="ltr">
+    <article className="panel generated-reading-text learning-content border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 max-width-reading-measure mx-auto padding-clamp-22px-4vw-40px text-exact-clamp-1p03rem-2vw-1p14rem line-height-1p8 in-p-p:margin-top-1p15em uv-max720:p-4.5 uv-max720:line-height-1p72 rounded-exact-18px in-reading-target-word:inline in-reading-target-word:padding-0-2px in-reading-target-word:border-0 in-reading-target-word:rounded-exact-4px in-reading-target-word:bg-color-mix-in-srgb-primary-22pct-transparent in-reading-target-word:text-uv-primary-strong in-reading-target-word:font-inherit in-reading-target-word:font-680 in-reading-target-word:line-height-inherit in-reading-target-word:cursor-pointer in-reading-target-word:box-decoration-break-clone in-reading-target-word-hover:bg-color-mix-in-srgb-primary-36pct-transparent in-reading-target-word-aria-expanded-true:bg-color-mix-in-srgb-primary-36pct-transparent" lang="de" dir="ltr">
       {content.split(/\n{2,}/u).map((paragraph, paragraphIndex) => {
         if (!pattern) return <p key={paragraphIndex}>{paragraph}</p>;
         const pieces: React.ReactNode[] = [];
@@ -149,13 +149,13 @@ export function ReadingText({
       {active
         ? createPortal(
             <div
-              className="reading-word-popover fixed z-index-90 width-min-280px-calc-100vw-24px max-height-min-300px-calc-100dvh-24px overflow-auto grid gap-2.25 p-3.75 border-1px-solid-border-strong rounded-uv-rd65225386d bg-uv-surface-raised box-shadow-shadow text-uv-f9601fe81a7 line-height-1p4 in-p-2:m-0 in-p-2:overflow-wrap-anywhere in-text-link:mt-0.5 in-text-link:text-uv-fe9d5fd6635"
+              className="reading-word-popover fixed z-index-90 width-min-280px-calc-100vw-24px max-height-min-300px-calc-100dvh-24px overflow-auto grid gap-2.25 p-3.75 border-1px-solid-border-strong rounded-exact-14px bg-uv-surface-raised box-shadow-shadow text-exact-0p86rem line-height-1p4 in-p-2:m-0 in-p-2:overflow-wrap-anywhere in-text-link:mt-0.5 in-text-link:text-exact-0p78rem"
               ref={popoverRef}
               role="dialog"
               aria-label={t("reading.detail.meaningOf", { word: active.target.lemma })}
               style={{ top: active.top, insetInlineStart: active.inlineStart }}
             >
-              <div className="reading-word-popover-head grid gap-0.75 in-strong-2:text-uv-text in-strong-2:text-uv-f19feeb881c in-small:text-uv-text-muted">
+              <div className="reading-word-popover-head grid gap-0.75 in-strong-2:text-uv-text in-strong-2:text-exact-1rem in-small:text-uv-text-muted">
                 <strong className="learning-content" lang="de" dir="ltr">{formatLexemeLabel(active.target)}</strong>
                 <small>
                   {partOfSpeechKeys[active.target.partOfSpeech] ? t(partOfSpeechKeys[active.target.partOfSpeech]) : active.target.partOfSpeech.toLowerCase().replaceAll("_", " ")}

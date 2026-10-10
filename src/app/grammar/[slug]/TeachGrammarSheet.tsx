@@ -113,7 +113,7 @@ export function TeachGrammarSheet({
   return (
     <>
       <button
-        className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+        className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
         type="button"
         ref={triggerRef}
         onClick={() => {
@@ -141,7 +141,7 @@ export function TeachGrammarSheet({
               onClick={close}
             />
             <motion.section
-              className="teach-sheet grammar-teach-sheet relative z-index-1 width-min-640px-100pct max-height-min-76dvh-680px flex flex-col overflow-hidden border-1px-solid-border-strong border-0-3 rounded-uv-r36e46e09d8 bg-uv-surface box-shadow-shadow uv-max619:w-full in-teach-sheet-header-small:block in-teach-sheet-header-small:mt-1 in-teach-sheet-header-small:capitalize"
+              className="teach-sheet grammar-teach-sheet relative z-index-1 width-min-640px-100pct max-height-min-76dvh-680px flex flex-col overflow-hidden border-1px-solid-border-strong border-0-3 rounded-exact-24px-24px-0-0 bg-uv-surface box-shadow-shadow uv-max619:w-full in-teach-sheet-header-small:block in-teach-sheet-header-small:mt-1 in-teach-sheet-header-small:capitalize"
               role="dialog"
               aria-modal="true"
               aria-labelledby="grammar-teach-sheet-title"
@@ -155,10 +155,10 @@ export function TeachGrammarSheet({
                   : { type: "spring", stiffness: 340, damping: 34, mass: 0.9 }
               }
             >
-              <div className="teach-sheet-handle w-9.5 h-1 flex-0-0-auto margin-10px-auto-0 rounded-uv-red9ab892c5 bg-uv-border-strong" aria-hidden="true" />
-              <header className="teach-sheet-header flex items-start justify-between gap-4 padding-18px-22px-12px border-1px-solid-border in-h2:margin-4px-0-0 in-h2:text-uv-ff65c5a7834">
+              <div className="teach-sheet-handle w-9.5 h-1 flex-0-0-auto margin-10px-auto-0 rounded-exact-999px bg-uv-border-strong" aria-hidden="true" />
+              <header className="teach-sheet-header flex items-start justify-between gap-4 padding-18px-22px-12px border-1px-solid-border in-h2:margin-4px-0-0 in-h2:text-exact-clamp-1p35rem-4vw-1p8rem">
                 <div>
-                  <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("grammar.teach.eyebrow")}</p>
+                  <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("grammar.teach.eyebrow")}</p>
                   <h2 id="grammar-teach-sheet-title" className="learning-content" lang="en" dir="ltr">
                     {label}
                   </h2>
@@ -169,7 +169,7 @@ export function TeachGrammarSheet({
                   ) : null}
                 </div>
                 <button
-                  className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft min-height-tap-target"
+                  className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-exact-13px bg-uv-surface text-uv-text-soft min-height-tap-target"
                   type="button"
                   aria-label={t("grammar.teach.close")}
                   ref={closeRef}
@@ -186,14 +186,14 @@ export function TeachGrammarSheet({
                   </p>
                 ) : null}
                 {error ? (
-                  <p className="optimistic-error width-min-100pct-760px mx-auto grid grid-template-columns-20px-minmax-0-1fr-auto items-center gap-2.25 padding-10px-12px border-1px-solid-rgb-239-91-91-0p35 rounded-uv-r233710a71e bg-uv-c4aa6e841de text-uv-text-soft text-uv-f63777cce16 in-svg:text-uv-danger in-text-button:min-h-9 uv-max480:grid-template-columns-20px-minmax-0-1fr uv-max480:in-text-button:grid-column-2 uv-max480:in-text-button:justify-self-start" role="alert">
+                  <p className="optimistic-error width-min-100pct-760px mx-auto grid grid-template-columns-20px-minmax-0-1fr-auto items-center gap-2.25 padding-10px-12px border-1px-solid-rgb-239-91-91-0p35 rounded-exact-13px bg-uv-c4aa6e841de text-uv-text-soft text-exact-0p74rem in-svg:text-uv-danger in-text-button:min-h-9 uv-max480:grid-template-columns-20px-minmax-0-1fr uv-max480:in-text-button:grid-column-2 uv-max480:in-text-button:justify-self-start" role="alert">
                     {error}
                   </p>
                 ) : null}
                 {lesson ? (
                   <div
                     className={
-                      "teach-sheet-lesson line-height-1p7 overflow-wrap-anywhere in-teach-sheet-lesson-fa:text-right in-teach-sheet-lesson-en:text-left in-first-child:mt-0 in-last-child:mb-0 in-p-2:margin-0-0-14px in-ul:margin-0-0-14px in-ol:margin-0-0-14px in-blockquote:margin-0-0-14px in-h1:margin-18px-0-8px in-h1:text-uv-f19feeb881c in-h1:line-height-1p4 in-h2:margin-18px-0-8px in-h2:text-uv-f19feeb881c in-h2:line-height-1p4 in-h3:margin-18px-0-8px in-h3:text-uv-f19feeb881c in-h3:line-height-1p4 in-ul:padding-inline-start-1p4rem in-ol:padding-inline-start-1p4rem in-li-li:mt-1.5 in-strong-2:text-uv-text in-a:text-uv-primary-strong in-a:underline in-blockquote:ps-3 in-blockquote:border-2px-solid-primary in-blockquote:text-uv-text-soft in-pre:overflow-x-auto in-pre:p-3 in-pre:rounded-uv-r933cc73310 in-pre:bg-uv-surface-soft in-pre:direction-ltr in-pre:text-left in-code:direction-ltr in-code:unicode-bidi-isolate in-table:block in-table:max-w-full in-table:overflow-x-auto in-table:border-collapse in-th:padding-7px-10px in-th:border-1px-solid-border-2 in-td:padding-7px-10px in-td:border-1px-solid-border-2 teach-sheet-lesson--" + language
+                      "teach-sheet-lesson line-height-1p7 overflow-wrap-anywhere in-teach-sheet-lesson-fa:text-right in-teach-sheet-lesson-en:text-left in-first-child:mt-0 in-last-child:mb-0 in-p-2:margin-0-0-14px in-ul:margin-0-0-14px in-ol:margin-0-0-14px in-blockquote:margin-0-0-14px in-h1:margin-18px-0-8px in-h1:text-exact-1rem in-h1:line-height-1p4 in-h2:margin-18px-0-8px in-h2:text-exact-1rem in-h2:line-height-1p4 in-h3:margin-18px-0-8px in-h3:text-exact-1rem in-h3:line-height-1p4 in-ul:padding-inline-start-1p4rem in-ol:padding-inline-start-1p4rem in-li-li:mt-1.5 in-strong-2:text-uv-text in-a:text-uv-primary-strong in-a:underline in-blockquote:ps-3 in-blockquote:border-2px-solid-primary in-blockquote:text-uv-text-soft in-pre:overflow-x-auto in-pre:p-3 in-pre:rounded-exact-10px in-pre:bg-uv-surface-soft in-pre:direction-ltr in-pre:text-left in-code:direction-ltr in-code:unicode-bidi-isolate in-table:block in-table:max-w-full in-table:overflow-x-auto in-table:border-collapse in-th:padding-7px-10px in-th:border-1px-solid-border-2 in-td:padding-7px-10px in-td:border-1px-solid-border-2 teach-sheet-lesson--" + language
                     }
                     dir={language === "fa" ? "rtl" : "ltr"}
                     lang={language}
@@ -207,7 +207,7 @@ export function TeachGrammarSheet({
 
               <div className="teach-sheet-footer flex justify-end padding-12px-22px-max-16px-env-safe-area-inset-bottom border-1px-solid-border-3">
                 <button
-                  className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+                  className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
                   type="button"
                   disabled={loading}
                   onClick={() => void generate(angle)}

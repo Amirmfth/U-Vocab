@@ -105,15 +105,15 @@ export function BattleRunner({
 
   if (!current || (mode === "TIMED" && remaining <= 0)) {
     return (
-      <section className="panel battle-finished border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-4.5 in-h2:m-0 in-h2:text-uv-fd69b9c5786 in-h2:line-height-1p25 in-h2:letter-spacing-0p035em rounded-uv-r6d27d54c6c">
-        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">BATTLE COMPLETE</p>
+      <section className="panel battle-finished border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-4.5 in-h2:m-0 in-h2:text-exact-clamp-1p3rem-6vw-2rem in-h2:line-height-1p25 in-h2:letter-spacing-0p035em rounded-exact-18px">
+        <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">BATTLE COMPLETE</p>
         <h2>{score} points</h2>
         <p className="muted text-uv-text-muted">
           {Math.min(answered, questions.length)} / {questions.length} answered
         </p>
         <button
           type="button"
-          className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
+          className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"
           disabled={pending}
           onClick={() =>
             startTransition(async () => {
@@ -165,7 +165,7 @@ export function BattleRunner({
 
   return (
     <section className="battle-runner flex flex-col gap-3.5">
-      <div className="battle-hud grid grid-template-columns-1fr-auto-1fr items-center gap-2.5 min-h-10.5 padding-0-2px text-uv-text-muted text-uv-f823f1262bd in-strong-2:text-uv-text in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:text-uv-f19feeb881c in-last-child:justify-self-end">
+      <div className="battle-hud grid grid-template-columns-1fr-auto-1fr items-center gap-2.5 min-h-10.5 padding-0-2px text-uv-text-muted text-exact-0p75rem in-strong-2:text-uv-text in-strong-2:font-font-geist-mono-geist-mono-monospace in-strong-2:text-exact-1rem in-last-child:justify-self-end">
         <span>{index + 1}/{questions.length}</span>
         <strong>{score} pts</strong>
         {mode === "TIMED" ? (
@@ -178,7 +178,7 @@ export function BattleRunner({
       <AnimatePresence mode="wait" initial={false}>
         <motion.article
           key={current.id}
-          className="panel battle-question-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-4.5 in-h2:m-0 in-h2:text-uv-fd69b9c5786 in-h2:line-height-1p25 in-h2:letter-spacing-0p035em rounded-uv-r6d27d54c6c"
+          className="panel battle-question-card border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-4.5 in-h2:m-0 in-h2:text-exact-clamp-1p3rem-6vw-2rem in-h2:line-height-1p25 in-h2:letter-spacing-0p035em rounded-exact-18px"
           initial={reduceMotion ? false : { opacity: 0, x: 30, scale: 0.99 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -36, scale: 0.985 }}
@@ -194,7 +194,7 @@ export function BattleRunner({
                 <button
                   type="button"
                   className={[
-                    "battle-option font-inherit min-h-14.5 w-full flex items-center justify-between gap-3 padding-13px-15px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-uv-text text-left cursor-pointer transition-transform-140ms-ease-border-color-140ms-ease-backgro in-hover-not-disabled:border-uv-border-strong in-hover-not-disabled:bg-uv-surface-raised in-hover-not-disabled:transform-translatey-1px in-focus-visible-not-disabled:border-uv-border-strong in-focus-visible-not-disabled:bg-uv-surface-raised in-focus-visible-not-disabled:transform-translatey-1px disabled:cursor-default in-is-selected:border-uv-border-strong in-is-selected:bg-uv-surface-raised in-is-correct:border-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-wrong:border-uv-danger in-is-wrong:bg-uv-c8b3083dabe in-is-correct-svg:text-uv-success in-is-wrong-svg:text-uv-danger",
+                    "battle-option font-inherit min-h-14.5 w-full flex items-center justify-between gap-3 padding-13px-15px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-uv-text text-left cursor-pointer transition-transform-140ms-ease-border-color-140ms-ease-backgro in-hover-not-disabled:border-uv-border-strong in-hover-not-disabled:bg-uv-surface-raised in-hover-not-disabled:transform-translatey-1px in-focus-visible-not-disabled:border-uv-border-strong in-focus-visible-not-disabled:bg-uv-surface-raised in-focus-visible-not-disabled:transform-translatey-1px disabled:cursor-default in-is-selected:border-uv-border-strong in-is-selected:bg-uv-surface-raised in-is-correct:border-uv-success in-is-correct:bg-uv-cafddaf6a65 in-is-wrong:border-uv-danger in-is-wrong:bg-uv-c8b3083dabe in-is-correct-svg:text-uv-success in-is-wrong-svg:text-uv-danger",
                     selected === option ? "is-selected" : "",
                     isCorrect ? "is-correct" : "",
                     isWrong ? "is-wrong" : "",
@@ -210,10 +210,10 @@ export function BattleRunner({
             })}
           </div>
 
-          {saveError ? <div className="battle-feedback is-wrong flex items-start gap-2.25 p-3 rounded-uv-r0939007802 in-is-correct:bg-uv-cb0392f6948 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8ae00eb793 in-is-wrong:text-uv-danger in-div:flex in-div:flex-col in-div:gap-0.75 in-span:text-uv-text-muted in-span:line-height-1p4 in-is-pending:text-uv-text-muted in-is-pending:bg-uv-surface-raised" role="status">{saveError}</div> : null}
+          {saveError ? <div className="battle-feedback is-wrong flex items-start gap-2.25 p-3 rounded-exact-12px in-is-correct:bg-uv-cb0392f6948 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8ae00eb793 in-is-wrong:text-uv-danger in-div:flex in-div:flex-col in-div:gap-0.75 in-span:text-uv-text-muted in-span:line-height-1p4 in-is-pending:text-uv-text-muted in-is-pending:bg-uv-surface-raised" role="status">{saveError}</div> : null}
 
           {result ? (
-            <div className={"battle-feedback flex items-start gap-2.25 p-3 rounded-uv-r0939007802 in-is-correct:bg-uv-cb0392f6948 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8ae00eb793 in-is-wrong:text-uv-danger in-div:flex in-div:flex-col in-div:gap-0.75 in-span:text-uv-text-muted in-span:line-height-1p4 in-is-pending:text-uv-text-muted in-is-pending:bg-uv-surface-raised " + (result.correct ? "is-correct" : "is-wrong")} role="status">
+            <div className={"battle-feedback flex items-start gap-2.25 p-3 rounded-exact-12px in-is-correct:bg-uv-cb0392f6948 in-is-correct:text-uv-success in-is-wrong:bg-uv-c8ae00eb793 in-is-wrong:text-uv-danger in-div:flex in-div:flex-col in-div:gap-0.75 in-span:text-uv-text-muted in-span:line-height-1p4 in-is-pending:text-uv-text-muted in-is-pending:bg-uv-surface-raised " + (result.correct ? "is-correct" : "is-wrong")} role="status">
               {result.correct ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
               <div>
                 <strong>

@@ -190,10 +190,10 @@ export async function GrammarProgressPanel({
   }
 
   return (
-    <section className="panel grammar-progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4.5 mb-5.5 rounded-uv-r6d27d54c6c">
-      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-uv-f24126b21bc in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
+    <section className="panel grammar-progress-panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 grid gap-4.5 mb-5.5 rounded-exact-18px">
+      <div className="section-heading flex items-center justify-between gap-3 in-h2:margin-5px-0-0 in-h2:text-exact-1p1rem in-h2:letter-spacing-0p025em mb-3 text-uv-text-soft">
         <div>
-          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("progress.grammar.eyebrow")}</p>
+          <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("progress.grammar.eyebrow")}</p>
           <h2>
             {currentLevel} → {targetLevel}
           </h2>
@@ -201,9 +201,9 @@ export async function GrammarProgressPanel({
         <GraduationCap size={20} />
       </div>
 
-      <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-uv-f58b84cc6f5 line-height-1p5">{t("progress.grammar.description")}</p>
+      <p className="analytics-caveat margin-14px-0-0 text-uv-text-muted text-exact-0p7rem line-height-1p5">{t("progress.grammar.description")}</p>
 
-      <div className="grammar-progress-status-grid grid grid-template-columns-repeat-2-minmax-0-1fr gap-2 in-div:grid in-div:gap-0.75 in-div:p-3 in-div:border-1px-solid-border-2 in-div:rounded-uv-r0939007802 in-strong-2:text-uv-fffcebd47f5 in-span:text-uv-text-muted in-span:text-uv-ff1713651e0 uv-min620:grid-template-columns-repeat-5-minmax-0-1fr">
+      <div className="grammar-progress-status-grid grid grid-template-columns-repeat-2-minmax-0-1fr gap-2 in-div:grid in-div:gap-0.75 in-div:p-3 in-div:border-1px-solid-border-2 in-div:rounded-exact-12px in-strong-2:text-exact-1p2rem in-span:text-uv-text-muted in-span:text-exact-0p72rem uv-min620:grid-template-columns-repeat-5-minmax-0-1fr">
         {(
           [
             "STRONG",
@@ -220,7 +220,7 @@ export async function GrammarProgressPanel({
         ))}
       </div>
 
-      <div className="grammar-progress-evidence text-uv-text-muted text-uv-ff1713651e0 flex flex-wrap gap-3">
+      <div className="grammar-progress-evidence text-uv-text-muted text-exact-0p72rem flex flex-wrap gap-3">
         <span>
           <strong>{formatNumber(locale, demonstrated)}</strong>{" "}
           {t("progress.grammar.demonstrated", {
@@ -236,9 +236,9 @@ export async function GrammarProgressPanel({
       </div>
 
       {!compact && byLevel.length ? (
-        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-exact-0p86rem">
           <h3>{t("progress.grammar.byLevel")}</h3>
-          <div className="grammar-profile-breakdown grid gap-2 in-div:grid in-div:grid-template-columns-minmax-0-1fr-auto in-div:gap-3px-10px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-strong-2:capitalize in-span:text-uv-text-muted in-span:text-uv-f58b84cc6f5 in-small:text-uv-text-muted in-small:text-uv-f58b84cc6f5 in-small:grid-column-1-1">
+          <div className="grammar-profile-breakdown grid gap-2 in-div:grid in-div:grid-template-columns-minmax-0-1fr-auto in-div:gap-3px-10px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-strong-2:capitalize in-span:text-uv-text-muted in-span:text-exact-0p7rem in-small:text-uv-text-muted in-small:text-exact-0p7rem in-small:grid-column-1-1">
             {byLevel.map((group) => (
               <div key={group.label}>
                 <strong>{group.label}</strong>
@@ -255,9 +255,9 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && byCategory.length ? (
-        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-exact-0p86rem">
           <h3>{t("progress.grammar.byCategory")}</h3>
-          <div className="grammar-profile-breakdown grid gap-2 in-div:grid in-div:grid-template-columns-minmax-0-1fr-auto in-div:gap-3px-10px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-strong-2:capitalize in-span:text-uv-text-muted in-span:text-uv-f58b84cc6f5 in-small:text-uv-text-muted in-small:text-uv-f58b84cc6f5 in-small:grid-column-1-1">
+          <div className="grammar-profile-breakdown grid gap-2 in-div:grid in-div:grid-template-columns-minmax-0-1fr-auto in-div:gap-3px-10px in-div:padding-10px-0 in-div:border-1px-solid-border-3 in-strong-2:capitalize in-span:text-uv-text-muted in-span:text-exact-0p7rem in-small:text-uv-text-muted in-small:text-exact-0p7rem in-small:grid-column-1-1">
             {byCategory.map((group) => (
               <div key={group.category}>
                 <strong>{t(categoryKeys[group.category])}</strong>
@@ -274,12 +274,12 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && weaknesses.length ? (
-        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-exact-0p86rem">
           <h3>{t("progress.grammar.needsAttention")}</h3>
           <div className="collection-list flex flex-col">
             {weaknesses.map((item) => (
               <Link
-                className="collection-row border-1px-solid-border min-h-16 grid grid-template-columns-minmax-0-1fr-auto items-center gap-3 padding-11px-2px in-strong-2:block in-span:block in-span:mt-0.75 in-span:text-uv-text-muted in-span:text-uv-f74fc13de71 uv-min940:hover:bg-uv-surface"
+                className="collection-row border-1px-solid-border min-h-16 grid grid-template-columns-minmax-0-1fr-auto items-center gap-3 padding-11px-2px in-strong-2:block in-span:block in-span:mt-0.75 in-span:text-uv-text-muted in-span:text-exact-0p76rem uv-min940:hover:bg-uv-surface"
                 href={"/practice?grammar=" + item.grammarConcept.slug}
                 key={item.id}
               >
@@ -305,7 +305,7 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && transitions.length ? (
-        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-exact-0p86rem">
           <h3>{t("progress.grammar.recentChanges")}</h3>
           <div className="weakness-list flex flex-col in-div:min-h-10.5 in-div:flex in-div:items-center in-div:justify-between in-div:gap-3 in-div:border-1px-solid-border in-div-last-child:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-strong-2:text-uv-text-muted in-strong-2:font-font-geist-mono-geist-mono-monospace">
             {transitions.map((transition) => (
@@ -326,7 +326,7 @@ export async function GrammarProgressPanel({
       ) : null}
 
       {!compact && recentEvidence.length ? (
-        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-uv-f9601fe81a7">
+        <div className="grammar-progress-section grid gap-2.5 in-h3:m-0 in-h3:text-exact-0p86rem">
           <h3>{t("progress.grammar.recentEvidence")}</h3>
           <div className="weakness-list flex flex-col in-div:min-h-10.5 in-div:flex in-div:items-center in-div:justify-between in-div:gap-3 in-div:border-1px-solid-border in-div-last-child:border-0-3 in-span:text-uv-text-soft in-span:capitalize in-strong-2:text-uv-text-muted in-strong-2:font-font-geist-mono-geist-mono-monospace">
             {recentEvidence.slice(0, 5).map((evidence) => (
@@ -351,7 +351,7 @@ export async function GrammarProgressPanel({
         </div>
       ) : null}
 
-      <Link href="/grammar" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
+      <Link href="/grammar" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
         {t("progress.grammar.openProfile")}{" "}
         <ArrowRight className="rtl-mirror" size={16} />
       </Link>

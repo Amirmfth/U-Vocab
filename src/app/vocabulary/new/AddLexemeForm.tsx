@@ -147,14 +147,14 @@ export function AddLexemeForm({ translationPreference }: {
 
   return (
     <div className="import-workspace flex flex-col gap-3.5 w-full max-w-uv-d1f4d3e141">
-      <div className="import-tabs flex gap-1 p-1 w-fit rounded-uv-r0939007802 bg-uv-surface-raised border-1px-solid-border-2 in-button-3:padding-8px-18px in-button-3:border-0 in-button-3:rounded-uv-r22be94e0a1 in-button-3:bg-transparent in-button-3:text-uv-text-muted in-button-3:cursor-pointer in-button-aria-selected-true:bg-uv-surface in-button-aria-selected-true:text-uv-text in-button-aria-selected-true:box-shadow-0-1px-4px-rgb-0-0-0-0p12" role="tablist" aria-label={t("vocab.add.input")}>
+      <div className="import-tabs flex gap-1 p-1 w-fit rounded-exact-12px bg-uv-surface-raised border-1px-solid-border-2 in-button-3:padding-8px-18px in-button-3:border-0 in-button-3:rounded-exact-9px in-button-3:bg-transparent in-button-3:text-uv-text-muted in-button-3:cursor-pointer in-button-aria-selected-true:bg-uv-surface in-button-aria-selected-true:text-uv-text in-button-aria-selected-true:box-shadow-0-1px-4px-rgb-0-0-0-0p12" role="tablist" aria-label={t("vocab.add.input")}>
         <button type="button" role="tab" aria-selected={tab === "text"} onClick={() => setTab("text")} disabled={processing}>{t("vocab.add.text")}</button>
         <button type="button" role="tab" aria-selected={tab === "csv"} onClick={() => setTab("csv")} disabled={processing}>{t("vocab.add.csv")}</button>
       </div>
 
       {tab === "text" ? (
         <form action={previewAction} className="form-panel w-full max-w-uv-74487d394e">
-          <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-uv-f845cf53f3a in-label:font-560">
+          <div className="field flex flex-col gap-2 in-label:text-uv-text-soft in-label:text-exact-0p83rem in-label:font-560">
             <textarea id="text" name="text" placeholder={t("vocab.add.textPlaceholder")} lang="de" dir="ltr" rows={8} autoComplete="off" required disabled={processing} />
           </div>
           {preview.status === "error" ? <StatusNotice tone="error">{preview.message}</StatusNotice> : null}
@@ -168,13 +168,13 @@ export function AddLexemeForm({ translationPreference }: {
             if (file) updateCsv(await file.text());
             event.target.value = "";
           }} />
-          <button type="button" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={() => fileRef.current?.click()} disabled={processing}><Upload size={17} /> {t("vocab.add.upload")}</button>
+          <button type="button" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={() => fileRef.current?.click()} disabled={processing}><Upload size={17} /> {t("vocab.add.upload")}</button>
         </div>
       )}
 
       {rows.length > 0 ? (
-        <section className="panel import-preview border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 rounded-uv-r6d27d54c6c">
-          <div className="import-preview-head flex flex-col gap-1.25 in-h2:margin-3px-0-0 in-h2:text-uv-f19feeb881c in-h2:letter-spacing-0p02em-2 uv-min760:flex-row uv-min760:items-center uv-min760:justify-between">
+        <section className="panel import-preview border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex flex-col gap-3.5 rounded-exact-18px">
+          <div className="import-preview-head flex flex-col gap-1.25 in-h2:margin-3px-0-0 in-h2:text-exact-1rem in-h2:letter-spacing-0p02em-2 uv-min760:flex-row uv-min760:items-center uv-min760:justify-between">
             <h2>{tab === "csv" ? t("vocab.add.words", { count: formatNumber(locale, rows.length) }) : preview.message}</h2>
             <span className="muted text-uv-text-muted">{t("vocab.add.select")}</span>
           </div>
@@ -183,18 +183,18 @@ export function AddLexemeForm({ translationPreference }: {
             {rows.map((row) => {
               const status = statuses[row.key];
               return (
-                <label className={`import-row grid grid-template-columns-auto-minmax-0-1fr-2 gap-3 items-start padding-14px-0 border-1px-solid-border cursor-pointer in-input-2:w-4.5 in-input-2:h-4.5 in-input-2:min-h-auto in-input-2:margin-3px-0-0${status?.state === "saved" ? " import-row--saved px-3 rounded-uv-r933cc73310 bg-uv-cecaca9698c cursor-default" : ""}`} key={row.key}>
+                <label className={`import-row grid grid-template-columns-auto-minmax-0-1fr-2 gap-3 items-start padding-14px-0 border-1px-solid-border cursor-pointer in-input-2:w-4.5 in-input-2:h-4.5 in-input-2:min-h-auto in-input-2:margin-3px-0-0${status?.state === "saved" ? " import-row--saved px-3 rounded-exact-10px bg-uv-cecaca9698c cursor-default" : ""}`} key={row.key}>
                   {status?.state === "loading" ? <LoaderCircle className="import-row-spinner flex-none animation-import-spin-0p8s-linear-infinite" size={20} aria-label={t("vocab.add.adding")} />
                     : status?.state === "saved" ? <Check className="import-row-check text-uv-ccbecfd37ca mt-0.5" size={20} aria-label={t("vocab.add.added")} />
                       : <input type="checkbox" checked={selected.has(row.key)} onChange={() => toggle(row.key)} disabled={processing} />}
-                  <div className="import-row-copy min-w-0 flex flex-col gap-1.25 in-span-2:text-uv-text-muted in-span-2:text-uv-fe9d5fd6635 in-span-2:line-height-1p45 in-small-2:text-uv-text-muted in-small-2:text-uv-fe9d5fd6635 in-small-2:line-height-1p45">
+                  <div className="import-row-copy min-w-0 flex flex-col gap-1.25 in-span-2:text-uv-text-muted in-span-2:text-exact-0p78rem in-span-2:line-height-1p45 in-small-2:text-uv-text-muted in-small-2:text-exact-0p78rem in-small-2:line-height-1p45">
                     <div className="word-meta flex flex-wrap gap-1.75 items-center">
                       <strong className="learning-content" lang="de" dir="ltr">{row.label}</strong>
                       {row.candidate ? (
                         <>
-                          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{row.candidate.partOfSpeech}</span>
-                          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{row.candidate.cefrLevel}</span>
-                          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{row.candidate.userVocabularyId ? t("vocab.add.inVocabulary") : t("vocab.add.new")}</span>
+                          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{row.candidate.partOfSpeech}</span>
+                          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{row.candidate.cefrLevel}</span>
+                          <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{row.candidate.userVocabularyId ? t("vocab.add.inVocabulary") : t("vocab.add.new")}</span>
                         </>
                       ) : null}
                     </div>
@@ -205,13 +205,13 @@ export function AddLexemeForm({ translationPreference }: {
                         {row.candidate.pattern ? <small className="learning-content" lang="de" dir="ltr">{row.candidate.pattern}</small> : null}
                       </>
                     ) : null}
-                    {status?.state === "error" ? <small className="optimistic-error width-min-100pct-760px mx-auto grid grid-template-columns-20px-minmax-0-1fr-auto items-center gap-2.25 padding-10px-12px border-1px-solid-rgb-239-91-91-0p35 rounded-uv-r233710a71e bg-uv-c4aa6e841de text-uv-text-soft text-uv-f63777cce16 in-svg:text-uv-danger in-text-button:min-h-9 uv-max480:grid-template-columns-20px-minmax-0-1fr uv-max480:in-text-button:grid-column-2 uv-max480:in-text-button:justify-self-start">{status.message}</small> : null}
+                    {status?.state === "error" ? <small className="optimistic-error width-min-100pct-760px mx-auto grid grid-template-columns-20px-minmax-0-1fr-auto items-center gap-2.25 padding-10px-12px border-1px-solid-rgb-239-91-91-0p35 rounded-exact-13px bg-uv-c4aa6e841de text-uv-text-soft text-exact-0p74rem in-svg:text-uv-danger in-text-button:min-h-9 uv-max480:grid-template-columns-20px-minmax-0-1fr uv-max480:in-text-button:grid-column-2 uv-max480:in-text-button:justify-self-start">{status.message}</small> : null}
                   </div>
                 </label>
               );
             })}
           </div>
-          <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="button" onClick={addSelected} disabled={processing || remaining === 0}>
+          <button className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="button" onClick={addSelected} disabled={processing || remaining === 0}>
             {processing ? <LoaderCircle className="import-row-spinner flex-none animation-import-spin-0p8s-linear-infinite" size={18} /> : <Check size={18} />}
             {processing
               ? t("vocab.add.addingWords")

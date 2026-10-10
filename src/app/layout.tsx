@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body>
         <I18nProvider locale={locale}>
-          <a className="skip-link fixed z-index-200 top-max-10px-env-safe-area-inset-top left-3 padding-10px-13px border-1px-solid-border-strong rounded-uv-r0939007802 bg-uv-text text-uv-bg text-uv-f6c2d68ddb8 font-bold transform-translatey-160pct transition-transform-140ms-ease focus:transform-translatey-0" href="#main-content">
+          <a className="skip-link fixed z-index-200 top-max-10px-env-safe-area-inset-top left-3 padding-10px-13px border-1px-solid-border-strong rounded-exact-12px bg-uv-text text-uv-bg text-exact-0p8rem font-bold transform-translatey-160pct transition-transform-140ms-ease focus:transform-translatey-0" href="#main-content">
             {t("layout.skipToContent")}
           </a>
           {authenticated ? <WebVitals /> : null}

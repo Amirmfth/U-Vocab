@@ -48,8 +48,8 @@ function ReadingDetail({
   return (
     <>
       <div className="word-meta flex flex-wrap gap-1.75 items-center">
-        <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em">{selected.partOfSpeech}</span>
-        <span className={"badge reading-state min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-uv-red9ab892c5 text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-uv-fe22288a701 letter-spacing-0p02em in-reading-state-known:text-uv-text-soft in-reading-state-learning:text-uv-cf9b86be2da in-reading-state-unknown:text-uv-primary-strong reading-state-" + selected.state.toLocaleLowerCase()}>
+        <span className="badge min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em">{selected.partOfSpeech}</span>
+        <span className={"badge reading-state min-h-6.5 inline-flex items-center padding-0-9px border-1px-solid-border-2 rounded-exact-999px text-uv-text-soft bg-uv-surface-raised font-font-geist-mono-geist-mono-monospace text-exact-0p67rem letter-spacing-0p02em in-reading-state-known:text-uv-text-soft in-reading-state-learning:text-uv-cf9b86be2da in-reading-state-unknown:text-uv-primary-strong reading-state-" + selected.state.toLocaleLowerCase()}>
           {selected.state.toLocaleLowerCase()}
         </span>
       </div>
@@ -77,7 +77,7 @@ function ReadingDetail({
 
       {selected.patterns.length ? (
         <div className="reading-detail-section in-p-2:margin-5px-0 in-p-2:line-height-1p55 pt-3 border-1px-solid-border-3">
-          <span className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">PATTERN</span>
+          <span className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">PATTERN</span>
           {selected.patterns.map((pattern) => (
             <div key={pattern.pattern}>
               <strong>{pattern.pattern}</strong>
@@ -89,10 +89,10 @@ function ReadingDetail({
 
       {selected.collocations.length ? (
         <div className="reading-detail-section in-p-2:margin-5px-0 in-p-2:line-height-1p55 pt-3 border-1px-solid-border-3">
-          <span className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">COLLOCATIONS</span>
+          <span className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">COLLOCATIONS</span>
           <div className="relation-list flex flex-wrap gap-2">
             {selected.collocations.map((collocation) => (
-              <span className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-uv-ff7862da171" key={collocation}>
+              <span className="relation-chip min-h-12 min-w-27.5 inline-flex flex-col justify-center gap-0.75 padding-8px-12px border-1px-solid-border-2 rounded-exact-14px bg-uv-surface-raised in-span:font-semibold in-small:text-uv-text-muted in-small:text-exact-0p66rem" key={collocation}>
                 <span>{collocation}</span>
               </span>
             ))}
@@ -102,7 +102,7 @@ function ReadingDetail({
 
       {selected.examples[0] ? (
         <div className="reading-detail-section in-p-2:margin-5px-0 in-p-2:line-height-1p55 pt-3 border-1px-solid-border-3">
-          <span className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">EXAMPLE</span>
+          <span className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">EXAMPLE</span>
           <p>{selected.examples[0].german}</p>
         </div>
       ) : null}
@@ -110,7 +110,7 @@ function ReadingDetail({
       {selected.state === "UNKNOWN" ? (
         <AddReadingLexemeForm documentId={documentId} lexemeId={selected.lexemeId} />
       ) : (
-        <Link href={"/vocabulary/" + selected.lexemeId} className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
+        <Link href={"/vocabulary/" + selected.lexemeId} className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">
           <BookOpenCheck size={17} />
           Open word
         </Link>
@@ -229,16 +229,16 @@ export function ReadingViewer({
   return (
     <div className="reading-layout grid grid-template-columns-1fr gap-3.5 items-start uv-min760:grid-template-columns-minmax-0-1p7fr-minmax-250px-0p8fr uv-min760:gap-6">
       <article className="reading-text-panel min-w-0">
-        <div className="reading-legend flex flex-wrap gap-3 mb-3 text-uv-text-muted text-uv-ff1713651e0 in-span:inline-flex in-span:items-center in-span:gap-1.5">
-          <span><i className="legend-dot known w-2 h-2 rounded-uv-red9ab892c5 inline-block in-known:bg-uv-ceb5d327b54 in-learning:bg-uv-warning in-unknown:bg-uv-primary-strong" /> known</span>
-          <span><i className="legend-dot learning w-2 h-2 rounded-uv-red9ab892c5 inline-block in-known:bg-uv-ceb5d327b54 in-learning:bg-uv-warning in-unknown:bg-uv-primary-strong" /> learning</span>
-          <span><i className="legend-dot unknown w-2 h-2 rounded-uv-red9ab892c5 inline-block in-known:bg-uv-ceb5d327b54 in-learning:bg-uv-warning in-unknown:bg-uv-primary-strong" /> unknown</span>
+        <div className="reading-legend flex flex-wrap gap-3 mb-3 text-uv-text-muted text-exact-0p72rem in-span:inline-flex in-span:items-center in-span:gap-1.5">
+          <span><i className="legend-dot known w-2 h-2 rounded-exact-999px inline-block in-known:bg-uv-ceb5d327b54 in-learning:bg-uv-warning in-unknown:bg-uv-primary-strong" /> known</span>
+          <span><i className="legend-dot learning w-2 h-2 rounded-exact-999px inline-block in-known:bg-uv-ceb5d327b54 in-learning:bg-uv-warning in-unknown:bg-uv-primary-strong" /> learning</span>
+          <span><i className="legend-dot unknown w-2 h-2 rounded-exact-999px inline-block in-known:bg-uv-ceb5d327b54 in-learning:bg-uv-warning in-unknown:bg-uv-primary-strong" /> unknown</span>
         </div>
-        <div className="reading-text whitespace-pre-wrap text-uv-text-soft text-uv-fe3296cd469 line-height-2">{rendered}</div>
+        <div className="reading-text whitespace-pre-wrap text-uv-text-soft text-exact-clamp-1p05rem-3p8vw-1p22rem line-height-2">{rendered}</div>
       </article>
 
       {selected ? (
-        <aside className="panel reading-detail reading-detail-desktop border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex-col gap-3.5 in-h2:m-0 in-h2:text-uv-f3951047c34 in-h2:letter-spacing-0p035em uv-min760:sticky uv-min760:top-7.5 uv-min760:flex rounded-uv-r6d27d54c6c hidden uv-min940:flex uv-min940:sticky uv-min940:top-7 uv-min940:max-height-calc-100dvh-56px uv-min940:overflow-y-auto uv-min940:overscroll-contain">
+        <aside className="panel reading-detail reading-detail-desktop border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex-col gap-3.5 in-h2:m-0 in-h2:text-exact-1p35rem in-h2:letter-spacing-0p035em uv-min760:sticky uv-min760:top-7.5 uv-min760:flex rounded-exact-18px hidden uv-min940:flex uv-min940:sticky uv-min940:top-7 uv-min940:max-height-calc-100dvh-56px uv-min940:overflow-y-auto uv-min940:overscroll-contain">
           <ReadingDetail
             documentId={documentId}
             selected={selected}
@@ -246,7 +246,7 @@ export function ReadingViewer({
           />
         </aside>
       ) : (
-        <aside className="panel reading-detail reading-detail-desktop border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex-col gap-3.5 in-h2:m-0 in-h2:text-uv-f3951047c34 in-h2:letter-spacing-0p035em uv-min760:sticky uv-min760:top-7.5 uv-min760:flex rounded-uv-r6d27d54c6c hidden uv-min940:flex uv-min940:sticky uv-min940:top-7 uv-min940:max-height-calc-100dvh-56px uv-min940:overflow-y-auto uv-min940:overscroll-contain">
+        <aside className="panel reading-detail reading-detail-desktop border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 flex-col gap-3.5 in-h2:m-0 in-h2:text-exact-1p35rem in-h2:letter-spacing-0p035em uv-min760:sticky uv-min760:top-7.5 uv-min760:flex rounded-exact-18px hidden uv-min940:flex uv-min940:sticky uv-min940:top-7 uv-min940:max-height-calc-100dvh-56px uv-min940:overflow-y-auto uv-min940:overscroll-contain">
           <Plus size={18} />
           <p className="muted text-uv-text-muted">Select highlighted vocabulary to inspect it.</p>
         </aside>
@@ -271,20 +271,20 @@ export function ReadingViewer({
               animate={{ opacity: 1, y: 0 }}
               aria-label={`Details for ${selected.lemma}`}
               aria-modal="true"
-              className="panel reading-detail reading-detail-mobile border-1px-solid-border-2 flex flex-col gap-3.5 in-h2:m-0 in-h2:text-uv-f3951047c34 in-h2:letter-spacing-0p035em uv-min760:sticky uv-min760:top-7.5 uv-min760:hidden fixed z-index-70 inset-auto-10px-calc-82px-env-safe-area-inset-bottom-10px w-auto max-height-min-66dvh-620px overflow-y-auto overscroll-contain padding-10px-16px-18px border-uv-border-strong rounded-uv-r42d92f3218 bg-uv-surface box-shadow-0-24px-70px-rgb-0-0-0-0p5 uv-min940:hidden"
+              className="panel reading-detail reading-detail-mobile border-1px-solid-border-2 flex flex-col gap-3.5 in-h2:m-0 in-h2:text-exact-1p35rem in-h2:letter-spacing-0p035em uv-min760:sticky uv-min760:top-7.5 uv-min760:hidden fixed z-index-70 inset-auto-10px-calc-82px-env-safe-area-inset-bottom-10px w-auto max-height-min-66dvh-620px overflow-y-auto overscroll-contain padding-10px-16px-18px border-uv-border-strong rounded-exact-22px bg-uv-surface box-shadow-0-24px-70px-rgb-0-0-0-0p5 uv-min940:hidden"
               exit={{ opacity: 0, y: 28 }}
               initial={reduceMotion ? false : { opacity: 0, y: 28 }}
               key="reading-mobile-detail"
               role="dialog"
               transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
             >
-              <div className="reading-sheet-handle w-9.5 h-1 margin-0-auto-7px rounded-uv-red9ab892c5 bg-uv-border-strong" aria-hidden="true" />
-              <div className="reading-sheet-header flex items-center justify-between gap-3 min-h-11 mb-0.75 in-span-2:text-uv-text-muted in-span-2:text-uv-f58b84cc6f5 in-span-2:font-650 in-span-2:letter-spacing-0p05em in-span-2:uppercase in-icon-button:w-10 in-icon-button:h-10 in-icon-button:min-h-10 in-icon-button:border-0 in-icon-button:bg-transparent">
+              <div className="reading-sheet-handle w-9.5 h-1 margin-0-auto-7px rounded-exact-999px bg-uv-border-strong" aria-hidden="true" />
+              <div className="reading-sheet-header flex items-center justify-between gap-3 min-h-11 mb-0.75 in-span-2:text-uv-text-muted in-span-2:text-exact-0p7rem in-span-2:font-650 in-span-2:letter-spacing-0p05em in-span-2:uppercase in-icon-button:w-10 in-icon-button:h-10 in-icon-button:min-h-10 in-icon-button:border-0 in-icon-button:bg-transparent">
                 <span>Word details</span>
                 <button
                   ref={closeButtonRef}
                   aria-label="Close word details"
-                  className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-uv-r233710a71e bg-uv-surface text-uv-text-soft min-height-tap-target"
+                  className="icon-button w-11 h-11 grid place-items-center border-1px-solid-border-2 rounded-exact-13px bg-uv-surface text-uv-text-soft min-height-tap-target"
                   type="button"
                   onClick={() => setMobileOpen(false)}
                 >

@@ -108,26 +108,26 @@ export function OnboardingWizard({
 
   return (
     <main className="onboarding-page min-h-dvh grid place-items-center padding-clamp-1rem-4vw-3rem uv-max640:items-start uv-max640:padding-0p75rem">
-      <section className="onboarding-shell panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 width-min-100pct-720px grid gap-1p5rem uv-max640:rounded-uv-r6d27d54c6c rounded-uv-r6d27d54c6c">
-        <div className="onboarding-progress grid gap-0p6rem text-uv-fa2582d5d6e text-uv-c7dbd63a13e" aria-label={t("onboarding.progress", { step, total: ONBOARDING_STEP_COUNT })}>
+      <section className="onboarding-shell panel border-1px-solid-border-2 bg-linear-gradient-180deg-rgb-255-255-255-0p025-transparent-sur box-shadow-inset-0-1px-0-rgb-255-255-255-0p025 p-4.5 width-min-100pct-720px grid gap-1p5rem uv-max640:rounded-exact-18px rounded-exact-18px">
+        <div className="onboarding-progress grid gap-0p6rem text-exact-0p82rem text-uv-c7dbd63a13e" aria-label={t("onboarding.progress", { step, total: ONBOARDING_STEP_COUNT })}>
           <span>{t("onboarding.step", { step, total: ONBOARDING_STEP_COUNT })}</span>
-          <div className="onboarding-progress-track h-1.5 overflow-hidden rounded-uv-red9ab892c5 bg-uv-c687589579d in-span-2:block in-span-2:h-full in-span-2:rounded-uv-r3e26d67509 in-span-2:bg-current in-span-2:transition-width-180ms-ease motion-reduce:in-span-2:transition-none">
+          <div className="onboarding-progress-track h-1.5 overflow-hidden rounded-exact-999px bg-uv-c687589579d in-span-2:block in-span-2:h-full in-span-2:rounded-exact-inherit in-span-2:bg-current in-span-2:transition-width-180ms-ease motion-reduce:in-span-2:transition-none">
             <span style={{ width: (step / ONBOARDING_STEP_COUNT) * 100 + "%" }} />
           </div>
         </div>
 
         {step === 1 ? (
           <div className="onboarding-step grid gap-1p25rem">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.welcomeEyebrow")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.welcomeEyebrow")}</p>
             <h1>{t("onboarding.welcomeTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.welcomeBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.welcomeBody")}</p>
             <fieldset className="onboarding-options grid gap-0p75rem border-0 p-0 m-0 in-legend:margin-bottom-0p75rem in-legend:font-bold">
               <legend>{t("onboarding.uiLanguage")}</legend>
               {(["en", "fa"] as UiLocale[]).map((value) => (
                 <button
                   key={value}
                   type="button"
-                  className={"onboarding-option w-full min-h-16 border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex items-center justify-between gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 in-small:block in-small:margin-top-0p2rem in-small:text-uv-c7dbd63a13e " + (selectedLocale === value ? "is-selected" : "")}
+                  className={"onboarding-option w-full min-h-16 border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex items-center justify-between gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 in-small:block in-small:margin-top-0p2rem in-small:text-uv-c7dbd63a13e " + (selectedLocale === value ? "is-selected" : "")}
                   onClick={() => setSelectedLocale(value)}
                   aria-pressed={selectedLocale === value}
                 >
@@ -137,7 +137,7 @@ export function OnboardingWizard({
               ))}
             </fieldset>
             <button
-              className="button button-primary onboarding-continue w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto justify-self-end in-button-danger:border-current min-height-tap-target"
+              className="button button-primary onboarding-continue w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto justify-self-end in-button-danger:border-current min-height-tap-target"
               type="button"
               disabled={pending}
               onClick={() =>
@@ -157,15 +157,15 @@ export function OnboardingWizard({
 
         {step === 2 ? (
           <div className="onboarding-step grid gap-1p25rem">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.courseEyebrow")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.courseEyebrow")}</p>
             <h1>{t("onboarding.courseTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.courseBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.courseBody")}</p>
             <div className="onboarding-options grid gap-0p75rem border-0 p-0 m-0 in-legend:margin-bottom-0p75rem in-legend:font-bold">
               {enabledLanguages.map((language) => (
                 <button
                   key={language}
                   type="button"
-                  className={"onboarding-option w-full min-h-16 border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex items-center justify-between gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 in-small:block in-small:margin-top-0p2rem in-small:text-uv-c7dbd63a13e " + (selectedLanguage === language ? "is-selected" : "")}
+                  className={"onboarding-option w-full min-h-16 border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex items-center justify-between gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 in-small:block in-small:margin-top-0p2rem in-small:text-uv-c7dbd63a13e " + (selectedLanguage === language ? "is-selected" : "")}
                   onClick={() => setSelectedLanguage(language)}
                   aria-pressed={selectedLanguage === language}
                 >
@@ -195,15 +195,15 @@ export function OnboardingWizard({
 
         {step === 3 ? (
           <div className="onboarding-step grid gap-1p25rem">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.currentEyebrow")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.currentEyebrow")}</p>
             <h1>{t("onboarding.currentTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.currentBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.currentBody")}</p>
             <div className="onboarding-level-grid grid gap-0p75rem border-0 p-0 m-0 grid-template-columns-repeat-2-minmax-0-1fr uv-max640:grid-template-columns-1fr">
               {CEFR_LEVELS.map((level) => (
                 <button
                   key={level}
                   type="button"
-                  className={"onboarding-level w-full min-h-16 border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 items-start justify-start in-strong-2:min-width-2p25rem in-strong-2:text-uv-f24126b21bc in-span:text-uv-c7dbd63a13e in-span:line-height-1p35 " + (selectedCurrent === level ? "is-selected" : "")}
+                  className={"onboarding-level w-full min-h-16 border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 items-start justify-start in-strong-2:min-width-2p25rem in-strong-2:text-exact-1p1rem in-span:text-uv-c7dbd63a13e in-span:line-height-1p35 " + (selectedCurrent === level ? "is-selected" : "")}
                   onClick={() => {
                     setSelectedCurrent(level);
                     if (CEFR_RANK[selectedTarget] < CEFR_RANK[level]) setSelectedTarget(level);
@@ -228,15 +228,15 @@ export function OnboardingWizard({
 
         {step === 4 ? (
           <div className="onboarding-step grid gap-1p25rem">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.targetEyebrow")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.targetEyebrow")}</p>
             <h1>{t("onboarding.targetTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.targetBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.targetBody")}</p>
             <div className="onboarding-level-grid grid gap-0p75rem border-0 p-0 m-0 grid-template-columns-repeat-2-minmax-0-1fr uv-max640:grid-template-columns-1fr">
               {validTargets.map((level) => (
                 <button
                   key={level}
                   type="button"
-                  className={"onboarding-level w-full min-h-16 border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 items-start justify-start in-strong-2:min-width-2p25rem in-strong-2:text-uv-f24126b21bc in-span:text-uv-c7dbd63a13e in-span:line-height-1p35 " + (selectedTarget === level ? "is-selected" : "")}
+                  className={"onboarding-level w-full min-h-16 border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 items-start justify-start in-strong-2:min-width-2p25rem in-strong-2:text-exact-1p1rem in-span:text-uv-c7dbd63a13e in-span:line-height-1p35 " + (selectedTarget === level ? "is-selected" : "")}
                   onClick={() => setSelectedTarget(level)}
                   aria-pressed={selectedTarget === level}
                 >
@@ -257,9 +257,9 @@ export function OnboardingWizard({
 
         {step === 5 ? (
           <div className="onboarding-step grid gap-1p25rem">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.explanationEyebrow")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.explanationEyebrow")}</p>
             <h1>{t("onboarding.explanationTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.explanationBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.explanationBody")}</p>
             <div className="onboarding-options grid gap-0p75rem border-0 p-0 m-0 in-legend:margin-bottom-0p75rem in-legend:font-bold">
               {([
                 ["ENGLISH", t("common.english")],
@@ -269,7 +269,7 @@ export function OnboardingWizard({
                 <button
                   key={value}
                   type="button"
-                  className={"onboarding-option w-full min-h-16 border-1px-solid-border-2 rounded-uv-rd65225386d bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex items-center justify-between gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 in-small:block in-small:margin-top-0p2rem in-small:text-uv-c7dbd63a13e " + (selectedExplanation === value ? "is-selected" : "")}
+                  className={"onboarding-option w-full min-h-16 border-1px-solid-border-2 rounded-exact-14px bg-uv-surface text-inherit text-start padding-0p9rem-1rem flex items-center justify-between gap-1rem cursor-pointer hover:border-uv-c57ff151414 focus-visible:border-uv-c57ff151414 in-is-selected:border-uv-c57ff151414 in-small:block in-small:margin-top-0p2rem in-small:text-uv-c7dbd63a13e " + (selectedExplanation === value ? "is-selected" : "")}
                   onClick={() => setSelectedExplanation(value)}
                   aria-pressed={selectedExplanation === value}
                 >
@@ -290,9 +290,9 @@ export function OnboardingWizard({
 
         {step === 6 ? (
           <div className="onboarding-step grid gap-1p25rem">
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.loopEyebrow")}</p>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.loopEyebrow")}</p>
             <h1>{t("onboarding.loopTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.loopBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.loopBody")}</p>
             <div className="onboarding-loop grid gap-0p65rem">
               <LoopItem icon={<Plus size={20} />} number="1" text={t("onboarding.loop.add")} />
               <LoopItem icon={<BookOpen size={20} />} number="2" text={t("onboarding.loop.learn")} />
@@ -312,12 +312,12 @@ export function OnboardingWizard({
 
         {step === 7 ? (
           <div className="onboarding-step onboarding-finish grid gap-1p25rem text-start">
-            <div className="onboarding-finish-icon display-inline-grid place-items-center w-10 h-10 rounded-uv-r0939007802 bg-uv-c687589579d"><MessageCircle size={24} /></div>
-            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-uv-f78eb7000a9 letter-spacing-0p12em font-semibold">{t("onboarding.readyEyebrow")}</p>
+            <div className="onboarding-finish-icon display-inline-grid place-items-center w-10 h-10 rounded-exact-12px bg-uv-c687589579d"><MessageCircle size={24} /></div>
+            <p className="eyebrow text-uv-text-muted m-0 font-font-geist-mono-geist-mono-monospace text-exact-0p68rem letter-spacing-0p12em font-semibold">{t("onboarding.readyEyebrow")}</p>
             <h1>{t("onboarding.readyTitle")}</h1>
-            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-uv-fde89c2b680 line-height-1p65">{t("onboarding.readyBody")}</p>
+            <p className="page-description m-0 max-w-uv-74487d394e text-uv-text-soft text-exact-0p98rem line-height-1p65">{t("onboarding.readyBody")}</p>
             <button
-              className="button button-primary onboarding-continue w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto justify-self-end in-button-danger:border-current min-height-tap-target"
+              className="button button-primary onboarding-continue w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto justify-self-end in-button-danger:border-current min-height-tap-target"
               type="button"
               disabled={pending}
               onClick={() => run(completeOnboarding)}
@@ -325,13 +325,13 @@ export function OnboardingWizard({
               <Plus size={18} />
               {t("onboarding.addFirstWord")}
             </button>
-            <button className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="button" disabled={pending} onClick={back}>
+            <button className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" type="button" disabled={pending} onClick={back}>
               {t("common.back")}
             </button>
           </div>
         ) : null}
 
-        {error ? <p className="status-notice error flex items-start gap-2.5 padding-13px-14px border-1px-solid-border-2 rounded-uv-rd65225386d text-uv-f9601fe81a7 line-height-1p5" role="alert">{error}</p> : null}
+        {error ? <p className="status-notice error flex items-start gap-2.5 padding-13px-14px border-1px-solid-border-2 rounded-exact-14px text-exact-0p86rem line-height-1p5" role="alert">{error}</p> : null}
       </section>
     </main>
   );
@@ -352,10 +352,10 @@ function OnboardingControls({
 }) {
   return (
     <div className="onboarding-controls flex justify-between gap-0p75rem">
-      <button type="button" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={back} disabled={pending}>
+      <button type="button" className="button button-secondary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text in-button-primary:text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised bg-uv-surface-raised in-button-secondary:border-uv-border border-uv-border in-button-secondary:text-uv-text text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={back} disabled={pending}>
         {backLabel}
       </button>
-      <button type="button" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={next} disabled={pending}>
+      <button type="button" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target" onClick={next} disabled={pending}>
         {nextLabel}
       </button>
     </div>
@@ -373,7 +373,7 @@ function LoopItem({
 }) {
   return (
     <div className="onboarding-loop-item grid grid-template-columns-auto-auto-1fr items-center gap-0p75rem padding-0p8rem-0 border-1px-solid-border last:border-0-3">
-      <span className="onboarding-loop-icon display-inline-grid place-items-center w-10 h-10 rounded-uv-r0939007802 bg-uv-c687589579d">{icon}</span>
+      <span className="onboarding-loop-icon display-inline-grid place-items-center w-10 h-10 rounded-exact-12px bg-uv-c687589579d">{icon}</span>
       <span className="onboarding-loop-number text-uv-c7dbd63a13e font-tabular-nums">{number}</span>
       <strong>{text}</strong>
     </div>

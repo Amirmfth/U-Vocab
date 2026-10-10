@@ -43,11 +43,11 @@ function PracticeHub({ t, userId }: { t: Translator; userId: string }) {
                   ? "conversation"
                   : "drill";
           return (
-            <Link key={destination.href} href={destination.href} className="practice-lane min-h-35 flex flex-col items-center justify-center gap-3 p-3.5 border-1px-solid-border-2 rounded-uv-r6d27d54c6c bg-uv-surface">
-              <span className="practice-lane-icon w-14.5 h-14.5 grid place-items-center border-1px-solid-border-2 rounded-uv-r157d8af993 bg-uv-surface-raised text-uv-primary-strong">
+            <Link key={destination.href} href={destination.href} className="practice-lane min-h-35 flex flex-col items-center justify-center gap-3 p-3.5 border-1px-solid-border-2 rounded-exact-18px bg-uv-surface">
+              <span className="practice-lane-icon w-14.5 h-14.5 grid place-items-center border-1px-solid-border-2 rounded-exact-17px bg-uv-surface-raised text-uv-primary-strong">
                 <AnimatedAppIcon name={icon} size={36} />
               </span>
-              <span className="practice-lane-copy min-w-0 flex flex-col items-center text-center in-strong-2:text-uv-f19feeb881c">
+              <span className="practice-lane-copy min-w-0 flex flex-col items-center text-center in-strong-2:text-exact-1rem">
                 <strong>{t(destination.labelKey)}</strong>
               </span>
             </Link>
@@ -71,8 +71,8 @@ export default async function PracticePage({
   if(!params.lexeme&&params.drill!=="1"&&!params.grammar) return <PracticeHub t={t} userId={user.id}/>;
 
   return <Suspense key={JSON.stringify(params)} fallback={<main className="page focus-page flex flex-col w-full max-w-uv-5dbc91eac8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6" aria-busy="true">
-    <div className="focus-meta flex justify-between items-center gap-3 min-h-10 text-uv-text-muted text-uv-fe9d5fd6635"><Link href="/practice">{t("nav.practice")}</Link></div>
-    <div className="skeleton loading-home-hero rounded-uv-r933cc73310 bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite min-h-51.25" aria-label={t("loading.surface", { surface: t("nav.practice") })} />
+    <div className="focus-meta flex justify-between items-center gap-3 min-h-10 text-uv-text-muted text-exact-0p78rem"><Link href="/practice">{t("nav.practice")}</Link></div>
+    <div className="skeleton loading-home-hero rounded-exact-10px bg-linear-gradient-90deg-hex-16161a-25pct-hex-202026-50pct-hex bg-200pct-100pct animation-shimmer-1p4s-infinite min-h-51.25" aria-label={t("loading.surface", { surface: t("nav.practice") })} />
   </main>}>
     <PracticeSession params={params} userId={user.id} t={t} />
   </Suspense>;
@@ -98,17 +98,17 @@ async function PracticeSession({ params, userId, t }: {
 
     if(!grammarExercises.length){
       return <main className="page focus-page flex flex-col w-full max-w-uv-5dbc91eac8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-        <section className="empty-state compact-empty flex flex-col gap-3 items-start border-1px-dashed-border-strong rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
+        <section className="empty-state compact-empty flex flex-col gap-3 items-start border-1px-dashed-border-strong rounded-exact-radius-lg text-uv-text-soft p-4.25">
           <strong>{t("practice.noGrammar")}</strong>
           <p className="muted text-uv-text-muted">{t("practice.noGrammarHelp")}</p>
-          <Link href="/grammar" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">{t("practice.chooseGrammar")}</Link>
+          <Link href="/grammar" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target">{t("practice.chooseGrammar")}</Link>
           <Link href="/practice" className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5">{t("practice.back")}</Link>
         </section>
       </main>;
     }
 
     return <main className="page focus-page flex flex-col w-full max-w-uv-5dbc91eac8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-      <div className="focus-meta flex justify-between items-center gap-3 min-h-10 text-uv-text-muted text-uv-fe9d5fd6635">
+      <div className="focus-meta flex justify-between items-center gap-3 min-h-10 text-uv-text-muted text-exact-0p78rem">
         <Link href="/grammar">{t("nav.grammar")}</Link>
         <span className={params.grammar==="1"?undefined:"learning-content"} lang={params.grammar==="1"?undefined:course.targetLanguage==="GERMAN"?"de":course.targetLanguage==="FRENCH"?"fr":"en"} dir={params.grammar==="1"?undefined:"ltr"}>{params.grammar==="1"?t("practice.recommended"):grammarExercises[0].lemma}</span>
       </div>
@@ -154,9 +154,9 @@ async function PracticeSession({ params, userId, t }: {
 
   if(!items.length){
     return <main className="page focus-page flex flex-col w-full max-w-uv-5dbc91eac8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-      <section className="empty-state compact-empty flex flex-col gap-3 items-start border-1px-dashed-border-strong rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
+      <section className="empty-state compact-empty flex flex-col gap-3 items-start border-1px-dashed-border-strong rounded-exact-radius-lg text-uv-text-soft p-4.25">
         <strong>{params.lexeme?t("practice.wordNotFound"):t("practice.addToStart")}</strong>
-        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"><Plus size={18}/>{t("nav.addWord")}</Link>:null}
+        {!params.lexeme?<Link href="/vocabulary/new" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"><Plus size={18}/>{t("nav.addWord")}</Link>:null}
         <Link href="/practice" className="text-link text-uv-primary-strong font-560 inline-flex items-center gap-1.5">{t("practice.back")}</Link>
       </section>
     </main>;
@@ -217,10 +217,10 @@ async function PracticeSession({ params, userId, t }: {
 
   if(!params.lexeme&&!exercises.length){
     return <main className="page focus-page flex flex-col w-full max-w-uv-5dbc91eac8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-      <section className="empty-state compact-empty flex flex-col gap-3 items-start border-1px-dashed-border-strong rounded-uv-r02a0a889dd text-uv-text-soft p-4.25">
+      <section className="empty-state compact-empty flex flex-col gap-3 items-start border-1px-dashed-border-strong rounded-exact-radius-lg text-uv-text-soft p-4.25">
         <strong>{t("practice.notEnoughChoices")}</strong>
         <p className="muted text-uv-text-muted">{t("practice.addMore")}</p>
-        <Link href="/vocabulary/new" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-uv-rd65225386d font-semibold text-uv-fee84419642 cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"><Plus size={18}/>{t("nav.addWord")}</Link>
+        <Link href="/vocabulary/new" className="button button-primary w-full inline-flex items-center justify-center gap-2.25 padding-0-16px border-1px-solid-transparent rounded-exact-14px font-semibold text-exact-0p9rem cursor-pointer transition-transform-150ms-ease-border-color-150ms-ease-backgro in-active-not-disabled:transform-scale-0p985 disabled:opacity-0p58 disabled:cursor-wait in-button-primary:bg-uv-text bg-uv-text in-button-primary:text-uv-cfcbfb23a40 text-uv-cfcbfb23a40 in-button-secondary:bg-uv-surface-raised in-button-secondary:border-uv-border in-button-secondary:text-uv-text in-button-success:bg-uv-success in-button-success:text-uv-c1667a9177b in-button-danger:bg-uv-danger in-button-danger:text-uv-cb667f4b109 uv-min940:w-auto in-button-danger:border-current min-height-tap-target"><Plus size={18}/>{t("nav.addWord")}</Link>
       </section>
     </main>;
   }
@@ -254,7 +254,7 @@ async function PracticeSession({ params, userId, t }: {
   }
 
   return <main className="page focus-page flex flex-col w-full max-w-uv-5dbc91eac8 gap-4.5 uv-min620:gap-5.5 uv-min940:gap-6">
-    <div className="focus-meta flex justify-between items-center gap-3 min-h-10 text-uv-text-muted text-uv-fe9d5fd6635">
+    <div className="focus-meta flex justify-between items-center gap-3 min-h-10 text-uv-text-muted text-exact-0p78rem">
       <Link href="/practice">{t("nav.practice")}</Link>
       <span className={params.lexeme?"learning-content":undefined} lang={params.lexeme?(course.targetLanguage==="GERMAN"?"de":course.targetLanguage==="FRENCH"?"fr":"en"):undefined} dir={params.lexeme?"ltr":undefined}>{params.lexeme?items[0].lexeme.lemma:t("practice.vocabulary")}</span>
     </div>

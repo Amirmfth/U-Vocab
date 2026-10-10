@@ -1,26 +1,27 @@
-name: Refine Tailwind utilities
+name: Fix Tailwind theme references
 on:
   push:
     branches: [issue-131-tailwind-migration]
 permissions:
   contents: write
 jobs:
-  refine:
-    if: "!contains(github.event.head_commit.message, 'refine generated Tailwind names')"
+  fix:
+    if: "!contains(github.event.head_commit.message, 'fix generated theme references')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
       - run: npm ci
-      - name: Generate readable utilities and breakpoint variants
+      - name: Fix token references
         run: |
-          node scripts/refine-tailwind-utilities.mjs
+          node scripts/fix-tailwind-theme-classes.mjs
           git diff --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "refactor(ui): refine generated Tailwind names"
+          git commit -m "fix(ui): fix generated theme references"
           git push
